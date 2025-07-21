@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="d82cad0577174e79bedad5dabd15d27a" Name="Diagram1" ZoomLevel="42" >
+        <EntityTypeShape EntityType="Model1.Rol" Width="1.5" PointX="8.625" PointY="9.75" FillColor="Green" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.User" Width="1.5" PointX="10" PointY="6.375" FillColor="Green" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Permission" Width="1.5" PointX="3.75" PointY="9.75" FillColor="Green" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Form" Width="1.5" PointX="6.5" PointY="13.125" FillColor="Green" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.ModuleForm" Width="1.5" PointX="9.125" PointY="12.875" FillColor="Green" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Module" Width="1.5" PointX="11.25" PointY="12.875" FillColor="Green" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Log" Width="1.5" PointX="16.75" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Contract" Width="1.5" PointX="14.25" PointY="4.125" />
+        <EntityTypeShape EntityType="Model1.RolFormPermission" Width="1.5" PointX="6.25" PointY="9.75" FillColor="Green" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Zone" Width="1.5" PointX="14.375" PointY="4.875" />
+        <EntityTypeShape EntityType="Model1.RolUser" Width="1.5" PointX="10.5" PointY="9.75" FillColor="Green" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Calculation" Width="1.5" PointX="20.375" PointY="8.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Person" Width="1.5" PointX="10.625" PointY="1.875" FillColor="ForestGreen" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Company" Width="1.5" PointX="6.5" PointY="0.625" FillColor="128, 128, 255" IsExpanded="false" />
+        <EntityTypeShape EntityType="Model1.Notification" Width="1.5" PointX="7.625" PointY="6.125" FillColor="128, 128, 255" />
+        <EntityTypeShape EntityType="Model1.SystemParameter" Width="1.5" PointX="18.5" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Departament" Width="1.5" PointX="11" PointY="0.625" IsExpanded="false" FillColor="128, 255, 128" />
+        <EntityTypeShape EntityType="Model1.City" Width="1.5" PointX="9" PointY="0.625" FillColor="128, 255, 128" IsExpanded="false" />
+        <EntityTypeShape EntityType="Model1.MonthlyPayment" Width="1.5" PointX="14.625" PointY="8.75" />
+        <AssociationConnector Association="Model1.CityCompany" />
+        <AssociationConnector Association="Model1.DepartamentCity" />
+        <AssociationConnector Association="Model1.CityPerson" />
+        <AssociationConnector Association="Model1.PersonUser" />
+        <AssociationConnector Association="Model1.UserNotification" />
+        <AssociationConnector Association="Model1.UserRolUser" />
+        <AssociationConnector Association="Model1.RolRolUser" />
+        <AssociationConnector Association="Model1.RolRolFormPermission" />
+        <AssociationConnector Association="Model1.FormRolFormPermission" />
+        <AssociationConnector Association="Model1.PermissionRolFormPermission" />
+        <AssociationConnector Association="Model1.FormModuleForm" />
+        <AssociationConnector Association="Model1.ModuleModuleForm" />
+        <EntityTypeShape EntityType="Model1.Appointment" Width="1.5" PointX="12" PointY="6.25" IsExpanded="true" />
+        <AssociationConnector Association="Model1.ContractMonthlyPayment" />
+        <EntityTypeShape EntityType="Model1.ContractTemplate" Width="1.5" PointX="16.75" PointY="4.875" />
+        <AssociationConnector Association="Model1.ContractTemplateContract" />
+        <EntityTypeShape EntityType="Model1.Image" Width="1.5" PointX="19.25" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Base" Width="1.5" PointX="23.5" PointY="2.625" />
+        <EntityTypeShape EntityType="Model1.Establishment" Width="1.5" PointX="16.125" PointY="0.5" />
+        <EntityTypeShape EntityType="Model1.Plaza" Width="1.5" PointX="13.25" PointY="0.5" IsExpanded="true" />
+        <AssociationConnector Association="Model1.PlazaEstablishment" />
+        <AssociationConnector Association="Model1.EstablishmentImage" />
+        <AssociationConnector Association="Model1.EstablishmentContract" />
+        <AssociationConnector Association="Model1.PersonContract" />
+        <AssociationConnector Association="Model1.PersonAppointment" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
