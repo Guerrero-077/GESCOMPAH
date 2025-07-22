@@ -4,22 +4,22 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="9801f22eec2e4da2bebb24b5f99286af" Name="Diagram1" ZoomLevel="48" >
-        <EntityTypeShape EntityType="Model1.Rol" Width="1.5" PointX="2.875" PointY="8.375" FillColor="Green" />
+      <Diagram DiagramId="9801f22eec2e4da2bebb24b5f99286af" Name="Diagram1" ZoomLevel="79" >
+        <EntityTypeShape EntityType="Model1.Rol" Width="1.5" PointX="3.375" PointY="8" FillColor="Green" />
         <EntityTypeShape EntityType="Model1.User" Width="1.5" PointX="5.375" PointY="5.75" FillColor="Green" />
-        <EntityTypeShape EntityType="Model1.Permission" Width="1.5" PointX="0.5" PointY="13" FillColor="Green" />
-        <EntityTypeShape EntityType="Model1.Form" Width="1.5" PointX="2.375" PointY="12" FillColor="Green" />
-        <EntityTypeShape EntityType="Model1.ModuleForm" Width="1.5" PointX="4.5" PointY="12" FillColor="Green" />
-        <EntityTypeShape EntityType="Model1.Module" Width="1.5" PointX="6.5" PointY="12" FillColor="Green" />
-        <EntityTypeShape EntityType="Model1.Log" Width="1.5" PointX="8.375" PointY="8.75" />
+        <EntityTypeShape EntityType="Model1.Permission" Width="1.5" PointX="0.5" PointY="11.25" FillColor="Green" />
+        <EntityTypeShape EntityType="Model1.Form" Width="1.5" PointX="2.5" PointY="11" FillColor="Green" />
+        <EntityTypeShape EntityType="Model1.ModuleForm" Width="1.5" PointX="4.5" PointY="11.75" FillColor="Green" />
+        <EntityTypeShape EntityType="Model1.Module" Width="1.5" PointX="6.625" PointY="11.625" FillColor="Green" />
+        <EntityTypeShape EntityType="Model1.Log" Width="1.5" PointX="12.75" PointY="6.125" />
         <EntityTypeShape EntityType="Model1.Contract" Width="1.5" PointX="9.5" PointY="0.625" />
-        <EntityTypeShape EntityType="Model1.RolFormPermission" Width="1.5" PointX="0.5" PointY="8.375" FillColor="Green" />
-        <EntityTypeShape EntityType="Model1.RolUser" Width="1.5" PointX="5.375" PointY="9.375" FillColor="Green" />
+        <EntityTypeShape EntityType="Model1.RolFormPermission" Width="1.5" PointX="0.5" PointY="7.875" FillColor="Green" />
+        <EntityTypeShape EntityType="Model1.RolUser" Width="1.5" PointX="5.375" PointY="9" FillColor="Green" />
         <EntityTypeShape EntityType="Model1.Calculation" Width="1.5" PointX="19.75" PointY="0.5" />
-        <EntityTypeShape EntityType="Model1.Person" Width="1.5" PointX="2.75" PointY="4" FillColor="ForestGreen" />
+        <EntityTypeShape EntityType="Model1.Person" Width="1.5" PointX="2" PointY="4.25" FillColor="ForestGreen" />
         <EntityTypeShape EntityType="Model1.Company" Width="1.5" PointX="0.5" PointY="0.5" FillColor="128, 128, 255" />
         <EntityTypeShape EntityType="Model1.Notification" Width="1.5" PointX="7.875" PointY="5.625" FillColor="128, 128, 255" />
-        <EntityTypeShape EntityType="Model1.SystemParameter" Width="1.5" PointX="11.375" PointY="6.25" />
+        <EntityTypeShape EntityType="Model1.SystemParameter" Width="1.5" PointX="10.5" PointY="6" />
         <EntityTypeShape EntityType="Model1.Departament" Width="1.5" PointX="5.125" PointY="0.5" FillColor="128, 255, 128" />
         <EntityTypeShape EntityType="Model1.City" Width="1.5" PointX="3" PointY="0.5" FillColor="128, 255, 128" />
         <EntityTypeShape EntityType="Model1.Appointment" Width="1.5" PointX="14.75" PointY="5.375" />
@@ -32,7 +32,8 @@
         <AssociationConnector Association="Model1.UserNotification" />
         <AssociationConnector Association="Model1.UserRolUser" />
         <AssociationConnector Association="Model1.PermissionRolFormPermission" />
-        <AssociationConnector Association="Model1.FormRolFormPermission" />
+        <AssociationConnector Association="Model1.FormRolFormPermission" ManuallyRouted="false" >
+        </AssociationConnector>
         <AssociationConnector Association="Model1.FormModuleForm" />
         <AssociationConnector Association="Model1.ModuleModuleForm" />
         <AssociationConnector Association="Model1.PersonContract" />

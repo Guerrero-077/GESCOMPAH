@@ -2,6 +2,7 @@
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.Persons;
 using Entity.DTOs.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Mapster;
 
 namespace Business.Mapping

@@ -1,12 +1,10 @@
 ﻿namespace Entity.DTOs.Implements.AdministrationSystem
 {
-    public class FormDto
+    public class MenuModuleDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string? Route { get; set; }
-        //public List<MenuModuleDto> Modules { get; set; }
-        public IEnumerable<string> Permissions { get; set; } = [];
+        public IEnumerable<FormDto> Forms { get; set; } = [];
     }
 }

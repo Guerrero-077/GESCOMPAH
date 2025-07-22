@@ -1,4 +1,4 @@
-﻿using Entity.DTOs.Implements.SecurityAuthentication;
+﻿using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using FluentValidation;
 
 namespace Entity.DTOs.Validations
@@ -26,7 +26,7 @@ namespace Entity.DTOs.Validations
                     .NotEmpty().WithMessage("El apellido es obligatorio.")
                     .MaximumLength(50).WithMessage("El apellido no puede exceder los 50 caracteres.");
 
-                RuleFor(x => x.Identification)
+                RuleFor(x => x.Document)
                     .NotEmpty().WithMessage("La identificación es obligatoria.")
                     .MaximumLength(20).WithMessage("La identificación no puede exceder los 20 caracteres.");
 

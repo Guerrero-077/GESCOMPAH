@@ -1,13 +1,14 @@
 ﻿using Business.Interfaces;
 using Business.Interfaces.Implements;
+using Common.Custom;
 using Data.Interfaz.IDataImplemenent;
-using Data.Services;
 using Entity.DTOs.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Utilities.Custom;
 using Utilities.Exceptions;
 
 namespace WebGESCOMPAH.Controllers
@@ -20,7 +21,6 @@ namespace WebGESCOMPAH.Controllers
         //private readonly IToken _token;
         private readonly ILogger<AuthController> _logger;
         private readonly IAuthService _authService;
-        private readonly EncriptePassword _utilities;
         private readonly IToken _token;
         private readonly IDepartmentService _departmentService;
         private readonly ICityService _cityService;
@@ -29,12 +29,18 @@ namespace WebGESCOMPAH.Controllers
         private readonly IMapper _mapper;
 
 
-        public AuthController(EncriptePassword utilities, ILogger<AuthController> logger, EncriptePassword utilidades,
-            IAuthService authService, IToken token, IDepartmentService departmentService, ICityService cityService, IConfiguration configuration, IUserRepository userData, IMapper mapper)
+        public AuthController(
+            ILogger<AuthController> logger, 
+            IAuthService authService, 
+            IToken token, 
+            IDepartmentService departmentService, 
+            ICityService cityService, 
+            IConfiguration configuration, 
+            IUserRepository userData, 
+            IMapper mapper)
         {
 
             _logger = logger;
-            _utilities = utilities;
             _authService = authService;
             _token = token;
             _departmentService = departmentService;
@@ -112,32 +118,20 @@ namespace WebGESCOMPAH.Controllers
             }
         }
 
-
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var userIdClaim = User.FindFirst("Id")?.Value;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (userIdClaim is null || !int.TryParse(userIdClaim, out var userId))
-                return Unauthorized("Claim 'Id' no encontrada o inválida");
+            if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized("El token no contiene un Claim 'sub' (NameIdentifier) válido o no es un GUID.");
 
-            // ✅ Ya incluye Person y Roles
-            var user = await _userData.GetByIdAsync(userId);
+            var currentUserDto = await _authService.BuildUserContextAsync(userId);
 
-            if (user is null)
-                return NotFound("Usuario no encontrado");
-
-            var dto = _mapper.Map<UserDto>(user);
-
-            // ✅ Extraer roles del usuario
-            dto.Roles = user.RolUsers
-                .Where(ru => ru.Rol != null)
-                .Select(ru => ru.Rol.Name)
-                .ToList();
-
-            return Ok(dto);
+            return Ok(currentUserDto);
         }
+
 
 
 

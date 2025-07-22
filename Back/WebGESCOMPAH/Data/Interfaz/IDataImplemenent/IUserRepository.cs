@@ -1,6 +1,6 @@
 ﻿using Data.Interfaz.DataBasic;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
-using Entity.DTOs.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 
 namespace Data.Interfaz.IDataImplemenent
 {

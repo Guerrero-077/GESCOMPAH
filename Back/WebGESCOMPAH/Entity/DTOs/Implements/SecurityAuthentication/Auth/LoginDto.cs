@@ -1,4 +1,4 @@
-﻿namespace Entity.DTOs.Implements.SecurityAuthentication
+﻿namespace Entity.DTOs.Implements.SecurityAuthentication.Auth
 {
     public class LoginDto
     {

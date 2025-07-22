@@ -1,4 +1,6 @@
 ﻿using Entity.DTOs.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 
 namespace Business.Interfaces.Implements
 {
@@ -7,5 +9,6 @@ namespace Business.Interfaces.Implements
         Task<UserDto> RegisterAsync(RegisterDto dto);
         Task RequestPasswordResetAsync(string email);   
         Task ResetPasswordAsync(ConfirmResetDto dto);
+        Task<UserMeDto> BuildUserContextAsync(int userId);
     }
 }

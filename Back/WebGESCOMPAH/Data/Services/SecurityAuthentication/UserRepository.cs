@@ -1,11 +1,11 @@
 ﻿using Data.Interfaz.IDataImplemenent;
 using Data.Repository;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
-using Entity.DTOs.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Services
+namespace Data.Services.SecurityAuthentication
 {
     public class UserRepository : DataGeneric<User>, IUserRepository
     {
@@ -29,9 +29,9 @@ namespace Data.Services
             var user = await _dbSet
                 .FirstOrDefaultAsync(u =>
                             u.Email == loginDto.Email &&
-                            u.Password == (loginDto.Password));
+                            u.Password == loginDto.Password);
 
-            suceeded = (user != null) ? true : throw new UnauthorizedAccessException("Credenciales inválidas");
+            suceeded = user != null ? true : throw new UnauthorizedAccessException("Credenciales inválidas");
 
             return user;
         }

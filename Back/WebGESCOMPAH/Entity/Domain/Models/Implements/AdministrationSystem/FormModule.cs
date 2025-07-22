@@ -2,7 +2,7 @@
 
 namespace Entity.Domain.Models.Implements.AdministrationSystem
 {
-    public class FormModule : BaseModelGeneric
+    public class FormModule : BaseModel
     {
         public int FormId { get; set; }
         public Form Form { get; set; } = null!;

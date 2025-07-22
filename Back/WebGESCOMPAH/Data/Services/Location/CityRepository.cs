@@ -4,7 +4,7 @@ using Entity.Domain.Models.Implements.Location;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Services
+namespace Data.Services.Location
 {
     public class CityRepository : DataGeneric<City>, ICityRepository
     {

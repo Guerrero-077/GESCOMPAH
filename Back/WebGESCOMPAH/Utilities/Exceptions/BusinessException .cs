@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Utilities.Exceptions
+﻿namespace Utilities.Exceptions
 {
     /// <summary>
     /// Excepción base para todos los errores relacionados con la capa de negocio.

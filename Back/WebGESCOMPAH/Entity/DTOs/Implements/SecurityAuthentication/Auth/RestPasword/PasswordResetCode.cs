@@ -1,6 +1,6 @@
 ﻿using Entity.Domain.Models.ModelBase;
 
-namespace Entity.DTOs.Implements.SecurityAuthentication
+namespace Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword
 {
     public class PasswordResetCode : BaseModel
     {

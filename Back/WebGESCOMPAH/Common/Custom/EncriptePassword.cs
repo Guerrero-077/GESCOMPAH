@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Utilities.Custom
+namespace Common.Custom
 {
-    public class EncriptePassword
+    public static class EncriptePassword
     {
-       public string EncripteSHA256(string text)
+       public static string EncripteSHA256(string text)
         {
             // Computar el hash 
             using (SHA256 sha256Hash = SHA256.Create())

@@ -1,7 +1,7 @@
 ﻿using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
-using Entity.DTOs.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 

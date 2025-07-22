@@ -4,7 +4,7 @@ using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Services
+namespace Data.Services.SecurityAuthentication
 {
     public class RolUserRepository : DataGeneric<RolUser>, IRolUserRepository
     {

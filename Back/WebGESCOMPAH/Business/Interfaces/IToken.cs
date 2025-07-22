@@ -1,4 +1,4 @@
-﻿using Entity.DTOs.Implements.SecurityAuthentication;
+﻿using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 
 namespace Business.Interfaces
 {

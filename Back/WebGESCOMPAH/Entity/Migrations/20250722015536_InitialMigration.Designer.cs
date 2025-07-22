@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250721060212_InitalMigration")]
-    partial class InitalMigration
+    [Migration("20250722015536_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Entity.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Entity.DTOs.Implements.SecurityAuthentication.PasswordResetCode", b =>
+            modelBuilder.Entity("Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword.PasswordResetCode", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,6 +93,38 @@ namespace Entity.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Forms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Gestión de usuarios",
+                            IsDeleted = false,
+                            Name = "Usuarios",
+                            Route = "/admin/users"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Gestión de roles",
+                            IsDeleted = false,
+                            Name = "Roles",
+                            Route = "/admin/roles"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Gestión de locales",
+                            IsDeleted = false,
+                            Name = "Locales",
+                            Route = "/locales"
+                        });
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.AdministrationSystem.FormModule", b =>
@@ -109,10 +141,6 @@ namespace Entity.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("FormId")
                         .HasColumnType("int");
 
@@ -122,10 +150,6 @@ namespace Entity.Migrations
                     b.Property<int>("ModuleId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("FormId");
@@ -133,6 +157,35 @@ namespace Entity.Migrations
                     b.HasIndex("ModuleId");
 
                     b.ToTable("FormModules");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 1,
+                            IsDeleted = false,
+                            ModuleId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 2,
+                            IsDeleted = false,
+                            ModuleId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 3,
+                            IsDeleted = false,
+                            ModuleId = 2
+                        });
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.AdministrationSystem.Module", b =>
@@ -167,6 +220,28 @@ namespace Entity.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Modules");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Módulo de gestión administrativa",
+                            Icon = "shield-lock",
+                            IsDeleted = false,
+                            Name = "Administración"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Módulo de gestión de locales municipales",
+                            Icon = "store-front",
+                            IsDeleted = false,
+                            Name = "Locales"
+                        });
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>
@@ -906,6 +981,44 @@ namespace Entity.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Permissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Permite ver registros",
+                            IsDeleted = false,
+                            Name = "Ver"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Permite crear registros",
+                            IsDeleted = false,
+                            Name = "Crear"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Permite editar registros",
+                            IsDeleted = false,
+                            Name = "Editar"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Permite eliminar registros",
+                            IsDeleted = false,
+                            Name = "Eliminar"
+                        });
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.SecurityAuthentication.Rol", b =>
@@ -993,6 +1106,128 @@ namespace Entity.Migrations
                     b.HasIndex("RolId");
 
                     b.ToTable("RolFormPermissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 1,
+                            IsDeleted = false,
+                            PermissionId = 1,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 1,
+                            IsDeleted = false,
+                            PermissionId = 2,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 1,
+                            IsDeleted = false,
+                            PermissionId = 3,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 1,
+                            IsDeleted = false,
+                            PermissionId = 4,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 2,
+                            IsDeleted = false,
+                            PermissionId = 1,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 2,
+                            IsDeleted = false,
+                            PermissionId = 2,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 2,
+                            IsDeleted = false,
+                            PermissionId = 3,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 2,
+                            IsDeleted = false,
+                            PermissionId = 4,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 3,
+                            IsDeleted = false,
+                            PermissionId = 1,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 3,
+                            IsDeleted = false,
+                            PermissionId = 2,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 3,
+                            IsDeleted = false,
+                            PermissionId = 3,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 3,
+                            IsDeleted = false,
+                            PermissionId = 4,
+                            RolId = 1
+                        });
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.SecurityAuthentication.RolUser", b =>
@@ -1081,7 +1316,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gescomph.com",
                             IsDeleted = false,
-                            Password = "admin123",
+                            Password = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
                             PersonId = 1
                         });
                 });

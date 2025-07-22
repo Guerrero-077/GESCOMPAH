@@ -1,5 +1,5 @@
 ﻿using Data.Interfaz.DataBasic;
-using Entity.DTOs.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 
 namespace Data.Interfaz.IDataImplemenent
 {

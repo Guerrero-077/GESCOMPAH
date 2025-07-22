@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Implements.SecurityAuthentication
+namespace Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword
 {
     public class ConfirmResetDto
     {

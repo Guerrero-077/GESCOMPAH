@@ -1,10 +1,10 @@
 ﻿using Data.Interfaz.IDataImplemenent;
 using Data.Repository;
-using Entity.DTOs.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Services
+namespace Data.Services.SecurityAuthentication
 {
     public class PasswordResetCodeRepository : DataGeneric<PasswordResetCode>, IPasswordResetCodeRepository
     {
