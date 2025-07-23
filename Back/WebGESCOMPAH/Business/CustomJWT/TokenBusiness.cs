@@ -1,7 +1,8 @@
 ﻿using Business.Interfaces;
-using Common.Custom;
 using Data.Interfaz.IDataImplemenent;
+using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,38 +11,46 @@ using System.Text;
 
 namespace Business.CustomJWT
     {
-        public class TokenBusiness : IToken
+    public class TokenBusiness : IToken
+    {
+        private readonly IConfiguration _configuration;
+        private readonly IUserRepository _userRepository;
+        private readonly IRolUserRepository _rolUserRepository;
+
+        public TokenBusiness(IConfiguration configuration, IUserRepository userRepository, IRolUserRepository rolUserRepository)
         {
+            _configuration = configuration;
+            _userRepository = userRepository;
+            _rolUserRepository = rolUserRepository;
+        }
 
-            private readonly IConfiguration _configuration;
-            private readonly IUserRepository _userData;
-            private readonly IRolUserRepository _rolUserData;
-            public TokenBusiness(IConfiguration configuration, IUserRepository userData, IRolUserRepository rolUserData)
-            {
-                _configuration = configuration;
-                _userData = userData;
-                _rolUserData = rolUserData;
-
-            }
         public async Task<string> GenerateToken(LoginDto dto)
         {
-            dto.Password = EncriptePassword.EncripteSHA256(dto.Password);
-            var user = await _userData.LoginUser(dto);
+            // 1. Buscar el usuario por email
+            var user = await _userRepository.GetByEmailAsync(dto.Email)
+                ?? throw new UnauthorizedAccessException("Usuario o contraseña inválida.");
 
-            if (user == null)
+            // 2. Verificar la contraseña usando el hash
+            var hasher = new PasswordHasher<User>();
+            var result = hasher.VerifyHashedPassword(user, user.Password, dto.Password);
+
+            if (result == PasswordVerificationResult.Failed)
                 throw new UnauthorizedAccessException("Usuario o contraseña inválida.");
 
-            var roles = await _rolUserData.GetRolesByUserIdAsync(user.Id);
+            // 3. Obtener roles del usuario
+            var roles = await _rolUserRepository.GetRolesByUserIdAsync(user.Id);
 
+            // 4. Generar claims
             var userClaims = new List<Claim>
-    {
-        new Claim("Id", user.Id.ToString()), // opcional
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // estándar
-        new Claim(ClaimTypes.Email, dto.Email!)
-    };
+        {
+            new Claim("Id", user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email)
+        };
 
             userClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
 
+            // 5. Crear token JWT
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -53,9 +62,6 @@ namespace Business.CustomJWT
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-
-
-
     }
+
 }

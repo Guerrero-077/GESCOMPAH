@@ -1,5 +1,4 @@
 ﻿using Business.Interfaces.Implements;
-using Common.Custom;
 using Data.Interfaz.IDataImplemenent;
 using Data.Interfaz.Security;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -11,6 +10,7 @@ using Entity.DTOs.Implements.SecurityAuthentication.User;
 using Entity.DTOs.Interfaces;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Utilities.Exceptions;
 using Utilities.Messaging.Interfaces;
@@ -53,34 +53,36 @@ namespace Business.Services
         {
             try
             {
+                // Validar entrada (FluentValidation u otra)
                 await _validator.ValidateAsync(dto);
-                // Validar que el correo no esté registrado
+
+                // Validar existencia de email
                 if (await _userRepository.ExistsByEmailAsync(dto.Email))
-                    throw new Exception("Correo ya registrado");
+                    throw new BusinessException("El correo ya está registrado.");
 
                 // Mapear DTO a entidades
                 var person = _mapper.Map<Entity.Domain.Models.Implements.Persons.Person>(dto);
                 var user = _mapper.Map<User>(dto);
 
-                // Encriptar contraseña
-                user.Password = EncriptePassword.EncripteSHA256(user.Password);
+                // Encriptar contraseña de forma segura
+                var hasher = new PasswordHasher<User>();
+                user.Password = hasher.HashPassword(user, dto.Password);
 
-                // Asignar relación
+                // Relación con persona
                 user.Person = person;
 
-
-                // Guardar usuario
+                // Persistir usuario
                 await _userRepository.AddAsync(user);
 
                 // Asignar rol por defecto
                 await _rolUserData.AsignateRolDefault(user);
 
-                // Recuperar el usuario con sus relaciones para el mapeo correcto
-                var createduser = await _userRepository.GetByIdAsync(user.Id);
-                if (createduser == null)
-                    throw new BusinessException("Error interno: el usuario no pudo ser recuperado tras la creación.");
+                // Recuperar el usuario con sus relaciones
+                var createdUser = await _userRepository.GetByIdAsync(user.Id);
+                if (createdUser is null)
+                    throw new BusinessException("Error interno: no se pudo recuperar el usuario tras registrarlo.");
 
-                return _mapper.Map<UserDto>(createduser);
+                return _mapper.Map<UserDto>(createdUser);
             }
             catch (Exception ex)
             {
@@ -116,7 +118,10 @@ namespace Business.Services
             var user = await _userRepository.GetByEmailAsync(dto.Email)
                 ?? throw new ValidationException("Usuario no encontrado");
 
-            user.Password = EncriptePassword.EncripteSHA256(dto.NewPassword);
+            var hasher = new PasswordHasher<User>();
+            user.Password = hasher.HashPassword(user, dto.NewPassword);
+
+            //user.Password = EncriptePassword.EncripteSHA256(dto.NewPassword);
             await _userRepository.UpdateAsync(user);
 
             record.IsUsed = true;

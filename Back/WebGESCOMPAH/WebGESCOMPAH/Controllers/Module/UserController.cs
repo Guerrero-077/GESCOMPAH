@@ -1,9 +1,13 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebGESCOMPAH.Extensions.User;
 
 namespace WebGESCOMPAH.Controllers.Module
 {
+    [ApiController]
+    [Authorize]
+    [Route("api/v1/[controller]")]
     public class UserController : Controller
     {
         private readonly IMediator _mediator;

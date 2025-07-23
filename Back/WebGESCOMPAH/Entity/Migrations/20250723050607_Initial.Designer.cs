@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250722154956_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250723050607_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -301,7 +301,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -310,7 +310,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 2,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -319,7 +319,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 3,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -328,7 +328,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 4,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -337,7 +337,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 5,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -346,7 +346,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 6,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -355,7 +355,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 7,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -364,7 +364,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 8,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -373,7 +373,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 9,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -382,7 +382,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 10,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -391,7 +391,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 11,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -400,7 +400,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 12,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -409,7 +409,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 13,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -418,7 +418,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 14,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -427,7 +427,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 15,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -436,7 +436,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 16,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -445,7 +445,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 17,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -454,7 +454,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 18,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -463,7 +463,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 19,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -472,7 +472,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 20,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -481,7 +481,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 21,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -490,7 +490,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 22,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -499,7 +499,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 23,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -508,7 +508,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 24,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -517,7 +517,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 25,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -526,7 +526,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 26,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -535,7 +535,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 27,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -544,7 +544,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 28,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -553,7 +553,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 29,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -562,7 +562,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 30,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -571,7 +571,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 31,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -580,7 +580,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 32,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -589,7 +589,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 33,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -598,7 +598,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 34,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -607,7 +607,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 35,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -616,7 +616,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 36,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -625,7 +625,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 37,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DepartmentId = 17,
                             IsDeleted = false,
@@ -666,7 +666,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 1,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Amazonas"
@@ -674,7 +674,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 2,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Antioquia"
@@ -682,7 +682,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 3,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Arauca"
@@ -690,7 +690,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 4,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Atlántico"
@@ -698,7 +698,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 5,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Bolívar"
@@ -706,7 +706,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 6,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Boyacá"
@@ -714,7 +714,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 7,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Caldas"
@@ -722,7 +722,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 8,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Caquetá"
@@ -730,7 +730,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 9,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Casanare"
@@ -738,7 +738,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 10,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Cauca"
@@ -746,7 +746,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 11,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Cesar"
@@ -754,7 +754,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 12,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Chocó"
@@ -762,7 +762,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 13,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Córdoba"
@@ -770,7 +770,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 14,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Cundinamarca"
@@ -778,7 +778,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 15,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Guainía"
@@ -786,7 +786,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 16,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Guaviare"
@@ -794,7 +794,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 17,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Huila"
@@ -802,7 +802,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 18,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "La Guajira"
@@ -810,7 +810,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 19,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Magdalena"
@@ -818,7 +818,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 20,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Meta"
@@ -826,7 +826,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 21,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Nariño"
@@ -834,7 +834,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 22,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Norte de Santander"
@@ -842,7 +842,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 23,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Putumayo"
@@ -850,7 +850,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 24,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Quindío"
@@ -858,7 +858,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 25,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Risaralda"
@@ -866,7 +866,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 26,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "San Andrés y Providencia"
@@ -874,7 +874,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 27,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Santander"
@@ -882,7 +882,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 28,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Sucre"
@@ -890,7 +890,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 29,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Tolima"
@@ -898,7 +898,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 30,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Valle del Cauca"
@@ -906,7 +906,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 31,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Vaupés"
@@ -914,7 +914,7 @@ namespace Entity.Migrations
                         new
                         {
                             Id = 32,
-                            Active = false,
+                            Active = true,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             Name = "Vichada"
@@ -1381,7 +1381,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gescomph.com",
                             IsDeleted = false,
-                            Password = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+                            Password = "AQAAAAEAACcQAAAAEK1QvWufDHBzB3acG5GKxdQTabH8BhbyLLyyZHo4WoOEvRYijXcOtRqsb3OeOpoGqw==",
                             PersonId = 1
                         });
                 });

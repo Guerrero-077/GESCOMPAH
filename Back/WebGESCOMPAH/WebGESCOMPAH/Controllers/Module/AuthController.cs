@@ -1,6 +1,8 @@
 ﻿using Business.CQRS.Auth.Commands.Login;
+using Business.CQRS.Auth.Commands.RecuperarContraseña;
 using Business.CQRS.Auth.Commands.Register;
 using Business.CQRS.Auth.Query.Me;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +49,30 @@ public class AuthController : ControllerBase
 
         return Ok(new { isSuccess = true, token, message = "Login exitoso" });
     }
+
+
+    //Revisar
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ConfirmResetDto dto)
+    {
+        var command = new ResetPasswordCommand(dto);
+        await _mediator.Send(command);
+        return NoContent(); // 204 si fue exitoso
+    }
+
+    [HttpPost("recuperar/enviar-codigo")]
+    public async Task<IActionResult> EnviarCodigoAsync([FromBody] RequestResetDto dto)
+    {
+        var command = new RequestPasswordResetCommand(dto);
+        await _mediator.Send(command);
+
+        return Ok(new
+        {
+            isSuccess = true,
+            message = "Código enviado al correo (si el email es válido)"
+        });
+    }
+
 
     [Authorize]
     [HttpGet("Me")]

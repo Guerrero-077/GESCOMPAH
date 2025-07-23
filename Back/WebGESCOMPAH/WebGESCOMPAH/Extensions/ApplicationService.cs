@@ -3,7 +3,6 @@ using Business.Interfaces;
 using Business.Interfaces.Implements;
 using Business.Mapping;
 using Business.Services;
-using Common.Custom;
 using Data.Interfaz.DataBasic;
 using Data.Interfaz.IDataImplemenent;
 using Data.Interfaz.Security;
@@ -33,7 +32,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IUserService, UserService>();
-
+            services.AddScoped<IRolService, RolService>();
 
             //Mapping
             services.AddMapster();
