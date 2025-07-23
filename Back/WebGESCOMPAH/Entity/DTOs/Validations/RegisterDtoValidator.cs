@@ -30,7 +30,7 @@ namespace Entity.DTOs.Validations
                     .NotEmpty().WithMessage("La identificación es obligatoria.")
                     .MaximumLength(20).WithMessage("La identificación no puede exceder los 20 caracteres.");
 
-                RuleFor(x => x.PhoneNumber)
+                RuleFor(x => x.Phone)
                     .NotEmpty().WithMessage("El número de teléfono es obligatorio.")
                     .Matches(@"^\+?\d{7,15}$").WithMessage("El número de teléfono no tiene un formato válido.");
 

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entity.Domain.Models.ModelBase;
 
 namespace Entity.Domain.Models.Implements.Utilities
 {
-    internal class Images
+    public class Images: BaseModel
     {
+        public string FileName { get; set; } = null!;
+        public string FilePath { get; set; } = null!;
+
     }
 }

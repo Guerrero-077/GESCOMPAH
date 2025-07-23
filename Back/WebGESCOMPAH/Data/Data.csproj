@@ -26,7 +26,6 @@
   <ItemGroup>
     <Folder Include="Services\AdministratiosSystem\" />
     <Folder Include="Services\Business\" />
-    <Folder Include="Services\Persons\" />
   </ItemGroup>
 
 </Project>

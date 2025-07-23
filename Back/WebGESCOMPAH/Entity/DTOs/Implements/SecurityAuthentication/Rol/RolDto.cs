@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.DTOs.Implements.Persons
+namespace Entity.DTOs.Implements.SecurityAuthentication.Rol
 {
-    internal class CompanyDto
+    internal class RolDto
     {
     }
 }

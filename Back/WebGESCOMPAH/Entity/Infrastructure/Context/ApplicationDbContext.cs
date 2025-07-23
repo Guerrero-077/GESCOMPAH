@@ -2,6 +2,7 @@
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
+using Entity.Infrastructure.Configurations.SecurityAuthentication;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -16,22 +17,29 @@ namespace Entity.Infrastructure.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.Entity<User>()
-             .HasOne(u => u.Person)
-             .WithOne(p => p.User)
-             .HasForeignKey<User>(u => u.PersonId)
-             .OnDelete(DeleteBehavior.Cascade); // o Restrict si no quieres borrado en cascada
+            //modelBuilder.Entity<User>()
+            // .HasOne(u => u.Person)
+            // .WithOne(p => p.User)
+            // .HasForeignKey<User>(u => u.PersonId)
+            // .OnDelete(DeleteBehavior.Cascade); // o Restrict si no quieres borrado en cascada
 
 
             //Data init
             base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+
+            // Apply configurations from the assembly where UserConfiguration is defined
+            //modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+
+
 
         }
 
         public DbSet<Person> Persons { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<Rol> Rols { get; set; }
+        public DbSet<Rol> Roles { get; set; }
         public DbSet<RolUser> RolUsers { get; set; }
         public DbSet<PasswordResetCode> PasswordResetCodes { get; set; }
         public DbSet<Permission> Permissions { get; set; }

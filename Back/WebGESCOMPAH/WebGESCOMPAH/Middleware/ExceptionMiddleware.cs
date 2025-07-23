@@ -1,95 +1,116 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 using Utilities.Exceptions;
+using ValidationException = FluentValidation.ValidationException;
 
-public class ExceptionMiddleware
+namespace ExceptionHandling
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionMiddleware> _logger;
-
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    public class ExceptionMiddleware
     {
-        _next = next;
-        _logger = logger;
-    }
+        private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly IHostEnvironment _env;
 
-    public async Task InvokeAsync(HttpContext context)
-    {
-        try
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment env)
         {
-            await _next(context);
+            _next = next;
+            _logger = logger;
+            _env = env;
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Excepción no manejada");
 
-            await HandleExceptionAsync(context, ex);
+        public async Task InvokeAsync(HttpContext context)
+        {
+            try
+            {
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Excepción no manejada en la ruta: {Path}", context.Request.Path);
+                await HandleExceptionAsync(context, ex);
+            }
         }
-    }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
-    {
-        context.Response.ContentType = "application/json";
-
-        var response = context.Response;
-        object result;
-
-        switch (exception)
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            case FluentValidation.ValidationException vex:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                result = new
-                {
-                    isSuccess = false,
-                    statusCode = 400,
-                    message = "Errores de validación.",
-                    errors = vex.Errors.Select(e => new
+            context.Response.ContentType = "application/json";
+            var response = context.Response;
+            object result;
+
+            switch (exception)
+            {
+                case ValidationException vex:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    result = new
                     {
-                        field = e.PropertyName,
-                        error = e.ErrorMessage
-                    })
-                };
-                break;
+                        isSuccess = false,
+                        statusCode = 400,
+                        message = "Errores de validación.",
+                        errors = vex.Errors.Select(e => new { field = e.PropertyName, error = e.ErrorMessage })
+                    };
+                    break;
 
-            case BusinessException bex:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                result = new
-                {
-                    isSuccess = false,
-                    statusCode = 400,
-                    message = bex.Message
-                };
-                break;
+                case BusinessException bex:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    result = new
+                    {
+                        isSuccess = false,
+                        statusCode = 400,
+                        message = bex.Message
+                    };
+                    break;
 
-            case UnauthorizedAccessException:
-                response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                result = new
-                {
-                    isSuccess = false,
-                    statusCode = 401,
-                    message = "Acceso no autorizado."
-                };
-                break;
+                case UnauthorizedAccessException:
+                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    result = new
+                    {
+                        isSuccess = false,
+                        statusCode = 401,
+                        message = "Acceso no autorizado."
+                    };
+                    break;
 
-            default:
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                result = new
-                {
-                    isSuccess = false,
-                    statusCode = 500,
-                    message = "Error interno del servidor.",
-                    detail = exception.Message
-                };
-                break;
+                case NotFoundException nf:
+                    response.StatusCode = (int)HttpStatusCode.NotFound;
+                    result = new
+                    {
+                        isSuccess = false,
+                        statusCode = 404,
+                        message = nf.Message
+                    };
+                    break;
+
+
+                default:
+                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    result = new
+                    {
+                        isSuccess = false,
+                        statusCode = 500,
+                        message = "Error interno del servidor.",
+                        detail = _env.IsDevelopment() ? exception.Message : null
+                    };
+                    break;
+            }
+
+            var json = JsonSerializer.Serialize(result, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            });
+
+            await context.Response.WriteAsync(json);
         }
+    }
 
-        var json = JsonSerializer.Serialize(result, new JsonSerializerOptions
+    public static class ExceptionMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseGlobalExceptionHandling(this IApplicationBuilder app)
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        });
-
-        await context.Response.WriteAsync(json);
+            return app.UseMiddleware<ExceptionMiddleware>();
+        }
     }
 }

@@ -48,12 +48,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Arriendo_Alcaldia.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Arriendo_Alcaldia1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Arriendo_Alcaldia.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EntityDeploy Include="Arriendo_Alcaldia.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Arriendo_Alcaldia.Designer.cs</LastGenOutput>
+      <LastGenOutput>Arriendo_Alcaldia1.Designer.cs</LastGenOutput>
     </EntityDeploy>
   </ItemGroup>
   <ItemGroup>

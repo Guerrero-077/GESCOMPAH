@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entity.Domain.Models.ModelBase;
 
 namespace Entity.Domain.Models.Implements.Utilities
 {
-    internal class Notification
+    public class Notification : BaseModel
     {
+        public enum TypeNotification
+        {
+            Information,
+            Warning,
+            Error,
+            Critical
+        }
+        public string Message { get; set; } = null!;
     }
 }

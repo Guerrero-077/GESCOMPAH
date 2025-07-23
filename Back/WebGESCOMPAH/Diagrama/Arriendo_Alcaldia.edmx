@@ -70,25 +70,9 @@
             <End Role="Module" EntitySet="Modules" />
             <End Role="ModuleForm" EntitySet="ModuleForms" />
           </AssociationSet>
-          <AssociationSet Name="PersonContract" Association="Model1.PersonContract">
-            <End Role="Person" EntitySet="PersonSet" />
-            <End Role="Contract" EntitySet="ContractSet" />
-          </AssociationSet>
           <AssociationSet Name="CityPerson" Association="Model1.CityPerson">
             <End Role="City" EntitySet="CitySet" />
             <End Role="Person" EntitySet="PersonSet" />
-          </AssociationSet>
-          <AssociationSet Name="CityCompany" Association="Model1.CityCompany">
-            <End Role="City" EntitySet="CitySet" />
-            <End Role="Company" EntitySet="Companys" />
-          </AssociationSet>
-          <AssociationSet Name="DepartamentCity" Association="Model1.DepartamentCity">
-            <End Role="Departament" EntitySet="DepartamentSet" />
-            <End Role="City" EntitySet="CitySet" />
-          </AssociationSet>
-          <AssociationSet Name="EstablishmentImage" Association="Model1.EstablishmentImage">
-            <End Role="Establishment" EntitySet="EstablishmentSet" />
-            <End Role="Image" EntitySet="ImageSet" />
           </AssociationSet>
           <AssociationSet Name="PlazaEstablishment" Association="Model1.PlazaEstablishment">
             <End Role="Plaza" EntitySet="PlazaSet" />
@@ -116,6 +100,22 @@
           <AssociationSet Name="EstablishmentAppointment" Association="Model1.EstablishmentAppointment">
             <End Role="Establishment" EntitySet="EstablishmentSet" />
             <End Role="Appointment" EntitySet="AppointmentSet" />
+          </AssociationSet>
+          <AssociationSet Name="EstablishmentImage" Association="Model1.EstablishmentImage">
+            <End Role="Establishment" EntitySet="EstablishmentSet" />
+            <End Role="Image" EntitySet="ImageSet" />
+          </AssociationSet>
+          <AssociationSet Name="DepartamentCity" Association="Model1.DepartamentCity">
+            <End Role="Departament" EntitySet="DepartamentSet" />
+            <End Role="City" EntitySet="CitySet" />
+          </AssociationSet>
+          <AssociationSet Name="CityCompany" Association="Model1.CityCompany">
+            <End Role="City" EntitySet="CitySet" />
+            <End Role="Company" EntitySet="Companys" />
+          </AssociationSet>
+          <AssociationSet Name="PersonContract" Association="Model1.PersonContract">
+            <End Role="Person" EntitySet="PersonSet" />
+            <End Role="Contract" EntitySet="ContractSet" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Rol">
@@ -211,15 +211,14 @@
           <Property Name="ContractNumber" Type="String" Nullable="false" />
           <Property Name="StartDate" Type="DateTime" Nullable="false" />
           <Property Name="EndDate" Type="DateTime" Nullable="false" />
-          <Property Name="CreationDate" Type="String" Nullable="false" />
           <Property Name="Status" Type="String" Nullable="false" />
           <Property Name="Destination" Type="String" Nullable="false" />
-          <Property Name="PersonId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Person" Relationship="Model1.PersonContract" FromRole="Contract" ToRole="Person" />
-          <Property Name="PDFFileRoute" Type="String" Nullable="false" />
+          <Property Name="PDFPath" Type="String" Nullable="false" />
           <NavigationProperty Name="ContractTerms" Relationship="Model1.ContractTermsContract" FromRole="Contract" ToRole="ContractTerms" />
           <NavigationProperty Name="ObligationMonths" Relationship="Model1.ContractObligationMonths" FromRole="Contract" ToRole="ObligationMonths" />
           <NavigationProperty Name="PremisesLeased" Relationship="Model1.ContractPremisesLeased" FromRole="Contract" ToRole="PremisesLeased" />
+          <NavigationProperty Name="Person" Relationship="Model1.PersonContract" FromRole="Contract" ToRole="Person" />
+          <Property Name="PersonId" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="RolFormPermission">
           <Key>
@@ -271,8 +270,8 @@
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <Property Name="CityId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="User" Relationship="Model1.PersonUser" FromRole="Person" ToRole="User" />
-          <NavigationProperty Name="Contract" Relationship="Model1.PersonContract" FromRole="Person" ToRole="Contract" />
           <NavigationProperty Name="City" Relationship="Model1.CityPerson" FromRole="Person" ToRole="City" />
+          <NavigationProperty Name="Contract" Relationship="Model1.PersonContract" FromRole="Person" ToRole="Contract" />
         </EntityType>
         <EntityType Name="Company">
           <Key>
@@ -285,6 +284,7 @@
           <Property Name="Status" Type="String" Nullable="false" />
           <Property Name="CityId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="City" Relationship="Model1.CityCompany" FromRole="Company" ToRole="City" />
+          <Property Name="CityId1" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Notification">
           <Key>
@@ -294,8 +294,6 @@
           <Property Name="Type" Type="String" Nullable="false" />
           <Property Name="Message" Type="String" Nullable="false" />
           <Property Name="Status" Type="String" Nullable="false" />
-          <Property Name="CreatedDate" Type="String" Nullable="false" />
-          <Property Name="ReadDate" Type="String" Nullable="false" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="User" Relationship="Model1.UserNotification" FromRole="Notification" ToRole="User" />
         </EntityType>
@@ -327,8 +325,9 @@
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="DepartamentId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Person" Relationship="Model1.CityPerson" FromRole="City" ToRole="Person" />
-          <NavigationProperty Name="Company" Relationship="Model1.CityCompany" FromRole="City" ToRole="Company" />
           <NavigationProperty Name="Departament" Relationship="Model1.DepartamentCity" FromRole="City" ToRole="Departament" />
+          <Property Name="DepartamentId1" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Company" Relationship="Model1.CityCompany" FromRole="City" ToRole="Company" />
         </EntityType>
         <EntityType Name="Appointment">
           <Key>
@@ -352,9 +351,8 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="FileName" Type="String" Nullable="false" />
           <Property Name="FilePath" Type="String" Nullable="false" />
-          <Property Name="EstablishmentId" Type="Int32" Nullable="false" />
-          <Property Name="EstablishmentId1" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Establishment" Relationship="Model1.EstablishmentImage" FromRole="Image" ToRole="Establishment" />
+          <Property Name="EstablishmentId" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Establishment">
           <Key>
@@ -363,15 +361,14 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="Type" Type="String" Nullable="false" />
           <Property Name="AreaM2" Type="String" Nullable="false" />
           <Property Name="RentBaseValue" Type="String" Nullable="false" />
           <Property Name="Status" Type="String" Nullable="false" />
           <Property Name="PlazaId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Image" Relationship="Model1.EstablishmentImage" FromRole="Establishment" ToRole="Image" />
           <NavigationProperty Name="Plaza" Relationship="Model1.PlazaEstablishment" FromRole="Establishment" ToRole="Plaza" />
           <NavigationProperty Name="PremisesLeased" Relationship="Model1.EstablishmentPremisesLeased" FromRole="Establishment" ToRole="PremisesLeased" />
           <NavigationProperty Name="Appointment" Relationship="Model1.EstablishmentAppointment" FromRole="Establishment" ToRole="Appointment" />
+          <NavigationProperty Name="Image" Relationship="Model1.EstablishmentImage" FromRole="Establishment" ToRole="Image" />
         </EntityType>
         <EntityType Name="Plaza">
           <Key>
@@ -380,7 +377,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="Ubication" Type="String" Nullable="false" />
+          <Property Name="Location" Type="String" Nullable="false" />
           <Property Name="Capacity" Type="String" Nullable="false" />
           <Property Name="Status" Type="String" Nullable="false" />
           <NavigationProperty Name="Establishment" Relationship="Model1.PlazaEstablishment" FromRole="Plaza" ToRole="Establishment" />
@@ -485,18 +482,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="PersonContract">
-          <End Type="Model1.Person" Role="Person" Multiplicity="1" />
-          <End Type="Model1.Contract" Role="Contract" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Person">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Contract">
-              <PropertyRef Name="PersonId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="CityPerson">
           <End Type="Model1.City" Role="City" Multiplicity="1" />
           <End Type="Model1.Person" Role="Person" Multiplicity="*" />
@@ -506,42 +491,6 @@
             </Principal>
             <Dependent Role="Person">
               <PropertyRef Name="CityId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="CityCompany">
-          <End Type="Model1.City" Role="City" Multiplicity="1" />
-          <End Type="Model1.Company" Role="Company" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="City">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Company">
-              <PropertyRef Name="CityId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="DepartamentCity">
-          <End Type="Model1.Departament" Role="Departament" Multiplicity="1" />
-          <End Type="Model1.City" Role="City" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Departament">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="City">
-              <PropertyRef Name="DepartamentId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="EstablishmentImage">
-          <End Type="Model1.Establishment" Role="Establishment" Multiplicity="1" />
-          <End Type="Model1.Image" Role="Image" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Establishment">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Image">
-              <PropertyRef Name="EstablishmentId1" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -579,11 +528,10 @@
           <Property Name="IVA" Type="String" Nullable="false" />
           <Property Name="DaysMora" Type="String" Nullable="false" />
           <Property Name="ValueMora" Type="String" Nullable="false" />
-          <Property Name="CalculatedTotal" Type="String" Nullable="false" />
+          <Property Name="TotalValue" Type="String" Nullable="false" />
           <Property Name="PaymentNotifiedTenant" Type="String" Nullable="false" />
-          <Property Name="ValidatedAdministrator" Type="String" Nullable="false" />
-          <Property Name="ObservationPayment" Type="String" Nullable="false" />
-          <Property Name="DateGeneration" Type="String" Nullable="false" />
+          <Property Name="ValidatedAdmin" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" />
           <NavigationProperty Name="Contract" Relationship="Model1.ContractObligationMonths" FromRole="ObligationMonths" ToRole="Contract" />
           <Property Name="ContractId" Type="Int32" Nullable="false" />
         </EntityType>
@@ -646,6 +594,54 @@
             </Principal>
             <Dependent Role="Appointment">
               <PropertyRef Name="EstablishmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="EstablishmentImage">
+          <End Type="Model1.Establishment" Role="Establishment" Multiplicity="1" />
+          <End Type="Model1.Image" Role="Image" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Establishment">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Image">
+              <PropertyRef Name="EstablishmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DepartamentCity">
+          <End Type="Model1.Departament" Role="Departament" Multiplicity="1" />
+          <End Type="Model1.City" Role="City" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Departament">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="City">
+              <PropertyRef Name="DepartamentId1" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="CityCompany">
+          <End Type="Model1.City" Role="City" Multiplicity="1" />
+          <End Type="Model1.Company" Role="Company" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="City">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Company">
+              <PropertyRef Name="CityId1" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PersonContract">
+          <End Type="Model1.Person" Role="Person" Multiplicity="1" />
+          <End Type="Model1.Contract" Role="Contract" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Contract">
+              <PropertyRef Name="PersonId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>

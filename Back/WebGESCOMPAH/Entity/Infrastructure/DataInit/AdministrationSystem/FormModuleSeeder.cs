@@ -13,9 +13,30 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
 
             builder.HasData(
                 // Asignamos cada formulario a su módulo correspondiente
-                new FormModule { Id = 1, FormId = 1, ModuleId = 1,  IsDeleted = false, Active = true, CreatedAt = seedDate }, // Usuarios -> Administración
-                new FormModule { Id = 2, FormId = 2, ModuleId = 1,  IsDeleted = false, Active = true, CreatedAt = seedDate }, // Roles -> Administración
-                new FormModule { Id = 3, FormId = 3, ModuleId = 2, IsDeleted = false, Active = true, CreatedAt = seedDate }  // Locales -> Locales
+                new FormModule { 
+                    Id = 1, 
+                    FormId = 1, 
+                    ModuleId = 1,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                }, // Usuarios -> Administración
+                new FormModule { 
+                    Id = 2, 
+                    FormId = 2, 
+                    ModuleId = 1,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                }, // Roles -> Administración
+                new FormModule { 
+                    Id = 3, 
+                    FormId = 3, 
+                    ModuleId = 2,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                }  // Locales -> Locales
             );
         }
     }

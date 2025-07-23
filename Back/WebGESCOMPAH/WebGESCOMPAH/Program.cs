@@ -1,8 +1,9 @@
 ﻿
+using Business.CQRS.Auth.Commands.Login;
 using Entity.DTOs.Interfaces;
 using Entity.DTOs.Services;
-using Entity.DTOs.Validations;
 using Entity.DTOs.Validations.Entity.DTOs.Validators.SecurityAuthentication;
+using ExceptionHandling;
 using FluentValidation;
 using WebGESCOMPAH.Extensions;
 
@@ -32,6 +33,10 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssemblyContaining<LoginCommandHandler>());
+
+
 
 var app = builder.Build();
 
@@ -45,6 +50,9 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+
+
+app.UseGlobalExceptionHandling();// Errores globales
 
 app.UseAuthentication();// Usar autentificación de JWT
 

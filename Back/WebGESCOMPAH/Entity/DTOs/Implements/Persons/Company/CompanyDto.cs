@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entity.Domain.Models.Implements.Business
+namespace Entity.DTOs.Implements.Persons.Company
 {
-    internal class ContractTemplate
+    internal class CompanyDto
     {
     }
 }

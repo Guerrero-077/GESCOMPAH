@@ -70,26 +70,34 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Route")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Forms");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Forms", (string)null);
 
                     b.HasData(
                         new
@@ -136,7 +144,9 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("FormId")
                         .HasColumnType("int");
@@ -149,11 +159,12 @@ namespace Entity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FormId");
-
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("FormModules");
+                    b.HasIndex("FormId", "ModuleId")
+                        .IsUnique();
+
+                    b.ToTable("FormModules", (string)null);
 
                     b.HasData(
                         new
@@ -197,26 +208,34 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Icon")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Modules");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Modules", (string)null);
 
                     b.HasData(
                         new
@@ -263,13 +282,17 @@ namespace Entity.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("City");
+                    b.HasIndex("Name", "DepartmentId")
+                        .IsUnique();
+
+                    b.ToTable("Cities", (string)null);
 
                     b.HasData(
                         new
@@ -626,11 +649,15 @@ namespace Entity.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Department");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Departments", (string)null);
 
                     b.HasData(
                         new
@@ -903,36 +930,47 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("CityId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Document")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
 
-                    b.ToTable("Persons");
+                    b.HasIndex("Document")
+                        .IsUnique()
+                        .HasFilter("[Document] IS NOT NULL");
+
+                    b.ToTable("Persons", (string)null);
 
                     b.HasData(
                         new
@@ -962,22 +1000,29 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Permissions", (string)null);
 
                     b.HasData(
                         new
@@ -1030,22 +1075,29 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Rols");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -1080,7 +1132,9 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("FormId")
                         .HasColumnType("int");
@@ -1100,9 +1154,10 @@ namespace Entity.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.HasIndex("RolId");
+                    b.HasIndex("RolId", "FormId", "PermissionId")
+                        .IsUnique();
 
-                    b.ToTable("RolFormPermissions");
+                    b.ToTable("RolFormPermissions", (string)null);
 
                     b.HasData(
                         new
@@ -1239,7 +1294,9 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1254,9 +1311,10 @@ namespace Entity.Migrations
 
                     b.HasIndex("RolId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "RolId")
+                        .IsUnique();
 
-                    b.ToTable("RolUsers");
+                    b.ToTable("RolUsers", (string)null);
 
                     b.HasData(
                         new
@@ -1282,28 +1340,35 @@ namespace Entity.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("PersonId")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new
@@ -1323,13 +1388,13 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Domain.Models.Implements.AdministrationSystem.Form", "Form")
                         .WithMany("FormModules")
                         .HasForeignKey("FormId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Entity.Domain.Models.Implements.AdministrationSystem.Module", "Module")
                         .WithMany("FormModules")
                         .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Form");
@@ -1342,7 +1407,7 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Domain.Models.Implements.Location.Department", "Department")
                         .WithMany("Cities")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Department");
@@ -1353,7 +1418,7 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Domain.Models.Implements.Location.City", "City")
                         .WithMany("People")
                         .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("City");
@@ -1370,7 +1435,7 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Domain.Models.Implements.SecurityAuthentication.Permission", "Permission")
                         .WithMany("RolFormPermissions")
                         .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Entity.Domain.Models.Implements.SecurityAuthentication.Rol", "Rol")
@@ -1391,7 +1456,7 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Domain.Models.Implements.SecurityAuthentication.Rol", "Rol")
                         .WithMany("RolUsers")
                         .HasForeignKey("RolId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Entity.Domain.Models.Implements.SecurityAuthentication.User", "User")
@@ -1410,7 +1475,7 @@ namespace Entity.Migrations
                     b.HasOne("Entity.Domain.Models.Implements.Persons.Person", "Person")
                         .WithOne("User")
                         .HasForeignKey("Entity.Domain.Models.Implements.SecurityAuthentication.User", "PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Person");

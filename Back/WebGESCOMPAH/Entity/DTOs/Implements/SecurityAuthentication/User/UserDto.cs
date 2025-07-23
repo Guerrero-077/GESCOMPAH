@@ -1,6 +1,6 @@
-﻿using Entity.DTOs.Implements.Persons;
+﻿using Entity.DTOs.Implements.Persons.Peron;
 
-namespace Entity.DTOs.Implements.SecurityAuthentication
+namespace Entity.DTOs.Implements.SecurityAuthentication.User
 {
     public class UserDto
     {

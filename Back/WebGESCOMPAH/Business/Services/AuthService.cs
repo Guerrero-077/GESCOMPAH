@@ -2,13 +2,12 @@
 using Common.Custom;
 using Data.Interfaz.IDataImplemenent;
 using Data.Interfaz.Security;
-using Data.Services.SecurityAuthentication;
-using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.AdministrationSystem;
 using Entity.DTOs.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
+using Entity.DTOs.Implements.SecurityAuthentication.User;
 using Entity.DTOs.Interfaces;
 using Mapster;
 using MapsterMapper;

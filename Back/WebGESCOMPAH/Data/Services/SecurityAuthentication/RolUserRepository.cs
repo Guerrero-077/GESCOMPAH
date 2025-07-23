@@ -18,7 +18,7 @@ namespace Data.Services.SecurityAuthentication
             {
                 UserId = user.Id,
                 RolId = 2,
-
+                Active = true,
             };
 
             _context.RolUsers.Add(rolUser);

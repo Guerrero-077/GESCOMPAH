@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entity.Domain.Models.ModelBase;
 
 namespace Entity.Domain.Models.Implements.Business
 {
-    internal class Calculation
+    public class Calculation : BaseModel
     {
+        public enum Type {};
+        public string Formula { get; set; } = null!;
+        public string Description { get; set; } = null!;
+
     }
 }
