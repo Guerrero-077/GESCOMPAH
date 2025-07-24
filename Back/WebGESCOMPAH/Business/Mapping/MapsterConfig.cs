@@ -1,12 +1,17 @@
-﻿using Business.CQRS.Auth.Commands.Login;
+﻿using Business.CQRS.SecrutityAuthentication.Login;
 using Entity.Domain.Models.Implements.AdministrationSystem;
+using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
+using Entity.Domain.Models.Implements.Utilities;
 using Entity.DTOs.Implements.AdministrationSystem;
+using Entity.DTOs.Implements.Business.Establishment;
+using Entity.DTOs.Implements.Business.Plaza;
 using Entity.DTOs.Implements.Persons.Peron;
 using Entity.DTOs.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.User;
+using Entity.DTOs.Implements.Utilities;
 using Mapster;
 
 namespace Business.Mapping
@@ -33,6 +38,11 @@ namespace Business.Mapping
             // Map Person → PersonDto
             config.NewConfig<Person, PersonDto>();
 
+            // Map Plaza → PlazaSelectDto
+            config.NewConfig<Plaza, PlazaSelectDto>();
+
+
+
             // ---------------------------
             // Map LoginCommand → LoginDto
             // (útil para CQRS, aunque es herencia, queda explícito)
@@ -58,9 +68,20 @@ namespace Business.Mapping
             config.NewConfig<User, UserMeDto>()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.FullName, src => $"{src.Person.FirstName} {src.Person.LastName}")
-                .Map(dest => dest.Email, src => src.Email)
-                // Roles y Permissions asignados en handler manualmente
-                ;
+                .Map(dest => dest.Email, src => src.Email);
+
+            // Establishment → EstablishmentDto
+            config.NewConfig<Establishment, EstablishmentSelectDto>()
+                .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageDto>>());
+
+            // Images → ImageDto
+            config.NewConfig<Images, ImageDto>();
+
+            // EstablishmentCreateDto → Establishment (se ignoran las imágenes porque se manejan manualmente)
+            config.NewConfig<EstablishmentCreateDto, Establishment>()
+                .Ignore(dest => dest.Images);
+
+
 
             return config;
         }

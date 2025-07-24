@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.27.6" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
     <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
@@ -20,6 +21,34 @@
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Entity\Entity.csproj" />
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CQRS\AdministrationSystem\" />
+    <Folder Include="CQRS\Business\Plaza\Delete\" />
+    <Folder Include="CQRS\Location\Create\" />
+    <Folder Include="CQRS\Location\Delete\" />
+    <Folder Include="CQRS\Location\Select\" />
+    <Folder Include="CQRS\Location\Update\" />
+    <Folder Include="CQRS\Persons\Person\Create\" />
+    <Folder Include="CQRS\Persons\Person\Delete\" />
+    <Folder Include="CQRS\Persons\Person\Update\" />
+    <Folder Include="CQRS\SecrutityAuthentication\Me\Create\" />
+    <Folder Include="CQRS\SecrutityAuthentication\Me\Delete\" />
+    <Folder Include="CQRS\SecrutityAuthentication\Me\Select\" />
+    <Folder Include="CQRS\SecrutityAuthentication\Me\Update\" />
+    <Folder Include="CQRS\SecrutityAuthentication\Rol\Delete\" />
+    <Folder Include="CQRS\SecrutityAuthentication\Rol\Select\" />
+    <Folder Include="CQRS\SecrutityAuthentication\Rol\Update\" />
+    <Folder Include="CQRS\SecrutityAuthentication\User\Create\" />
+    <Folder Include="CQRS\SecrutityAuthentication\User\Delete\" />
+    <Folder Include="CQRS\SecrutityAuthentication\User\Select\" />
+    <Folder Include="CQRS\SecrutityAuthentication\User\Update\" />
+    <Folder Include="CQRS\Utilities\Create\" />
+    <Folder Include="CQRS\Utilities\Delete\" />
+    <Folder Include="CQRS\Utilities\Select\" />
+    <Folder Include="CQRS\Utilities\Update\" />
+    <Folder Include="Services\Utilities\" />
   </ItemGroup>
 
 </Project>

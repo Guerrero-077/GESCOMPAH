@@ -1,11 +1,11 @@
 ﻿namespace Business.Interfaces.IBusiness
 {
-    public interface IBusiness<TDto, TDtoGet>
+    public interface IBusiness<TDtoGet, TDtoCreate, TDtoUpdate>
     {
         Task<IEnumerable<TDtoGet>> GetAllAsync();
         Task<TDtoGet?> GetByIdAsync(int id);
-        Task<TDto> CreateAsync(TDto dto);
-        Task<bool> UpdateAsync(TDto dto);
+        Task<TDtoGet> CreateAsync(TDtoCreate dto);
+        Task<TDtoGet> UpdateAsync(TDtoUpdate dto);
         Task<bool> DeleteAsync(int id);
         Task<bool> DeleteLogicAsync(int id);
 

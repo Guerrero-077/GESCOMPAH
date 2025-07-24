@@ -260,6 +260,103 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<double>("AreaM2")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("RentValueBase")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Establishment");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Plaza", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("plaza");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            Capacity = 5000,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Espacio principal para eventos masivos",
+                            IsDeleted = false,
+                            Location = "Centro Ciudad",
+                            Name = "Plaza Central"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            Capacity = 3000,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Zona adecuada para ferias temporales",
+                            IsDeleted = false,
+                            Location = "Zona Norte",
+                            Name = "Plaza Norte"
+                        });
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>
                 {
                     b.Property<int>("Id")
@@ -1383,6 +1480,41 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Utilities.Images", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EstablishmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstablishmentId");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.AdministrationSystem.FormModule", b =>
                 {
                     b.HasOne("Entity.Domain.Models.Implements.AdministrationSystem.Form", "Form")
@@ -1481,6 +1613,17 @@ namespace Entity.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Utilities.Images", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Establishment", "Establishment")
+                        .WithMany("Images")
+                        .HasForeignKey("EstablishmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Establishment");
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.AdministrationSystem.Form", b =>
                 {
                     b.Navigation("FormModules");
@@ -1491,6 +1634,11 @@ namespace Entity.Migrations
             modelBuilder.Entity("Entity.Domain.Models.Implements.AdministrationSystem.Module", b =>
                 {
                     b.Navigation("FormModules");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>

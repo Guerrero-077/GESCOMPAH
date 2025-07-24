@@ -1,4 +1,5 @@
-﻿using Entity.Domain.Models.ModelBase;
+﻿using Entity.Domain.Models.Implements.Utilities;
+using Entity.Domain.Models.ModelBase;
 
 namespace Entity.Domain.Models.Implements.Business
 {
@@ -7,6 +8,6 @@ namespace Entity.Domain.Models.Implements.Business
         public Double AreaM2 { get; set; } // Area of the establishment in square meters
         public Double RentValueBase { get; set; } // Monthly rent value for the establishment
 
-
+        public List<Images> Images { get; set; } = new();
     }
 }

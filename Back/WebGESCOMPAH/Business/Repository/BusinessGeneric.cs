@@ -1,4 +1,5 @@
 ﻿using Data.Interfaz.DataBasic;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Entity.Domain.Models.ModelBase;
 using MapsterMapper;
 using Utilities.Exceptions;
@@ -6,7 +7,7 @@ using Utilities.Helpers.Business;
 
 namespace Business.Repository
 {
-    public class BusinessGeneric<TDto, TDtoGet, TEntity> : ABusinessGeneric<TDto, TDtoGet, TEntity> where TEntity : BaseModel
+    public class BusinessGeneric<TDtoGet, TDtoCreate, TDtoUpdate, TEntity> : ABusinessGeneric<TDtoGet, TDtoCreate, TDtoUpdate, TEntity> where TEntity : BaseModel
     {
         protected readonly IDataGeneric<TEntity> Data;
         protected readonly IMapper _mapper;
@@ -44,7 +45,7 @@ namespace Business.Repository
                 throw new BusinessException($"Error al obtener el registro con ID {id}.", ex);
             }
         }
-        public override async Task<TDto> CreateAsync(TDto dto)
+        public override async Task<TDtoGet> CreateAsync(TDtoCreate dto)
         {
             try
             {
@@ -54,27 +55,22 @@ namespace Business.Repository
                 entity.InitializeLogicalState(); // Inicializa estado lógico (is_deleted = false)
 
                 var created = await Data.AddAsync(entity);
-                return _mapper.Map<TDto>(created);
+                return _mapper.Map<TDtoGet>(created);
             }
             catch (Exception ex)
             {
                 throw new BusinessException("Error al crear el registro.", ex);
             }
         }
-        public override async Task<bool> UpdateAsync(TDto dto)
+        public override async Task<TDtoGet> UpdateAsync(TDtoUpdate dto)
         {
-            try
-            {
-                BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
+            BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
 
-                var entity = _mapper.Map<TEntity>(dto);
-                entity.InitializeLogicalState(); // Mantiene el estado en un update normal
-                return await Data.UpdateAsync(entity);
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"Error al actualizar el registro: {ex.Message}", ex);
-            }
+            var entity = _mapper.Map<TEntity>(dto);
+            entity.InitializeLogicalState();
+
+            var updated = await Data.UpdateAsync(entity);
+            return _mapper.Map<TDtoGet>(updated);
         }
 
         public override async Task<bool> DeleteAsync(int id)

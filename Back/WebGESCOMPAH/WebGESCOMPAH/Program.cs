@@ -1,5 +1,6 @@
-﻿
-using Business.CQRS.Auth.Commands.Login;
+﻿using Business.CQRS.SecrutityAuthentication.Login;
+using Business.Mapping;
+using CloudinaryDotNet;
 using Entity.DTOs.Interfaces;
 using Entity.DTOs.Services;
 using Entity.DTOs.Validations.Entity.DTOs.Validators.SecurityAuthentication;
@@ -9,57 +10,52 @@ using WebGESCOMPAH.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Add services to the container
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Cors
-
+// CORS, JWT, DB, Servicios personalizados
 builder.Services.AddCustomCors(builder.Configuration);
-
-//Jwt
 builder.Services.AddJwtAuthentication(builder.Configuration);
-
-//Services
-builder.Services.AddApplicationServices(); 
-
-
-//Database
+builder.Services.AddApplicationServices();
 builder.Services.AddDatabase(builder.Configuration);
 
+// Validaciones y CQRS
 builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<LoginCommandHandler>());
 
+// ✅ Configuración de Cloudinary como singleton
+var cloudinaryConfig = builder.Configuration.GetSection("Cloudinary");
+var cloudinary = new Cloudinary(new Account(
+    cloudinaryConfig["CloudName"],
+    cloudinaryConfig["ApiKey"],
+    cloudinaryConfig["ApiSecret"]
+));
+cloudinary.Api.Secure = true;
+builder.Services.AddSingleton(cloudinary);
 
+// Mapster config (si aplica aquí)
+MapsterConfig.Register();
 
+// Construcción de la app
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware y pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-
-
 app.UseHttpsRedirection();
-
-
-app.UseGlobalExceptionHandling();// Errores globales
-
-app.UseAuthentication();// Usar autentificación de JWT
-
+app.UseGlobalExceptionHandling();
+app.UseAuthentication();
 app.UseCors();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

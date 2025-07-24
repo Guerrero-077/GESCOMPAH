@@ -2,7 +2,10 @@
 using Business.Interfaces;
 using Business.Interfaces.Implements;
 using Business.Mapping;
-using Business.Services;
+using Business.Services.AdministrationSystem;
+using Business.Services.Business;
+using Business.Services.Location;
+using Business.Services.SecrutityAuthentication;
 using Data.Interfaz.DataBasic;
 using Data.Interfaz.IDataImplemenent;
 using Data.Interfaz.Security;
@@ -30,9 +33,12 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IPasswordResetCodeRepository, PasswordResetCodeRepository>();
             //services.AddScoped<EncriptePassword>();
             services.AddScoped<IAuthService, AuthService>();
+
+            //Services
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRolService, RolService>();
+            services.AddScoped<IPlazaService, PlazasService>();
 
             //Mapping
             services.AddMapster();
@@ -56,7 +62,7 @@ namespace WebGESCOMPAH.Extensions
             // JWT 
             services.AddScoped<IToken, TokenBusiness>();
 
-
+            services.AddScoped<IEstablishmentService, EstablishmentService>();
 
 
 
