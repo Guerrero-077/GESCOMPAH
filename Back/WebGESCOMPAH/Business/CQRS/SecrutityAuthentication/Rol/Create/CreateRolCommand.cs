@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Business.CQRS.SecrutityAuthentication.Rol.Create
 {
-    public class CreateRolCommand : IRequest<int> 
+    public class CreateRolCommand : IRequest<RolSelectDto> 
     {
         public RolDto Rol { get; set; }
 

@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements;
+﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using MediatR;
 
 namespace Business.CQRS.SecrutityAuthentication.RecuperarContraseña

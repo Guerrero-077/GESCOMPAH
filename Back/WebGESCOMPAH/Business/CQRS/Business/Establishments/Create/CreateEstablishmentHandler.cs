@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements;
+﻿using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.Establishment;
 using MediatR;
 

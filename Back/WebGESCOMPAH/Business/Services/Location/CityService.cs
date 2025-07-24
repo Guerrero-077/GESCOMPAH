@@ -1,9 +1,9 @@
-﻿using Business.Interfaces.Implements;
+﻿using Business.Interfaces.Implements.Location;
 using Business.Repository;
 using Data.Interfaz.DataBasic;
 using Data.Interfaz.IDataImplemenent;
 using Entity.Domain.Models.Implements.Location;
-using Entity.DTOs.Implements.Location.Select;
+using Entity.DTOs.Implements.Location.City;
 using MapsterMapper;
 
 namespace Business.Services.Location

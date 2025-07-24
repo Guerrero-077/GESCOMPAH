@@ -82,6 +82,7 @@ namespace Business.Mapping
                 .Ignore(dest => dest.Images);
 
 
+            config.NewConfig<Images, ImageSelectDto>();
 
             return config;
         }

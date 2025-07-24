@@ -1,4 +1,5 @@
-﻿using Business.CQRS.SecrutityAuthentication.Login;
+﻿using Business.CQRS.Behaviors;
+using Business.CQRS.SecrutityAuthentication.Login;
 using Business.Mapping;
 using CloudinaryDotNet;
 using Entity.DTOs.Interfaces;
@@ -6,6 +7,7 @@ using Entity.DTOs.Services;
 using Entity.DTOs.Validations.Entity.DTOs.Validators.SecurityAuthentication;
 using ExceptionHandling;
 using FluentValidation;
+using MediatR;
 using WebGESCOMPAH.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +39,7 @@ var cloudinary = new Cloudinary(new Account(
 ));
 cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
+
 
 // Mapster config (si aplica aquí)
 MapsterConfig.Register();

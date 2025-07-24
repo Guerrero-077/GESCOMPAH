@@ -2,6 +2,7 @@
 using Business.CQRS.Business.Establishments.Delete;
 using Business.CQRS.Business.Establishments.Select;
 using Business.CQRS.Business.Establishments.Update;
+using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.Establishment;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,11 @@ using Microsoft.AspNetCore.Mvc;
 public class EstablishmentsController : ControllerBase
 {
     private readonly IMediator _mediator;
-
-    public EstablishmentsController(IMediator mediator)
+    private readonly IEstablishmentService _establishmentService;
+    public EstablishmentsController(IMediator mediator, IEstablishmentService establishmentService)
     {
         _mediator = mediator;
+        _establishmentService = establishmentService;
     }
 
     [HttpGet]
@@ -40,7 +42,7 @@ public class EstablishmentsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    [HttpPut("Udate")]
+    [HttpPut("Update")]
     public async Task<IActionResult> Update([FromForm] EstablishmentUpdateDto dto)
     {
         var result = await _mediator.Send(new UpdateEstablishmentCommand(dto));
@@ -56,5 +58,13 @@ public class EstablishmentsController : ControllerBase
     }
 
 
-
+    /// <summary>
+    /// Elimina una imagen específica de un establecimiento
+    /// </summary>
+    [HttpDelete("{establishmentId}/images/{imageId}")]
+    public async Task<IActionResult> DeleteImage(int establishmentId, int imageId)
+    {
+        await _establishmentService.DeleteImageAsync(establishmentId, imageId);
+        return NoContent(); // 204
+    }
 }

@@ -1,9 +1,10 @@
-﻿using Business.Interfaces.Implements;
+﻿using Business.Interfaces.Implements.AdministrationSystem;
+using Entity.DTOs.Implements.SecurityAuthentication.Rol;
 using MediatR;
 
 namespace Business.CQRS.SecrutityAuthentication.Rol.Create
 {
-    public class CreateRolCommandHandler : IRequestHandler<CreateRolCommand, int>
+    public class CreateRolCommandHandler : IRequestHandler<CreateRolCommand, RolSelectDto>
     {
         private readonly IRolService _rolService;
 
@@ -12,9 +13,9 @@ namespace Business.CQRS.SecrutityAuthentication.Rol.Create
             _rolService = rolService;   
         }
 
-        public async Task<int> Handle(CreateRolCommand request, CancellationToken cancellationToken)
+        public async Task<RolSelectDto> Handle(CreateRolCommand request, CancellationToken cancellationToken)
         {
-            return await _rolService.CreateRolAsync(request.Rol);
+            return await _rolService.CreateAsync(request.Rol);
         }
     }
 }

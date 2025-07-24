@@ -1,5 +1,5 @@
 ﻿using Business.CQRS.Persons.Person.Select;
-using Business.Interfaces.Implements;
+using Business.Interfaces.Implements.Persons;
 using Entity.DTOs.Implements.Persons.Peron;
 using MediatR;
 
@@ -14,6 +14,6 @@ public class GetAllPersonsQueryHandler : IRequestHandler<GetAllPersonsQuery, IEn
 
     public async Task<IEnumerable<PersonSelectDto>> Handle(GetAllPersonsQuery request, CancellationToken cancellationToken)
     {
-        return await _personService.GetAllPersonAsync();
+        return await _personService.GetAllAsync();
     }
 }

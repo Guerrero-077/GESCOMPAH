@@ -3,8 +3,7 @@ using MediatR;
 
 namespace Business.CQRS.Business.Establishments.Create
 {
-    public record CreateEstablishmentCommand(EstablishmentCreateDto Dto)
-     : IRequest<EstablishmentSelectDto>;
+    public record CreateEstablishmentCommand(EstablishmentCreateDto Dto): IRequest<EstablishmentSelectDto>;
 
 
 }

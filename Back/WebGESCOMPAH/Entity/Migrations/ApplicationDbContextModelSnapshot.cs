@@ -294,6 +294,41 @@ namespace Entity.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Establishment");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            AreaM2 = 500.0,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Establecimiento amplio con excelente ubicación.",
+                            IsDeleted = false,
+                            Name = "Centro Comercial Primavera",
+                            RentValueBase = 2500.0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            AreaM2 = 120.0,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Oficina moderna en zona empresarial.",
+                            IsDeleted = false,
+                            Name = "Oficina Torre Norte",
+                            RentValueBase = 1500.0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            AreaM2 = 1000.0,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Espacio para almacenamiento de gran capacidad.",
+                            IsDeleted = false,
+                            Name = "Bodega Industrial Sur",
+                            RentValueBase = 3000.0
+                        });
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Plaza", b =>
@@ -1513,6 +1548,68 @@ namespace Entity.Migrations
                     b.HasIndex("EstablishmentId");
 
                     b.ToTable("Images");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EstablishmentId = 1,
+                            FileName = "primavera_1.jpg",
+                            FilePath = "https://cdn.app.com/establishments/primavera_1.jpg",
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EstablishmentId = 1,
+                            FileName = "primavera_2.jpg",
+                            FilePath = "https://cdn.app.com/establishments/primavera_2.jpg",
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EstablishmentId = 2,
+                            FileName = "torre_1.jpg",
+                            FilePath = "https://cdn.app.com/establishments/torre_1.jpg",
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EstablishmentId = 2,
+                            FileName = "torre_2.jpg",
+                            FilePath = "https://cdn.app.com/establishments/torre_2.jpg",
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EstablishmentId = 3,
+                            FileName = "bodega_1.jpg",
+                            FilePath = "https://cdn.app.com/establishments/bodega_1.jpg",
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EstablishmentId = 3,
+                            FileName = "bodega_2.jpg",
+                            FilePath = "https://cdn.app.com/establishments/bodega_2.jpg",
+                            IsDeleted = false
+                        });
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.AdministrationSystem.FormModule", b =>

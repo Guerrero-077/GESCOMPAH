@@ -1,74 +1,78 @@
-﻿using Business.Interfaces.Implements;
-using Business.Repository;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
-using Data.Interfaz.DataBasic;
-using Entity.Domain.Models.Implements.Business;
-using Entity.Domain.Models.Implements.Utilities;
-using Entity.DTOs.Implements.Business.Establishment;
-using MapsterMapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Utilities.Exceptions;
+﻿    using Business.Interfaces.Implements.Business;
+    using Business.Repository;
+    using CloudinaryDotNet;
+    using CloudinaryDotNet.Actions;
+    using Data.Interfaz.DataBasic;
+    using Entity.Domain.Models.Implements.Business;
+    using Entity.Domain.Models.Implements.Utilities;
+    using Entity.DTOs.Implements.Business.Establishment;
+    using MapsterMapper;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.EntityFrameworkCore;
+    using Utilities.Exceptions;
 
-public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, EstablishmentCreateDto, EstablishmentUpdateDto, Establishment>, IEstablishmentService
-{
-    private readonly IDataGeneric<Establishment> _repoEstablishment;
-    private readonly Cloudinary _cloudinary;
-
-    private const int MaxImageCount = 5;
-    private static readonly HashSet<string> AllowedContentTypes = new() { "image/jpeg", "image/png" };
-
-    public EstablishmentService(
-        IDataGeneric<Establishment> repoEstablishment,
-        IMapper mapper,
-        Cloudinary cloudinary) : base(repoEstablishment, mapper)
+    public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, EstablishmentCreateDto, EstablishmentUpdateDto, Establishment>, IEstablishmentService
     {
-        _repoEstablishment = repoEstablishment;
-        _cloudinary = cloudinary;
-    }
+        private readonly IDataGeneric<Establishment> _repoEstablishment;
+        private readonly Cloudinary _cloudinary;
 
-    public override async Task<IEnumerable<EstablishmentSelectDto>> GetAllAsync()
-    {
-        var establishments = await _repoEstablishment
-            .GetAllQueryable()
-            .Include(e => e.Images)
-            .Where(e => !e.IsDeleted)
-            .ToListAsync();
+        private const int MaxImageCount = 5;
+        private static readonly HashSet<string> AllowedContentTypes = new() { "image/jpeg", "image/png" };
 
-        return _mapper.Map<List<EstablishmentSelectDto>>(establishments);
-    }
-
-    public override async Task<EstablishmentSelectDto?> GetByIdAsync(int id)
-    {
-        var est = await _repoEstablishment
-            .GetAllQueryable()
-            .Include(e => e.Images)
-            .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
-
-        return est != null ? _mapper.Map<EstablishmentSelectDto>(est) : null;
-    }
-
-    public override async Task<EstablishmentSelectDto> CreateAsync(EstablishmentCreateDto dto)
-    {
-        try
+        public EstablishmentService(
+            IDataGeneric<Establishment> repoEstablishment,
+            IMapper mapper,
+            Cloudinary cloudinary) : base(repoEstablishment, mapper)
         {
-            var establishment = _mapper.Map<Establishment>(dto);
-            establishment.Images = await UploadImagesAsync(dto.Files);
-
-            await _repoEstablishment.AddAsync(establishment);
-            return _mapper.Map<EstablishmentSelectDto>(establishment);
+            _repoEstablishment = repoEstablishment;
+            _cloudinary = cloudinary;
         }
-        catch (BusinessException) { throw; }
-        catch (Exception ex)
+
+        public override async Task<IEnumerable<EstablishmentSelectDto>> GetAllAsync()
         {
-            throw new BusinessException("No se pudo crear el establecimiento.", ex);
-        }
-    }
+            var establishments = await _repoEstablishment
+                .GetAllQueryable()
+                .Include(e => e.Images)
+                .Where(e => !e.IsDeleted)
+                .ToListAsync();
 
-    public override async Task<EstablishmentSelectDto> UpdateAsync(EstablishmentUpdateDto dto)
-    {
-        try
+            return _mapper.Map<List<EstablishmentSelectDto>>(establishments);
+        }
+
+        public override async Task<EstablishmentSelectDto?> GetByIdAsync(int id)
+        {
+            var est = await _repoEstablishment
+                .GetAllQueryable()
+                .Include(e => e.Images)
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+
+            return est != null ? _mapper.Map<EstablishmentSelectDto>(est) : null;
+        }
+
+        public override async Task<EstablishmentSelectDto> CreateAsync(EstablishmentCreateDto dto)
+        {
+            try
+            {
+                var establishment = _mapper.Map<Establishment>(dto);
+                await _repoEstablishment.AddAsync(establishment);
+
+                // Subir imágenes después de tener el ID
+                if (dto.Files?.Count > 0)
+                {
+                    var images = await UploadImagesAsync(dto.Files, establishment.Id);
+                    establishment.Images.AddRange(images);
+                    await _repoEstablishment.UpdateAsync(establishment);
+                }
+
+                return _mapper.Map<EstablishmentSelectDto>(establishment);
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException("No se pudo crear el establecimiento.", ex);
+            }
+        }
+
+        public override async Task<EstablishmentSelectDto> UpdateAsync(EstablishmentUpdateDto dto)
         {
             var establishment = await _repoEstablishment
                 .GetAllQueryable()
@@ -78,33 +82,23 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
             if (establishment == null)
                 throw new BusinessException("Establecimiento no encontrado.");
 
-            _mapper.Map(dto, establishment); // Asegúrate de configurar bien el mapeo
+            _mapper.Map(dto, establishment);
 
+            // Adjunta imágenes nuevas sin eliminar todas las anteriores
             if (dto.Files?.Count > 0)
             {
-                var newImages = await UploadImagesAsync(dto.Files);
+                if (establishment.Images.Count + dto.Files.Count > MaxImageCount)
+                    throw new BusinessException($"Solo se permiten hasta {MaxImageCount} imágenes por establecimiento.");
 
-                foreach (var image in establishment.Images)
-                    await _cloudinary.DestroyAsync(new DeletionParams(image.FileName));
-
-                establishment.Images.Clear();
+                var newImages = await UploadImagesAsync(dto.Files, establishment.Id);
                 establishment.Images.AddRange(newImages);
             }
 
             await _repoEstablishment.UpdateAsync(establishment);
             return _mapper.Map<EstablishmentSelectDto>(establishment);
         }
-        catch (BusinessException) { throw; }
-        catch (Exception ex)
-        {
-            throw new BusinessException("No se pudo actualizar el establecimiento.", ex);
-        }
-    }
 
-
-    public async Task DeleteAsync(int id, bool forceDelete)
-    {
-        try
+        public async Task DeleteAsync(int id, bool forceDelete)
         {
             var establishment = await _repoEstablishment
                 .GetAllQueryable()
@@ -115,8 +109,11 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
             if (establishment == null || (!forceDelete && establishment.IsDeleted))
                 throw new BusinessException("Establecimiento no encontrado.");
 
+            // Eliminar imágenes de Cloudinary
             foreach (var image in establishment.Images)
+            {
                 await _cloudinary.DestroyAsync(new DeletionParams(image.FileName));
+            }
 
             var result = forceDelete
                 ? await _repoEstablishment.DeleteAsync(id)
@@ -125,25 +122,31 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
             if (!result)
                 throw new BusinessException("No se pudo eliminar el establecimiento.");
         }
-        catch (BusinessException) { throw; }
-        catch (Exception ex)
+
+        public async Task DeleteAsync(int establishmentId, int imageId)
         {
-            throw new BusinessException("Error al eliminar el establecimiento.", ex);
+            var establishment = await _repoEstablishment
+                .GetAllQueryable()
+                .Include(e => e.Images)
+                .FirstOrDefaultAsync(e => e.Id == establishmentId && !e.IsDeleted);
+
+            if (establishment == null)
+                throw new BusinessException("Establecimiento no encontrado.");
+
+            var image = establishment.Images.FirstOrDefault(i => i.Id == imageId);
+            if (image == null)
+                throw new BusinessException("Imagen no encontrada.");
+
+            await _cloudinary.DestroyAsync(new DeletionParams(image.FileName));
+
+            establishment.Images.Remove(image);
+            await _repoEstablishment.UpdateAsync(establishment);
         }
-    }
 
-    private async Task<List<Images>> UploadImagesAsync(ICollection<IFormFile>? files)
-    {
-        if (files == null || files.Count == 0)
-            return new List<Images>();
-
-        if (files.Count > MaxImageCount)
-            throw new BusinessException($"Solo se permiten hasta {MaxImageCount} imágenes por establecimiento.");
-
-        var uploadedImages = new List<(Images image, string publicId)>();
-
-        try
+        private async Task<List<Images>> UploadImagesAsync(ICollection<IFormFile> files, int establishmentId)
         {
+            var uploadedImages = new List<Images>();
+
             foreach (var file in files)
             {
                 if (file.Length == 0 || !AllowedContentTypes.Contains(file.ContentType))
@@ -151,11 +154,14 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
 
                 using var stream = file.OpenReadStream();
 
+                var publicId = $"img_{Guid.NewGuid()}";
+                var folder = $"establishments/{establishmentId}";
+
                 var uploadParams = new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
-                    Folder = "establishments",
-                    PublicId = $"establishment_{Guid.NewGuid()}"
+                    Folder = folder,
+                    PublicId = publicId
                 };
 
                 var result = await _cloudinary.UploadAsync(uploadParams);
@@ -163,24 +169,48 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
                 if (result.Error != null)
                     throw new BusinessException($"Cloudinary error: {result.Error.Message}");
 
-                uploadedImages.Add((
-                    new Images
-                    {
-                        FileName = result.PublicId,
-                        FilePath = result.SecureUrl.ToString()
-                    },
-                    result.PublicId
-                ));
+                uploadedImages.Add(new Images
+                {
+                    FileName = $"{folder}/{publicId}",       // Ruta completa usada para eliminar luego
+                    FilePath = result.SecureUrl.ToString()
+                });
             }
 
-            return uploadedImages.Select(x => x.image).ToList();
+            return uploadedImages;
         }
-        catch
-        {
-            foreach (var (_, publicId) in uploadedImages)
-                await _cloudinary.DestroyAsync(new DeletionParams(publicId));
 
-            throw;
+        public async Task DeleteImageAsync(int establishmentId, int imageId)
+        {
+            try
+            {
+                var establishment = await _repoEstablishment
+                    .GetAllQueryable()
+                    .Include(e => e.Images)
+                    .FirstOrDefaultAsync(e => e.Id == establishmentId && !e.IsDeleted);
+
+                if (establishment == null)
+                    throw new BusinessException("Establecimiento no encontrado.");
+
+                var imageToDelete = establishment.Images.FirstOrDefault(img => img.Id == imageId);
+                if (imageToDelete == null)
+                    throw new BusinessException("Imagen no encontrada en el establecimiento.");
+
+                // Eliminar de Cloudinary
+                var deleteResult = await _cloudinary.DestroyAsync(new DeletionParams(imageToDelete.FileName));
+                if (deleteResult.Result != "ok")
+                    throw new BusinessException($"Error al eliminar la imagen en Cloudinary: {deleteResult.Error?.Message}");
+
+                // Eliminar de la colección
+                establishment.Images.Remove(imageToDelete);
+
+                // Persistir cambios
+                await _repoEstablishment.UpdateAsync(establishment);
+            }
+            catch (BusinessException) { throw; }
+            catch (Exception ex)
+            {
+                throw new BusinessException("No se pudo eliminar la imagen del establecimiento.", ex);
+            }
         }
+
     }
-}
