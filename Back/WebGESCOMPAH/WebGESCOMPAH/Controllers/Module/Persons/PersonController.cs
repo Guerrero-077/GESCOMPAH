@@ -1,27 +1,26 @@
-﻿using Business.CQRS.Persons.Person;
-using Business.CQRS.Persons.Person.Select;
+﻿using Business.Interfaces.Implements.Persons;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebGESCOMPAH.Controllers.Module.Persons
 {
-    [ApiController]
+    [Route("api/[controller]")]
     [Authorize]
-    [Route("api/v1/[controller]")]
+    [ApiController]
     public class PersonController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IPersonService _personService;
 
-        public PersonController(IMediator mediator)
+        public PersonController(IPersonService personService)
         {
-            _mediator = mediator;
+            _personService = personService;
         }
         [HttpGet("Person")]        
         
         public async Task<IActionResult> Get()
         {
-            var person = await _mediator.Send(new GetAllPersonsQuery());
+            var person = await _personService.GetAllAsync();
             return Ok(person);
         }
 

@@ -1,5 +1,4 @@
 ﻿using Data.Interfaz.DataBasic;
-using DocumentFormat.OpenXml.Drawing.Charts;
 using Entity.Domain.Models.ModelBase;
 using MapsterMapper;
 using Utilities.Exceptions;

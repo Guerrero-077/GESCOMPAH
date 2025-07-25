@@ -1,36 +1,31 @@
-﻿using Business.CQRS.Business.Establishments.Create;
-using Business.CQRS.Business.Establishments.Delete;
-using Business.CQRS.Business.Establishments.Select;
-using Business.CQRS.Business.Establishments.Update;
-using Business.Interfaces.Implements.Business;
+﻿using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.Establishment;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-
 [Route("api/[controller]")]
+//[Authorize]
+[ApiController]
 public class EstablishmentsController : ControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly IEstablishmentService _establishmentService;
-    public EstablishmentsController(IMediator mediator, IEstablishmentService establishmentService)
+    public EstablishmentsController(IEstablishmentService establishmentService)
     {
-        _mediator = mediator;
         _establishmentService = establishmentService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _mediator.Send(new GetAllEstablishmentsQuery());
+        var result = await _establishmentService.GetAllAsync();
         return Ok(result);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var result = await _mediator.Send(new GetEstablishmentByIdQuery(id));
+        var result = await _establishmentService.GetByIdAsync(id);
         if (result == null)
             return NotFound();
         return Ok(result);
@@ -38,14 +33,14 @@ public class EstablishmentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromForm] EstablishmentCreateDto dto)
     {
-        var result = await _mediator.Send(new CreateEstablishmentCommand(dto));
+        var result = await _establishmentService.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpPut("Update")]
     public async Task<IActionResult> Update([FromForm] EstablishmentUpdateDto dto)
     {
-        var result = await _mediator.Send(new UpdateEstablishmentCommand(dto));
+        var result = await _establishmentService.UpdateAsync(dto);
         return Ok(result);
     }
 
@@ -53,7 +48,7 @@ public class EstablishmentsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id, [FromQuery] bool forceDelete = false)
     {
-        await _mediator.Send(new DeleteEstablishmentCommand(id, forceDelete));
+        await _establishmentService.DeleteAsync(id, forceDelete);
         return NoContent();
     }
 

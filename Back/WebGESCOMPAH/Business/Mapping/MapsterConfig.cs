@@ -1,5 +1,4 @@
-﻿using Business.CQRS.SecrutityAuthentication.Login;
-using Entity.Domain.Models.Implements.AdministrationSystem;
+﻿using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -43,10 +42,7 @@ namespace Business.Mapping
 
 
 
-            // ---------------------------
-            // Map LoginCommand → LoginDto
-            // (útil para CQRS, aunque es herencia, queda explícito)
-            config.NewConfig<LoginCommand, LoginDto>();
+
 
             // NUEVO: Mapear Module → MenuModuleDto
             config.NewConfig<Module, MenuModuleDto>()

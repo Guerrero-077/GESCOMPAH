@@ -1,6 +1,4 @@
-﻿using Business.CQRS.Behaviors;
-using Business.CQRS.Business.Establishments.Create;
-using Business.CustomJWT;
+﻿using Business.CustomJWT;
 using Business.Interfaces;
 using Business.Interfaces.Implements.AdministrationSystem;
 using Business.Interfaces.Implements.Business;
@@ -23,6 +21,8 @@ using Mapster;
 using MediatR;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
+using WebGESCOMPAH.Middleware;
+using WebGESCOMPAH.Middleware.Handlers;
 
 namespace WebGESCOMPAH.Extensions
 {
@@ -49,6 +49,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IPlazaService, PlazasService>();
             services.AddScoped<IEstablishmentService, EstablishmentService>();
             services.AddScoped<IImagesService, ImageService>(); 
+            services.AddScoped<IAppointmentService, AppointmentService>();
 
             //Mapping
             services.AddMapster();
@@ -72,12 +73,16 @@ namespace WebGESCOMPAH.Extensions
             // JWT 
             services.AddScoped<IToken, TokenBusiness>();
 
-            //Validation
 
-            services.AddValidatorsFromAssemblyContaining<CreateEstablishmentCommandValidator>();
+            //Validaciones
+            services.AddScoped<ExceptionMiddleware>();
 
-            // Registro global del pipeline de validación
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            services.AddScoped<IExceptionHandler, ValidationExceptionHandler>();
+            services.AddScoped<IExceptionHandler, BusinessExceptionHandler>();
+            services.AddScoped<IExceptionHandler, EntityNotFoundExceptionHandler>();
+            services.AddScoped<IExceptionHandler, ExternalServiceExceptionHandler>();
+            services.AddScoped<IExceptionHandler, UnauthorizedAccessHandler>();
+
 
             return services;
         }

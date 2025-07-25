@@ -1,5 +1,4 @@
-﻿using Entity.Domain.Models.Implements.Location;
-using Entity.DTOs.Implements.Location.City;
+﻿using Entity.DTOs.Implements.Location.City;
 
 namespace Entity.DTOs.Implements.Location.Department
 {

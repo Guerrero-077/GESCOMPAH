@@ -1,4 +1,4 @@
-﻿using Business.CQRS.SecrutityAuthentication.User;
+﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,20 +7,20 @@ namespace WebGESCOMPAH.Controllers.Module.AdministrationSystem
 {
     [ApiController]
     [Authorize]
-    [Route("api/v1/[controller]")]
+    [Route("api/[controller]")]
     public class UserController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IUserService _userService;
 
-        public UserController(IMediator mediator)
+        public UserController(IUserService userService)
         {
-            _mediator = mediator;
+            _userService = userService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var user = await _mediator.Send(new GetAllUserQuery());
+            var user = await _userService.GetAllUser();
             return Ok(user);
         }
     }

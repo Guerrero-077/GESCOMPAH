@@ -1,0 +1,12 @@
+<div class="container">
+    <button class="m-5" mat-raised-button color="primary" (click)="handleCreate()">Nuevo local</button>
+
+    <div class="d-flex justify-content-center align-items-center">
+
+        <section class="locales-list">
+            <app-localcard-component *ngFor="let local of locales" [local]="local" [showAvailableTag]="true"
+                (onView)="handleView($event)" (onEdit)="handleEdit($event)" (onDelete)="handleDelete($event)">
+            </app-localcard-component>
+        </section>
+    </div>
+</div>

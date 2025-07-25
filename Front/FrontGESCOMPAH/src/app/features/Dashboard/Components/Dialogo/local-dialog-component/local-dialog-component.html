@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>{{ local().id ? 'Editar local' : 'Crear nuevo local' }}</h2>
+
+<mat-dialog-content class="dialog-form">
+
+    <div class="text-create m-1">
+        <h3 class="m-0 p-0">Informacion Basica</h3>
+        <span class="m-0 p-0">Ingrese la Información Basica del Local</span>
+    </div>
+    <!-- Formulario dinámico -->
+    <app-dynamic-form-component [config]="formConfig" (formSubmit)="onFormSubmit($event)">
+    </app-dynamic-form-component>
+
+    <!-- Carga de imágenes -->
+    <div class="image-upload mt-3">
+        <label for="imageInput">Agregar imágenes:</label>
+        <input type="file" id="imageInput" (change)="handleImageUpload($event)" multiple accept="image/*" />
+
+        <div *ngIf="imagePreviews.length > 0" class="mt-2 d-flex flex-wrap gap-2">
+            <img *ngFor="let img of imagePreviews" [src]="img" alt="preview" width="100" height="100"
+                style="object-fit: cover; border-radius: 4px;" />
+        </div>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close (click)="onCancel()">Cancelar</button>
+</mat-dialog-actions>
+
+
+

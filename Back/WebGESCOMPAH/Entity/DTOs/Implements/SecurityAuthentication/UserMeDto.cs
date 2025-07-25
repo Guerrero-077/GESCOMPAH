@@ -1,13 +1,12 @@
 ﻿using Entity.DTOs.Implements.AdministrationSystem;
-using Entity.DTOs.Implements.Persons;
 
 namespace Entity.DTOs.Implements.SecurityAuthentication
 {
     public class UserMeDto
     {
         public int Id { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
+        public string FullName { get; set; } = null!;
+        public string Email { get; set; } = null!;
 
 
         //public PersonDto Person { get; set; }

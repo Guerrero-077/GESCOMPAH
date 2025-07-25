@@ -260,6 +260,78 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Appointment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateTimeAssigned")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Appointments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTimeAssigned = new DateTime(2025, 1, 3, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Consulta sobre producto X",
+                            Email = "juan.perez@example.com",
+                            FullName = "Juan Pérez",
+                            IsDeleted = false,
+                            Phone = "3001234567",
+                            RequestDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTimeAssigned = new DateTime(2025, 1, 4, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Revisión de contrato",
+                            Email = "laura.gomez@example.com",
+                            FullName = "Laura Gómez",
+                            IsDeleted = false,
+                            Phone = "3109876543",
+                            RequestDate = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
                 {
                     b.Property<int>("Id")
@@ -1557,7 +1629,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 1,
                             FileName = "primavera_1.jpg",
-                            FilePath = "https://cdn.app.com/establishments/primavera_1.jpg",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                             IsDeleted = false
                         },
                         new
@@ -1567,7 +1639,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 1,
                             FileName = "primavera_2.jpg",
-                            FilePath = "https://cdn.app.com/establishments/primavera_2.jpg",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                             IsDeleted = false
                         },
                         new
@@ -1577,7 +1649,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 2,
                             FileName = "torre_1.jpg",
-                            FilePath = "https://cdn.app.com/establishments/torre_1.jpg",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                             IsDeleted = false
                         },
                         new
@@ -1587,7 +1659,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 2,
                             FileName = "torre_2.jpg",
-                            FilePath = "https://cdn.app.com/establishments/torre_2.jpg",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                             IsDeleted = false
                         },
                         new
@@ -1597,7 +1669,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 3,
                             FileName = "bodega_1.jpg",
-                            FilePath = "https://cdn.app.com/establishments/bodega_1.jpg",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                             IsDeleted = false
                         },
                         new
@@ -1607,7 +1679,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 3,
                             FileName = "bodega_2.jpg",
-                            FilePath = "https://cdn.app.com/establishments/bodega_2.jpg",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                             IsDeleted = false
                         });
                 });

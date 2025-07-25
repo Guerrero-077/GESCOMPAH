@@ -1,7 +1,5 @@
-﻿using Business.CQRS.SecrutityAuthentication.Rol;
-using Business.CQRS.SecrutityAuthentication.Rol.Create;
+﻿using Business.Interfaces.Implements.AdministrationSystem;
 using Entity.DTOs.Implements.SecurityAuthentication.Rol;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,14 +7,14 @@ namespace WebGESCOMPAH.Controllers.Module.AdministrationSystem
 {
     [ApiController]
     [Authorize]
-    [Route("api/v1/[controller]")]
+    [Route("api/[controller]")]
     public class RolController : ControllerBase
     {
-        private readonly IMediator _mediator;
+        private readonly IRolService _rolService;
 
-        public RolController(IMediator mediator)
+        public RolController(IRolService rolService)
         {
-            _mediator = mediator;
+            _rolService = rolService;
         }
 
         /// <summary>
@@ -25,11 +23,8 @@ namespace WebGESCOMPAH.Controllers.Module.AdministrationSystem
         [HttpPost("CrearRol")]
         public async Task<IActionResult> Create([FromBody] RolDto rolDto)
         {
-            var command = new CreateRolCommand(rolDto);
-            var newRolId = await _mediator.Send(command);
-
-            // Retorna 201 Created sin CreatedAtAction ni GetById
-            return StatusCode(StatusCodes.Status201Created, new { id = newRolId });
+            var result = await _rolService.CreateAsync(rolDto);
+            return Ok(result);
         }
     }
 }

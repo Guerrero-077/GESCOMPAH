@@ -24,32 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CQRS\AdministrationSystem\" />
-    <Folder Include="CQRS\Business\Plaza\Delete\" />
-    <Folder Include="CQRS\Location\Create\" />
-    <Folder Include="CQRS\Location\Delete\" />
-    <Folder Include="CQRS\Location\Department\Create\" />
-    <Folder Include="CQRS\Location\Department\Delete\" />
-    <Folder Include="CQRS\Location\Department\Update\" />
-    <Folder Include="CQRS\Location\Select\" />
-    <Folder Include="CQRS\Location\Update\" />
-    <Folder Include="CQRS\Persons\Person\Create\" />
-    <Folder Include="CQRS\Persons\Person\Delete\" />
-    <Folder Include="CQRS\Persons\Person\Update\" />
-    <Folder Include="CQRS\SecrutityAuthentication\Me\Create\" />
-    <Folder Include="CQRS\SecrutityAuthentication\Me\Delete\" />
-    <Folder Include="CQRS\SecrutityAuthentication\Me\Select\" />
-    <Folder Include="CQRS\SecrutityAuthentication\Me\Update\" />
-    <Folder Include="CQRS\SecrutityAuthentication\Rol\Delete\" />
-    <Folder Include="CQRS\SecrutityAuthentication\Rol\Select\" />
-    <Folder Include="CQRS\SecrutityAuthentication\Rol\Update\" />
-    <Folder Include="CQRS\SecrutityAuthentication\User\Create\" />
-    <Folder Include="CQRS\SecrutityAuthentication\User\Delete\" />
-    <Folder Include="CQRS\SecrutityAuthentication\User\Select\" />
-    <Folder Include="CQRS\SecrutityAuthentication\User\Update\" />
-    <Folder Include="CQRS\Utilities\Image\Create\" />
-    <Folder Include="CQRS\Utilities\Image\Delete\" />
-    <Folder Include="CQRS\Utilities\Image\Update\" />
     <Folder Include="Services\AdministrationSystem\" />
   </ItemGroup>
 

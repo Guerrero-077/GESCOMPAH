@@ -1,28 +1,28 @@
-﻿using Business.CQRS.Location.Department.Select;
-using Business.CQRS.Persons.Person.Select;
+﻿using Business.Interfaces.Implements.Location;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebGESCOMPAH.Controllers.Module.Locations
 {
+    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
-    //[Authorize]
-    [Route("api/v1/[controller]")]
     public class DepartmentController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IMediator mediator)
+        public DepartmentController(IDepartmentService departmentService)
         {
-            _mediator = mediator;
+            _departmentService = departmentService;
         }
+
         [HttpGet("Department")]
 
         public async Task<IActionResult> Get()
         {
-            var person = await _mediator.Send(new GetAllDepartmentQuery());
-            return Ok(person);
+            var departments = await _departmentService.GetAllAsync();
+            return Ok(departments);
         }
     }
 }

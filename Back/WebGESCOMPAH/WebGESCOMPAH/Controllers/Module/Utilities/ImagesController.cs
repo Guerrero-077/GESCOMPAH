@@ -1,22 +1,19 @@
-﻿using Business.CQRS.Utilities.Image.Select;
-using Business.Interfaces.Implements;
-using Entity.DTOs.Implements.Utilities;
+﻿using Business.Interfaces.Implements.Utilities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebGESCOMPAH.Controllers.Module.Utilities
 {
-    [ApiController]
+    [Route("api/[controller]")]
     [Authorize]
-    [Route("api/v1/[controller]")]
+    [ApiController]
     public class ImagesController : Controller
     {
-        private readonly IMediator _mediaror;
-        public ImagesController(IMediator mediaror)
+        private readonly IImagesService _imagesService;
+        public ImagesController(IImagesService imagesService)
         {
-            _mediaror = mediaror;
+            _imagesService = imagesService;
         }
 
         [HttpGet("Images")]
@@ -24,7 +21,7 @@ namespace WebGESCOMPAH.Controllers.Module.Utilities
         {
             try
             {
-                var images = await _mediaror.Send(new GetAllImageQuery());
+                var images = await _imagesService.GetAllAsync();
                 return Ok(images);
             }
             catch (Exception ex)

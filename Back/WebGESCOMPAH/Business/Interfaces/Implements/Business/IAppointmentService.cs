@@ -1,0 +1,9 @@
+﻿using Business.Interfaces.IBusiness;
+using Entity.DTOs.Implements.Business.Appointment;
+
+namespace Business.Interfaces.Implements.Business
+{
+    public interface IAppointmentService : IBusiness<AppointmentSelectDto, AppointmentCreateDto, AppointmentUpdateDto>
+    {
+    }
+}

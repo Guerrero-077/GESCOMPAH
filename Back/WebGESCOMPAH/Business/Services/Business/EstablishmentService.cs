@@ -98,50 +98,50 @@
             return _mapper.Map<EstablishmentSelectDto>(establishment);
         }
 
-        public async Task DeleteAsync(int id, bool forceDelete)
-        {
-            var establishment = await _repoEstablishment
-                .GetAllQueryable()
-                .Include(e => e.Images)
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(e => e.Id == id);
+        //public async Task DeleteAsync(int id, bool forceDelete)
+        //{
+        //    var establishment = await _repoEstablishment
+        //        .GetAllQueryable()
+        //        .Include(e => e.Images)
+        //        .IgnoreQueryFilters()
+        //        .FirstOrDefaultAsync(e => e.Id == id);
 
-            if (establishment == null || (!forceDelete && establishment.IsDeleted))
-                throw new BusinessException("Establecimiento no encontrado.");
+        //    if (establishment == null || (!forceDelete && establishment.IsDeleted))
+        //        throw new BusinessException("Establecimiento no encontrado.");
 
-            // Eliminar imágenes de Cloudinary
-            foreach (var image in establishment.Images)
-            {
-                await _cloudinary.DestroyAsync(new DeletionParams(image.FileName));
-            }
+        //    // Eliminar imágenes de Cloudinary
+        //    foreach (var image in establishment.Images)
+        //    {
+        //        await _cloudinary.DestroyAsync(new DeletionParams(image.FileName));
+        //    }
 
-            var result = forceDelete
-                ? await _repoEstablishment.DeleteAsync(id)
-                : await _repoEstablishment.DeleteLogicAsync(id);
+        //    var result = forceDelete
+        //        ? await _repoEstablishment.DeleteAsync(id)
+        //        : await _repoEstablishment.DeleteLogicAsync(id);
 
-            if (!result)
-                throw new BusinessException("No se pudo eliminar el establecimiento.");
-        }
+        //    if (!result)
+        //        throw new BusinessException("No se pudo eliminar el establecimiento.");
+        //}
 
-        public async Task DeleteAsync(int establishmentId, int imageId)
-        {
-            var establishment = await _repoEstablishment
-                .GetAllQueryable()
-                .Include(e => e.Images)
-                .FirstOrDefaultAsync(e => e.Id == establishmentId && !e.IsDeleted);
+        //public async Task DeleteAsync(int establishmentId, int imageId)
+        //{
+        //    var establishment = await _repoEstablishment
+        //        .GetAllQueryable()
+        //        .Include(e => e.Images)
+        //        .FirstOrDefaultAsync(e => e.Id == establishmentId && !e.IsDeleted);
 
-            if (establishment == null)
-                throw new BusinessException("Establecimiento no encontrado.");
+        //    if (establishment == null)
+        //        throw new BusinessException("Establecimiento no encontrado.");
 
-            var image = establishment.Images.FirstOrDefault(i => i.Id == imageId);
-            if (image == null)
-                throw new BusinessException("Imagen no encontrada.");
+        //    var image = establishment.Images.FirstOrDefault(i => i.Id == imageId);
+        //    if (image == null)
+        //        throw new BusinessException("Imagen no encontrada.");
 
-            await _cloudinary.DestroyAsync(new DeletionParams(image.FileName));
+        //    await _cloudinary.DestroyAsync(new DeletionParams(image.FileName));
 
-            establishment.Images.Remove(image);
-            await _repoEstablishment.UpdateAsync(establishment);
-        }
+        //    establishment.Images.Remove(image);
+        //    await _repoEstablishment.UpdateAsync(establishment);
+        //}
 
         private async Task<List<Images>> UploadImagesAsync(ICollection<IFormFile> files, int establishmentId)
         {

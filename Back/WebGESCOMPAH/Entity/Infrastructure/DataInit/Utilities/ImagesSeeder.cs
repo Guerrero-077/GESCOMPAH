@@ -16,7 +16,7 @@ namespace Entity.Infrastructure.DataInit.Utilities
                 {
                     Id = 1,
                     FileName = "primavera_1.jpg",
-                    FilePath = "https://cdn.app.com/establishments/primavera_1.jpg",
+                    FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                     EstablishmentId = 1,
                     Active = true,
                     IsDeleted = false,
@@ -26,7 +26,7 @@ namespace Entity.Infrastructure.DataInit.Utilities
                 {
                     Id = 2,
                     FileName = "primavera_2.jpg",
-                    FilePath = "https://cdn.app.com/establishments/primavera_2.jpg",
+                    FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                     EstablishmentId = 1,
                     Active = true,
                     IsDeleted = false,
@@ -38,7 +38,7 @@ namespace Entity.Infrastructure.DataInit.Utilities
                 {
                     Id = 3,
                     FileName = "torre_1.jpg",
-                    FilePath = "https://cdn.app.com/establishments/torre_1.jpg",
+                    FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                     EstablishmentId = 2,
                     Active = true,
                     IsDeleted = false,
@@ -48,7 +48,7 @@ namespace Entity.Infrastructure.DataInit.Utilities
                 {
                     Id = 4,
                     FileName = "torre_2.jpg",
-                    FilePath = "https://cdn.app.com/establishments/torre_2.jpg",
+                    FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                     EstablishmentId = 2,
                     Active = true,
                     IsDeleted = false,
@@ -60,7 +60,7 @@ namespace Entity.Infrastructure.DataInit.Utilities
                 {
                     Id = 5,
                     FileName = "bodega_1.jpg",
-                    FilePath = "https://cdn.app.com/establishments/bodega_1.jpg",
+                    FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                     EstablishmentId = 3,
                     Active = true,
                     IsDeleted = false,
@@ -70,7 +70,7 @@ namespace Entity.Infrastructure.DataInit.Utilities
                 {
                     Id = 6,
                     FileName = "bodega_2.jpg",
-                    FilePath = "https://cdn.app.com/establishments/bodega_2.jpg",
+                    FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
                     EstablishmentId = 3,
                     Active = true,
                     IsDeleted = false,

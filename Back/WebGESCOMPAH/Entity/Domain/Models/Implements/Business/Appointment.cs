@@ -9,7 +9,7 @@ namespace Entity.Domain.Models.Implements.Business
         public string Phone { get; set; } = null!;
         public string Description { get; set; } = null!;
         public DateTime RequestDate { get; set; } 
-        public DateTime DareTimeAssigned { get; set; }
+        public DateTime DateTimeAssigned { get; set; }
 
     }
 }
