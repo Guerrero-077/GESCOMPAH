@@ -1,0 +1,32 @@
+<!-- Header (solo si no estás en /Login) -->
+<app-header *ngIf="router.url !== '/Login'" [title]="'Gestión de Locales'"
+    [description]="'Administra la información de tus establecimientos'">
+</app-header>
+
+
+
+<!-- Contenedor principal -->
+<div class="container mt-4">
+
+    <!-- Botón para crear un nuevo local -->
+    <div class="d-flex justify-content-end mb-4">
+        <button mat-raised-button color="primary" (click)="handleCreate()">
+            Nuevo local
+        </button>
+    </div>
+
+
+    <!-- Lista de locales (tarjetas) -->
+
+    <div class="d-flex justify-content-center align-items-center">
+
+        <section class="locales-list">
+
+            <app-local-card *ngFor="let local of locales" [local]="local" [showAvailableTag]="true"
+                (onView)="handleView(local.id)" (onEdit)="handleEdit(local)" (onDelete)="handleDelete(local.id)">
+            </app-local-card>
+
+        </section>
+        
+    </div>
+</div>

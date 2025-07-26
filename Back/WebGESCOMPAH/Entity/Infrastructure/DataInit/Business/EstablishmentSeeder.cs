@@ -18,6 +18,7 @@ namespace Entity.Infrastructure.DataInit.Business
                     Description = "Establecimiento amplio con excelente ubicación.",
                     AreaM2 = 500,
                     RentValueBase = 2500,
+                    PlazaId = 1, // Asumiendo que la Plaza con Id 1 ya existe
                     Active = true,
                     IsDeleted = false,
                     CreatedAt = seedDate
@@ -29,6 +30,7 @@ namespace Entity.Infrastructure.DataInit.Business
                     Description = "Oficina moderna en zona empresarial.",
                     AreaM2 = 120,
                     RentValueBase = 1500,
+                    PlazaId = 2, // Asumiendo que la Plaza con Id 1 ya existe
                     Active = true,
                     IsDeleted = false,
                     CreatedAt = seedDate
@@ -40,6 +42,7 @@ namespace Entity.Infrastructure.DataInit.Business
                     Description = "Espacio para almacenamiento de gran capacidad.",
                     AreaM2 = 1000,
                     RentValueBase = 3000,
+                    PlazaId = 1, // Asumiendo que la Plaza con Id 1 ya existe
                     Active = true,
                     IsDeleted = false,
                     CreatedAt = seedDate

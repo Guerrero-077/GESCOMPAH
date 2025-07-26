@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Data.Interfaz.DataBasic;
+using Entity.Domain.Models.Implements.Utilities;
 
 namespace Data.Interfaz.IDataImplemenent
 {
-    internal interface IImagesRepository
+    public interface IImagesRepository : IDataGeneric<Images>
     {
+        Task AddAsync(List<Images> entity);
+        Task<List<Images>> GetByEstablishmentIdAsync(int establishmentId);
+        Task DeleteRangeAsync(List<Images> images);
     }
 }

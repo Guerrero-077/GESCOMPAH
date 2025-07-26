@@ -47,7 +47,7 @@ export class LoginComponent {
     this.auth.Login({ email, password }).subscribe({
       next: (data) => {
         if (data != null) {
-          this.router.navigateByUrl('/Home/locales');
+          this.router.navigateByUrl('/Establishment/ListEstablishment');
 
           console.log(this.me());
 

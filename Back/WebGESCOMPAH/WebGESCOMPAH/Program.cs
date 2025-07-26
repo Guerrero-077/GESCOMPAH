@@ -1,9 +1,11 @@
 ﻿using Business.Mapping;
 using CloudinaryDotNet;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Entity.DTOs.Interfaces;
 using Entity.DTOs.Services;
 using Entity.DTOs.Validations.Entity.DTOs.Validators.SecurityAuthentication;
 using FluentValidation;
+using Utilities.Helpers.CloudinaryHelper;
 using WebGESCOMPAH.Extensions;
 using WebGESCOMPAH.Middleware;
 using WebGESCOMPAH.Middleware.Handlers;
@@ -38,6 +40,7 @@ var cloudinary = new Cloudinary(new Account(
 ));
 cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
+builder.Services.AddScoped<CloudinaryUtility>();
 
 // Mapster
 MapsterConfig.Register();

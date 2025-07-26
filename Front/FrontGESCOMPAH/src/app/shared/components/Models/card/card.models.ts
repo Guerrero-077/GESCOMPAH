@@ -20,3 +20,12 @@ export interface LocalesModel {
     createdAt: Date;
     images: ImagesModel[]; // Bien estructurado
 }
+
+export interface LocalUpdateModel {
+    id: number;
+    name: string;
+    description: string;
+    areaM2: number;
+    rentValueBase: number;
+    files?: File[]; // Nuevas imágenes a adjuntar (opcional)
+}

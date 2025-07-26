@@ -7,6 +7,8 @@ namespace Entity.Domain.Models.Implements.Business
     {
         public Double AreaM2 { get; set; } // Area of the establishment in square meters
         public Double RentValueBase { get; set; } // Monthly rent value for the establishment
+        public int PlazaId { get; set; } // Foreign key to the Plaza entity
+        public Plaza? Plaza { get; set; } // Navigation property to the Plaza entity
 
         public List<Images> Images { get; set; } = new();
     }

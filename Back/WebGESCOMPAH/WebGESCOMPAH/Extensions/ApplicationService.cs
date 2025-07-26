@@ -15,10 +15,11 @@ using Data.Interfaz.DataBasic;
 using Data.Interfaz.IDataImplemenent;
 using Data.Interfaz.Security;
 using Data.Repository;
+using Data.Services.Business;
 using Data.Services.Location;
 using Data.Services.SecurityAuthentication;
+using Data.Services.Utilities;
 using Mapster;
-using MediatR;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
 using WebGESCOMPAH.Middleware;
@@ -55,14 +56,15 @@ namespace WebGESCOMPAH.Extensions
             services.AddMapster();
             MapsterConfig.Register();
 
-            //services
-
+            //services Data
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRolUserRepository, RolUserRepository>();
 
+
+            services.AddScoped<IEstablishments, EstablishmentsRepository>();
+            services.AddScoped<IImagesRepository, ImagesRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<ICityService, CityService>();
-
             services.AddScoped<IDepartmentService, DepartmentService>();
 
 

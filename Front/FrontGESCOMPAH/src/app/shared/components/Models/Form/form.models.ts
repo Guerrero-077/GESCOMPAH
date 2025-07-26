@@ -9,12 +9,13 @@ export type FormFieldType =
     | 'radio'
     | 'date'
     | 'email'
-    | 'password';
+    | 'password'
+    | 'hidden';
 
 export interface DynamicFormField {
     name: string;
     label: string;
-    type: FormFieldType;
+    type: FormFieldType;    
     value?: any;
     placeholder?: string;
     options?: { label: string; value: any }[]; // para select y radio

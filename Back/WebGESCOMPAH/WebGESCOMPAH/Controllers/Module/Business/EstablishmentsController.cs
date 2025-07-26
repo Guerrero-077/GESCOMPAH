@@ -1,65 +1,73 @@
 ﻿using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.Establishment;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[Route("api/[controller]")]
-//[Authorize]
-[ApiController]
-public class EstablishmentsController : ControllerBase
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace WebGESCOMPAH.Controllers.Module.Business
 {
-    private readonly IEstablishmentService _establishmentService;
-    public EstablishmentsController(IEstablishmentService establishmentService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EstablishmentsController : ControllerBase
     {
-        _establishmentService = establishmentService;
-    }
+        private readonly IEstablishmentService _establishmentService;
+        public EstablishmentsController(IEstablishmentService establishmentService)
+        {
+            _establishmentService = establishmentService;
+            
+        }
+        // GET: api/<EstablishmentsController>
+        [HttpGet]
+        public async Task<IEnumerable<EstablishmentSelectDto>> Get()
+        {
+            return await _establishmentService.GetAllAsync();
+        }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var result = await _establishmentService.GetAllAsync();
-        return Ok(result);
-    }
+        // GET api/<EstablishmentsController>/5
+        [HttpGet("{id}")]
+        public async Task<EstablishmentSelectDto?> Get(int id)
+        {
+            return await _establishmentService.GetByIdAsync(id);
+        }
+    
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var result = await _establishmentService.GetByIdAsync(id);
-        if (result == null)
-            return NotFound();
-        return Ok(result);
-    }
-    [HttpPost]
-    public async Task<IActionResult> Create([FromForm] EstablishmentCreateDto dto)
-    {
-        var result = await _establishmentService.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-    }
+        // POST api/<EstablishmentsController>
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] EstablishmentCreateDto dto)
+        {
+            var result = await _establishmentService.CreateAsync(dto);
+            return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
+        }
 
-    [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromForm] EstablishmentUpdateDto dto)
-    {
-        var result = await _establishmentService.UpdateAsync(dto);
-        return Ok(result);
-    }
+        // PUT api/<EstablishmentsController>/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] EstablishmentUpdateDto dto)
+        {
+            if (id != dto.Id)
+            {
+                return BadRequest();
+            }
 
+            var result = await _establishmentService.UpdateAsync(dto);
+            if (result == null)
+            {
+                return NotFound();
+            }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id, [FromQuery] bool forceDelete = false)
-    {
-        await _establishmentService.DeleteAsync(id, forceDelete);
-        return NoContent();
-    }
+            return NoContent();
+        }
 
+        // DELETE api/<EstablishmentsController>/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _establishmentService.DeleteAsync(id);
+            if (!result)
+            {
+                return NotFound();
+            }
 
-    /// <summary>
-    /// Elimina una imagen específica de un establecimiento
-    /// </summary>
-    [HttpDelete("{establishmentId}/images/{imageId}")]
-    public async Task<IActionResult> DeleteImage(int establishmentId, int imageId)
-    {
-        await _establishmentService.DeleteImageAsync(establishmentId, imageId);
-        return NoContent(); // 204
+            return NoContent();
+        }
     }
 }

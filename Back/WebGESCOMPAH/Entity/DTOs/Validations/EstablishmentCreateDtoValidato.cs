@@ -23,20 +23,20 @@ namespace Entity.DTOs.Validations
                     if (dto.RentValueBase < 0)
                         context.AddFailure(nameof(dto.RentValueBase), "El valor de renta no puede ser negativo.");
 
-                    if (dto.Files != null)
-                    {
-                        foreach (var file in dto.Files)
-                        {
-                            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                            var allowed = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
+                    //if (dto.Files != null)
+                    //{
+                    //    foreach (var file in dto.Files)
+                    //    {
+                    //        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                    //        var allowed = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
 
-                            if (!allowed.Contains(extension))
-                                context.AddFailure(nameof(dto.Files), $"El archivo '{file.FileName}' tiene una extensión inválida.");
+                    //        if (!allowed.Contains(extension))
+                    //            context.AddFailure(nameof(dto.Files), $"El archivo '{file.FileName}' tiene una extensión inválida.");
 
-                            if (file.Length > 5 * 1024 * 1024)
-                                context.AddFailure(nameof(dto.Files), $"El archivo '{file.FileName}' supera el tamaño máximo permitido (5 MB).");
-                        }
-                    }
+                    //        if (file.Length > 5 * 1024 * 1024)
+                    //            context.AddFailure(nameof(dto.Files), $"El archivo '{file.FileName}' supera el tamaño máximo permitido (5 MB).");
+                    //    }
+                    //}
                 });
         }
     }

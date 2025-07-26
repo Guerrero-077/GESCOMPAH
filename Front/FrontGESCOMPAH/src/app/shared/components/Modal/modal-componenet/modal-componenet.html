@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content class="dialog-form">
+    <div *ngIf="data.subtitle" class="text-create m-1">
+        <h3>{{ data.subtitle }}</h3>
+    </div>
+
+    <app-dynamic-form-component [config]="data.formConfig" (formSubmit)="onFormSubmit($event)">
+    </app-dynamic-form-component>
+
+    <div *ngIf="data.allowImageUpload" class="image-upload mt-3">
+        <label>Agregar imágenes:</label>
+        <input type="file" (change)="handleImageUpload($event)" multiple accept="image/*" />
+
+        <div *ngIf="imagePreviews.length > 0" class="mt-2 d-flex flex-wrap gap-2">
+            <img *ngFor="let img of imagePreviews" [src]="img" width="100" height="100"
+                style="object-fit: cover; border-radius: 4px;" />
+        </div>
+    </div>
+    
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close (click)="onCancel()">Cancelar</button>
+</mat-dialog-actions>

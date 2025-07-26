@@ -8,7 +8,8 @@ namespace Entity.DTOs.Implements.Business.Establishment
         public string Description { get; set; } = null!;
         public double AreaM2 { get; set; }
         public double RentValueBase { get; set; }
+        public int PlazaId { get; set; } 
         // Archivos subidos desde el formulario
-        public List<IFormFile>? Files { get; set; }
+        //public List<IFormFile>? Files { get; set; }
     }
 }

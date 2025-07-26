@@ -360,10 +360,15 @@ namespace Entity.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PlazaId")
+                        .HasColumnType("int");
+
                     b.Property<double>("RentValueBase")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PlazaId");
 
                     b.ToTable("Establishment");
 
@@ -377,6 +382,7 @@ namespace Entity.Migrations
                             Description = "Establecimiento amplio con excelente ubicación.",
                             IsDeleted = false,
                             Name = "Centro Comercial Primavera",
+                            PlazaId = 1,
                             RentValueBase = 2500.0
                         },
                         new
@@ -388,6 +394,7 @@ namespace Entity.Migrations
                             Description = "Oficina moderna en zona empresarial.",
                             IsDeleted = false,
                             Name = "Oficina Torre Norte",
+                            PlazaId = 2,
                             RentValueBase = 1500.0
                         },
                         new
@@ -399,6 +406,7 @@ namespace Entity.Migrations
                             Description = "Espacio para almacenamiento de gran capacidad.",
                             IsDeleted = false,
                             Name = "Bodega Industrial Sur",
+                            PlazaId = 1,
                             RentValueBase = 3000.0
                         });
                 });
@@ -1703,6 +1711,17 @@ namespace Entity.Migrations
                     b.Navigation("Module");
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Plaza", "Plaza")
+                        .WithMany("Establishments")
+                        .HasForeignKey("PlazaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plaza");
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>
                 {
                     b.HasOne("Entity.Domain.Models.Implements.Location.Department", "Department")
@@ -1808,6 +1827,11 @@ namespace Entity.Migrations
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Plaza", b =>
+                {
+                    b.Navigation("Establishments");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>
