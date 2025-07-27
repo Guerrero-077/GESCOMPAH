@@ -7,13 +7,7 @@ using MapsterMapper;
 
 namespace Business.Services.SecrutityAuthentication
 {
-    public class RolService : BusinessGeneric<RolSelectDto, RolDto, RolDto, Rol>, IRolService
+    public class RolService(IDataGeneric<Rol> rolRepository, IMapper mapper) : BusinessGeneric<RolSelectDto, RolCreateDto, RolUpdateDto, Rol>(rolRepository, mapper), IRolService
     {
-        private readonly IDataGeneric<Rol> _rolRepository;
-        public RolService(IDataGeneric<Rol> rolRepository, IMapper mapper) : base(rolRepository, mapper)
-        {
-            _rolRepository = rolRepository;
-        }
-
     }
 }

@@ -3,10 +3,12 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebGESCOMPAH.Controllers.Module.AdministrationSystem
+namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
+    [Produces("application/json")]
+
     [Route("api/[controller]")]
     public class UserController : Controller
     {

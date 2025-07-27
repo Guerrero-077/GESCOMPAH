@@ -1,8 +1,8 @@
-<div class="local-card">
+<div class="local-card bg-white rounded-2">
     <!-- Contenedor de imagen -->
     <div class="image-container">
         <img [src]="primaryImage" [alt]="local.name" class="local-image" loading="lazy">
-     
+
         <!-- Tag de disponibilidad -->
         <div *ngIf="showAvailableTag && local.active" class="availability-tag">
             Disponible
@@ -18,22 +18,29 @@
         <div class="info-grid">
             <div class="info-item">
                 <span class="info-label">Dirección</span>
-                <span class="info-value">{{ local.description }}</span>
+                <span class="info-value ellipsis">{{ local.description }}</span>
             </div>
-            <div class="info-item">
+
+            <div class="info-item text-end">
                 <span class="info-label">Área</span>
                 <span class="info-value">{{ local.areaM2 }} m²</span>
             </div>
         </div>
 
-        <!-- Precio -->
-        <div class="rent-section">
-            <span class="rent-label">Renta Mensual</span>
-            <div class="rent-price">{{ formattedRent }}</div>
-        </div>
+        <hr />
 
-        <!-- Botones de acción -->
-        <app-action-button-componenet (onView)="handleView()" (onEdit)="handleEdit()"
-            (onDelete)="handleDelete()"></app-action-button-componenet>
+
+        <div class="d-flex justify-content-between align-items-center footer">
+
+            <!-- Precio -->
+            <div class="rent-section">
+                <span class="rent-label">Renta Mensual</span>
+                <div class="rent-price">{{ formattedRent }}</div>
+            </div>
+
+            <!-- Botones de acción -->
+            <app-action-button-componenet (onView)="handleView()" (onEdit)="handleEdit()"
+                (onDelete)="handleDelete()"></app-action-button-componenet>
+        </div>
     </div>
 </div>

@@ -7,6 +7,7 @@ namespace Data.Interfaz.IDataImplemenent
     {
         Task AddAsync(List<Images> entity);
         Task<List<Images>> GetByEstablishmentIdAsync(int establishmentId);
-        Task DeleteRangeAsync(List<Images> images);
+        Task<bool> DeleteByPublicIdAsync(string publicId);
+        //Task DeleteRangeAsync(List<Images> images);
     }
 }

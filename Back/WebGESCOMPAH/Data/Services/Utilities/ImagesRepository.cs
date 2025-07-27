@@ -14,31 +14,39 @@ namespace Data.Services.Utilities
                 .Where(e => !e.IsDeleted)
                 .ToListAsync();
         }
+
+
         public async Task<List<Images>> GetByEstablishmentIdAsync(int establishmentId)
         {
             return await _dbSet
                 .Where(e => e.EstablishmentId == establishmentId && !e.IsDeleted)
                 .ToListAsync();
         }
-        public async Task AddAsync(List<Images> entity)
+
+
+        public async Task AddAsync(List<Images> images)
         {
-            _dbSet.AddRange(entity);
+            if (!images.Any()) return;
+
+            var establishmentId = images.First().EstablishmentId;
+            var existingCount = await _dbSet
+                .CountAsync(i => i.EstablishmentId == establishmentId && !i.IsDeleted);
+
+            if (existingCount + images.Count > 5)
+                throw new InvalidOperationException("No se pueden asociar más de 5 imágenes a un establecimiento.");
+
+            _dbSet.AddRange(images);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteRangeAsync(List<Images> images)
+        public async Task<bool> DeleteByPublicIdAsync(string publicId)
         {
-            if (images == null || !images.Any())
-            throw new ArgumentNullException(nameof(images), "La lista de imágenes no puede ser nula o vacía.");
-            foreach (var image in images)
-            {
-                var existingImage = await _dbSet.FindAsync(image.Id);
-                if (existingImage != null)
-                {
-                    existingImage.IsDeleted = true; // Marcar como eliminado lógicamente
-                }
-            }
-            await _context.SaveChangesAsync();
+            var image = await _dbSet.FirstOrDefaultAsync(i => i.PublicId == publicId);
+            if (image == null) return false;
+
+            _dbSet.Remove(image);
+            return await _context.SaveChangesAsync() > 0;
         }
+
     }
 }

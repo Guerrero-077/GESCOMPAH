@@ -2,11 +2,15 @@
 
 namespace Entity.DTOs.Implements.Utilities.Images
 {
+
     public class ImageUpdateDto
     {
-        public int Id { get; set; } // ID de la imagen a actualizar
-        public int? EstablishmentId { get; set; } // También opcional
-        public IFormFile? File { get; set; } // Nueva imagen (opcional)
+        public int Id { get; set; }
+        public string FileName { get; set; } = null!;
+        public string FilePath { get; set; } = null!;
+        public string PublicId { get; set; } = null!;
+        public int EstablishmentId { get; set; }
     }
+
 
 }

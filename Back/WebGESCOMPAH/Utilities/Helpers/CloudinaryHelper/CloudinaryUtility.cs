@@ -1,4 +1,7 @@
-﻿using CloudinaryDotNet;
+﻿
+
+
+using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Utilities.Exceptions;
@@ -14,42 +17,45 @@ namespace Utilities.Helpers.CloudinaryHelper
             _cloudinary = cloudinary;
         }
 
-        public async Task<(string FilePath, string FileName)> UploadAsync(IFormFile file, string folder)
+        public async Task<ImageUploadResult> UploadImageAsync(IFormFile file, int establishmentId)
         {
-            if (file.Length == 0)
-                throw new BusinessException("Archivo vacío.");
+            if (file.Length <= 0)
+                throw new ArgumentException("Archivo vacío.");
 
-            var allowedTypes = new[] { "image/jpeg", "image/png" };
-            if (!allowedTypes.Contains(file.ContentType))
-                throw new BusinessException("Formato de imagen no soportado. Solo JPG y PNG están permitidos.");
+            await using var stream = file.OpenReadStream();
 
-            var publicId = $"img_{Guid.NewGuid()}";
-            var fullFolder = folder.TrimEnd('/');
+            var uniqueSuffix = Guid.NewGuid().ToString("N"); // Evita colisiones entre imágenes del mismo establecimiento
+            var fileExtension = Path.GetExtension(file.FileName);
+            var sanitizedFileName = Path.GetFileNameWithoutExtension(file.FileName).Replace(" ", "_");
 
-            using var stream = file.OpenReadStream();
+            var publicId = $"establishments/{establishmentId}/{sanitizedFileName}_{uniqueSuffix}";
 
             var uploadParams = new ImageUploadParams
             {
                 File = new FileDescription(file.FileName, stream),
                 PublicId = publicId,
-                Folder = fullFolder
+                Overwrite = false,
+                UseFilename = false, // Ahora usamos publicId personalizado
+                UniqueFilename = false,
+                Folder = null // Ya está implícito en el public_id
             };
 
             var result = await _cloudinary.UploadAsync(uploadParams);
-
-            if (result.Error != null)
-                throw new BusinessException($"Error al subir imagen a Cloudinary: {result.Error.Message}");
-
-            return (result.SecureUrl.ToString(), $"{fullFolder}/{publicId}");
+            return result;
         }
+
+
 
         public async Task DeleteAsync(string publicId)
         {
-            var deleteParams = new DeletionParams(publicId);
-            var result = await _cloudinary.DestroyAsync(deleteParams);
+            if (string.IsNullOrWhiteSpace(publicId))
+                throw new BusinessException("PublicId no puede estar vacío.");
+
+            var deletionParams = new DeletionParams(publicId);
+            var result = await _cloudinary.DestroyAsync(deletionParams);
 
             if (result.Result != "ok")
-                throw new BusinessException($"Error al eliminar imagen en Cloudinary: {result.Error?.Message}");
+                throw new BusinessException($"Error al eliminar imagen: {result.Error?.Message ?? result.Result}");
         }
     }
 }

@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace Web.Controllers.Implements.Auth
+namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
+
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;

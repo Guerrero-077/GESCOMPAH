@@ -1,12 +1,11 @@
 ﻿using Business.Interfaces.Implements.Utilities;
 using Entity.DTOs.Implements.Utilities.Images;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebGESCOMPAH.Controllers.Module.Utilities
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class ImagesController : ControllerBase
     {
@@ -17,48 +16,52 @@ namespace WebGESCOMPAH.Controllers.Module.Utilities
             _imagesService = imagesService;
         }
 
-        [HttpGet("Images")]
-        public async Task<IActionResult> Get()
+        /// <summary>
+        /// Obtener todas las imágenes asociadas a un establecimiento
+        /// </summary>
+        [HttpGet("establishment/{establishmentId}")]
+        public async Task<ActionResult<List<ImageSelectDto>>> GetImagesByEstablishmentId(int establishmentId)
         {
-            var images = await _imagesService.GetAllAsync();
-            return Ok(images);
+            var result = await _imagesService.GetImagesByEstablishmentIdAsync(establishmentId);
+            return Ok(result);
         }
 
-        [HttpGet("ImagesByEstablishmentId/{establishmentId}")]
-        public async Task<IActionResult> GetByEstablishmentId(int establishmentId)
+        /// <summary>
+        /// Subir imágenes a un establecimiento (máximo 5 por establecimiento)
+        /// </summary>
+        [HttpPost("establishment/{establishmentId}")]
+        public async Task<ActionResult<List<ImageSelectDto>>> UploadImages(
+            int establishmentId,
+            [FromForm] List<IFormFile> files)
         {
-            var images = await _imagesService.GetByEstablishmentIdAsync(establishmentId);
-            return Ok(images);
+            if (files == null || files.Count == 0)
+                return BadRequest("Debe subir al menos una imagen.");
+
+            var result = await _imagesService.AddImagesAsync(establishmentId, files);
+            return CreatedAtAction(nameof(GetImagesByEstablishmentId), new { establishmentId }, result);
         }
 
-        [HttpPost("AddImages")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddImages([FromForm] ImageCreateDto images)
+        /// <summary>
+        /// Eliminar una imagen por su ID
+        /// </summary>
+        [HttpDelete("{imageId:int}")]
+        public async Task<IActionResult> DeleteImageById(int imageId)
         {
-            if (images == null || images.Files == null || !images.Files.Any())
-                return BadRequest("La lista de imágenes no puede ser nula o vacía.");
-
-            await _imagesService.AddAsync(images);
-            return Ok("Imágenes agregadas correctamente.");
+            await _imagesService.DeleteImageByIdAsync(imageId);
+            return NoContent();
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateImage(int id, [FromForm] ImageUpdateDto dto)
+        /// <summary>
+        /// Eliminar múltiples imágenes usando una lista de publicIds
+        /// </summary>
+        [HttpDelete("by-publicIds")]
+        public async Task<IActionResult> DeleteImagesByPublicIds([FromBody] List<string> publicIds)
         {
-            if (id != dto.Id)
-                return BadRequest("ID mismatch");
+            if (publicIds == null || !publicIds.Any())
+                return BadRequest("Debe proporcionar al menos un publicId.");
 
-            var updated = await _imagesService.UpdateAsync(dto);
-            return Ok(updated);
-        }
-
-        [HttpDelete("DeleteImage/{id}")]
-        public async Task<IActionResult> DeleteImage(int id)
-        {
-            var deleted = await _imagesService.DeleteAsync(id);
-            return deleted
-                ? Ok("Imagen eliminada correctamente.")
-                : NotFound("Imagen no encontrada.");
+            await _imagesService.DeleteImagesByPublicIdsAsync(publicIds);
+            return NoContent();
         }
     }
 }

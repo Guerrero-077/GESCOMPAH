@@ -1,0 +1,108 @@
+<mat-horizontal-stepper [linear]="true" #stepper>
+    <!-- Paso 1: Datos del establecimiento -->
+    <mat-step [stepControl]="generalGroup">
+        <form [formGroup]="generalGroup">
+            <ng-template matStepLabel>
+                <span>Datos del Local</span>
+            </ng-template>
+
+
+            <div class="info mb-4">
+                <h3>Información Básica del Local</h3>
+                <span>Ingrese la Información básica del nuevo local</span>
+            </div>
+
+            <div class="d-flex">
+
+                <mat-form-field appearance="fill" class="w-100 me-3 mb-3">
+                    <mat-label>Nombre</mat-label>
+                    <input matInput formControlName="name" required />
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="w-100 mb-3">
+                    <mat-label>Área (m²)</mat-label>
+                    <input matInput type="number" formControlName="areaM2" required />
+                </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="fill" class="w-100 mb-3">
+                <mat-label>Valor base de arriendo</mat-label>
+                <input matInput type="number" formControlName="rentValueBase" required />
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="w-100 mb-3">
+                <mat-label>Descripción</mat-label>
+                <textarea matInput formControlName="description" required></textarea>
+            </mat-form-field>
+
+
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button mat-button matStepperNext [disabled]="generalGroup.invalid">Siguiente</button>
+            </div>
+        </form>
+    </mat-step>
+
+    <!-- Paso 2: Ubicación -->
+    <mat-step [stepControl]="ubicacionGroup">
+        <form [formGroup]="ubicacionGroup">
+            <ng-template matStepLabel>
+                <span>Ubicación</span>
+            </ng-template>
+
+            <mat-form-field appearance="fill" class="w-100 mb-3">
+                <mat-label>Plaza</mat-label>
+                <mat-select formControlName="plazaId" required>
+                    <mat-option *ngFor="let plaza of plazas" [value]="plaza.id">{{ plaza.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="w-100 mb-3">
+                <mat-label>Dirección</mat-label>
+                <input matInput formControlName="address" required />
+            </mat-form-field>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button mat-button matStepperPrevious>Anterior</button>
+                <button mat-button matStepperNext [disabled]="ubicacionGroup.invalid">Siguiente</button>
+            </div>
+        </form>
+    </mat-step>
+
+    <!-- Paso 3: Imágenes -->
+    <mat-step [stepControl]="imagenesGroup">
+        <form [formGroup]="imagenesGroup">
+            <ng-template matStepLabel>
+                <span>Imágenes</span>
+            </ng-template>
+
+            <!-- Zona Drag & Drop -->
+            <div class="drop-zone" (dragover)="onDragOver($event)" (drop)="onDrop($event)"
+                (dragleave)="onDragLeave($event)" [class.dragover]="isDragging" (click)="fileInput.click()">
+                <p>Arrastra imágenes aquí o haz clic para seleccionarlas</p>
+                <input type="file" #fileInput (change)="onFileChange($event)" accept="image/*" multiple hidden />
+            </div>
+
+            <!-- Vista previa -->
+            <div class="image-preview-wrapper mt-3">
+                <div class="image-preview" *ngFor="let img of imagesPreview; let i = index"
+                    (mouseenter)="hoveredImageIndex = i" (mouseleave)="hoveredImageIndex = null">
+                    <img [src]="img" alt="preview" />
+                    <button mat-icon-button color="warn" class="remove-button" *ngIf="hoveredImageIndex === i"
+                        (click)="removeImage(i)">
+                        ❌
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button mat-button matStepperPrevious>Anterior</button>
+                <button mat-raised-button color="primary" type="button" (click)="onSubmit()">
+                    {{ isEdit ? 'Actualizar' : 'Crear' }}
+                </button>
+            </div>
+        </form>
+    </mat-step>
+
+
+</mat-horizontal-stepper>

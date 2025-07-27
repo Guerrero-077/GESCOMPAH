@@ -3,6 +3,9 @@
     public class ImageSelectDto
     {
         public int Id { get; set; }
-        public string FilePath { get; set; } = default!;
+        public string FileName { get; set; } = null!;
+        public string FilePath { get; set; } = null!;
+        public string PublicId { get; set; } = null!;
     }
+
 }

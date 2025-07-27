@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { LocalesModel } from '../../Models/card/card.models';
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { ActionButtonComponenet } from "../../Button/action-button-componenet/action-button-componenet";
-import { CommonModule } from '@angular/common';
+import { CommonModule } from "@angular/common";
+import { EstablishmentSelect } from "../../../../features/Establishment/Models/Establishment.models";
+
 
 @Component({
   selector: 'app-local-card',
@@ -10,7 +11,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './local-card.css'
 })
 export class LocalCard {
-  @Input() local!: LocalesModel;
+  @Input() local!: EstablishmentSelect;
   @Input() showAvailableTag: boolean = true;
 
   @Output() onView = new EventEmitter<number>();
@@ -30,6 +31,7 @@ export class LocalCard {
   }
 
   handleView(): void {
+    console.log('Ver ID:', this.local.id);
     this.onView.emit(this.local.id);
   }
 

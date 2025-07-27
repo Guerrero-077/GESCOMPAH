@@ -2,12 +2,10 @@
 using Entity.DTOs.Implements.Business.Establishment;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace WebGESCOMPAH.Controllers.Module.Business
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class EstablishmentsController : ControllerBase
     {
         private readonly IEstablishmentService _establishmentService;
@@ -16,57 +14,59 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             _establishmentService = establishmentService;
             
         }
-        // GET: api/<EstablishmentsController>
+
+        /// <summary>
+        /// Obtener todos los establecimientos activos.
+        /// </summary>
         [HttpGet]
-        public async Task<IEnumerable<EstablishmentSelectDto>> Get()
+        public async Task<ActionResult<IEnumerable<EstablishmentSelectDto>>> GetAll()
         {
-            return await _establishmentService.GetAllAsync();
+            var result = await _establishmentService.GetAllAsync();
+            return Ok(result);
         }
 
-        // GET api/<EstablishmentsController>/5
-        [HttpGet("{id}")]
-        public async Task<EstablishmentSelectDto?> Get(int id)
+        /// <summary>
+        /// Obtener un establecimiento por ID.
+        /// </summary>
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            return await _establishmentService.GetByIdAsync(id);
+            var result = await _establishmentService.GetByIdAsync(id);
+            return Ok(result);
         }
-    
 
-        // POST api/<EstablishmentsController>
+        /// <summary>
+        /// Crear un nuevo establecimiento con imágenes.
+        /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] EstablishmentCreateDto dto)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<EstablishmentSelectDto>> Create([FromForm] EstablishmentCreateDto dto)
         {
             var result = await _establishmentService.CreateAsync(dto);
-            return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
-
-        // PUT api/<EstablishmentsController>/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] EstablishmentUpdateDto dto)
+        /// <summary>
+        /// Actualizar un establecimiento y sus imágenes.
+        /// </summary>
+        [HttpPut("{id:int}")]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<EstablishmentSelectDto>> Update(int id, [FromForm] EstablishmentUpdateDto dto)
         {
             if (id != dto.Id)
-            {
-                return BadRequest();
-            }
+                return BadRequest("El ID de la URL no coincide con el ID del cuerpo del formulario.");
 
             var result = await _establishmentService.UpdateAsync(dto);
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return NoContent();
+            return Ok(result);
         }
 
-        // DELETE api/<EstablishmentsController>/5
-        [HttpDelete("{id}")]
+
+        /// <summary>
+        /// Eliminar lógicamente un establecimiento (soft delete).
+        /// </summary>
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _establishmentService.DeleteAsync(id);
-            if (!result)
-            {
-                return NotFound();
-            }
-
+            await _establishmentService.DeleteAsync(id);
             return NoContent();
         }
     }

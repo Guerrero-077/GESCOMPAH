@@ -5,14 +5,19 @@ namespace Entity.DTOs.Implements.Business.Establishment
     public class EstablishmentSelectDto
     {
         public int Id { get; set; }
-        public string Name { get; set; } = default!;
-        public string Description { get; set; } = default!;
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null!;
         public double AreaM2 { get; set; }
-        public double RentValueBase { get; set; }
+        public decimal RentValueBase { get; set; }
+        public string Address { get; set; } = String.Empty;
         public int PlazaId { get; set; }
-        public List<ImageSelectDto> Images { get; set; } = [];
+        public string PlazaName { get; set; } = null!;
         public bool Active { get; set; }
-        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// Imágenes asociadas al establecimiento
+        /// </summary>
+        public List<ImageSelectDto> Images { get; set; } = [];
     }
 
 }

@@ -39,4 +39,8 @@
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Module\AdministrationSystem\" />
+  </ItemGroup>
+
 </Project>

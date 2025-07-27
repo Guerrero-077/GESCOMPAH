@@ -4,6 +4,7 @@ using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250727184317_Update")]
+    partial class Update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,10 +346,6 @@ namespace Entity.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<double>("AreaM2")
                         .HasColumnType("float");
 
@@ -381,7 +380,6 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             Active = true,
-                            Address = "Cr 1 ",
                             AreaM2 = 500.0,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Establecimiento amplio con excelente ubicación.",
@@ -394,7 +392,6 @@ namespace Entity.Migrations
                         {
                             Id = 2,
                             Active = true,
-                            Address = "Cr 1 ",
                             AreaM2 = 120.0,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Oficina moderna en zona empresarial.",
@@ -407,7 +404,6 @@ namespace Entity.Migrations
                         {
                             Id = 3,
                             Active = true,
-                            Address = "Cr 1 ",
                             AreaM2 = 1000.0,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Espacio para almacenamiento de gran capacidad.",

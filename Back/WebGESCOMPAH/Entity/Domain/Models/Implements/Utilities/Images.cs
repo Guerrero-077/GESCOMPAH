@@ -7,7 +7,11 @@ namespace Entity.Domain.Models.Implements.Utilities
     {
         public string FileName { get; set; } = null!;
         public string FilePath { get; set; } = null!;
+        public string PublicId { get; set; } = null!;
+
+        //  Relación    
         public int EstablishmentId { get; set; }
         public Establishment Establishment { get; set; } = null!;
     }
+
 }

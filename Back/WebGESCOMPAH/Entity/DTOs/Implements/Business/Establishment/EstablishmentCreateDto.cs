@@ -7,9 +7,14 @@ namespace Entity.DTOs.Implements.Business.Establishment
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public double AreaM2 { get; set; }
-        public double RentValueBase { get; set; }
-        public int PlazaId { get; set; } 
-        // Archivos subidos desde el formulario
-        //public List<IFormFile>? Files { get; set; }
+        public decimal RentValueBase { get; set; }
+        public string Address { get; set; } = string.Empty;
+        public int PlazaId { get; set; }
+
+        /// <summary>
+        /// Archivos de imagen asociados (máximo 5).
+        /// </summary>
+        public ICollection<IFormFile>? Files { get; set; }
     }
+
 }
