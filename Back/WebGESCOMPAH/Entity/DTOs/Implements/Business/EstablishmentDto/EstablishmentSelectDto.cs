@@ -1,7 +1,7 @@
 ﻿using Entity.DTOs.Implements.Utilities.Images;
 
-namespace Entity.DTOs.Implements.Business.Establishment
-{
+namespace Entity.DTOs.Implements.Business.EstablishmentDto
+{ 
     public class EstablishmentSelectDto
     {
         public int Id { get; set; }

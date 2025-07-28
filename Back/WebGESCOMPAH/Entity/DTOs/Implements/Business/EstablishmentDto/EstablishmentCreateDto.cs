@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Entity.DTOs.Implements.Business.Establishment
+namespace Entity.DTOs.Implements.Business.EstablishmentDto
 {
     public class EstablishmentCreateDto
     {

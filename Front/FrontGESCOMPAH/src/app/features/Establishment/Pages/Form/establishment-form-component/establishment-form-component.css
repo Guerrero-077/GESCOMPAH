@@ -1,45 +1,106 @@
-.drop-zone {
-    border: 2px dashed #ccc;
-    padding: 2rem;
-    text-align: center;
-    cursor: pointer;
-    margin-bottom: 1rem;
+/* Estilos para imágenes compactas */
+.compact-image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.compact-image-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
     border-radius: 8px;
-    transition: background-color 0.3s ease;
-    position: relative;
-}
-
-.drop-zone.dragover {
-    background-color: #f0f0f0;
-    border-color: #3f51b5;
-}
-
-.image-preview-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.image-preview {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
     overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
 }
 
-.image-preview img {
+.compact-image-container:hover {
+    transform: scale(1.05);
+}
+
+.compact-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.remove-button {
+.compact-image-actions {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    background: white;
-    border-radius: 50%;
-    font-weight: bold;
+    top: 2px;
+    right: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.compact-image-container:hover .compact-image-actions {
+    opacity: 1;
+}
+
+.compact-image-actions button {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+}
+
+.compact-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.compact-image-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 10px;
+    text-align: center;
+    padding: 2px;
+}
+
+/* Estilos para el contador */
+.counter-badge {
+    background: #3f51b5;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+/* Estilos para la zona de drop (mejorados) */
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f9f9f9;
+}
+
+.drop-zone.dragover {
+    border-color: #3f51b5;
+    background: rgba(63, 81, 181, 0.05);
+}
+
+.drop-zone mat-icon {
+    color: #3f51b5;
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+    margin-bottom: 8px;
+}
+
+.drop-zone p {
+    margin: 8px 0;
+    font-weight: 500;
+}
+
+.drop-zone small {
+    color: #666;
+    font-size: 12px;
 }

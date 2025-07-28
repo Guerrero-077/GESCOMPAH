@@ -7,7 +7,7 @@ using MapsterMapper;
 
 namespace Business.Services.Location
 {
-    public class DepartmentService : BusinessGeneric<DepartmentSelectDto, DepartmentSelectDto, DepartmentSelectDto, Department>, IDepartmentService
+    public class DepartmentService : BusinessGeneric<DepartmentSelectDto, DepartmentCreateDto, DepartmentUpdateDto, Department>, IDepartmentService
     {
 
         public DepartmentService(IDataGeneric<Department> data, IMapper mapper) : base(data, mapper)

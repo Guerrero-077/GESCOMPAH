@@ -1,11 +1,13 @@
-﻿using Entity.Domain.Models.Implements.AdministrationSystem;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Utilities;
 
 using Entity.DTOs.Implements.AdministrationSystem;
-using Entity.DTOs.Implements.Business.Establishment;
+using Entity.DTOs.Implements.Business.Appointment;
+using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Entity.DTOs.Implements.Business.Plaza;
 using Entity.DTOs.Implements.Persons.Peron;
 using Entity.DTOs.Implements.SecurityAuthentication;
@@ -104,6 +106,12 @@ namespace Business.Mapping
                 .Ignore(dest => dest.CreatedAt)
                 .Ignore(dest => dest.IsDeleted)   // Controlado por lógica
                 .IgnoreNullValues(true);          // Fundamental para evitar sobrescritura
+
+
+            config.NewConfig<Appointment, AppointmentSelectDto>()
+                .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
+
+
 
             return config;
         }

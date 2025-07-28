@@ -10,6 +10,8 @@ namespace Entity.Domain.Models.Implements.Business
         public string Description { get; set; } = null!;
         public DateTime RequestDate { get; set; } 
         public DateTime DateTimeAssigned { get; set; }
+        public int EstablishmentId { get; set; }
+        public  Establishment Establishment { get; set; }
 
     }
 }

@@ -1,4 +1,4 @@
-﻿using Entity.DTOs.Implements.Business.Establishment;
+﻿using Entity.DTOs.Implements.Business.EstablishmentDto;
 using FluentValidation;
 
 namespace Entity.DTOs.Validations

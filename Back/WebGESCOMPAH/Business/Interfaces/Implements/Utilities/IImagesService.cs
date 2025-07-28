@@ -1,26 +1,33 @@
-﻿using Business.Interfaces.IBusiness;
-using Entity.Domain.Models.Implements.Utilities;
+﻿using Microsoft.AspNetCore.Http;
 using Entity.DTOs.Implements.Utilities.Images;
-using Microsoft.AspNetCore.Http;
 
 namespace Business.Interfaces.Implements.Utilities
 {
-    public interface IImagesService : IBusiness<ImageSelectDto, ImageCreateDto, ImageUpdateDto>
+    public interface IImagesService
     {
-        //Task<List<ImageSelectDto>> AddImagesAsync(int establishmentId, ICollection<IFormFile> files);
-        //Task DeleteImagesByPublicIdsAsync(ICollection<string> publicIds);
-        //Task<List<ImageSelectDto>> GetImagesByEstablishmentIdAsync(int establishmentId);
+        /// <summary>
+        /// Agrega múltiples imágenes a un establecimiento.
+        /// </summary>
+        Task<List<ImageSelectDto>> AddImagesAsync(int establishmentId, IFormFileCollection files);
 
+        /// <summary>
+        /// Reemplaza una imagen existente (por ID).
+        /// </summary>
+        Task<ImageSelectDto> ReplaceImageAsync(int imageId, IFormFile newFile);
 
-        Task<List<ImageSelectDto>> AddImagesAsync(int establishmentId, ICollection<IFormFile> files);
+        /// <summary>
+        /// Elimina una imagen individual por ID.
+        /// </summary>
         Task DeleteImageByIdAsync(int imageId);
-        Task DeleteImagesByPublicIdsAsync(ICollection<string> publicIds);
+
+        /// <summary>
+        /// Elimina múltiples imágenes por sus publicIds en Cloudinary.
+        /// </summary>
+        Task DeleteImagesByPublicIdsAsync(List<string> publicIds);
+
+        /// <summary>
+        /// Obtiene todas las imágenes asociadas a un establecimiento.
+        /// </summary>
         Task<List<ImageSelectDto>> GetImagesByEstablishmentIdAsync(int establishmentId);
     }
-
 }
-
-//Task<IEnumerable<ImageSelectDto>> GetByEstablishmentIdAsync(int establishmentId);
-//Task AddAsync(ImageCreateDto entity);
-//Task<(string Url, string PublicId)> UploadImageAsync(IFormFile file);
-//Task DeleteImageAsync(string publicId);

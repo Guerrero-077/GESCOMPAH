@@ -52,6 +52,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IImagesService, ImageService>(); 
             services.AddScoped<IAppointmentService, AppointmentService>();
 
+
             //Mapping
             services.AddMapster();
             MapsterConfig.Register();
@@ -66,6 +67,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
 
 

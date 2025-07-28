@@ -2,9 +2,9 @@
 
 namespace Entity.DTOs.Implements.Location.Department
 {
-    public class DepartmentDto
+    public class DepartmentCreateDto
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         public List<CityDto> Cities { get; set; } = new();
     }

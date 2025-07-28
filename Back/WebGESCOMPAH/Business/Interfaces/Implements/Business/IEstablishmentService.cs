@@ -1,5 +1,5 @@
 ﻿using Business.Interfaces.IBusiness;
-using Entity.DTOs.Implements.Business.Establishment;
+using Entity.DTOs.Implements.Business.EstablishmentDto;
 
 namespace Business.Interfaces.Implements.Business
 {

@@ -17,9 +17,10 @@ namespace Entity.Infrastructure.DataInit.Business
                     FullName = "Juan Pérez",
                     Email = "juan.perez@example.com",
                     Phone = "3001234567",
-                    Description = "Consulta sobre producto X",
+                    Description = "Solicitud para conocer el local",
                     RequestDate = seedDate,
-                    DateTimeAssigned = seedDate.AddDays(2).AddHours(10),
+                    DateTimeAssigned = seedDate.AddDays(3).AddHours(10),
+                    EstablishmentId = 1,
                     CreatedAt = seedDate,
                     Active = true,
                     IsDeleted = false
@@ -27,13 +28,28 @@ namespace Entity.Infrastructure.DataInit.Business
                 new Appointment
                 {
                     Id = 2,
-                    FullName = "Laura Gómez",
-                    Email = "laura.gomez@example.com",
-                    Phone = "3109876543",
-                    Description = "Revisión de contrato",
+                    FullName = "María Gómez",
+                    Email = "maria.gomez@example.com",
+                    Phone = "3019876543",
+                    Description = "Revisión de contrato anterior",
                     RequestDate = seedDate.AddDays(1),
-                    DateTimeAssigned = seedDate.AddDays(3).AddHours(14),
-                    CreatedAt = seedDate,
+                    DateTimeAssigned = seedDate.AddDays(4).AddHours(11),
+                    EstablishmentId = 2,
+                    CreatedAt = seedDate.AddDays(1),
+                    Active = true,
+                    IsDeleted = false
+                },
+                new Appointment
+                {
+                    Id = 3,
+                    FullName = "Carlos Ramírez",
+                    Email = "carlos.ramirez@example.com",
+                    Phone = "3021122334",
+                    Description = "Consulta sobre requisitos para arriendo",
+                    RequestDate = seedDate.AddDays(2),
+                    DateTimeAssigned = seedDate.AddDays(5).AddHours(9),
+                    EstablishmentId = 3,
+                    CreatedAt = seedDate.AddDays(2),
                     Active = true,
                     IsDeleted = false
                 }

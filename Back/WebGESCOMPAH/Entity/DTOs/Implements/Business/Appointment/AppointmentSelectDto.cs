@@ -1,4 +1,6 @@
-﻿namespace Entity.DTOs.Implements.Business.Appointment
+﻿using Entity.Domain.Models.Implements.Business;
+
+namespace Entity.DTOs.Implements.Business.Appointment
 {
     public class AppointmentSelectDto
     {
@@ -7,7 +9,12 @@
         public string Email { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public string Description { get; set; } = null!;
+        public bool Active { get; set; }
         public DateTime RequestDate { get; set; }
-        public DateTime DareTimeAssigned { get; set; }
+        public DateTime DateTimeAssigned { get; set; }
+
+        // Relación con Establecimiento
+        public int EstablishmentId { get; set; }
+        public string EstablishmentName { get; set; } = null!;
     }
 }

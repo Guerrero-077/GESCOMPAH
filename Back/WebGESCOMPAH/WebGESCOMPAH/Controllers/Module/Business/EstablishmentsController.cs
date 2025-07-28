@@ -1,5 +1,5 @@
 ﻿using Business.Interfaces.Implements.Business;
-using Entity.DTOs.Implements.Business.Establishment;
+using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebGESCOMPAH.Controllers.Module.Business

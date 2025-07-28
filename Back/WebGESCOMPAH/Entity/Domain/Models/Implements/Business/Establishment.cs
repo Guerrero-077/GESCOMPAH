@@ -11,6 +11,7 @@ namespace Entity.Domain.Models.Implements.Business
         public int PlazaId { get; set; } // Foreign key to the Plaza entity
         public Plaza? Plaza { get; set; } // Navigation property to the Plaza entity
 
-        public List<Images> Images { get; set; } = new();
+        public List<Images> Images { get; set; } = [];
+        public ICollection<Appointment> Appointments { get; set; } = [];
     }
 }
