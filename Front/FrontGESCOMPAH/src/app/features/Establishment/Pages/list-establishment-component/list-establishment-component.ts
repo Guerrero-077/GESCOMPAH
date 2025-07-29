@@ -10,7 +10,6 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 import { LocalCard } from '../../../../shared/components/card/local-card/local-card';
-import { Header } from '../../../../shared/components/Header/header/header';
 import { ModalComponenet } from '../../../../shared/components/Modal/modal-componenet/modal-componenet';
 import {
   LocalesModel,
@@ -20,6 +19,7 @@ import {
 import { GenericFormDialogData } from '../../../../shared/components/Models/Modal/modal.models';
 import { buildLocalFormConfig } from '../../Models/form-config/local-form.config';
 import { LocalesService } from '../../Services/Locales/locales-service';
+import { HeaderComponent } from '../../../../shared/components/header/header.component';
 
 @Component({
   selector: 'app-list-establishment-component',
@@ -32,7 +32,7 @@ import { LocalesService } from '../../Services/Locales/locales-service';
     MatButtonModule,
     MatDialogModule,
     MatSnackBarModule,
-    Header,
+    HeaderComponent,
     LocalCard
   ],
   templateUrl: './list-establishment-component.html',

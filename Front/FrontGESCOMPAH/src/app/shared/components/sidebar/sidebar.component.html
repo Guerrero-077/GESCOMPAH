@@ -1,0 +1,17 @@
+<div class="sidebar">
+    <div class="header">
+      <h3>GESCOMPAH</h3>
+      <p>Palermo Locales</p>
+    </div>
+
+    <ul class="menu">
+      <li *ngFor="let item of menu" routerLinkActive="active" [routerLink]="item.route">
+        <span class="material-icons">{{ item.icon }}</span>
+        {{ item.label }}
+      </li>
+    </ul>
+
+    <div class="logout" (click)="cerrarSesion()">
+      <span class="material-icons">logout</span> Cerrar Sesión
+    </div>
+</div>

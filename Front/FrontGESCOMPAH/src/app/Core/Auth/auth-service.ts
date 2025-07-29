@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { LoginModel, LoginResponseModel } from '../../features/Auth/Models/login.models';
 import { RegisterModel } from '../../features/Auth/Models/register.models';
+import { User } from '../../shared/models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
     private http = inject(HttpClient);
-  private urlBase = environment.apiURL + '/Auth/';
+    private urlBase = environment.apiURL + '/Auth/';
 
   /**
    *
@@ -25,8 +26,8 @@ export class AuthService {
     return this.http.post<any>(this.urlBase + 'Login', Objeto);
   }
 
-  GetMe(): Observable<LoginResponseModel> {
-    return this.http.get<LoginResponseModel>(this.urlBase + 'me');
+  GetMe(): Observable<User> {
+    return this.http.get<User>(this.urlBase + 'me');
   }
 
 }
