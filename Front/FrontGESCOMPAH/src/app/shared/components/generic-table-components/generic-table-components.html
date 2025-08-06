@@ -1,11 +1,14 @@
 <div class="table-wrapper">
 
-    <mat-form-field appearance="outline">
-        <mat-label>Buscar</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Search">
+    <div class="div" style="display: flex; justify-content: space-between;">
 
-        <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
+        <mat-form-field appearance="outline" style="margin-bottom: 16px;">
+            <mat-label>Buscar</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Search">
+        </mat-form-field>
+
+        <button>Gurdar</button>
+    </div>
 
 
     <table mat-table [dataSource]="dataSource" matSort>

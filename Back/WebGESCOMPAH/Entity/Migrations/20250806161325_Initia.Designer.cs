@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250805200954_Initial")]
-    partial class Initial
+    [Migration("20250806161325_Initia")]
+    partial class Initia
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1672,7 +1672,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 1,
                             FileName = "primavera_1.jpg",
-                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png",
                             IsDeleted = false,
                             PublicId = "primavera_1"
                         },
@@ -1683,7 +1683,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 1,
                             FileName = "primavera_2.jpg",
-                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png",
                             IsDeleted = false,
                             PublicId = "primavera_2"
                         },
@@ -1694,7 +1694,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 2,
                             FileName = "torre_1.jpg",
-                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png",
                             IsDeleted = false,
                             PublicId = "torre_1"
                         },
@@ -1705,7 +1705,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 2,
                             FileName = "torre_2.jpg",
-                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png",
                             IsDeleted = false,
                             PublicId = "torre_2"
                         },
@@ -1716,7 +1716,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 3,
                             FileName = "bodega_1.jpg",
-                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png",
                             IsDeleted = false,
                             PublicId = "bodega_1"
                         },
@@ -1727,7 +1727,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 3,
                             FileName = "bodega_2.jpg",
-                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png",
                             IsDeleted = false,
                             PublicId = "bodega_2"
                         });
