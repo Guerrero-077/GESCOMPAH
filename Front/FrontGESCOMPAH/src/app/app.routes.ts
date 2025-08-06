@@ -9,6 +9,9 @@ import { PermissionComponent } from './features/ModelSecurity/Pages/Permission/p
 import { MainComponent } from './features/Establishment/Pages/main-component/main-component';
 import { MainSistemSegurity } from './features/ModelSecurity/Pages/main/main-sistem-segurity/main-sistem-segurity';
 import { TenantsComponent } from './features/Tenants/Pages/Tenants/tenants-component/tenants-component';
+import { CityComponent } from './features/Config/Pages/City/city-component/city-component';
+import { MainConfig } from './features/Config/Pages/Main/main-config/main-config';
+import { DepartmentsCitiesComponent } from './features/Config/Pages/Main/departments-cities-component/departments-cities-component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'Auth/login', pathMatch: 'full' },
@@ -33,6 +36,9 @@ export const routes: Routes = [
       { path: 'Establishment', component: ListEstablishmentComponent },
       { path: 'tenants', component: TenantsComponent },
       { path: 'mainSistemSegurity', component: MainSistemSegurity },
+      { path: 'city', component: CityComponent },
+      { path: 'mainConfig', component: MainConfig },
+      { path: 'departmentCities', component: DepartmentsCitiesComponent },
     ],
     data: { role: 'Administrador' },
   },

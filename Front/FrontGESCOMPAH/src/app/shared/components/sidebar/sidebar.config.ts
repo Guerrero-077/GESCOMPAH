@@ -13,7 +13,7 @@ export const SIDEBAR_BY_ROLE: Record<string, SidebarItem[]> = {
     { label: 'Citas', icon: 'event', route: 'citas' },
     { label: 'Reportes', icon: 'bar_chart', route: 'reportes' },
     { label: 'SistemSegurity', icon: 'security', route: 'mainSistemSegurity' },
-    { label: 'Configuración', icon: 'settings', route: 'configuracion' }
+    { label: 'Configuración', icon: 'settings', route: 'mainConfig' }
   ],
   arrendamiento: [
     { label: 'Dashboard', icon: 'home', route: '/dashboard' },

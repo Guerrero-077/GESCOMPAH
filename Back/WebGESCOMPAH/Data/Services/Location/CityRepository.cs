@@ -12,7 +12,7 @@ namespace Data.Services.Location
         {
         }
 
-        public async Task<IEnumerable<City>> GetCityByDepartment(int idDepartment)
+        public async Task<IEnumerable<City>> GetCityByDepartmentAsync(int idDepartment)
         {
             return await _dbSet.Where(c => c.DepartmentId == idDepartment && !c.IsDeleted)
                 .ToListAsync();
