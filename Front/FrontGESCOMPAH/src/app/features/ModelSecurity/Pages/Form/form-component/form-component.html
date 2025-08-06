@@ -6,3 +6,16 @@
 <ng-template #estadoTemplate let-row>
     <span class="badge badge-success">Activo</span>
 </ng-template>
+
+<div class="modal fade" id="editFormModal" tabindex="-1" aria-labelledby="editFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <app-dymanic-forms
+                [formType]="'Form'" 
+                [initialData]="selectedForm"
+                ></app-dymanic-forms>
+            </div>
+        </div>
+    </div>
+</div>

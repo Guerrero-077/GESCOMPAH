@@ -1,6 +1,6 @@
 <form class="row g-3" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div *ngFor="let field of fields" class="mb-3">
-        <label class="form-label">{{ field.name }}</label>
+    <div *ngFor="let field of fields" class="mb-3" >
+        <label *ngIf="field.name !== 'id'" class="form-label">{{ field.name }}</label>
         <ng-container [ngSwitch]="field.type">
             <input
                 *ngSwitchCase="'text'"
@@ -13,6 +13,12 @@
                 [formControlName]="field.name"
                 class="form-control"
                 type="date"
+            />
+            <input
+                *ngSwitchCase="'hidden'"
+                [formControlName]="field.name"
+                class="form-control"
+                type="hidden"
             />
             <select
                 *ngSwitchCase="'select'"
@@ -31,3 +37,4 @@
         </ng-container>
     </div>
 </form>
+

@@ -5,6 +5,8 @@ import { FormModule } from '../../../Models/form.model';
 import { FormServices } from '../../../Services/Form/form-services';
 import { DymanicFormsComponent } from "../../../../../shared/components/dymanic-forms/dymanic-forms.component";
 
+declare var bootstrap: any;
+
 @Component({
   selector: 'app-form-component',
   imports: [GenericTableComponents, DymanicFormsComponent],
@@ -14,6 +16,7 @@ import { DymanicFormsComponent } from "../../../../../shared/components/dymanic-
 export class FormComponent implements OnInit {
   private readonly formService = inject(FormServices);
   Forms: FormModule[] = [];
+  selectedForm: any = null;
 
   columns: TableColumn<FormModule>[] = [];
 
@@ -40,7 +43,10 @@ export class FormComponent implements OnInit {
   }
 
   onEdit(row: FormModule) {
-    console.log('Editar:', row);
+    this.selectedForm = row;
+    console.log(this.selectedForm)
+    const modal = new bootstrap.Modal(document.getElementById('editFormModal')!);
+    modal.show();
   }
 
   onDelete(row: FormModule) {
