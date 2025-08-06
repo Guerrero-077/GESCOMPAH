@@ -1,0 +1,33 @@
+<form class="row g-3" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div *ngFor="let field of fields" class="mb-3">
+        <label class="form-label">{{ field.name }}</label>
+        <ng-container [ngSwitch]="field.type">
+            <input
+                *ngSwitchCase="'text'"
+                [formControlName]="field.name"
+                class="form-control"
+                type="text"
+            />
+            <input
+                *ngSwitchCase="'date'"
+                [formControlName]="field.name"
+                class="form-control"
+                type="date"
+            />
+            <select
+                *ngSwitchCase="'select'"
+                [formControlName]="field.name"
+                class="form-select"
+            >
+                <option value="">Seleccione...</option>
+                <option *ngFor="let opt of field.options" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+            <textarea
+                *ngSwitchCase="'textarea'"
+                [formControlName]="field.name"
+                class="form-control"
+                [placeholder]="field.label"
+            ></textarea>
+        </ng-container>
+    </div>
+</form>
