@@ -1,0 +1,39 @@
+.sidebar {
+  width: 240px;
+  background: white;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: space-between;
+} 
+.header {
+  background-color: #2E7D32;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+.menu {
+  list-style: none;
+  padding: 0;
+  height: 100vh;
+}
+.menu li {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.menu li.active {
+  background: #E8F5E9;
+  border-left: 4px solid #2E7D32;
+}
+.logout {
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid #ddd;
+}

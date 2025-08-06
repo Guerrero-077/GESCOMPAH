@@ -1,0 +1,52 @@
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  max-width: 100%;
+}
+
+.card-headers {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #22543d !important; /* verde oscuro */
+  margin: 0;
+}
+
+.card-value p {
+  font-size: 36px;
+  font-weight: bold;
+  color: #2f855a; /* verde más claro */
+  margin: 12px 0 0 0;
+}
+
+.card-progress {
+  margin-top: 12px;
+}
+
+.progress-bar-background {
+  width: 100%;
+  height: 12px;
+  background-color: #e5e7eb; /* gris claro */
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #000;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #4b5563; /* gris medio */
+}

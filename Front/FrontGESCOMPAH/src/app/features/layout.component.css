@@ -1,0 +1,16 @@
+.container-d {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background-color: #fff;
+}
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.main-content{
+    padding: 3vh;
+    display: flex;
+    flex-direction: column;
+}
