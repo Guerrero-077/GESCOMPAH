@@ -5,6 +5,6 @@ namespace Data.Interfaz.IDataImplemenent.Location
 {
     public interface ICityRepository : IDataGeneric<City>
     {
-        Task<IEnumerable<City>> GetCityByDepartment(int idDepartment);
+        Task<IEnumerable<City>> GetCityByDepartmentAsync(int idDepartment);
     }
 }

@@ -35,7 +35,7 @@ export class FormServices extends GenericService<FormModule> {
     });
   }
 
-  AddPruebas(form: FormModule){
-    
+  AddPruebas(form: FormModule) {
+
   }
 }

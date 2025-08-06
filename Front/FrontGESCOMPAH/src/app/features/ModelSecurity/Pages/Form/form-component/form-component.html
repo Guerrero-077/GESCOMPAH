@@ -1,21 +1,12 @@
-<app-generic-table-components [data]="Forms" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
-    (view)="onView($event)">
-</app-generic-table-components>
+<div class="row d-flex justify-content-center">
+    <app-generic-table-components [data]="Forms" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
+        (view)="onView($event)">
+    </app-generic-table-components>
 
 
-<ng-template #estadoTemplate let-row>
-    <span class="badge badge-success">Activo</span>
-</ng-template>
-
-<div class="modal fade" id="editFormModal" tabindex="-1" aria-labelledby="editFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-body">
-                <app-dymanic-forms
-                [formType]="'Form'" 
-                [initialData]="selectedForm"
-                ></app-dymanic-forms>
-            </div>
-        </div>
-    </div>
+    <ng-template #estadoTemplate let-row>
+        <span class="badge badge-success">Activo</span>
+    </ng-template>
 </div>
+
+

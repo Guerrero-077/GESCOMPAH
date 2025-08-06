@@ -11,7 +11,7 @@ namespace WebGESCOMPAH.Controllers.Module.Locations
     [ApiController]
     public class DepartmentController : BaseController<DepartmentSelectDto, DepartmentCreateDto, DepartmentUpdateDto, IDepartmentService>
     {
-        public DepartmentController(IDepartmentService service, ILogger logger) : base(service, logger)
+        public DepartmentController(IDepartmentService service, ILogger<DepartmentController> logger) : base(service, logger)
         {
         }
 

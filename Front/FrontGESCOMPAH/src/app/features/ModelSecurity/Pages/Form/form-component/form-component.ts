@@ -4,12 +4,14 @@ import { TableColumn } from '../../../../../shared/models/TableColumn.models';
 import { FormModule } from '../../../Models/form.model';
 import { FormServices } from '../../../Services/Form/form-services';
 import { DymanicFormsComponent } from "../../../../../shared/components/dymanic-forms/dymanic-forms.component";
+import { CommonModule } from '@angular/common'; 
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { FormDialogComponent } from '../../../../../shared/components/form-dialog/form-dialog.component';
 
-declare var bootstrap: any;
 
 @Component({
   selector: 'app-form-component',
-  imports: [GenericTableComponents, DymanicFormsComponent],
+  imports: [GenericTableComponents, DymanicFormsComponent, CommonModule, MatDialogModule],
   templateUrl: './form-component.html',
   styleUrl: './form-component.css'
 })
@@ -19,6 +21,8 @@ export class FormComponent implements OnInit {
   selectedForm: any = null;
 
   columns: TableColumn<FormModule>[] = [];
+
+  constructor(private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.columns = [
@@ -43,10 +47,17 @@ export class FormComponent implements OnInit {
   }
 
   onEdit(row: FormModule) {
-    this.selectedForm = row;
-    console.log(this.selectedForm)
-    const modal = new bootstrap.Modal(document.getElementById('editFormModal')!);
-    modal.show();
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      width: '600px',
+      data: row
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.selectedForm = null;
+      if (result) {
+        this.load(); // Recarga si es necesario
+      }
+    });
   }
 
   onDelete(row: FormModule) {
@@ -56,8 +67,5 @@ export class FormComponent implements OnInit {
   onView(row: FormModule) {
     console.log('Ver:', row);
   }
-
-
-
 
 }

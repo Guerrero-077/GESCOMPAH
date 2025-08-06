@@ -41,6 +41,11 @@ export class EstablishmentFormComponent {
   isDragging = false;
   isDeletingImage = false;
 
+  readonly MAX_IMAGES = 5;
+  readonly MAX_FILE_SIZE_MB = 5;
+  readonly MAX_FILE_SIZE_BYTES = this.MAX_FILE_SIZE_MB * 1024 * 1024;
+
+
   selectedFiles: File[] = [];
   imagesPreview: string[] = [];
 
@@ -157,17 +162,40 @@ export class EstablishmentFormComponent {
 
   private processFiles(files: FileList): void {
     const totalImages = this.selectedFiles.length + this.existingImages.length;
-    const remainingSlots = 5 - totalImages;
+    const remainingSlots = this.MAX_IMAGES - totalImages;
 
     if (remainingSlots <= 0) {
-      this.snackBar.open('Máximo 5 imágenes permitidas', 'Cerrar', { duration: 3000 });
+      this.snackBar.open(`Máximo ${this.MAX_IMAGES} imágenes permitidas`, 'Cerrar', { duration: 3000 });
       return;
     }
 
-    for (let i = 0; i < Math.min(remainingSlots, files.length); i++) {
-      const file = files[i];
-      if (!file.type.match(/image\/*/)) continue;
+    const validFiles: File[] = [];
+    const errors: string[] = [];
 
+    for (let i = 0; i < files.length && validFiles.length < remainingSlots; i++) {
+      const file = files[i];
+
+      if (!file.type.startsWith('image/')) {
+        errors.push(`"${file.name}" no es una imagen válida.`);
+        continue;
+      }
+
+      if (file.size > this.MAX_FILE_SIZE_BYTES) {
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        errors.push(`"${file.name}" pesa ${sizeMB}MB. El límite es ${this.MAX_FILE_SIZE_MB}MB.`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    // Feedback de errores
+    if (errors.length > 0) {
+      this.snackBar.open(errors.join('\n'), 'Cerrar', { duration: 6000 });
+    }
+
+    // Agregar archivos válidos
+    validFiles.forEach((file) => {
       this.selectedFiles.push(file);
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -176,8 +204,9 @@ export class EstablishmentFormComponent {
         }
       };
       reader.readAsDataURL(file);
-    }
+    });
   }
+
 
   removeImage(index: number, isExisting: boolean): void {
     if (this.isDeletingImage) return;
