@@ -54,7 +54,7 @@ export class FormComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       this.selectedForm = null;
-      if (result) {
+      if (result) { //comentario
         this.load(); // Recarga si es necesario
       }
     });
