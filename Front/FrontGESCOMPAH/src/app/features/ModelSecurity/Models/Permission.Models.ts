@@ -1,6 +1,6 @@
-export type FormModule = {
+export interface PermissionModule {
     name: string;
     description: string;
-    route: string;
     active: boolean;
+
 }

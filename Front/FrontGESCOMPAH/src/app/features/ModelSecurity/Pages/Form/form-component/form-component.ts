@@ -20,7 +20,9 @@ export class FormComponent implements OnInit {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
-      { key: 'description', header: 'Descripción' }
+      { key: 'description', header: 'Descripción' },
+      { key: 'route', header: 'Route' },
+      { key: 'active', header: 'Active' }
     ];
     this.load();
   }

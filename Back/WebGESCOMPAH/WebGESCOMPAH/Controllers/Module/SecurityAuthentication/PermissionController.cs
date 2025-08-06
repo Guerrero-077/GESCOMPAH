@@ -1,6 +1,7 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Permission;
 using Microsoft.AspNetCore.Mvc;
+using WebGESCOMPAH.Controllers.Base;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,59 +11,40 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
     [ApiController]
     [Produces("application/json")]
 
-    public class PermissionController(IPermissionService permissionService) : ControllerBase
+    public class PermissionController : BaseController<PermissionSelectDto, PermissionCreateDto, PermissionUpdateDto, IPermissionService>
     {
-
-        private readonly IPermissionService _permissionService = permissionService;
-
-        // GET: api/<PermissionController>
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        public PermissionController(IPermissionService service, ILogger<PermissionController> logger) : base(service, logger)
         {
-           var permissions = await _permissionService.GetAllAsync();
-            return Ok(permissions);
         }
 
-        // GET api/<PermissionController>/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        protected override async Task AddAsync(PermissionCreateDto dto)
         {
-            var permission = await _permissionService.GetByIdAsync(id);
-            return Ok(permission);
+            await _service.CreateAsync(dto);
         }
 
-        // POST api/<PermissionController>
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PermissionCreateDto permissionDto)
+        protected override async Task<bool> DeleteAsync(int id)
         {
-            var permission = await _permissionService.CreateAsync(permissionDto);
-            return CreatedAtAction(nameof(Get), new { id = permission.Id }, permission);
+            return await _service.DeleteAsync(id);
         }
 
-        // PUT api/<PermissionController>/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] PermissionUpdateDto permissionDto)
+        protected override async Task<bool> DeleteLogicAsync(int id)
         {
-
-            var existingPermission = await _permissionService.GetByIdAsync(id);
-
-            await _permissionService.UpdateAsync(permissionDto);
-            return NoContent();
+            return await _service.DeleteLogicAsync(id);
         }
 
-        // DELETE api/<PermissionController>/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        protected override async Task<IEnumerable<PermissionSelectDto>> GetAllAsync()
         {
-            var existingPermission = await _permissionService.GetByIdAsync(id);
-            if (existingPermission == null)
-            {
-                return NotFound();
-            }
+            return await _service.GetAllAsync();
+        }
 
-            await _permissionService.DeleteAsync(id);
-            return Ok(new { message = $"El Permission con ID {id} fue eliminado exitosamente." });
+        protected override async Task<PermissionSelectDto?> GetByIdAsync(int id)
+        {
+            return await _service.GetByIdAsync(id);
+        }
 
+        protected override async Task<PermissionUpdateDto> UpdateAsync(int id, PermissionUpdateDto dto)
+        {
+            return await _service.UpdateAsync(dto);
         }
     }
 }
