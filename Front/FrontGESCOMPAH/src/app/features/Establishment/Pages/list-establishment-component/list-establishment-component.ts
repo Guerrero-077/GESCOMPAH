@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { LocalCard } from "../../../../shared/components/card/local-card/local-card";
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
+import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { EstablishmentSelect } from '../../Models/Establishment.models';
 import { LocalesService } from '../../Services/Locales/locales-service';
 import { EstablishmentFormComponent } from '../Form/establishment-form-component/establishment-form-component';
