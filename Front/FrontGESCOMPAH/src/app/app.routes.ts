@@ -1,14 +1,12 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './features/Auth/pages/login/login-component/login-component';
 import { LayoutComponent } from './features/layout.component';
+import { DashboardComponent } from './features/dashboard/Pages/dashboard/dashboard-component/dashboard-component';
+import { EstablishmentFormComponent } from './features/Establishment/Pages/Form/establishment-form-component/establishment-form-component';
 import { ListEstablishmentComponent } from './features/Establishment/Pages/list-establishment-component/list-establishment-component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { PropiedadComponent } from './features/propiedad/propiedad.component';
-import { ArrentadariosComponent } from './features/arrentadarios/arrentadarios.component';
 
 export const routes: Routes = [
-  // { path: '', redirectTo: 'Auth', pathMatch: 'full' },
-  { path: '', redirectTo: 'Admin', pathMatch: 'full' },
+  { path: '', redirectTo: 'Auth/login', pathMatch: 'full' },
+  // { path: '', redirectTo: 'Admin', pathMatch: 'full' },
   {
     path: 'Auth',
     loadChildren: () =>
@@ -24,9 +22,8 @@ export const routes: Routes = [
     component: LayoutComponent,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard' , component: DashboardComponent},
-      { path: 'propiedades' , component: PropiedadComponent},
-      { path: 'arrendatarios' , component: ArrentadariosComponent},
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'Establishment', component: ListEstablishmentComponent },
     ],
     data: { role: 'Administrador' },
   }

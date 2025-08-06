@@ -7,7 +7,7 @@ export interface SidebarItem {
 export const SIDEBAR_BY_ROLE: Record<string, SidebarItem[]> = {
   admin: [
     { label: 'Dashboard', icon: 'home', route: 'dashboard' },
-    { label: 'Propiedades', icon: 'description', route: 'propiedades' },
+    { label: 'Propiedades', icon: 'description', route: 'Establishment' },
     { label: 'Arrendatarios', icon: 'person', route: 'arrendatarios' },
     { label: 'Contratos', icon: 'assignment', route: 'contratos' },
     { label: 'Citas', icon: 'event', route: 'citas' },
