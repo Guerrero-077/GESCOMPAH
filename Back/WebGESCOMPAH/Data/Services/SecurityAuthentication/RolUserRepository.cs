@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplemenent;
+﻿using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Data.Repository;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Infrastructure.Context;
@@ -12,6 +12,22 @@ namespace Data.Services.SecurityAuthentication
         {
         }
 
+
+        public override async Task<IEnumerable<RolUser>> GetAllAsync()
+        {
+            return await _dbSet
+                .Include(e => e.Rol)
+                .Include(e => e.User)
+                .ToListAsync();
+        }
+
+        public override async Task<RolUser?> GetByIdAsync(int id)
+        {
+            return await _dbSet
+                    .Include(e => e.Rol)
+                    .Include(e => e.User)
+                    .FirstOrDefaultAsync(e => e.Id == id);
+        }
         public async Task<RolUser> AsignateRolDefault(User user)
         {
             var rolUser = new RolUser
@@ -34,6 +50,7 @@ namespace Data.Services.SecurityAuthentication
                 .Select(ru => ru.Rol)
                 .ToListAsync();
         }
+
 
     }
 }

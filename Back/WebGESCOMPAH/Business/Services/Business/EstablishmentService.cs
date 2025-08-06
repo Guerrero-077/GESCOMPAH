@@ -1,6 +1,7 @@
 ﻿using Business.Interfaces.Implements.Business;
 using Business.Repository;
-using Data.Interfaz.IDataImplemenent;
+using Data.Interfaz.IDataImplemenent.Business;
+using Data.Interfaz.IDataImplemenent.Utilities;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Utilities;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
@@ -53,50 +54,50 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
         return dtoResult;
     }
 
-    public override async Task<EstablishmentSelectDto> UpdateAsync(EstablishmentUpdateDto dto)
-    {
-        var entity = await _repository.GetByIdAsync(dto.Id);
-        if (entity == null)
-        {
-            _logger.LogWarning("Intento de actualizar establecimiento inexistente con ID {Id}", dto.Id);
-            throw new NotFoundException("Establishment", "Establecimiento no encontrado");
-        }
+    //public override async Task<EstablishmentUpdateDto> UpdateAsync(EstablishmentUpdateDto dto)
+    //{
+    //    var entity = await _repository.GetByIdAsync(dto.Id);
+    //    if (entity == null)
+    //    {
+    //        _logger.LogWarning("Intento de actualizar establecimiento inexistente con ID {Id}", dto.Id);
+    //        throw new NotFoundException("Establishment", "Establecimiento no encontrado");
+    //    }
 
-        _mapper.Map(dto, entity);
-        await _repository.UpdateAsync(entity);
-        _logger.LogInformation("Establecimiento actualizado con ID {Id}", entity.Id);
+    //    _mapper.Map(dto, entity);
+    //    await _repository.UpdateAsync(entity);
+    //    _logger.LogInformation("Establecimiento actualizado con ID {Id}", entity.Id);
 
-        var existingImages = await _imagesRepository.GetByEstablishmentIdAsync(dto.Id);
-        var totalImages = existingImages.Count;
+    //    var existingImages = await _imagesRepository.GetByEstablishmentIdAsync(dto.Id);
+    //    var totalImages = existingImages.Count;
 
-        var newImages = new List<Images>();
-        if (dto.Files?.Any() == true)
-        {
-            var availableSlots = 5 - totalImages;
-            if (dto.Files.Count > availableSlots)
-            {
-                _logger.LogWarning("Actualización excede el límite de imágenes: {Count} nuevas, {Available} permitidas",
-                    dto.Files.Count, availableSlots);
-                throw new BusinessException($"Solo puede subir {availableSlots} imágenes adicionales (máximo 5 por establecimiento)");
-            }
+    //    var newImages = new List<Images>();
+    //    if (dto.Images?.Any() == true)
+    //    {
+    //        var availableSlots = 5 - totalImages;
+    //        if (dto.Images.Count > availableSlots)
+    //        {
+    //            _logger.LogWarning("Actualización excede el límite de imágenes: {Count} nuevas, {Available} permitidas",
+    //                dto.Images.Count, availableSlots);
+    //            throw new BusinessException($"Solo puede subir {availableSlots} imágenes adicionales (máximo 5 por establecimiento)");
+    //        }
 
-            var filesToUpload = dto.Files.Take(availableSlots).ToList();
-            newImages = await UploadAndMapImagesAsync(filesToUpload, entity.Id);
+    //        var filesToUpload = dto.Images.Take(availableSlots).ToList();
+    //        newImages = await UploadAndMapImagesAsync(filesToUpload, entity.Id);
 
-            if (newImages.Any())
-            {
-                await _imagesRepository.AddAsync(newImages);
-                _logger.LogInformation("{Count} imágenes nuevas agregadas al establecimiento ID {Id}", newImages.Count, entity.Id);
-            }
-        }
+    //        if (newImages.Any())
+    //        {
+    //            await _imagesRepository.AddAsync(newImages);
+    //            _logger.LogInformation("{Count} imágenes nuevas agregadas al establecimiento ID {Id}", newImages.Count, entity.Id);
+    //        }
+    //    }
 
-        var resultDto = _mapper.Map<EstablishmentSelectDto>(entity);
-        resultDto.Images = existingImages
-            .Concat(newImages)
-            .Adapt<List<ImageSelectDto>>();
+    //    var resultDto = _mapper.Map<EstablishmentUpdateDto>(entity);
+    //    resultDto.Images = existingImages
+    //        .Concat(newImages)
+    //        .Adapt<List<ImageSelectDto>>();
 
-        return resultDto;
-    }
+    //    return resultDto;
+    //}
 
     public override async Task<bool> DeleteAsync(int id)
     {

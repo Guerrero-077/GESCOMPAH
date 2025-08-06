@@ -1,5 +1,5 @@
 ﻿using Business.Interfaces;
-using Data.Interfaz.IDataImplemenent;
+using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Microsoft.AspNetCore.Identity;

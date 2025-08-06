@@ -3,7 +3,7 @@ using Entity.DTOs.Implements.Location.City;
 
 namespace Business.Interfaces.Implements.Location
 {
-    public interface ICityService : IBusiness<CitySelectDto, CitySelectDto, CitySelectDto>
+    public interface ICityService : IBusiness<CitySelectDto, CityCreateDto, CityUpdateDto>
     {
         Task<IEnumerable<CitySelectDto>> GetCityByDepartment(int idDepartment);
     }

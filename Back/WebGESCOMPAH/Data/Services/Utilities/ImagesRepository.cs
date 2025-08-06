@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplemenent;
+﻿using Data.Interfaz.IDataImplemenent.Utilities;
 using Data.Repository;
 using Entity.Domain.Models.Implements.Utilities;
 using Entity.Infrastructure.Context;

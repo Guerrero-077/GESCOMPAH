@@ -1,17 +1,24 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using Entity.Domain.Models.Implements.AdministrationSystem;
+﻿using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Business;
+using Entity.Domain.Models.Implements.Location;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Utilities;
-
-using Entity.DTOs.Implements.AdministrationSystem;
+using Entity.DTOs.Implements.AdministrationSystem.Form;
+using Entity.DTOs.Implements.AdministrationSystem.FormModule;
+using Entity.DTOs.Implements.AdministrationSystem.Module;
 using Entity.DTOs.Implements.Business.Appointment;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Entity.DTOs.Implements.Business.Plaza;
+using Entity.DTOs.Implements.Location.City;
+using Entity.DTOs.Implements.Location.Department;
 using Entity.DTOs.Implements.Persons.Peron;
-using Entity.DTOs.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
+using Entity.DTOs.Implements.SecurityAuthentication.Me;
+using Entity.DTOs.Implements.SecurityAuthentication.Permission;
+using Entity.DTOs.Implements.SecurityAuthentication.Rol;
+using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
+using Entity.DTOs.Implements.SecurityAuthentication.RolUser;
 using Entity.DTOs.Implements.SecurityAuthentication.User;
 using Entity.DTOs.Implements.Utilities.Images;
 
@@ -25,68 +32,77 @@ namespace Business.Mapping
         {
             var config = TypeAdapterConfig.GlobalSettings;
 
-            // ============================================
-            // 🌐 USUARIOS / AUTENTICACIÓN
-            // ============================================
 
-            // DTO de registro hacia entidad User
-            config.NewConfig<RegisterDto, User>()
-                .Ignore(dest => dest.Id); // ID generado por DB
 
-            // DTO de registro hacia entidad Person
-            config.NewConfig<RegisterDto, Person>()
-                .Ignore(dest => dest.Id); // ID generado por DB
-
-            // User hacia DTO de retorno
-            config.NewConfig<User, UserDto>()
-                .Map(dest => dest.Person, src => src.Person)
-                .Map(dest => dest.Roles, src => src.RolUsers.Select(r => r.Rol.Name).ToList());
-
-            // User hacia DTO para "mi perfil"
-            config.NewConfig<User, UserMeDto>()
-                .Map(dest => dest.Id, src => src.Id)
-                .Map(dest => dest.FullName, src => $"{src.Person.FirstName} {src.Person.LastName}")
-                .Map(dest => dest.Email, src => src.Email);
-
-            // Person hacia DTO
-            config.NewConfig<Person, PersonDto>();
 
             // ============================================
-            // 📦 PLAZAS
-            // ============================================
-            config.NewConfig<Plaza, PlazaSelectDto>();
-
-            // ============================================
-            // 🧩 MÓDULOS Y FORMULARIOS
-            // ============================================
-            config.NewConfig<Module, MenuModuleDto>()
-                .Map(dest => dest.Forms, src => src.FormModules.Select(fm => fm.Form).Adapt<List<FormDto>>());
-
-            config.NewConfig<Form, FormDto>();
-
-            // ============================================
-            // 🏢 ESTABLECIMIENTOS
+            // AdministrationSystem
             // ============================================
 
-            // Entidad → DTO para retorno con imágenes
+            config.NewConfig<Form, FormSelectDto>();
+            config.NewConfig<FormModule, FormModuleSelectDto>();
+            config.NewConfig<Module, ModuleSelectDto>();
+
+
+            // ============================================
+            // Business
+            // ============================================
+
+            config.NewConfig<Appointment, AppointmentSelectDto>()
+                    .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
+
+
             config.NewConfig<Establishment, EstablishmentSelectDto>()
                 .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageSelectDto>>());
 
-            // DTO de creación → Entidad (las imágenes se manejan aparte)
+
             config.NewConfig<EstablishmentCreateDto, Establishment>()
                 .Ignore(dest => dest.Images);
 
-            // DTO de actualización → Entidad
-            config.NewConfig<EstablishmentUpdateDto, Establishment>()
-                .Ignore(dest => dest.Images) // Se maneja a mano en el servicio
-                .IgnoreNullValues(true);     // Para evitar que nulls sobrescriban valores existentes
+
+
+            config.NewConfig<Plaza, PlazaSelectDto>();
 
             // ============================================
-            // 🖼️ IMÁGENES
+            // Location
             // ============================================
 
-            // Entidad → DTO de retorno
+            config.NewConfig<City, CitySelectDto>();
+
+            config.NewConfig<Department, DepartmentSelectDto>();
+
+
+            // ============================================
+            // Persons
+            // ============================================
+
+            config.NewConfig<Person, PersonDto>();
+
+
+            // ============================================
+            // SecurityAuthentication
+            // ============================================
+
+            config.NewConfig<Permission, PermissionSelectDto>();
+
+            config.NewConfig<Rol, RolSelectDto>();
+
+            config.NewConfig<RolFormPermission, RolFormPermissionSelectDto>();
+
+            config.NewConfig<RolUser, RolUserSelectDto>();
+
+            config.NewConfig<User, UserSelectDto>()
+               .Map(dest => dest.PersonName, src => $"{src.Person.FirstName} {src.Person.LastName}");
+
+
+            // ============================================
+            // Utilities
+            // ============================================
+
             config.NewConfig<Images, ImageSelectDto>();
+
+
+            //? Revisar
 
             // DTO de creación → Entidad (nuevo mapeo agregado)
             config.NewConfig<ImageCreateDto, Images>()
@@ -108,9 +124,34 @@ namespace Business.Mapping
                 .IgnoreNullValues(true);          // Fundamental para evitar sobrescritura
 
 
-            config.NewConfig<Appointment, AppointmentSelectDto>()
-                .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
 
+            // ============================================
+            // USUARIOS / AUTENTICACIÓN
+            // ============================================
+
+            config.NewConfig<RegisterDto, User>()
+                .Ignore(dest => dest.Id); 
+
+            
+            config.NewConfig<RegisterDto, Person>()
+                .Ignore(dest => dest.Id); 
+
+            
+            config.NewConfig<User, UserDto>()
+                .Map(dest => dest.Person, src => src.Person)
+                .Map(dest => dest.Roles, src => src.RolUsers.Select(r => r.Rol.Name).ToList());
+
+            // User hacia DTO para "mi perfil"
+            config.NewConfig<User, UserMeDto>()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.FullName, src => $"{src.Person.FirstName} {src.Person.LastName}")
+                .Map(dest => dest.Email, src => src.Email);
+
+         
+            config.NewConfig<Module, MenuModuleDto>()
+                .Map(dest => dest.Forms, src => src.FormModules.Select(fm => fm.Form).Adapt<List<FormDto>>());
+
+            config.NewConfig<Form, FormDto>();
 
 
             return config;

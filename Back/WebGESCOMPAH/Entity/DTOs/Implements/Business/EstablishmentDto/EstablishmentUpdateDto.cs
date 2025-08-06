@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Entity.DTOs.Implements.Utilities.Images;
+using Microsoft.AspNetCore.Http;
 
 namespace Entity.DTOs.Implements.Business.EstablishmentDto
 {
@@ -12,7 +13,9 @@ namespace Entity.DTOs.Implements.Business.EstablishmentDto
         public int PlazaId { get; set; }
 
         // Nuevas imágenes a subir
-        public ICollection<IFormFile>? Files { get; set; }
-    }   
+        //public ICollection<IFormFile>? Images { get; set; }
+        public List<ImageSelectDto> Images { get; set; } = [];
+
+    }
 
 }

@@ -23,8 +23,4 @@
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\AdministrationSystem\" />
-  </ItemGroup>
-
 </Project>

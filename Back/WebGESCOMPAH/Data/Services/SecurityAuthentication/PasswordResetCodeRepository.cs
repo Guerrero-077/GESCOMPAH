@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplemenent;
+﻿using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Data.Repository;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 using Entity.Infrastructure.Context;

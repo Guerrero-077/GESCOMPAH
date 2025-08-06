@@ -1,14 +1,10 @@
-﻿using Entity.DTOs.Implements.SecurityAuthentication.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Business.Interfaces.IBusiness;
+using Data.Interfaz.IDataImplemenent;
+using Entity.DTOs.Implements.SecurityAuthentication.User;
 
 namespace Business.Interfaces.Implements.SecrutityAuthentication
 {
-    public interface IUserService 
+    public interface IUserService : IBusiness<UserSelectDto, UserCreateDto, UserUpdateDto>
     {
-        Task<IEnumerable<UserSelectDto>> GetAllUser();
     }
 }

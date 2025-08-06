@@ -6,6 +6,6 @@ namespace Entity.DTOs.Implements.Location.Department
     {
         public string Name { get; set; } = null!;
 
-        public List<CityDto> Cities { get; set; } = new();
+        public List<CityCreateDto> Cities { get; set; } = new();
     }
 }

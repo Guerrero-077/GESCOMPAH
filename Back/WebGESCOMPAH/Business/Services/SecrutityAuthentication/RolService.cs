@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements.AdministrationSystem;
+﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Business.Repository;
 using Data.Interfaz.DataBasic;
 using Entity.Domain.Models.Implements.SecurityAuthentication;

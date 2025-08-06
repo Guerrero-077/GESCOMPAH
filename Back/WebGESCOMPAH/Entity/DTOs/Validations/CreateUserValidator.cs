@@ -1,4 +1,4 @@
-﻿using Entity.DTOs.Implements.SecurityAuthentication.User;
+﻿using Entity.DTOs.Implements.SecurityAuthentication.Me;
 using Entity.DTOs.Validations.Persons;
 using FluentValidation;
 

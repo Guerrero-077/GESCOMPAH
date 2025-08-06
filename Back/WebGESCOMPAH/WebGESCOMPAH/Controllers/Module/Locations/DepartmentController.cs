@@ -2,63 +2,47 @@
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Location.Department;
 using Microsoft.AspNetCore.Mvc;
+using WebGESCOMPAH.Controllers.Base;
 
 namespace WebGESCOMPAH.Controllers.Module.Locations
 {
     [Route("api/[controller]")]
     //[Authorize]
     [ApiController]
-    public class DepartmentController : Controller
+    public class DepartmentController : BaseController<DepartmentSelectDto, DepartmentCreateDto, DepartmentUpdateDto, IDepartmentService>
     {
-        private readonly IDepartmentService _departmentService;
-
-        public DepartmentController(IDepartmentService departmentService)
+        public DepartmentController(IDepartmentService service, ILogger logger) : base(service, logger)
         {
-            _departmentService = departmentService;
         }
 
-        [HttpGet]
-
-        public async Task<ActionResult<IEnumerable<DepartmentSelectDto>>> Get()
+        protected override async Task AddAsync(DepartmentCreateDto dto)
         {
-            var departments = await _departmentService.GetAllAsync();
-            return Ok(departments);
+            await _service.CreateAsync(dto);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<DepartmentSelectDto>> GetById(int id)
+        protected override async Task<bool> DeleteAsync(int id)
         {
-            var departments = await _departmentService.GetByIdAsync(id);
-            if (departments == null)
-                return NotFound($"Department con ID {id} no encontrado.");
-            return Ok(departments);
+            return await _service.DeleteAsync(id);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<DepartmentSelectDto>> Create([FromForm] DepartmentCreateDto dto) 
+        protected override async Task<bool> DeleteLogicAsync(int id)
         {
-            var departaments = await _departmentService.CreateAsync(dto);
-            return Ok(departaments);
+            return await _service.DeleteLogicAsync(id);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id,  [FromBody] DepartmentUpdateDto dto)
+        protected override async Task<IEnumerable<DepartmentSelectDto>> GetAllAsync()
         {
-            if (id != dto.Id)
-            {
-                return BadRequest("ID en URL no coincide con el del DTO.");
-            }
-            var departments = await _departmentService.UpdateAsync(dto);
-            return Ok(departments);
+            return await _service.GetAllAsync();
         }
 
-
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        protected override async Task<DepartmentSelectDto?> GetByIdAsync(int id)
         {
-            await _departmentService.DeleteAsync(id);
-            return Ok();
+            return await _service.GetByIdAsync(id);
         }
 
+        protected override async Task<DepartmentUpdateDto> UpdateAsync(int id, DepartmentUpdateDto dto)
+        {
+            return await _service.UpdateAsync(dto);
+        }
     }
 }
