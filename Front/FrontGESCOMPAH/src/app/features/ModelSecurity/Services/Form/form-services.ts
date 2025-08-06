@@ -11,12 +11,16 @@ export class FormServices extends GenericService<FormModule> {
     {
       "id": 1,
       "name": "Usuarios",
-      "description": "Gestión de usuarios"
+      "description": "Gestión de usuarios",
+      "route": "/users",
+      "active": true
     },
     {
       "id": 2,
       "name": "Roles",
-      "description": "Gestión de roles"
+      "description": "Gestión de roles",
+      "route": "/users",
+      "active": true
     }
   ];
 
@@ -31,7 +35,7 @@ export class FormServices extends GenericService<FormModule> {
     });
   }
 
-  AddPruebas(form: FormModule){
-    
+  AddPruebas(form: FormModule) {
+
   }
 }
