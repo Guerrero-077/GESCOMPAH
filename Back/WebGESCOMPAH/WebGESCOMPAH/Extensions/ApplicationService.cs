@@ -72,6 +72,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IModuleService, ModuleService>();
             services.AddScoped<IRolUserService, RolUserService>();
             services.AddScoped<IFormService, FormService>();
+            services.AddScoped<IPermissionService, PermissionService>();
             //Mapping
             services.AddMapster();
             MapsterConfig.Register();

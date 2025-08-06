@@ -21,7 +21,8 @@ export class PermissionComponent implements OnInit {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
-      { key: 'description', header: 'Descripción' }
+      { key: 'description', header: 'Descripción' },
+      { key: 'active', header: 'Active' }
     ];
     this.load();
   }
@@ -33,15 +34,15 @@ export class PermissionComponent implements OnInit {
     })
   }
 
-  onEdit(row: FormModule) {
+  onEdit(row: PermissionModule) {
     console.log('Editar:', row);
   }
 
-  onDelete(row: FormModule) {
+  onDelete(row: PermissionModule) {
     console.log('Eliminar:', row);
   }
 
-  onView(row: FormModule) {
+  onView(row: PermissionModule) {
     console.log('Ver:', row);
   }
 
