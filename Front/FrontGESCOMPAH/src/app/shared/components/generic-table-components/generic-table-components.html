@@ -1,69 +1,71 @@
 <div class="table-wrapper">
 
-    <div class="div" style="display: flex; justify-content: space-between;">
-
-        <mat-form-field appearance="outline" style="margin-bottom: 16px;">
+    <!-- 📌 Header -->
+    <div class="table-header d-flex justify-content-between align-items-center">
+        <mat-form-field appearance="outline">
             <mat-label>Buscar</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Search">
+            <input matInput (keyup)="applyFilter($event)" placeholder="Buscar...">
         </mat-form-field>
 
-        <button>Gurdar</button>
+        <button mat-raised-button color="primary">Guardar</button>
     </div>
 
+    <!-- 📌 Tabla -->
+    <div class="table-body">
+        <table mat-table [dataSource]="dataSource" matSort>
 
-    <table mat-table [dataSource]="dataSource" matSort>
+            <!-- Columnas dinámicas -->
+            <ng-container *ngFor="let col of columns" [matColumnDef]="col.key.toString()">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ col.header }}</th>
+                <td mat-cell *matCellDef="let row; let i = index">
+                    <ng-container *ngIf="col.type === 'index'">{{ i + 1 }}</ng-container>
 
-        <ng-container *ngFor="let col of columns; let colIndex = index" [matColumnDef]="col.key.toString()">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ col.header }}</th>
-            <td mat-cell *matCellDef="let row; let i = index">
-
-                <ng-container *ngIf="col.type === 'index'">
-                    {{ i + 1 }}
-                </ng-container>
-
-                <ng-container *ngIf="!col.type || col.type !== 'index'">
-                    <ng-container *ngIf="!col.template">{{ row[col.key] }}</ng-container>
-                    <ng-container *ngIf="col.template" [ngTemplateOutlet]="col.template"
-                        [ngTemplateOutletContext]="{ $implicit: row }">
+                    <ng-container *ngIf="!col.type || col.type !== 'index'">
+                        <ng-container *ngIf="!col.template">{{ row[col.key] }}</ng-container>
+                        <ng-container *ngIf="col.template" [ngTemplateOutlet]="col.template"
+                            [ngTemplateOutletContext]="{ $implicit: row }">
+                        </ng-container>
                     </ng-container>
-                </ng-container>
+                </td>
+            </ng-container>
 
-            </td>
-        </ng-container>
-
-
-
-        <!-- Acciones -->
-        <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Detalles</th>
-            <td mat-cell *matCellDef="let row">
-                <!-- 👁️ Ver afuera -->
-                <button mat-icon-button matTooltip="Ver" (click)="onView(row)">
-                    <mat-icon>visibility</mat-icon>
-                </button>
-
-                <!-- Menú de acciones (Editar, Eliminar) -->
-                <button mat-icon-button [matMenuTriggerFor]="menu">
-                    <mat-icon>more_vert</mat-icon>
-                </button>
-
-                <mat-menu #menu="matMenu">
-                    <button mat-menu-item (click)="onEdit(row)">
-                        <mat-icon>edit</mat-icon>
-                        Editar
+            <!-- Columna de acciones -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Detalles</th>
+                <td mat-cell *matCellDef="let row">
+                    <button mat-icon-button matTooltip="Ver" (click)="onView(row)">
+                        <mat-icon>visibility</mat-icon>
                     </button>
-                    <button mat-menu-item (click)="onDelete(row)">
-                        <mat-icon>delete</mat-icon>
-                        Eliminar
+
+                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                        <mat-icon>more_vert</mat-icon>
                     </button>
-                </mat-menu>
-            </td>
 
-        </ng-container>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item (click)="onEdit(row)">
+                            <mat-icon>edit</mat-icon>
+                            Editar
+                        </button>
+                        <button mat-menu-item (click)="onDelete(row)">
+                            <mat-icon>delete</mat-icon>
+                            Eliminar
+                        </button>
+                    </mat-menu>
+                </td>
+            </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+            <!-- Fila de encabezado y filas de datos -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row class="data-row" *matRowDef="let row; columns: displayedColumns;"></tr>
 
-    <mat-paginator class="custom-paginator" [length]="data.length" [pageSize]="[5, 10, 25, 100]"></mat-paginator>
+
+        </table>
+    </div>
+
+    <!-- 📌 Footer -->
+    <div class="table-footer">
+        <mat-paginator class="custom-paginator" [length]="data.length" [pageSizeOptions]="[5, 10, 25, 100]"
+            showFirstLastButtons>
+        </mat-paginator>
+    </div>
 </div>

@@ -50,6 +50,7 @@ export class FormComponent implements OnInit {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: row
+      
     });
 
     dialogRef.afterClosed().subscribe(result => {
