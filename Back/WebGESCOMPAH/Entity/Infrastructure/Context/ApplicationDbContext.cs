@@ -58,6 +58,7 @@ namespace Entity.Infrastructure.Context
         public DbSet<Plaza> plaza { get; set; }
         public DbSet<Establishment> Establishment { get; set; }
         public DbSet<Images> Images { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
 
     }
 }

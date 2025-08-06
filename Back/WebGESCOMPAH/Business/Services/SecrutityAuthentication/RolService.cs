@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements.AdministrationSystem;
+﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Business.Repository;
 using Data.Interfaz.DataBasic;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -7,13 +7,7 @@ using MapsterMapper;
 
 namespace Business.Services.SecrutityAuthentication
 {
-    public class RolService : BusinessGeneric<RolSelectDto, RolDto, RolDto, Rol>, IRolService
+    public class RolService(IDataGeneric<Rol> rolRepository, IMapper mapper) : BusinessGeneric<RolSelectDto, RolCreateDto, RolUpdateDto, Rol>(rolRepository, mapper), IRolService
     {
-        private readonly IDataGeneric<Rol> _rolRepository;
-        public RolService(IDataGeneric<Rol> rolRepository, IMapper mapper) : base(rolRepository, mapper)
-        {
-            _rolRepository = rolRepository;
-        }
-
     }
 }

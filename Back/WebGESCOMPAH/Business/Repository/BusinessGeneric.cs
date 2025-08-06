@@ -1,5 +1,4 @@
 ﻿using Data.Interfaz.DataBasic;
-using DocumentFormat.OpenXml.Drawing.Charts;
 using Entity.Domain.Models.ModelBase;
 using MapsterMapper;
 using Utilities.Exceptions;
@@ -62,7 +61,7 @@ namespace Business.Repository
                 throw new BusinessException("Error al crear el registro.", ex);
             }
         }
-        public override async Task<TDtoGet> UpdateAsync(TDtoUpdate dto)
+        public override async Task<TDtoUpdate> UpdateAsync(TDtoUpdate dto)
         {
             BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
 
@@ -70,7 +69,7 @@ namespace Business.Repository
             entity.InitializeLogicalState();
 
             var updated = await Data.UpdateAsync(entity);
-            return _mapper.Map<TDtoGet>(updated);
+            return _mapper.Map<TDtoUpdate>(updated);
         }
 
         public override async Task<bool> DeleteAsync(int id)

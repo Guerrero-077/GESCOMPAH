@@ -1,12 +1,10 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
-using Data.Interfaz.IDataImplemenent;
+using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Data.Interfaz.Security;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
-using Entity.DTOs.Implements.AdministrationSystem;
-using Entity.DTOs.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
-using Entity.DTOs.Implements.SecurityAuthentication.User;
+using Entity.DTOs.Implements.SecurityAuthentication.Me;
 using Entity.DTOs.Interfaces;
 using Mapster;
 using MapsterMapper;

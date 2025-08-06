@@ -3,7 +3,7 @@ using Entity.DTOs.Implements.Location.Department;
 
 namespace Business.Interfaces.Implements.Location
 {
-    public interface IDepartmentService : IBusiness<DepartmentSelectDto, DepartmentSelectDto, DepartmentSelectDto>
+    public interface IDepartmentService : IBusiness<DepartmentSelectDto, DepartmentCreateDto, DepartmentUpdateDto>
     {
     }
 }

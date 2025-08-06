@@ -1,7 +1,6 @@
-﻿using Entity.DTOs.Implements.SecurityAuthentication;
-using Entity.DTOs.Implements.SecurityAuthentication.Auth;
+﻿using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
-using Entity.DTOs.Implements.SecurityAuthentication.User;
+using Entity.DTOs.Implements.SecurityAuthentication.Me;
 
 namespace Business.Interfaces.Implements.SecrutityAuthentication
 {

@@ -3,7 +3,6 @@ using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Data.Services.SecurityAuthentication
 {

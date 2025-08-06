@@ -5,8 +5,8 @@ namespace WebGESCOMPAH.Controllers.Base
 {
     [ApiController]
     [Route("api/[controller]")]
-    public abstract class BaseController<TDto, TSelect, TService> : ControllerBase
-          where TDto : class
+    public abstract class BaseController<TDtoGet, TDtoCreate, TDtoUpdate, TService> : ControllerBase
+          where TDtoGet : class
           where TService : class
     {
         protected readonly TService _service;
@@ -75,7 +75,7 @@ namespace WebGESCOMPAH.Controllers.Base
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public virtual async Task<IActionResult> Post([FromBody] TDto dto)
+        public virtual async Task<IActionResult> Post([FromBody] TDtoCreate dto)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace WebGESCOMPAH.Controllers.Base
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public virtual async Task<IActionResult> Put(int id, [FromBody] TDto dto)
+        public virtual async Task<IActionResult> Put(int id, [FromBody] TDtoUpdate dto)
         {
             try
             {
@@ -108,8 +108,9 @@ namespace WebGESCOMPAH.Controllers.Base
                 var updated = await UpdateAsync(id, dto);
                 if (updated == null)
                     return NotFound(new { message = $"No se encontró el recurso con ID {id} para actualizar." });
+                return Ok(dto);
 
-                return Ok(new { message = "Elemento actualizado exitosamente." });
+                //return Ok(new { message = "Elemento actualizado exitosamente." });
             }
             catch (ValidationException ex)
             {
@@ -204,10 +205,10 @@ namespace WebGESCOMPAH.Controllers.Base
 
 
         // Métodos que las subclases deben implementar
-        protected abstract Task<IEnumerable<TSelect>> GetAllAsync();
-        protected abstract Task<TSelect?> GetByIdAsync(int id);
-        protected abstract Task AddAsync(TDto dto);
-        protected abstract Task<bool> UpdateAsync(int id, TDto dto);
+        protected abstract Task<IEnumerable<TDtoGet>> GetAllAsync();
+        protected abstract Task<TDtoGet?> GetByIdAsync(int id);
+        protected abstract Task AddAsync(TDtoCreate dto);
+        protected abstract Task<TDtoUpdate> UpdateAsync(int id, TDtoUpdate dto);
         protected abstract Task<bool> DeleteAsync(int id);
         protected abstract Task<bool> DeleteLogicAsync(int id);
 

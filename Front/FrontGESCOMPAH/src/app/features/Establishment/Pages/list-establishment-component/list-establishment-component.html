@@ -1,0 +1,28 @@
+<app-header [title]="'Gestión de Locales'" [description]="'Administra la información de tus establecimientos'">
+</app-header>
+
+<div class="container mt-4">
+
+    <!-- Botón para abrir el formulario en un modal -->
+    <div class="d-flex justify-content-end mb-4">
+        <button mat-raised-button color="primary" (click)="openCreateDialog()">
+            Nuevo establecimiento
+        </button>
+    </div>
+
+    <!-- Lista de locales -->
+    <div *ngIf="locales.length > 0; else noLocales">
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <app-local-card *ngFor="let local of locales" [local]="local" [showAvailableTag]="true"
+                (onDelete)="handleDelete(local.id)">
+            </app-local-card>
+        </div>
+    </div>
+
+    <!-- Si no hay locales -->
+    <ng-template #noLocales>
+        <div class="text-center text-muted mt-4">
+            No hay locales registrados aún.
+        </div>
+    </ng-template>
+</div>

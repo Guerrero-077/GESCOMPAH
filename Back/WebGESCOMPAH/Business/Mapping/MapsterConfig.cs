@@ -1,17 +1,27 @@
-﻿using Business.CQRS.SecrutityAuthentication.Login;
-using Entity.Domain.Models.Implements.AdministrationSystem;
+﻿using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Business;
+using Entity.Domain.Models.Implements.Location;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Utilities;
-using Entity.DTOs.Implements.AdministrationSystem;
-using Entity.DTOs.Implements.Business.Establishment;
+using Entity.DTOs.Implements.AdministrationSystem.Form;
+using Entity.DTOs.Implements.AdministrationSystem.FormModule;
+using Entity.DTOs.Implements.AdministrationSystem.Module;
+using Entity.DTOs.Implements.Business.Appointment;
+using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Entity.DTOs.Implements.Business.Plaza;
+using Entity.DTOs.Implements.Location.City;
+using Entity.DTOs.Implements.Location.Department;
 using Entity.DTOs.Implements.Persons.Peron;
-using Entity.DTOs.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
+using Entity.DTOs.Implements.SecurityAuthentication.Me;
+using Entity.DTOs.Implements.SecurityAuthentication.Permission;
+using Entity.DTOs.Implements.SecurityAuthentication.Rol;
+using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
+using Entity.DTOs.Implements.SecurityAuthentication.RolUser;
 using Entity.DTOs.Implements.SecurityAuthentication.User;
-using Entity.DTOs.Implements.Utilities;
+using Entity.DTOs.Implements.Utilities.Images;
+
 using Mapster;
 
 namespace Business.Mapping
@@ -22,67 +32,127 @@ namespace Business.Mapping
         {
             var config = TypeAdapterConfig.GlobalSettings;
 
-            // Map RegisterDto → User
+
+
+
+            // ============================================
+            // AdministrationSystem
+            // ============================================
+
+            config.NewConfig<Form, FormSelectDto>();
+            config.NewConfig<FormModule, FormModuleSelectDto>();
+            config.NewConfig<Module, ModuleSelectDto>();
+
+
+            // ============================================
+            // Business
+            // ============================================
+
+            config.NewConfig<Appointment, AppointmentSelectDto>()
+                    .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
+
+
+            config.NewConfig<Establishment, EstablishmentSelectDto>()
+                .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageSelectDto>>());
+
+
+            config.NewConfig<EstablishmentCreateDto, Establishment>()
+                .Ignore(dest => dest.Images);
+
+
+
+            config.NewConfig<Plaza, PlazaSelectDto>();
+
+            // ============================================
+            // Location
+            // ============================================
+
+            config.NewConfig<City, CitySelectDto>();
+
+            config.NewConfig<Department, DepartmentSelectDto>();
+
+
+            // ============================================
+            // Persons
+            // ============================================
+
+            config.NewConfig<Person, PersonDto>();
+
+
+            // ============================================
+            // SecurityAuthentication
+            // ============================================
+
+            config.NewConfig<Permission, PermissionSelectDto>();
+
+            config.NewConfig<Rol, RolSelectDto>();
+
+            config.NewConfig<RolFormPermission, RolFormPermissionSelectDto>();
+
+            config.NewConfig<RolUser, RolUserSelectDto>();
+
+            config.NewConfig<User, UserSelectDto>()
+               .Map(dest => dest.PersonName, src => $"{src.Person.FirstName} {src.Person.LastName}");
+
+
+            // ============================================
+            // Utilities
+            // ============================================
+
+            config.NewConfig<Images, ImageSelectDto>();
+
+
+            //? Revisar
+
+            // DTO de creación → Entidad (nuevo mapeo agregado)
+            config.NewConfig<ImageCreateDto, Images>()
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.Establishment) // Relación se setea manualmente
+                .Ignore(dest => dest.CreatedAt)
+                .Ignore(dest => dest.IsDeleted);
+
+            // Entidad → DTO de creación (por si lo necesitás)
+            config.NewConfig<Images, ImageCreateDto>();
+
+            // DTO de actualización → Entidad
+            config.NewConfig<ImageUpdateDto, Images>()
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.FilePath)    // Solo cambia desde Cloudinary
+                .Ignore(dest => dest.FileName)    // No se modifica directamente
+                .Ignore(dest => dest.CreatedAt)
+                .Ignore(dest => dest.IsDeleted)   // Controlado por lógica
+                .IgnoreNullValues(true);          // Fundamental para evitar sobrescritura
+
+
+
+            // ============================================
+            // USUARIOS / AUTENTICACIÓN
+            // ============================================
+
             config.NewConfig<RegisterDto, User>()
-                .Ignore(dest => dest.Id);
+                .Ignore(dest => dest.Id); 
 
-            // Map RegisterDto → Person
+            
             config.NewConfig<RegisterDto, Person>()
-                .Ignore(dest => dest.Id);
+                .Ignore(dest => dest.Id); 
 
-            // Map User → UserDto
+            
             config.NewConfig<User, UserDto>()
                 .Map(dest => dest.Person, src => src.Person)
                 .Map(dest => dest.Roles, src => src.RolUsers.Select(r => r.Rol.Name).ToList());
 
-            // Map Person → PersonDto
-            config.NewConfig<Person, PersonDto>();
-
-            // Map Plaza → PlazaSelectDto
-            config.NewConfig<Plaza, PlazaSelectDto>();
-
-
-
-            // ---------------------------
-            // Map LoginCommand → LoginDto
-            // (útil para CQRS, aunque es herencia, queda explícito)
-            config.NewConfig<LoginCommand, LoginDto>();
-
-            // NUEVO: Mapear Module → MenuModuleDto
-            config.NewConfig<Module, MenuModuleDto>()
-                .Map(dest => dest.Id, src => src.Id)
-                .Map(dest => dest.Name, src => src.Name)
-                .Map(dest => dest.Description, src => src.Description)
-                .Map(dest => dest.Forms, src => src.FormModules.Select(fm => fm.Form).Adapt<List<FormDto>>());
-
-            // Mapear Form → FormDto (incluye permisos manualmente en handler, pero puede incluirse)
-            config.NewConfig<Form, FormDto>()
-                .Map(dest => dest.Id, src => src.Id)
-                .Map(dest => dest.Name, src => src.Name)
-                .Map(dest => dest.Description, src => src.Description)
-                // .Permissions será asignado en el handler manualmente porque es dinámica
-
-                ;
-
-            // Opcional: Mapear User → UserMeDto si quieres automatizar parcialmente
+            // User hacia DTO para "mi perfil"
             config.NewConfig<User, UserMeDto>()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.FullName, src => $"{src.Person.FirstName} {src.Person.LastName}")
                 .Map(dest => dest.Email, src => src.Email);
 
-            // Establishment → EstablishmentDto
-            config.NewConfig<Establishment, EstablishmentSelectDto>()
-                .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageDto>>());
+         
+            config.NewConfig<Module, MenuModuleDto>()
+                .Map(dest => dest.Forms, src => src.FormModules.Select(fm => fm.Form).Adapt<List<FormDto>>());
 
-            // Images → ImageDto
-            config.NewConfig<Images, ImageDto>();
+            config.NewConfig<Form, FormDto>();
 
-            // EstablishmentCreateDto → Establishment (se ignoran las imágenes porque se manejan manualmente)
-            config.NewConfig<EstablishmentCreateDto, Establishment>()
-                .Ignore(dest => dest.Images);
-
-
-            config.NewConfig<Images, ImageSelectDto>();
 
             return config;
         }

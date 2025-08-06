@@ -260,6 +260,99 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Appointment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateTimeAssigned")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstablishmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstablishmentId");
+
+                    b.ToTable("Appointments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTimeAssigned = new DateTime(2025, 1, 4, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Solicitud para conocer el local",
+                            Email = "juan.perez@example.com",
+                            EstablishmentId = 1,
+                            FullName = "Juan Pérez",
+                            IsDeleted = false,
+                            Phone = "3001234567",
+                            RequestDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTimeAssigned = new DateTime(2025, 1, 5, 11, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Revisión de contrato anterior",
+                            Email = "maria.gomez@example.com",
+                            EstablishmentId = 2,
+                            FullName = "María Gómez",
+                            IsDeleted = false,
+                            Phone = "3019876543",
+                            RequestDate = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTimeAssigned = new DateTime(2025, 1, 6, 9, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Consulta sobre requisitos para arriendo",
+                            Email = "carlos.ramirez@example.com",
+                            EstablishmentId = 3,
+                            FullName = "Carlos Ramírez",
+                            IsDeleted = false,
+                            Phone = "3021122334",
+                            RequestDate = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
                 {
                     b.Property<int>("Id")
@@ -270,6 +363,10 @@ namespace Entity.Migrations
 
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("AreaM2")
                         .HasColumnType("float");
@@ -288,10 +385,15 @@ namespace Entity.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PlazaId")
+                        .HasColumnType("int");
+
                     b.Property<double>("RentValueBase")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PlazaId");
 
                     b.ToTable("Establishment");
 
@@ -300,33 +402,39 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             Active = true,
+                            Address = "Cr 1 ",
                             AreaM2 = 500.0,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Establecimiento amplio con excelente ubicación.",
                             IsDeleted = false,
                             Name = "Centro Comercial Primavera",
+                            PlazaId = 1,
                             RentValueBase = 2500.0
                         },
                         new
                         {
                             Id = 2,
                             Active = true,
+                            Address = "Cr 1 ",
                             AreaM2 = 120.0,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Oficina moderna en zona empresarial.",
                             IsDeleted = false,
                             Name = "Oficina Torre Norte",
+                            PlazaId = 2,
                             RentValueBase = 1500.0
                         },
                         new
                         {
                             Id = 3,
                             Active = true,
+                            Address = "Cr 1 ",
                             AreaM2 = 1000.0,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Espacio para almacenamiento de gran capacidad.",
                             IsDeleted = false,
                             Name = "Bodega Industrial Sur",
+                            PlazaId = 1,
                             RentValueBase = 3000.0
                         });
                 });
@@ -1543,6 +1651,10 @@ namespace Entity.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EstablishmentId");
@@ -1557,8 +1669,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 1,
                             FileName = "primavera_1.jpg",
-                            FilePath = "https://cdn.app.com/establishments/primavera_1.jpg",
-                            IsDeleted = false
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            IsDeleted = false,
+                            PublicId = "primavera_1"
                         },
                         new
                         {
@@ -1567,8 +1680,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 1,
                             FileName = "primavera_2.jpg",
-                            FilePath = "https://cdn.app.com/establishments/primavera_2.jpg",
-                            IsDeleted = false
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            IsDeleted = false,
+                            PublicId = "primavera_2"
                         },
                         new
                         {
@@ -1577,8 +1691,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 2,
                             FileName = "torre_1.jpg",
-                            FilePath = "https://cdn.app.com/establishments/torre_1.jpg",
-                            IsDeleted = false
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            IsDeleted = false,
+                            PublicId = "torre_1"
                         },
                         new
                         {
@@ -1587,8 +1702,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 2,
                             FileName = "torre_2.jpg",
-                            FilePath = "https://cdn.app.com/establishments/torre_2.jpg",
-                            IsDeleted = false
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            IsDeleted = false,
+                            PublicId = "torre_2"
                         },
                         new
                         {
@@ -1597,8 +1713,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 3,
                             FileName = "bodega_1.jpg",
-                            FilePath = "https://cdn.app.com/establishments/bodega_1.jpg",
-                            IsDeleted = false
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            IsDeleted = false,
+                            PublicId = "bodega_1"
                         },
                         new
                         {
@@ -1607,8 +1724,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EstablishmentId = 3,
                             FileName = "bodega_2.jpg",
-                            FilePath = "https://cdn.app.com/establishments/bodega_2.jpg",
-                            IsDeleted = false
+                            FilePath = "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png",
+                            IsDeleted = false,
+                            PublicId = "bodega_2"
                         });
                 });
 
@@ -1629,6 +1747,28 @@ namespace Entity.Migrations
                     b.Navigation("Form");
 
                     b.Navigation("Module");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Appointment", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Establishment", "Establishment")
+                        .WithMany("Appointments")
+                        .HasForeignKey("EstablishmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Establishment");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Plaza", "Plaza")
+                        .WithMany("Establishments")
+                        .HasForeignKey("PlazaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plaza");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>
@@ -1735,7 +1875,14 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
                 {
+                    b.Navigation("Appointments");
+
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Plaza", b =>
+                {
+                    b.Navigation("Establishments");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>

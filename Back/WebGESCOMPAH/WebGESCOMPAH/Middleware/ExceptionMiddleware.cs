@@ -1,116 +1,51 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System.Net;
-using System.Text.Json;
-using Utilities.Exceptions;
-using ValidationException = FluentValidation.ValidationException;
+﻿using System.Text.Json;
+using WebGESCOMPAH.Middleware;
+using WebGESCOMPAH.Middleware.Handlers;
 
-namespace ExceptionHandling
+public class ExceptionMiddleware : IMiddleware
 {
-    public class ExceptionMiddleware
+    private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly IHostEnvironment _env;
+    private readonly IEnumerable<IExceptionHandler> _handlers;
+
+    public ExceptionMiddleware(ILogger<ExceptionMiddleware> logger,
+                               IHostEnvironment env,
+                               IEnumerable<IExceptionHandler> handlers)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionMiddleware> _logger;
-        private readonly IHostEnvironment _env;
+        _logger = logger;
+        _env = env;
+        _handlers = handlers;
+    }
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment env)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        try
         {
-            _next = next;
-            _logger = logger;
-            _env = env;
+            await next(context);
         }
-
-        public async Task InvokeAsync(HttpContext context)
+        catch (Exception ex)
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Excepción no manejada en la ruta: {Path}", context.Request.Path);
-                await HandleExceptionAsync(context, ex);
-            }
-        }
-
-        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
-        {
-            context.Response.ContentType = "application/json";
-            var response = context.Response;
-            object result;
-
-            switch (exception)
-            {
-                case ValidationException vex:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    result = new
-                    {
-                        isSuccess = false,
-                        statusCode = 400,
-                        message = "Errores de validación.",
-                        errors = vex.Errors.Select(e => new { field = e.PropertyName, error = e.ErrorMessage })
-                    };
-                    break;
-
-                case BusinessException bex:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    result = new
-                    {
-                        isSuccess = false,
-                        statusCode = 400,
-                        message = bex.Message
-                    };
-                    break;
-
-                case UnauthorizedAccessException:
-                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    result = new
-                    {
-                        isSuccess = false,
-                        statusCode = 401,
-                        message = "Acceso no autorizado."
-                    };
-                    break;
-
-                case NotFoundException nf:
-                    response.StatusCode = (int)HttpStatusCode.NotFound;
-                    result = new
-                    {
-                        isSuccess = false,
-                        statusCode = 404,
-                        message = nf.Message
-                    };
-                    break;
-
-
-                default:
-                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    result = new
-                    {
-                        isSuccess = false,
-                        statusCode = 500,
-                        message = "Error interno del servidor.",
-                        detail = _env.IsDevelopment() ? exception.Message : null
-                    };
-                    break;
-            }
-
-            var json = JsonSerializer.Serialize(result, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
-            });
-
-            await context.Response.WriteAsync(json);
+            _logger.LogError(ex, "Excepción no manejada en la ruta: {Path}", context.Request.Path);
+            await HandleExceptionAsync(context, ex);
         }
     }
 
-    public static class ExceptionMiddlewareExtensions
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        public static IApplicationBuilder UseGlobalExceptionHandling(this IApplicationBuilder app)
+        context.Response.ContentType = "application/problem+json";
+
+        var handler = _handlers.FirstOrDefault(h => h.CanHandle(exception))
+                      ?? new DefaultExceptionHandler();
+
+        var (problem, statusCode) = handler.Handle(exception, _env);
+        context.Response.StatusCode = statusCode;
+
+        var json = JsonSerializer.Serialize(problem, new JsonSerializerOptions
         {
-            return app.UseMiddleware<ExceptionMiddleware>();
-        }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        });
+
+        await context.Response.WriteAsync(json);
     }
 }

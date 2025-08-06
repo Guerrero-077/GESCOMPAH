@@ -1,18 +1,22 @@
-﻿using Business.CQRS.Behaviors;
-using Business.CQRS.SecrutityAuthentication.Login;
-using Business.Mapping;
+﻿using Business.Mapping;
 using CloudinaryDotNet;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Entity.DTOs.Interfaces;
 using Entity.DTOs.Services;
 using Entity.DTOs.Validations.Entity.DTOs.Validators.SecurityAuthentication;
-using ExceptionHandling;
 using FluentValidation;
-using MediatR;
+using Utilities.Helpers.CloudinaryHelper;
 using WebGESCOMPAH.Extensions;
+using WebGESCOMPAH.Middleware;
+using WebGESCOMPAH.Middleware.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// --------------------------
+// SERVICIOS (DI Container)
+// --------------------------
+
+// Controladores
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -27,10 +31,7 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssemblyContaining<LoginCommandHandler>());
-
-// ✅ Configuración de Cloudinary como singleton
+// Cloudinary
 var cloudinaryConfig = builder.Configuration.GetSection("Cloudinary");
 var cloudinary = new Cloudinary(new Account(
     cloudinaryConfig["CloudName"],
@@ -39,15 +40,31 @@ var cloudinary = new Cloudinary(new Account(
 ));
 cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
+builder.Services.AddScoped<CloudinaryUtility>();
 
-
-// Mapster config (si aplica aquí)
+// Mapster
 MapsterConfig.Register();
 
-// Construcción de la app
+// --------------------------
+// MANEJO DE EXCEPCIONES
+// --------------------------
+
+// Registro de Handlers personalizados
+builder.Services.AddScoped<IExceptionHandler, BusinessExceptionHandler>();
+builder.Services.AddScoped<IExceptionHandler, EntityNotFoundExceptionHandler>();
+builder.Services.AddScoped<IExceptionHandler, UnauthorizedAccessHandler>();
+builder.Services.AddScoped<IExceptionHandler, ExternalServiceExceptionHandler>();
+
+// Registro del middleware como scoped
+builder.Services.AddScoped<ExceptionMiddleware>();
+
+// --------------------------
+// APP Y PIPELINE HTTP
+// --------------------------
+
 var app = builder.Build();
 
-// Middleware y pipeline
+// Swagger solo en desarrollo
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -55,10 +72,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseGlobalExceptionHandling();
+
+// ✅ Middleware de excepciones (desde el contenedor de DI para evitar problemas de scope)
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseAuthentication();
 app.UseCors();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

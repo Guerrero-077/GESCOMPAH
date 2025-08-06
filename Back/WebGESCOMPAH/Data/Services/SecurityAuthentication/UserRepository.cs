@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplemenent;
+﻿using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Data.Repository;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
@@ -11,6 +11,13 @@ namespace Data.Services.SecurityAuthentication
     {
         public UserRepository(ApplicationDbContext context) : base(context)
         {
+        }
+
+        public override async Task<IEnumerable<User>> GetAllAsync()
+        {
+            return await _dbSet
+                .Include(e => e.Person)
+                .ToListAsync();
         }
 
         public override async Task<User?> GetByIdAsync(int id)

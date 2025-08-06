@@ -1,0 +1,76 @@
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #f5f5f5;
+    color: #666;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn:hover {
+    background: #E3F2FD;
+    color: #1976D2;
+}
+
+.edit-btn:hover {
+    background: #FFF3E0;
+    color: #F57C00;
+}
+
+.delete-btn:hover {
+    background: #FFEBEE;
+    color: #D32F2F;
+}
+
+.action-btn svg {
+    stroke-width: 2;
+    transition: stroke-width 0.2s ease;
+}
+
+.action-btn:hover svg {
+    stroke-width: 2.5;
+}
+
+/* Estados de focus para accesibilidad */
+.action-btn:focus {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
+}
+
+.action-btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .action-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .action-buttons {
+        gap: 12px;
+    }
+}

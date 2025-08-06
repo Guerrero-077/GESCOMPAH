@@ -1,40 +1,115 @@
 ﻿using Business.Interfaces.Implements.Utilities;
 using Business.Repository;
-using Data.Interfaz.DataBasic;
+using Data.Interfaz.IDataImplemenent.Utilities;
 using Entity.Domain.Models.Implements.Utilities;
-using Entity.DTOs.Implements.Utilities;
+using Entity.DTOs.Implements.Utilities.Images;
 using MapsterMapper;
-using Utilities.Helpers.Business;
+using Microsoft.AspNetCore.Http;
+using Utilities.Helpers.CloudinaryHelper;
 
-namespace Business.Services.Utilities
+namespace Business.Services.Utilities;
+
+public class ImageService : BusinessGeneric<ImageSelectDto, ImageCreateDto, ImageUpdateDto, Images>, IImagesService
 {
-    public class ImageService : BusinessGeneric<ImageSelectDto, ImageDto, ImageDto, Images>, IImagesService
+    private readonly IImagesRepository _imagesRepository;
+    private readonly CloudinaryUtility _cloudinaryHelper;
+
+    public ImageService(
+        IImagesRepository imagesRepository,
+        IMapper mapper,
+        CloudinaryUtility cloudinaryHelper
+    ) : base(imagesRepository, mapper)
     {
-        private readonly IDataGeneric<Images> _dataRepository;
-        public ImageService(IDataGeneric<Images> data, IMapper mapper) : base(data, mapper)
+        _imagesRepository = imagesRepository;
+        _cloudinaryHelper = cloudinaryHelper;
+    }
+
+    /// <summary>
+    /// Subir nuevas imágenes a un establecimiento (máx. 5)
+    /// </summary>
+    public async Task<List<ImageSelectDto>> AddImagesAsync(int establishmentId, IFormFileCollection files)
+    {
+        var existing = await _imagesRepository.GetByEstablishmentIdAsync(establishmentId);
+        var remaining = 5 - existing.Count;
+
+        if (remaining <= 0)
+            throw new InvalidOperationException("Máximo de 5 imágenes por establecimiento.");
+
+        var imagesToAdd = new List<Images>();
+
+        foreach (var file in files.Take(remaining))
         {
-            _dataRepository = data;
+            var uploadResult = await _cloudinaryHelper.UploadImageAsync(file, establishmentId);
+
+            var image = new Images
+            {
+                FileName = file.FileName,
+                FilePath = uploadResult.SecureUrl.AbsoluteUri,
+                PublicId = uploadResult.PublicId,
+                EstablishmentId = establishmentId
+            };
+
+            imagesToAdd.Add(image);
         }
 
-        public override async Task<IEnumerable<ImageSelectDto>> GetAllAsync()
+        await _imagesRepository.AddAsync(imagesToAdd);
+        return _mapper.Map<List<ImageSelectDto>>(imagesToAdd);
+    }
+
+    /// <summary>
+    /// Reemplaza una imagen existente: sube nueva, elimina anterior y actualiza la BD
+    /// </summary>
+    public async Task<ImageSelectDto> ReplaceImageAsync(int imageId, IFormFile newFile)
+    {
+        var image = await _imagesRepository.GetByIdAsync(imageId)
+            ?? throw new KeyNotFoundException("Imagen no encontrada");
+
+        var uploadResult = await _cloudinaryHelper.UploadImageAsync(newFile, image.EstablishmentId);
+
+        await _cloudinaryHelper.DeleteAsync(image.PublicId);
+
+        image.PublicId = uploadResult.PublicId;
+        image.FilePath = uploadResult.SecureUrl.AbsoluteUri;
+        image.FileName = newFile.FileName;
+
+        await _imagesRepository.UpdateAsync(image);
+
+        return _mapper.Map<ImageSelectDto>(image);
+    }
+
+    /// <summary>
+    /// Eliminar una imagen por ID
+    /// </summary>
+    public async Task DeleteImageByIdAsync(int imageId)
+    {
+        var image = await _imagesRepository.GetByIdAsync(imageId)
+            ?? throw new KeyNotFoundException("Imagen no encontrada");
+
+        await _cloudinaryHelper.DeleteAsync(image.PublicId);
+        await _imagesRepository.DeleteAsync(image.Id);
+    }
+
+    /// <summary>
+    /// Eliminar múltiples imágenes por PublicId
+    /// </summary>
+    public async Task DeleteImagesByPublicIdsAsync(List<string> publicIds)
+    {
+        if (publicIds == null || publicIds.Count == 0)
+            return;
+
+        foreach (var publicId in publicIds)
         {
-            try
-            {
-                var entities = await _dataRepository.GetAllAsync();
-                return _mapper.Map<IEnumerable<ImageSelectDto>>(entities);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error al obtener las imágenes", ex);
-            }
+            await _cloudinaryHelper.DeleteAsync(publicId);
+            await _imagesRepository.DeleteByPublicIdAsync(publicId);
         }
-        public override async Task<ImageSelectDto> CreateAsync(ImageDto dto)
-        {
-            if (dto == null) throw new ArgumentNullException(nameof(dto), "El DTO de imagen no puede ser nulo.");
-            var entity = _mapper.Map<Images>(dto);
-            entity.InitializeLogicalState(); // Inicializa estado lógico (is_deleted = false)
-            var created = await _dataRepository.AddAsync(entity);
-            return _mapper.Map<ImageSelectDto>(created);
-        }
+    }
+
+    /// <summary>
+    /// Obtener todas las imágenes asociadas a un establecimiento
+    /// </summary>
+    public async Task<List<ImageSelectDto>> GetImagesByEstablishmentIdAsync(int establishmentId)
+    {
+        var images = await _imagesRepository.GetByEstablishmentIdAsync(establishmentId);
+        return _mapper.Map<List<ImageSelectDto>>(images);
     }
 }

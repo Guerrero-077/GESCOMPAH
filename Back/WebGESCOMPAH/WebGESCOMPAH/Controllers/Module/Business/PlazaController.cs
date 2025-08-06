@@ -1,27 +1,20 @@
-﻿using Business.CQRS.Business.Plaza;
-using Business.CQRS.Business.Plaza.Create;
-using Business.CQRS.Business.Plaza.Select;
-using Business.CQRS.Business.Plaza.Update;
+﻿using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.Plaza;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace WebGESCOMPAH.Controllers.Module.Business
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class PlazaController : ControllerBase
     {
 
-        private readonly IMediator _mediator;
+        private readonly IPlazaService _plazaService;
 
-        public PlazaController(IMediator mediator)
+        public PlazaController(IPlazaService plazaService)
         {
-            _mediator = mediator;
+            _plazaService = plazaService;
         }
 
         /// <summary>
@@ -30,7 +23,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var plazas = await _mediator.Send(new GetAllPlazasQuery());
+            var plazas = await _plazaService.GetAllAsync();
             return Ok(plazas);
         }
         /// <summary>
@@ -40,7 +33,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var plaza = await _mediator.Send(new GetPlazaByIdQuery(id));
+            var plaza = await _plazaService.GetByIdAsync(id);
 
             if (plaza == null)
                 return NotFound();
@@ -54,8 +47,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         [HttpPost("CrearPlaza")]
         public async Task<IActionResult> Create([FromBody] PlazaCreateDto plazaDto)
         {
-            var command = new CreatePlazaCommand(plazaDto);
-            var newPlazaId = await _mediator.Send(command);
+            var newPlazaId = await _plazaService.CreateAsync(plazaDto);
 
             // Retorna 201 Created sin CreatedAtAction ni GetById
             return StatusCode(StatusCodes.Status201Created, new { id = newPlazaId });
@@ -67,9 +59,8 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         [HttpPut("UpdatePlaza")]
         public async Task<IActionResult> Update([FromBody] PlazaUpdateDto plazaDto)
         {
-           
-            var command = new UpdatePlazaCommand(plazaDto);
-            var updatedPlaza = await _mediator.Send(command);
+
+            var updatedPlaza = await _plazaService.UpdateAsync(plazaDto);
 
             return Ok(updatedPlaza);
         }
@@ -81,7 +72,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         [HttpPatch("{id:int}/estado")]
         public async Task<IActionResult> ChangeActiveStatus(int id, [FromBody] bool active)
         {
-            var result = await _mediator.Send(new UpdatePlazaActiveStatusCommand(id, active));
+            var result = await _plazaService.UpdateActiveStatusAsync(id, active);
             return Ok(result);
         }
 

@@ -1,28 +1,48 @@
-﻿using Business.CQRS.Location.Department.Select;
-using Business.CQRS.Persons.Person.Select;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using Business.Interfaces.Implements.Location;
+using Entity.Domain.Models.Implements.Business;
+using Entity.DTOs.Implements.Location.Department;
 using Microsoft.AspNetCore.Mvc;
+using WebGESCOMPAH.Controllers.Base;
 
 namespace WebGESCOMPAH.Controllers.Module.Locations
 {
-    [ApiController]
+    [Route("api/[controller]")]
     //[Authorize]
-    [Route("api/v1/[controller]")]
-    public class DepartmentController : Controller
+    [ApiController]
+    public class DepartmentController : BaseController<DepartmentSelectDto, DepartmentCreateDto, DepartmentUpdateDto, IDepartmentService>
     {
-        private readonly IMediator _mediator;
-
-        public DepartmentController(IMediator mediator)
+        public DepartmentController(IDepartmentService service, ILogger logger) : base(service, logger)
         {
-            _mediator = mediator;
         }
-        [HttpGet("Department")]
 
-        public async Task<IActionResult> Get()
+        protected override async Task AddAsync(DepartmentCreateDto dto)
         {
-            var person = await _mediator.Send(new GetAllDepartmentQuery());
-            return Ok(person);
+            await _service.CreateAsync(dto);
+        }
+
+        protected override async Task<bool> DeleteAsync(int id)
+        {
+            return await _service.DeleteAsync(id);
+        }
+
+        protected override async Task<bool> DeleteLogicAsync(int id)
+        {
+            return await _service.DeleteLogicAsync(id);
+        }
+
+        protected override async Task<IEnumerable<DepartmentSelectDto>> GetAllAsync()
+        {
+            return await _service.GetAllAsync();
+        }
+
+        protected override async Task<DepartmentSelectDto?> GetByIdAsync(int id)
+        {
+            return await _service.GetByIdAsync(id);
+        }
+
+        protected override async Task<DepartmentUpdateDto> UpdateAsync(int id, DepartmentUpdateDto dto)
+        {
+            return await _service.UpdateAsync(dto);
         }
     }
 }
