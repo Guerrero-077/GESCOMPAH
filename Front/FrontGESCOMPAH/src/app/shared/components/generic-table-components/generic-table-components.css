@@ -1,6 +1,52 @@
 td button {
     margin-right: 4px;
 }
-.boton{
-    background-color: forestgreen;
+
+.table-wrapper {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-header {
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+    background-color: #F4F7FC;
+}
+
+.table-body {
+    overflow-x: auto;
+    padding: 1rem;
+}
+
+/* Estilo base */
+.data-row {
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Estilo al hacer hover */
+.data-row:hover {
+    background-color: #99A0A9;
+    cursor: pointer;
+}
+
+
+.table-footer {
+    border-top: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    background-color: #F4F7FC;
+}
+
+.custom-paginator .mat-paginator-range-label,
+.custom-paginator .mat-icon-button,
+.custom-paginator .mat-select-value {
+    color: #424242;
+}
+
+.custom-paginator .mat-paginator-navigation-previous,
+.custom-paginator .mat-paginator-navigation-next {
+    color: #1565c0;
 }
