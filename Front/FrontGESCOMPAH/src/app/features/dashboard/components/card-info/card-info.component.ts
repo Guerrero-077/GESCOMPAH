@@ -1,11 +1,14 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-card-info',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './card-info.component.html',
   styleUrl: './card-info.component.css'
 })
 export class CardInfoComponent {
-
+  @Input() title: string = '';
+  @Input() value: number = 0;
+  @Input() percentage: number = 0;
 }
