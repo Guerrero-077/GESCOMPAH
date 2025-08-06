@@ -8,7 +8,7 @@ export const SIDEBAR_BY_ROLE: Record<string, SidebarItem[]> = {
   admin: [
     { label: 'Dashboard', icon: 'home', route: 'dashboard' },
     { label: 'Propiedades', icon: 'description', route: 'main' },
-    { label: 'Arrendatarios', icon: 'person', route: 'arrendatarios' },
+    { label: 'Arrendatarios', icon: 'person', route: 'tenants' },
     { label: 'Contratos', icon: 'assignment', route: 'contratos' },
     { label: 'Citas', icon: 'event', route: 'citas' },
     { label: 'Reportes', icon: 'bar_chart', route: 'reportes' },
