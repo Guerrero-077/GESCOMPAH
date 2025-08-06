@@ -1,8 +1,13 @@
-<h1 mat-dialog-title>Editar Formulario</h1>
-<div mat-dialog-content class="mat-dialog-content">
-  <app-dymanic-forms [formType]="'Form'" [initialData]="data"></app-dymanic-forms>
-</div>
-<div mat-dialog-actions align="end">
-  <button mat-button (click)="close()">Cancelar</button>
+<h2 mat-dialog-title>Editar {{ formType }}</h2>
+
+<mat-dialog-content class="mat-dialog-content">
+  <app-dymanic-forms
+    [formType]="formType"
+    [initialData]="entity"
+  ></app-dymanic-forms>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close color="warn">Cancelar</button>
   <button mat-button color="primary">Guardar</button>
-</div>
+</mat-dialog-actions>

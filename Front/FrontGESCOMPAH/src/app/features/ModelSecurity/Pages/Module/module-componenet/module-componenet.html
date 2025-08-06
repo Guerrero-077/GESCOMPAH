@@ -1,8 +1,10 @@
-<app-generic-table-components [data]="Forms" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
-    (view)="onView($event)">
-</app-generic-table-components>
+<div class="row d-flex justify-content-center">
+    <app-generic-table-components [data]="Forms" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
+        (view)="onView($event)">
+    </app-generic-table-components>
 
 
-<ng-template #estadoTemplate let-row>
-    <span class="badge badge-success">Activo</span>
-</ng-template>
+    <ng-template #estadoTemplate let-row>
+        <span class="badge badge-success">Activo</span>
+    </ng-template>
+</div>

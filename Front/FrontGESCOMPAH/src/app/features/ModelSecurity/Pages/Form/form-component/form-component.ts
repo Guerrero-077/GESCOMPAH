@@ -49,7 +49,10 @@ export class FormComponent implements OnInit {
   onEdit(row: FormModule) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
-      data: row
+      data: {
+        entity: row, // los datos a editar
+        formType: 'Form' // o 'User', 'Product', etc.
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {

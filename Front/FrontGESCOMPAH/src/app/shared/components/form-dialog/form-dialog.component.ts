@@ -1,7 +1,8 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { DymanicFormsComponent } from '../dymanic-forms/dymanic-forms.component';
 import { MatButtonModule } from '@angular/material/button';
+import { FormType } from '../dymanic-forms/dymanic-forms.config';
 
 @Component({
   selector: 'app-form-dialog',
@@ -10,12 +11,20 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './form-dialog.component.css'
 })
 export class FormDialogComponent {
+  entity!: any;
+  formType!: FormType;
+
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: { entity: any; formType: FormType }
+  ) {
+    this.entity = data.entity;
+    this.formType = data.formType;
+  }
 
   close(): void {
     this.dialogRef.close();
   }
 }
+
+
