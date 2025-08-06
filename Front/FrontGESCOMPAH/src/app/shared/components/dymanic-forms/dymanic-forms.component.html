@@ -1,13 +1,12 @@
 <form class="row g-3" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div *ngFor="let field of fields" class="mb-3">
-        <label class="form-label">{{ field.label }}</label>
+        <label class="form-label">{{ field.name }}</label>
         <ng-container [ngSwitch]="field.type">
             <input
                 *ngSwitchCase="'text'"
                 [formControlName]="field.name"
                 class="form-control"
                 type="text"
-                [placeholder]="field.label"
             />
             <input
                 *ngSwitchCase="'date'"

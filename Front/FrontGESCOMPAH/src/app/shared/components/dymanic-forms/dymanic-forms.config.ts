@@ -22,11 +22,11 @@ export const formSchemas: Record<FormType, any[]> = {
     ],
     'Appointment': [
         {name: 'FullName', type: 'text', required: true},
-        {name: 'Email', type: 'email', required: true},
+        {name: 'Email', type: 'text', required: true},
         {name: 'Phone', type: 'text', required: true},
         {name: 'Description', type: 'textarea', required: false},
         {name: 'RequestDate', type: 'date', required: true},
-        {name: 'DateTimeAssigned', type: 'datetime', required: false},
+        {name: 'DateTimeAssigned', type: 'date', required: false},
         {name: 'Establishment', type: 'select', options: [], required: true},
     ],
     'City': [
@@ -68,7 +68,7 @@ export const formSchemas: Record<FormType, any[]> = {
         {name: 'Active', type: 'checkbox', required: true}
     ],
     'User': [
-        {name: 'Email', type: 'email', required: true},
+        {name: 'Email', type: 'text', required: true},
         {name: 'Person', type: 'select', options: [], required: true},
         {name: 'Active', type: 'checkbox', required: true}
     ],
