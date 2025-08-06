@@ -3,10 +3,11 @@ import { GenericTableComponents } from "../../../../../shared/components/generic
 import { TableColumn } from '../../../../../shared/models/TableColumn.models';
 import { FormModule } from '../../../Models/form.model';
 import { FormServices } from '../../../Services/Form/form-services';
+import { DymanicFormsComponent } from "../../../../../shared/components/dymanic-forms/dymanic-forms.component";
 
 @Component({
   selector: 'app-form-component',
-  imports: [GenericTableComponents],
+  imports: [GenericTableComponents, DymanicFormsComponent],
   templateUrl: './form-component.html',
   styleUrl: './form-component.css'
 })
@@ -28,7 +29,11 @@ export class FormComponent implements OnInit {
   }
 
   load() {
-    this.formService.getAll("form").subscribe({
+    // this.formService.getAll("form").subscribe({
+    //   next: (data) => (this.Forms = data),
+    //   error: (err) => console.error('Error al cargar formularios:', err)
+    // })
+    this.formService.getAllPruebas().subscribe({
       next: (data) => (this.Forms = data),
       error: (err) => console.error('Error al cargar formularios:', err)
     })
