@@ -71,4 +71,22 @@ export class FormComponent implements OnInit {
     console.log('Ver:', row);
   }
 
+  onCreateNew() {
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      width: '600px',
+      data: {  
+        entity: {},
+        formType: 'Form' // o 'User', 'Product', etc.
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.formService.AddPruebas(result).subscribe(res => {
+          this.load();
+        });
+      }
+    });
+  }
+
 }

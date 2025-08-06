@@ -3,7 +3,7 @@ export type FormType = 'Form' | 'Module' | 'FormModule' | 'Appointment' | 'City'
 
 export const formSchemas: Record<FormType, any[]> = {
     'Form': [
-        {name: 'id', type: 'hidden', required: true},
+        {name: 'id', type: 'hidden', required: false},
         {name: 'name', type: 'text', required: true},
         {name: 'description', type: 'textarea', required: true},
         {name: 'route', type: 'text', required: true},
@@ -11,20 +11,20 @@ export const formSchemas: Record<FormType, any[]> = {
         
     ],
     'Module': [
-        {name: 'id', type: 'hidden', required: true},
+        {name: 'id', type: 'hidden', required: false},
         {name: 'name', type: 'text', required: true},
         {name: 'description', type: 'textarea', required: false},
         {name: 'icon', type: 'text', required: true},
         {name: 'active', type: 'checkbox', required: true}
     ],
     'FormModule': [
-        {name: 'id', type: 'hidden', required: true},
+        {name: 'id', type: 'hidden', required: false},
         {name: 'form', type: 'select', options: [], required: true},
         {name: 'module', type: 'select', options: [], required: true},
         {name: 'active', type: 'checkbox', required: true}
     ],
     'Appointment': [
-        {name: 'id', type: 'hidden', required: true},
+        {name: 'id', type: 'hidden', required: false},
         {name: 'fullName', type: 'text', required: true},
         {name: 'Email', type: 'text', required: true},
         {name: 'Phone', type: 'text', required: true},
@@ -34,17 +34,17 @@ export const formSchemas: Record<FormType, any[]> = {
         {name: 'Establishment', type: 'select', options: [], required: true},
     ],
     'City': [
-        {name: 'Id', type: 'hidden', required: true},
+        {name: 'Id', type: 'hidden', required: false},
         {name: 'Name', type: 'text', required: true},
         {name: 'Department', type: 'select', options: [], required: true},
     ],
     'Department': [
-        {name: 'Id', type: 'hidden', required: true},
+        {name: 'Id', type: 'hidden', required: false},
         {name: 'Name', type: 'text', required: true},
         {name: 'Active', type: 'checkbox', required: true}
     ],
     'Person': [
-        {name: 'Id', type: 'hidden', required: true},
+        {name: 'Id', type: 'hidden', required: false},
         {name: 'FirstName', type: 'text', required: true},
         {name: 'LastName', type: 'text', required: true},
         {name: 'Document', type: 'text', required: false},
@@ -54,32 +54,32 @@ export const formSchemas: Record<FormType, any[]> = {
         {name: 'User', type: 'select', options: [], required: false},
     ],
     'Permission': [
-        {name: 'Id', type: 'hidden', required: true},
-        {name: 'Name', type: 'text', required: true},
-        {name: 'Description', type: 'textarea', required: false},
-        {name: 'Active', type: 'checkbox', required: true}
+        {name: 'id', type: 'hidden', required: false},
+        {name: 'name', type: 'text', required: true},
+        {name: 'description', type: 'textarea', required: false},
+        {name: 'active', type: 'checkbox', required: true}
     ],
     'Rol': [
-        {name: 'Id', type: 'hidden', required: true},
-        {name: 'Name', type: 'text', required: true},
-        {name: 'Description', type: 'textarea', required: false},
-        {name: 'Active', type: 'checkbox', required: true}
+        {name: 'id', type: 'hidden', required: false},
+        {name: 'name', type: 'text', required: true},
+        {name: 'description', type: 'textarea', required: false},
+        {name: 'active', type: 'checkbox', required: true}
     ],
     'RolFormPermission': [
-        {name: 'Id', type: 'hidden', required: true},
+        {name: 'Id', type: 'hidden', required: false},
         {name: 'Rol', type: 'select', options: [], required: true},
         {name: 'FormModule', type: 'select', options: [], required: true},
         {name: 'Permission', type: 'select', options: [], required: true},
         {name: 'Active', type: 'checkbox', required: true}
     ],
     'RolUser': [
-        {name: 'Id', type: 'hidden', required: true},
+        {name: 'Id', type: 'hidden', required: false},
         {name: 'Rol', type: 'select', options: [], required: true},
         {name: 'User', type: 'select', options: [], required: true},
         {name: 'Active', type: 'checkbox', required: true}
     ],
     'User': [
-        {name: 'Id', type: 'hidden', required: true},
+        {name: 'Id', type: 'hidden', required: false},
         {name: 'Email', type: 'text', required: true},
         {name: 'Person', type: 'select', options: [], required: true},
         {name: 'Active', type: 'checkbox', required: true}

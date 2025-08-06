@@ -22,8 +22,8 @@ export class FormDialogComponent {
     this.formType = data.formType;
   }
 
-  close(): void {
-    this.dialogRef.close();
+  close(data: any): void {
+    this.dialogRef.close(data);
   }
 }
 
