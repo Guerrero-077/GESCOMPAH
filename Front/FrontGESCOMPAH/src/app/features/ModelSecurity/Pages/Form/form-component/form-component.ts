@@ -4,7 +4,7 @@ import { TableColumn } from '../../../../../shared/models/TableColumn.models';
 import { FormModule } from '../../../Models/form.model';
 import { FormServices } from '../../../Services/Form/form-services';
 import { DymanicFormsComponent } from "../../../../../shared/components/dymanic-forms/dymanic-forms.component";
-import { CommonModule } from '@angular/common'; 
+import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormDialogComponent } from '../../../../../shared/components/form-dialog/form-dialog.component';
 
@@ -22,7 +22,7 @@ export class FormComponent implements OnInit {
 
   columns: TableColumn<FormModule>[] = [];
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.columns = [
@@ -36,32 +36,39 @@ export class FormComponent implements OnInit {
   }
 
   load() {
-    // this.formService.getAll("form").subscribe({
-    //   next: (data) => (this.Forms = data),
-    //   error: (err) => console.error('Error al cargar formularios:', err)
-    // })
-    this.formService.getAllPruebas().subscribe({
+    this.formService.getAll("form").subscribe({
       next: (data) => (this.Forms = data),
       error: (err) => console.error('Error al cargar formularios:', err)
     })
+    // this.formService.getAllPruebas().subscribe({
+    //   next: (data) => (this.Forms = data),
+    //   error: (err) => console.error('Error al cargar formularios:', err)
+    // })
   }
 
   onEdit(row: FormModule) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
-        entity: row, // los datos a editar
-        formType: 'Form' // o 'User', 'Product', etc.
+        entity: row,
+        formType: 'Form' // el tipo de schema a cargar
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.selectedForm = null;
-      if (result) { //comentario
-        this.load(); // Recarga si es necesario
+      if (result) {
+        const id = row.id;
+        this.formService.Update("form", id, result).subscribe({
+          next: () => {
+            console.log('Formulario actualizado correctamente');
+            this.load();
+          },
+          error: err => console.error('Error actualizando el formulario:', err)
+        });
       }
     });
   }
+
 
   onDelete(row: FormModule) {
     console.log('Eliminar:', row);

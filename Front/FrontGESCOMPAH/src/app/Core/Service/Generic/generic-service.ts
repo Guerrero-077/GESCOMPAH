@@ -23,9 +23,10 @@ export class GenericService<T> { // Pendiente por agregar los demas Dtos
     return this.http.post<T>(`${this.urlBase}${entidad}`, dto);
   }
 
-  Update(entidad: string, dto: T): Observable<T> {
-    return this.http.put<T>(`${this.urlBase}${entidad}`, dto);
+  Update(entidad: string, id: number, dto: T): Observable<T> {
+    return this.http.put<T>(`${this.urlBase}${entidad}/${id}`, dto);
   }
+
 
   Delete(entidad: string, id: number): Observable<T> {
     return this.http.delete<T>(`${this.urlBase}${entidad}/${id}`);

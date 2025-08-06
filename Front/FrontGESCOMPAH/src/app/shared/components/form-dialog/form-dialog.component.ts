@@ -1,4 +1,4 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject, Input, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { DymanicFormsComponent } from '../dymanic-forms/dymanic-forms.component';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,11 +6,14 @@ import { FormType } from '../dymanic-forms/dymanic-forms.config';
 
 @Component({
   selector: 'app-form-dialog',
-  imports: [DymanicFormsComponent, MatDialogTitle, MatDialogActions, MatDialogModule, MatButtonModule ],
+  imports: [DymanicFormsComponent, MatDialogTitle, MatDialogActions, MatDialogModule, MatButtonModule],
   templateUrl: './form-dialog.component.html',
   styleUrl: './form-dialog.component.css'
 })
 export class FormDialogComponent {
+
+  @ViewChild(DymanicFormsComponent) formComponent!: DymanicFormsComponent;
+
   entity!: any;
   formType!: FormType;
 
@@ -22,6 +25,13 @@ export class FormDialogComponent {
     this.formType = data.formType;
   }
 
+  guardar(): void {
+    this.formComponent.submit(); // llama a onSubmit() del formulario
+  }
+
+  onSubmit(data: any): void {
+    this.dialogRef.close(data); // cierra y envía los datos al padre
+  }
   close(): void {
     this.dialogRef.close();
   }

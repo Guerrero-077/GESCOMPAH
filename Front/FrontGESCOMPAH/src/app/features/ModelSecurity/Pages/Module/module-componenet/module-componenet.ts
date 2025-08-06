@@ -19,7 +19,7 @@ export class ModuleComponenet implements OnInit {
   columns: TableColumn<ModulesModule>[] = [];
   selectedForm: any = null;
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.columns = [
@@ -31,33 +31,38 @@ export class ModuleComponenet implements OnInit {
   }
 
   load() {
-    // this.ModuleService.getAll("module").subscribe({
-    //   next: (data) => (this.Forms = data),
-    //   error: (err) => console.error('Error al cargar formularios:', err)
-    // })
-    this.ModuleService.getAllPruebas().subscribe({
+    this.ModuleService.getAll("module").subscribe({
       next: (data) => (this.Forms = data),
       error: (err) => console.error('Error al cargar formularios:', err)
     })
+    // this.ModuleService.getAllPruebas().subscribe({
+    //   next: (data) => (this.Forms = data),
+    //   error: (err) => console.error('Error al cargar formularios:', err)
+    // })
   }
 
   onEdit(row: ModulesModule) {
-      const dialogRef = this.dialog.open(FormDialogComponent, {
-        width: '600px',
-        data: {
-          entity: row, // los datos a editar
-          formType: 'Module' // o 'User', 'Product', etc.
-        }
-      });
-  
-      dialogRef.afterClosed().subscribe(result => {
-        this.selectedForm = null;
-        if (result) { //comentario
-          this.load(); // Recarga si es necesario
-        }
-      });
-    }
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      width: '600px',
+      data: {
+        entity: row,
+        formType: 'Module' // el tipo de schema a cargar
+      }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const id = row.id;
+        this.ModuleService.Update("module", id, result).subscribe({
+          next: () => {
+            console.log('Module actualizado correctamente');
+            this.load();
+          },
+          error: err => console.error('Error actualizando el Module:', err)
+        });
+      }
+    });
+  }
   onDelete(row: ModulesModule) {
     console.log('Eliminar:', row);
   }
