@@ -20,7 +20,7 @@ namespace Business.Services.Location
         {
             try
             {
-                var entities = await _cityRepository.GetCityByDepartment(idDepartment);
+                var entities = await _cityRepository.GetCityByDepartmentAsync(idDepartment);
                 return _mapper.Map<IEnumerable<CitySelectDto>>(entities);
             }
             catch (Exception ex)

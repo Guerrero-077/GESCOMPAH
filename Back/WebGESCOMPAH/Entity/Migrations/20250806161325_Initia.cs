@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Initia : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -570,12 +570,12 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "EstablishmentId", "FileName", "FilePath", "IsDeleted", "PublicId" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "primavera_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png", false, "primavera_1" },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "primavera_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png", false, "primavera_2" },
-                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "torre_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png", false, "torre_1" },
-                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "torre_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png", false, "torre_2" },
-                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "bodega_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png", false, "bodega_1" },
-                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "bodega_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1753409000/establishments/1/img_59efdafd-89c8-40ce-a147-ebf6d92875a3.png", false, "bodega_2" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "primavera_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png", false, "primavera_1" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "primavera_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png", false, "primavera_2" },
+                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "torre_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png", false, "torre_1" },
+                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "torre_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png", false, "torre_2" },
+                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "bodega_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png", false, "bodega_1" },
+                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "bodega_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1754490905/establishments/6/Gemini_Generated_Image_1x3mol1x3mol1x3m_%281%29_55ab90047aae467988180701fe1bb6f1.png", false, "bodega_2" }
                 });
 
             migrationBuilder.InsertData(
