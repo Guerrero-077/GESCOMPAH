@@ -5,9 +5,9 @@ export const formSchemas: Record<FormType, any[]> = {
     'Form': [
         {name: 'id', type: 'hidden', required: true},
         {name: 'name', type: 'text', required: true},
-        {name: 'description', type: 'textarea', required: false},
+        {name: 'description', type: 'textarea', required: true},
         {name: 'route', type: 'text', required: true},
-        {name: 'active', type: 'checkbox', required: true}
+        {name: 'active', type: 'checkbox' , required: true}
         
     ],
     'Module': [

@@ -2,11 +2,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormType, formSchemas } from './dymanic-forms.config';
 import { CommonModule } from '@angular/common';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-dymanic-forms',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatSlideToggleModule],
   templateUrl: './dymanic-forms.component.html',
   styleUrl: './dymanic-forms.component.css'
 })

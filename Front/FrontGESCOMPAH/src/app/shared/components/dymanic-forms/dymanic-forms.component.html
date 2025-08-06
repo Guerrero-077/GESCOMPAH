@@ -1,6 +1,6 @@
 <form class="row g-3" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div *ngFor="let field of fields" class="mb-3" >
-        <label *ngIf="field.name !== 'id'" class="form-label">{{ field.name }}</label>
+        <label *ngIf="field.name !== 'id'" class="form-label pe-4">{{ field.name }}</label>
         <ng-container [ngSwitch]="field.type">
             <input
                 *ngSwitchCase="'text'"
@@ -13,7 +13,7 @@
                 [formControlName]="field.name"
                 class="form-control"
                 type="date"
-            />
+            />  
             <input
                 *ngSwitchCase="'hidden'"
                 [formControlName]="field.name"
@@ -32,8 +32,13 @@
                 *ngSwitchCase="'textarea'"
                 [formControlName]="field.name"
                 class="form-control"
-                [placeholder]="field.label"
             ></textarea>
+            <mat-slide-toggle
+                *ngSwitchCase="'checkbox'"
+                [formControlName]="field.name"
+                color="primary"
+            >
+            </mat-slide-toggle>
         </ng-container>
     </div>
 </form>
