@@ -3,6 +3,8 @@ import { LayoutComponent } from './features/layout.component';
 import { DashboardComponent } from './features/dashboard/Pages/dashboard/dashboard-component/dashboard-component';
 import { EstablishmentFormComponent } from './features/Establishment/Pages/Form/establishment-form-component/establishment-form-component';
 import { ListEstablishmentComponent } from './features/Establishment/Pages/list-establishment-component/list-establishment-component';
+import { RolComponent } from './features/ModelSecurity/Pages/Rol/rol-component/rol-component';
+import { FormComponent } from './features/ModelSecurity/Pages/Form/form-component/form-component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'Auth/login', pathMatch: 'full' },
@@ -26,5 +28,7 @@ export const routes: Routes = [
       { path: 'Establishment', component: ListEstablishmentComponent },
     ],
     data: { role: 'Administrador' },
-  }
+  },
+  { path: 'Rol', component: RolComponent },
+  { path: 'Form', component: FormComponent },
 ];
