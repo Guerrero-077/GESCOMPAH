@@ -2,22 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
-import { LocalCard } from '../../../../shared/components/card/local-card/local-card';
-import { ModalComponenet } from '../../../../shared/components/Modal/modal-componenet/modal-componenet';
-import {
-  LocalesModel,
-  LocalCreateModel,
-  LocalUpdateModel
-} from '../../../../shared/components/Models/card/card.models';
-import { GenericFormDialogData } from '../../../../shared/components/Models/Modal/modal.models';
-import { buildLocalFormConfig } from '../../Models/form-config/local-form.config';
+
 import { LocalCard } from "../../../../shared/components/card/local-card/local-card";
-import { Header } from "../../../../shared/components/Header/header/header";
+import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { EstablishmentSelect } from '../../Models/Establishment.models';
 import { LocalesService } from '../../Services/Locales/locales-service';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { EstablishmentFormComponent } from '../Form/establishment-form-component/establishment-form-component';
 
 @Component({
@@ -29,9 +20,7 @@ import { EstablishmentFormComponent } from '../Form/establishment-form-component
     MatDialogModule,
     MatSnackBarModule,
     HeaderComponent,
-    LocalCard
     LocalCard,
-    Header
   ],
   templateUrl: './list-establishment-component.html',
   styleUrl: './list-establishment-component.css'
