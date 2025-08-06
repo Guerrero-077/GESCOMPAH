@@ -29,6 +29,7 @@ export const routes: Routes = [
     ],
     data: { role: 'Administrador' },
   },
+
   { path: 'Rol', component: RolComponent },
-  { path: 'Form', component: FormComponent },
+  { path: 'form', component: FormComponent },
 ];
