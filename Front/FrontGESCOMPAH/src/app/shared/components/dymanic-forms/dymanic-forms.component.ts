@@ -2,22 +2,22 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormType, formSchemas } from './dymanic-forms.config';
 import { CommonModule } from '@angular/common';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-dymanic-forms',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatSlideToggleModule],
+  imports: [CommonModule, ReactiveFormsModule, MatSlideToggleModule, MatButtonModule],
   templateUrl: './dymanic-forms.component.html',
-  styleUrl: './dymanic-forms.component.css'
+  styleUrl: './dymanic-forms.component.css',
 })
 export class DymanicFormsComponent implements OnInit {
   @Input() formType!: FormType;
   @Input() initialData: any = {};
   @Input() selectOptions: Record<string, any[]> = {};
 
-
-  @Output() submitForm = new EventEmitter<any>();
+  @Output() formSubmit = new EventEmitter<any>();
 
   form!: FormGroup;
   fields: any[] = [];
@@ -48,15 +48,10 @@ export class DymanicFormsComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
-      console.log('Formulario enviado:', this.form.value);
-      this.submitForm.emit(this.form.value);
+      this.formSubmit.emit(this.form.value); 
     } else {
       this.form.markAllAsTouched();
     }
   }
-
-  submit() {
-    this.onSubmit();
-  }
-
+  
 }

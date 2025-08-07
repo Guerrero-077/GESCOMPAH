@@ -27,6 +27,7 @@ export class FormServices extends GenericService<FormModule> {
   getAllPruebas(): Observable<FormModule[]> {
     return of(this.form);
   }
+
   getByIdPruebas(id: number) {
     const form = this.form.find(x => x.id === id);
     return new Observable<FormModule | undefined>(observer => {
@@ -35,7 +36,14 @@ export class FormServices extends GenericService<FormModule> {
     });
   }
 
-  AddPruebas(form: FormModule) {
-
+  AddPruebas(form: FormModule): Observable<FormModule> {
+    const newForm = {
+      ...form,
+      id: this.form.length + 1
+    };
+    console.log(newForm);
+    this.form.push(newForm);
+    console.log(this.form)
+    return of(newForm);
   }
 }
