@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormType, formSchemas } from './dymanic-forms.config';
 import { CommonModule } from '@angular/common';
@@ -7,9 +8,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 @Component({
   selector: 'app-dymanic-forms',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatSlideToggleModule],
+  imports: [CommonModule, ReactiveFormsModule, MatSlideToggleModule, MatButtonModule],
   templateUrl: './dymanic-forms.component.html',
-  styleUrl: './dymanic-forms.component.css'
+  styleUrl: './dymanic-forms.component.css',
 })
 export class DymanicFormsComponent implements OnInit {
   @Input() formType!: FormType;

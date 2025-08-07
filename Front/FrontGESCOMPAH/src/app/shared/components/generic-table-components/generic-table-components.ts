@@ -31,10 +31,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class GenericTableComponents<T> implements AfterViewInit {
   @Input() data: T[] = [];
   @Input() columns: TableColumn<T>[] = [];
+  @Input() createButtonLabel = 'Crear';
 
   @Output() edit = new EventEmitter<T>();
   @Output() delete = new EventEmitter<T>();
   @Output() view = new EventEmitter<T>();
+  @Output() create = new EventEmitter<void>();
+
 
   displayedColumns: string[] = [];
 
@@ -64,4 +67,6 @@ export class GenericTableComponents<T> implements AfterViewInit {
   onEdit(row: T) { this.edit.emit(row); }
   onDelete(row: T) { this.delete.emit(row); }
   onView(row: T) { this.view.emit(row); }
+  onCreate() { this.create.emit(); }
+
 }
