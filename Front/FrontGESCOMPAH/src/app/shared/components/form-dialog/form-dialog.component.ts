@@ -25,15 +25,8 @@ export class FormDialogComponent {
     this.formType = data.formType;
   }
 
-  guardar(): void {
-    this.formComponent.submit(); // llama a onSubmit() del formulario
-  }
-
-  onSubmit(data: any): void {
-    this.dialogRef.close(data); // cierra y envía los datos al padre
-  }
-  close(): void {
-    this.dialogRef.close();
+  close(data: any): void {
+    this.dialogRef.close(data);
   }
 }
 
