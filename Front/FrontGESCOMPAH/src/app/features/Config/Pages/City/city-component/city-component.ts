@@ -6,9 +6,10 @@ import { GenericTableComponents } from "../../../../../shared/components/generic
 
 @Component({
   selector: 'app-city-component',
-  imports: [GenericTableComponents],
+  // imports: [GenericTableComponents],
   templateUrl: './city-component.html',
-  styleUrl: './city-component.css'
+  styleUrl: './city-component.css',
+  imports: [GenericTableComponents]
 })
 export class CityComponent implements OnInit {
   private readonly service = inject(CityServices);

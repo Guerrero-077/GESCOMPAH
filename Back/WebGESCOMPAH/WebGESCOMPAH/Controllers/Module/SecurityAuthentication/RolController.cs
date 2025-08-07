@@ -2,6 +2,7 @@
 using Entity.DTOs.Implements.SecurityAuthentication.Rol;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebGESCOMPAH.Controllers.Base;
 
 [ApiController]
 //[Authorize]
@@ -9,50 +10,39 @@ using Microsoft.AspNetCore.Mvc;
 [Produces("application/json")]
 
 
-public class RolController(IRolService rolService) : ControllerBase
+public class RolController : BaseController<RolSelectDto, RolCreateDto, RolUpdateDto, IRolService>
 {
-    private readonly IRolService _rolService = rolService;
-
-    [HttpGet]
-    public async Task<IActionResult> Get()
+    public RolController(IRolService service, ILogger<RolController> logger) : base(service, logger)
     {
-        var roles = await _rolService.GetAllAsync();
-        return Ok(roles);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    protected override async Task AddAsync(RolCreateDto dto)
     {
-        var rol = await _rolService.GetByIdAsync(id);
-        return Ok(rol); // Si no existe, debería lanzar EntityNotFoundException
+        await _service.CreateAsync(dto);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] RolCreateDto rolDto)
+    protected override async Task<bool> DeleteAsync(int id)
     {
-        var result = await _rolService.CreateAsync(rolDto);
-        return Ok(new { message = "Elemento agregado exitosamente" });
+        return await _service.DeleteAsync(id);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, [FromBody] RolUpdateDto rolDto)
+    protected override async Task<bool> DeleteLogicAsync(int id)
     {
-        if (rolDto == null || id != rolDto.Id)
-            return BadRequest("Los IDs no coinciden o el cuerpo está mal formado.");
-
-        var existingRol = await _rolService.GetByIdAsync(id);
-        if (existingRol == null)
-            return NotFound($"No se encontró un rol con ID {id}.");
-
-        var result = await _rolService.UpdateAsync(rolDto);
-        return Ok(new { message = "Elemento Actualizado exitosamente" });
+        return await _service.DeleteLogicAsync(id);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    protected override async Task<IEnumerable<RolSelectDto>> GetAllAsync()
     {
-        await _rolService.DeleteAsync(id);
-        return Ok(new { message = $"El rol con ID {id} fue eliminado exitosamente." });
+        return await _service.GetAllAsync();
+    }
 
+    protected override async Task<RolSelectDto?> GetByIdAsync(int id)
+    {
+        return await _service.GetByIdAsync(id);
+    }
+
+    protected override async Task<RolUpdateDto> UpdateAsync(int id, RolUpdateDto dto)
+    {
+        return await _service.UpdateAsync(dto);
     }
 }

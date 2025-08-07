@@ -11,6 +11,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+
+
+// Tme
+
 @Component({
   selector: 'app-generic-table-components',
   imports: [
@@ -28,6 +32,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   templateUrl: './generic-table-components.html',
   styleUrl: './generic-table-components.css'
 })
+
+
 export class GenericTableComponents<T> implements AfterViewInit {
   @Input() data: T[] = [];
   @Input() columns: TableColumn<T>[] = [];

@@ -6,9 +6,10 @@ import { GenericTableComponents } from "../../../../shared/components/generic-ta
 
 @Component({
   selector: 'app-squares-component',
-  imports: [GenericTableComponents],
+  // imports: [GenericTableComponents],
   templateUrl: './squares-component.html',
-  styleUrl: './squares-component.css'
+  styleUrl: './squares-component.css',
+  imports: [GenericTableComponents]
 })
 export class SquaresComponent implements OnInit {
   private readonly SquaresService = inject(SquaresService);

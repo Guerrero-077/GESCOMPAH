@@ -10,9 +10,11 @@ import { ModuleServices } from '../../../Services/Module/module-services';
 @Component({
   selector: 'app-module-componenet',
   standalone: true,
-  imports: [GenericTableComponents],
+  // imports: [GenericTableComponents],
   templateUrl: './module-componenet.html',
   styleUrls: ['./module-componenet.css'] // ❗ corregido: `styleUrl` → `styleUrls`
+  ,
+  imports: [GenericTableComponents]
 })
 export class ModuleComponenet implements OnInit {
   private readonly moduleService = inject(ModuleServices);
@@ -82,6 +84,25 @@ export class ModuleComponenet implements OnInit {
       });
     }
   }
+
+  onCreateNew() {
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      width: '600px',
+      data: {
+        entity: {},
+        formType: 'Module' // o 'User', 'Product', etc.
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.moduleService.Add("Module", result).subscribe(res => {
+          this.load();
+        });
+      }
+    });
+  }
+
 
   onView(row: ModulesModule) {
     console.log('Ver:', row);

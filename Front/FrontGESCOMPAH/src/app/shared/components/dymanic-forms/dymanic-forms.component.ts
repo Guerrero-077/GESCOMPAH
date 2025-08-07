@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormType, formSchemas } from './dymanic-forms.config';
-import { CommonModule } from '@angular/common';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { FormType, formSchemas } from './dymanic-forms.config';
 
 @Component({
   selector: 'app-dymanic-forms',
@@ -49,10 +49,10 @@ export class DymanicFormsComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
-      this.formSubmit.emit(this.form.value); 
+      this.formSubmit.emit(this.form.value);
     } else {
       this.form.markAllAsTouched();
     }
   }
-  
+
 }

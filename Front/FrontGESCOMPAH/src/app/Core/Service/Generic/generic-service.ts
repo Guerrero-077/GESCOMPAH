@@ -33,8 +33,10 @@ export class GenericService<T> { // Pendiente por agregar los demas Dtos
   }
 
   DeleteLogical(entidad: string, id: number): Observable<T> {
-    return this.http.delete<T>(`${this.urlBase}${entidad}/${id}`);
+    const body = { isDeleted: true }; // o el campo que uses
+    return this.http.patch<T>(`${this.urlBase}${entidad}/${id}`, body);
   }
+
 
 
 }

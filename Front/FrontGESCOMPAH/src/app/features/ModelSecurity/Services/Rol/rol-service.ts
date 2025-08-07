@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GenericTableComponents } from '../../../../shared/components/generic-table-components/generic-table-components';
+// import { GenericTableComponents } from '../../../../shared/components/generic-table-components/generic-table-components';
 import { RolModule } from '../../Models/rol.models';
 import { GenericService } from '../../../../Core/Service/Generic/generic-service';
 import { Observable, of } from 'rxjs';
