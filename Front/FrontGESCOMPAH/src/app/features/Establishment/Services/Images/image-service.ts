@@ -6,9 +6,9 @@ import { ImageSelectDto } from '../../Models/Establishment.models';
 
 @Injectable({ providedIn: 'root' })
 export class ImageService {
-  private readonly baseUrl = `${environment.apiURL}/image`;
+  private readonly baseUrl = `${environment.apiURL}/images`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** Obtener imágenes de un establecimiento */
   getImagesByEstablishmentId(id: number): Observable<ImageSelectDto[]> {
@@ -19,4 +19,11 @@ export class ImageService {
   deleteImagesByPublicIds(publicIds: string[]): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/by-publicIds`, { body: publicIds });
   }
+
+  /** Eliminar lógicamente una imagen por su publicId */
+  logicalDeleteImage(publicId: string): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/logical-delete`, null, { params: { publicId } });
+  }
+
+
 }

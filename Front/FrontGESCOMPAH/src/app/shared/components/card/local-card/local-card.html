@@ -1,6 +1,6 @@
 <div class="local-card bg-white rounded-2">
     <!-- Contenedor de imagen -->
-    <div class="image-container">
+    <div class="image-container w-100 position-relative p-2">
         <img [src]="primaryImage" [alt]="local.name" class="local-image" loading="lazy">
 
         <!-- Tag de disponibilidad -->
@@ -10,35 +10,88 @@
     </div>
 
     <!-- Contenido de la tarjeta -->
-    <div class="card-content">
-        <!-- Nombre del local -->
-        <h3 class="local-name">{{ local.name }}</h3>
+    <div class="card-content container">
+
+        <div class="row p-0 m-0">
+            <!-- Nombre del local -->
+            <div class="info-lavel ">
+                <span class="local-name d-flex justify-content-start w-100 p-0 m-0">{{ local.name }}</span>
+            </div>
+        </div>
+
+        <div class="row p-0 m-0">
+            <div class="description">
+                <span>{{local.description}}</span>
+            </div>
+        </div>
+
+        <div class="row m-0 p-0">
+            <div class="col-6 d-block">
+                <div>
+                    <span>Dirección</span>
+                </div>
+                <div>
+                    <span>{{local.address}}</span>
+                </div>
+            </div>
+            <div class="col-6 d-block">
+                <div>
+                    <span>Area</span>
+                </div>
+                <div>
+                    <span>{{local.areaM2}}</span>
+                </div>
+
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row p-0 m-0">
+            <div class="col-6">
+                <div><span>Precio</span></div>
+                <div><span>{{local.rentValueBase}}</span></div>
+            </div>
+            <div class="col-6">
+                <div><span>Acciones</span></div>
+                <div><span>
+                        <!-- Botones de acción -->
+                        <app-action-button-componenet (onView)="handleView()" (onEdit)="handleEdit()"
+                            (onDelete)="handleDelete()">
+                        </app-action-button-componenet>
+                    </span></div>
+            </div>
+        </div>
+        <!-- <div class="description">
+            <div class="text">
+                <span class="info-value">{{local.description}}</span>
+            </div>
+        </div> -->
 
         <!-- Información en dos columnas -->
-        <div class="info-grid">
+        <!-- <div class="info-grid">
             <div class="info-item">
                 <span class="info-label">Dirección</span>
-                <span class="info-value ellipsis">{{ local.description }}</span>
+                <span class="info-value ellipsis">{{ local.address }}</span>
             </div>
 
             <div class="info-item text-end">
                 <span class="info-label">Área</span>
                 <span class="info-value">{{ local.areaM2 }} m²</span>
             </div>
-        </div>
+        </div> -->
 
-        <hr />
 
-        <div class="d-flex justify-content-between align-items-center footer">
-            <!-- Precio -->
-            <div class="rent-section">
+        <!-- <div class="d-flex justify-content-between align-items-center footer"> -->
+        <!-- Precio -->
+        <!--  <div class="rent-section">
                 <span class="rent-label">Renta Mensual</span>
                 <div class="rent-price">{{ formattedRent }}</div>
-            </div>
+            </div> -->
 
-            <!-- Botones de acción -->
-            <app-action-button-componenet (onView)="handleView()" (onEdit)="handleEdit()" (onDelete)="handleDelete()">
+        <!-- Botones de acción -->
+        <!-- <app-action-button-componenet (onView)="handleView()" (onEdit)="handleEdit()" (onDelete)="handleDelete()">
             </app-action-button-componenet>
-        </div>
+        </div> -->
     </div>
 </div>

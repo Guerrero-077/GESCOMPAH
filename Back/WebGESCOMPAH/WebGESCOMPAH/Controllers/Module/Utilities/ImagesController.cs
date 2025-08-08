@@ -1,7 +1,9 @@
 ﻿using Business.Interfaces.Implements.Utilities;
+using Business.Services.Utilities;
 using Entity.DTOs.Implements.Utilities.Images;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Utilities.Exceptions;
 
 namespace Web.Controllers.Utilities;
 
@@ -10,10 +12,12 @@ namespace Web.Controllers.Utilities;
 public class ImagesController : ControllerBase
 {
     private readonly IImagesService _imagesService;
+    private readonly ILogger _logger;
 
-    public ImagesController(IImagesService imagesService)
+    public ImagesController(IImagesService imagesService, ILogger<ImagesController> logger)
     {
         _imagesService = imagesService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -64,6 +68,22 @@ public class ImagesController : ControllerBase
         await _imagesService.DeleteImagesByPublicIdsAsync(publicIds);
         return NoContent();
     }
+
+    [HttpPatch("logical-delete")]
+    public async Task<IActionResult> LogicalDelete([FromQuery] string publicId)
+    {
+        if (string.IsNullOrWhiteSpace(publicId))
+            return BadRequest("El publicId es obligatorio.");
+
+        var result = await _imagesService.DeleteLogicalByPublicIdAsync(publicId);
+
+        if (!result)
+            return NotFound($"No se encontró la imagen con publicId '{publicId}'.");
+
+        return NoContent();
+    }
+
+
 
     /// <summary>
     /// Obtener todas las imágenes de un establecimiento

@@ -34,6 +34,7 @@ namespace Entity.Infrastructure.Context
 
             //Data init
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Images>().HasQueryFilter(img => !img.IsDeleted);
             //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
 

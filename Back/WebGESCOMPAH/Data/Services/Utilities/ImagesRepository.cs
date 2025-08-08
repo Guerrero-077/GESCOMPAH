@@ -6,15 +6,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Services.Utilities
 {
-    public class ImagesRepository(ApplicationDbContext context) : DataGeneric<Images>(context), IImagesRepository
+    public class ImagesRepository : DataGeneric<Images>, IImagesRepository
     {
+        private readonly ApplicationDbContext _context;
+
+        public ImagesRepository(ApplicationDbContext context) : base(context)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+        }
+
         public override async Task<IEnumerable<Images>> GetAllAsync()
         {
             return await _dbSet
                 .Where(e => !e.IsDeleted)
                 .ToListAsync();
         }
-
 
         public async Task<List<Images>> GetByEstablishmentIdAsync(int establishmentId)
         {
@@ -23,20 +29,14 @@ namespace Data.Services.Utilities
                 .ToListAsync();
         }
 
-
-        public async Task AddAsync(List<Images> images)
+        public Task AddAsync(List<Images> images)
         {
-            if (!images.Any()) return;
+            if (images == null || !images.Any())
+                return Task.CompletedTask;
 
-            var establishmentId = images.First().EstablishmentId;
-            var existingCount = await _dbSet
-                .CountAsync(i => i.EstablishmentId == establishmentId && !i.IsDeleted);
-
-            if (existingCount + images.Count > 5)
-                throw new InvalidOperationException("No se pueden asociar más de 5 imágenes a un establecimiento.");
-
+            // No transacciones ni SaveChanges aquí
             _dbSet.AddRange(images);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
 
         public async Task<bool> DeleteByPublicIdAsync(string publicId)
@@ -45,7 +45,19 @@ namespace Data.Services.Utilities
             if (image == null) return false;
 
             _dbSet.Remove(image);
-            return await _context.SaveChangesAsync() > 0;
+            return true;
+        }
+
+        public async Task<bool> DeleteLogicalByPublicIdAsync(string publicId)
+        {
+            var entity = await _context.Images.FirstOrDefaultAsync(i => i.PublicId == publicId);
+            if (entity == null) return false;
+
+            entity.Active = false;
+            entity.IsDeleted = true; // o el nombre del flag soft delete
+            _context.Images.Update(entity);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
     }

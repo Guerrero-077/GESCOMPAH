@@ -171,23 +171,31 @@ export class EstablishmentFormComponent {
     }
 
     const errs: string[] = [];
+    const newFiles: File[] = [];
+
     Array.from(files).forEach(file => {
       if (!file.type.startsWith('image/')) errs.push(`"${file.name}" no es una imagen válida.`);
       else if (file.size > this.MAX_FILE_SIZE_BYTES)
         errs.push(`"${file.name}" pesa ${(file.size / (1024 * 1024)).toFixed(2)} MB (máx. ${this.MAX_FILE_SIZE_MB})`);
-      else this.selectedFiles.push(file);
+      else if (newFiles.length < remainingSlots) // evitar exceder límite
+        newFiles.push(file);
     });
 
     if (errs.length) this.snackBar.open(errs.join('\n'), 'Cerrar', { duration: 6000 });
 
-    this.selectedFiles.forEach(file => {
-      const r = new FileReader();
-      r.onload = (e: ProgressEvent<FileReader>) => {
+    // Agregar sólo las nuevas
+    this.selectedFiles.push(...newFiles);
+
+    // Solo generar previews para las nuevas
+    newFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
         if (e.target?.result) this.imagesPreview.push(e.target.result as string);
       };
-      r.readAsDataURL(file);
+      reader.readAsDataURL(file);
     });
   }
+
 
   /* ---------------------------------------------------------------------- */
   /* 🔄   Eliminar imagen (nueva o existente) */
@@ -197,13 +205,12 @@ export class EstablishmentFormComponent {
 
     if (isExisting) {
       const img = this.existingImagesFull[idx];
-      console.log(`Intentando eliminar imagen con publicId: ${img.publicId}`); // <-- Log agregado
 
       if (!confirm('¿Eliminar esta imagen permanentemente?')) return;
 
       this.isDeletingImage = true;
 
-      this.imageService.deleteImagesByPublicIds([img.publicId]).subscribe({
+      this.imageService.logicalDeleteImage(img.publicId).subscribe({
         next: () => {
           this.existingImagesFull.splice(idx, 1);
           this.isDeletingImage = false;
@@ -219,6 +226,8 @@ export class EstablishmentFormComponent {
       this.imagesPreview.splice(idx, 1);
     }
   }
+
+
 
 
   /* ---------------------------------------------------------------------- */

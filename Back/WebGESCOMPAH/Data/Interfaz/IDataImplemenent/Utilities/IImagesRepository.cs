@@ -8,6 +8,7 @@ namespace Data.Interfaz.IDataImplemenent.Utilities
         Task AddAsync(List<Images> entity);
         Task<List<Images>> GetByEstablishmentIdAsync(int establishmentId);
         Task<bool> DeleteByPublicIdAsync(string publicId);
+        Task<bool> DeleteLogicalByPublicIdAsync(string publicId);
         //Task DeleteRangeAsync(List<Images> images);
     }
 }
