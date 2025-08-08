@@ -208,7 +208,7 @@ namespace WebGESCOMPAH.Controllers.Base
         protected abstract Task<IEnumerable<TDtoGet>> GetAllAsync();
         protected abstract Task<TDtoGet?> GetByIdAsync(int id);
         protected abstract Task AddAsync(TDtoCreate dto);
-        protected abstract Task<TDtoUpdate> UpdateAsync(int id, TDtoUpdate dto);
+        protected abstract Task<TDtoGet> UpdateAsync(int id, TDtoUpdate dto);
         protected abstract Task<bool> DeleteAsync(int id);
         protected abstract Task<bool> DeleteLogicAsync(int id);
 

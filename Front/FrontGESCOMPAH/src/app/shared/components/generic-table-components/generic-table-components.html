@@ -4,14 +4,16 @@
     <div class="table-header d-flex justify-content-between align-items-center">
         <mat-form-field appearance="outline">
             <mat-label>Buscar</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Buscar...">
+            <input matInput [(ngModel)]="filterKey" (ngModelChange)="onFilterChange($event)" placeholder="Buscar...">
         </mat-form-field>
 
-        <button mat-button matButton="filled" class="boton" (click)="onCreate()">{{createButtonLabel}}</button>
+        <button mat-button matButton="filled" class="boton" (click)="onCreate()">
+            {{ createButtonLabel }}
+        </button>
     </div>
 
-    <!-- 📌 Tabla -->
-    <div class="table-body">
+    <!-- 📌 Tabla si hay datos -->
+    <div class="table-body" *ngIf="hasData; else noDataTemplate">
         <table mat-table [dataSource]="dataSource" matSort>
 
             <!-- Columnas dinámicas -->
@@ -54,18 +56,28 @@
                 </td>
             </ng-container>
 
-            <!-- Fila de encabezado y filas de datos -->
+            <!-- Header y Rows -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row class="data-row" *matRowDef="let row; columns: displayedColumns;"></tr>
-
 
         </table>
     </div>
 
-    <!-- 📌 Footer -->
-    <div class="table-footer">
-        <mat-paginator class="custom-paginator" [length]="data.length" [pageSizeOptions]="[5, 10, 25, 100]"
-            showFirstLastButtons>
+    <!-- 📌 Footer (solo si hay datos) -->
+    <!-- Footer (solo si hay datos) -->
+    <div class="table-footer" *ngIf="hasData">
+        <mat-paginator class="custom-paginator" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons>
         </mat-paginator>
     </div>
+
+
+    <!-- 📌 Si no hay datos -->
+    <ng-template #noDataTemplate>
+        <div class="no-data-container">
+            <mat-icon class="no-data-icon">inventory_2</mat-icon>
+            <div class="no-data-text">No hay registros disponibles.</div>
+        </div>
+    </ng-template>
+
+
 </div>

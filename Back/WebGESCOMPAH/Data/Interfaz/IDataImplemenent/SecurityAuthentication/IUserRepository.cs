@@ -9,5 +9,6 @@ namespace Data.Interfaz.IDataImplemenent.SecurityAuthentication
         Task<bool> ExistsByEmailAsync(string email);
         Task<User?> GetByEmailAsync(string email);
         Task<User> LoginUser(LoginDto loginDto);
+        Task<User?> GetByEmailProjectionAsync(string email);
     }
 }

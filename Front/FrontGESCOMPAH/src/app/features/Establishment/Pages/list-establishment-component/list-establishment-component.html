@@ -14,7 +14,7 @@
     <div *ngIf="locales.length > 0; else noLocales">
         <div class="d-flex flex-wrap gap-3 justify-content-center">
             <app-local-card *ngFor="let local of locales" [local]="local" [showAvailableTag]="true"
-                (onDelete)="handleDelete(local.id)">
+                (onDelete)="handleDelete(local.id)" (onUpdate)="loadLocales()">
             </app-local-card>
         </div>
     </div>

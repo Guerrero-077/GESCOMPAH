@@ -39,6 +39,10 @@ export const routes: Routes = [
       { path: 'city', component: CityComponent },
       { path: 'mainConfig', component: MainConfig },
       { path: 'departmentCities', component: DepartmentsCitiesComponent },
+      { path: 'rol', component: RolComponent },
+      { path: 'form', component: FormComponent },
+      { path: 'rol', component: RolComponent },
+
     ],
     data: { role: 'Administrador' },
   },

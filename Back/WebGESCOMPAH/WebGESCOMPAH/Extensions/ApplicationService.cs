@@ -85,7 +85,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IRolFormPermissionRepository, RolFormPermissionRepository>();
 
 
-            services.AddScoped<IEstablishments, EstablishmentsRepository>();
+            services.AddScoped<IEstablishmentsRepository, EstablishmentsRepository>();
             services.AddScoped<IImagesRepository, ImagesRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<ICityService, CityService>();
@@ -99,6 +99,7 @@ namespace WebGESCOMPAH.Extensions
 
             // JWT 
             services.AddScoped<IToken, TokenBusiness>();
+            services.AddMemoryCache();
 
 
             //Validaciones

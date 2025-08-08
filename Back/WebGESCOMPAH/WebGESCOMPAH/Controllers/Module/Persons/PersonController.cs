@@ -43,7 +43,7 @@ namespace WebGESCOMPAH.Controllers.Module.Persons
 
 
 
-        protected override async Task<PersonUpdateDto> UpdateAsync(int id, PersonUpdateDto dto)
+        protected override async Task<PersonSelectDto> UpdateAsync(int id, PersonUpdateDto dto)
         {
             return await _service.UpdateAsync(dto);
         }

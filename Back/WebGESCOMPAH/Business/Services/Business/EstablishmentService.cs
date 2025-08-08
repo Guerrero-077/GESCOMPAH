@@ -1,4 +1,7 @@
-﻿using Business.Interfaces.Implements.Business;
+﻿// ───────────────────────────────────────────────────────────────────────
+// 1.  Servicio completo – operaciones CRUD sin UoW / transacción
+// ───────────────────────────────────────────────────────────────────────
+using Business.Interfaces.Implements.Business;
 using Business.Repository;
 using Data.Interfaz.IDataImplemenent.Business;
 using Data.Interfaz.IDataImplemenent.Utilities;
@@ -13,110 +16,130 @@ using Microsoft.Extensions.Logging;
 using Utilities.Exceptions;
 using Utilities.Helpers.CloudinaryHelper;
 
-public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, EstablishmentCreateDto, EstablishmentUpdateDto, Establishment>,
-    IEstablishmentService
+public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto,
+                                                    EstablishmentCreateDto,
+                                                    EstablishmentUpdateDto,
+                                                    Establishment>,
+                                    IEstablishmentService
 {
-    private readonly IEstablishments _repository;
-    private readonly CloudinaryUtility _cloudinaryHelper;
-    private readonly IImagesRepository _imagesRepository;
+    private readonly IEstablishmentsRepository _repo;
+    private readonly IImagesRepository _imagesRepo;
+    private readonly CloudinaryUtility _cloudinary;
+    private readonly IMapper _mapper;
     private readonly ILogger<EstablishmentService> _logger;
 
-    public EstablishmentService(IEstablishments data, IImagesRepository imagesRepository, IMapper mapper, CloudinaryUtility cloudinaryHelper, ILogger<EstablishmentService> logger) : base(data, mapper)
+    public EstablishmentService(IEstablishmentsRepository repo,
+                                IImagesRepository imagesRepo,
+                                IMapper mapper,
+                                CloudinaryUtility cloudinary,
+                                ILogger<EstablishmentService> logger)
+        : base(repo, mapper)
     {
-        _repository = data;
-        _imagesRepository = imagesRepository;
-        _cloudinaryHelper = cloudinaryHelper;
+        _repo = repo;
+        _imagesRepo = imagesRepo;
+        _mapper = mapper;
+        _cloudinary = cloudinary;
         _logger = logger;
     }
 
-
+    // ───────────────────────────────────────
     public override async Task<EstablishmentSelectDto> CreateAsync(EstablishmentCreateDto dto)
     {
         if (dto.Files?.Count > 5)
         {
-            _logger.LogWarning("Intento de crear establecimiento con más de 5 imágenes ({Count})", dto.Files.Count);
+            _logger.LogWarning("Intento de crear establecimiento con más de 5 imágenes ({Count})",
+                               dto.Files.Count);
             throw new BusinessException("Solo se permiten hasta 5 imágenes por establecimiento");
         }
 
         var entity = _mapper.Map<Establishment>(dto);
-        await _repository.AddAsync(entity);
-        _logger.LogInformation("Establecimiento creado con ID {Id}", entity.Id);
+        await _repo.AddAsync(entity);
 
         var images = await UploadAndMapImagesAsync(dto.Files, entity.Id);
         if (images.Any())
         {
-            await _imagesRepository.AddAsync(images);
-            _logger.LogInformation("{Count} imágenes asociadas al establecimiento ID {Id}", images.Count, entity.Id);
+            await _imagesRepo.AddAsync(images);
         }
 
-        var dtoResult = _mapper.Map<EstablishmentSelectDto>(entity);
-        dtoResult.Images = images.Adapt<List<ImageSelectDto>>();
-        return dtoResult;
+        var result = _mapper.Map<EstablishmentSelectDto>(entity);
+        result.Images = images.Adapt<List<ImageSelectDto>>();
+        return result;
     }
 
-    //public override async Task<EstablishmentUpdateDto> UpdateAsync(EstablishmentUpdateDto dto)
-    //{
-    //    var entity = await _repository.GetByIdAsync(dto.Id);
-    //    if (entity == null)
-    //    {
-    //        _logger.LogWarning("Intento de actualizar establecimiento inexistente con ID {Id}", dto.Id);
-    //        throw new NotFoundException("Establishment", "Establecimiento no encontrado");
-    //    }
+    // ───────────────────────────────────────
+    public override async Task<EstablishmentSelectDto> UpdateAsync(EstablishmentUpdateDto dto)
+    {
+        // 1️⃣  Cargar la entidad con sus imágenes (para validaciones)
+        var entity = await _repo.GetByIdAsync(dto.Id);      // incluye .Images
+        if (entity == null)
+            throw new NotFoundException("Establishment", $"No se encontró el establecimiento {dto.Id}");
 
-    //    _mapper.Map(dto, entity);
-    //    await _repository.UpdateAsync(entity);
-    //    _logger.LogInformation("Establecimiento actualizado con ID {Id}", entity.Id);
+        // 2️⃣  Actualizar los campos escalares
+        entity.Name = dto.Name ?? entity.Name;
+        entity.Description = dto.Description ?? entity.Description;
+        entity.AreaM2 = dto.AreaM2 != default ? dto.AreaM2 : entity.AreaM2;
+        entity.RentValueBase = dto.RentValueBase != default ? dto.RentValueBase : entity.RentValueBase;
+        entity.PlazaId = dto.PlazaId != default ? dto.PlazaId : entity.PlazaId;
 
-    //    var existingImages = await _imagesRepository.GetByEstablishmentIdAsync(dto.Id);
-    //    var totalImages = existingImages.Count;
+        // 3️⃣  Persistir los scalars
+        await _repo.UpdateAsync(entity);      // repo ya hizo SaveChanges
 
-    //    var newImages = new List<Images>();
-    //    if (dto.Images?.Any() == true)
-    //    {
-    //        var availableSlots = 5 - totalImages;
-    //        if (dto.Images.Count > availableSlots)
-    //        {
-    //            _logger.LogWarning("Actualización excede el límite de imágenes: {Count} nuevas, {Available} permitidas",
-    //                dto.Images.Count, availableSlots);
-    //            throw new BusinessException($"Solo puede subir {availableSlots} imágenes adicionales (máximo 5 por establecimiento)");
-    //        }
+        // 4️⃣  Borrar imágenes marcadas
+        if (dto.ImagesToDelete != null)
+        {
+            foreach (var publicId in dto.ImagesToDelete.Where(id => !string.IsNullOrWhiteSpace(id)))
+            {
+                await _cloudinary.DeleteAsync(publicId);
+                await _imagesRepo.DeleteByPublicIdAsync(publicId);
+            }
+        }
 
-    //        var filesToUpload = dto.Images.Take(availableSlots).ToList();
-    //        newImages = await UploadAndMapImagesAsync(filesToUpload, entity.Id);
+        // 5️⃣  Añadir nuevas imágenes (máx 5 en total)
+        if (dto.Images?.Any() == true)
+        {
+            var validFiles = dto.Images.Where(f => f?.Length > 0).ToList();
 
-    //        if (newImages.Any())
-    //        {
-    //            await _imagesRepository.AddAsync(newImages);
-    //            _logger.LogInformation("{Count} imágenes nuevas agregadas al establecimiento ID {Id}", newImages.Count, entity.Id);
-    //        }
-    //    }
+            // Validar que no superemos el límite (5 imágenes)
+            var currentCount = await _imagesRepo.GetByEstablishmentIdAsync(dto.Id);
+            if (validFiles.Count + currentCount.Count > 5)
+                throw new BusinessException(
+                    $"Solo puede subir {5 - currentCount.Count} imágenes adicionales. Máximo 5 por establecimiento.");
 
-    //    var resultDto = _mapper.Map<EstablishmentUpdateDto>(entity);
-    //    resultDto.Images = existingImages
-    //        .Concat(newImages)
-    //        .Adapt<List<ImageSelectDto>>();
+            var newImages = await UploadAndMapImagesAsync(validFiles, entity.Id);
+            await _imagesRepo.AddAsync(newImages);
+        }
 
-    //    return resultDto;
-    //}
+        // 6️⃣  Devolver DTO con la nueva lista de imágenes
+        var updated = await _repo.GetByIdAsync(dto.Id);
+        var resultDto = _mapper.Map<EstablishmentSelectDto>(updated!);
+        resultDto.Images = updated!.Images
+                      .Select(i => new ImageSelectDto(
+                          i.Id, i.FileName, i.FilePath, i.PublicId, i.EstablishmentId))
+                      .ToList();
 
+        return resultDto;
+    }
+
+
+
+    // ───────────────────────────────────────
     public override async Task<bool> DeleteAsync(int id)
     {
-        var entity = await _repository.GetByIdAsync(id);
+        var entity = await _repo.GetByIdAsync(id);
         if (entity == null)
         {
             _logger.LogWarning("Intento de eliminar establecimiento inexistente con ID {Id}", id);
             return false;
         }
 
-        var images = await _imagesRepository.GetByEstablishmentIdAsync(id);
+        var images = await _imagesRepo.GetByEstablishmentIdAsync(id);
         foreach (var image in images)
         {
-            await _cloudinaryHelper.DeleteAsync(image.PublicId);
-            await _imagesRepository.DeleteByPublicIdAsync(image.PublicId);
-            _logger.LogInformation("Imagen eliminada de Cloudinary y DB: PublicId {PublicId}", image.PublicId);
+            await _cloudinary.DeleteAsync(image.PublicId);
+            await _imagesRepo.DeleteByPublicIdAsync(image.PublicId);
         }
 
-        var deleted = await _repository.DeleteAsync(id);
+        var deleted = await _repo.DeleteAsync(id);
         if (deleted)
             _logger.LogInformation("Establecimiento eliminado con ID {Id}", id);
         else
@@ -125,17 +148,19 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
         return deleted;
     }
 
-    private async Task<List<Images>> UploadAndMapImagesAsync(IEnumerable<IFormFile>? files, int establishmentId)
+    // ───────────────────────────────────────
+    #region Helpers
+
+    // • Subir las imágenes a Cloudinary y crear la entidad de dominio
+    private async Task<List<Images>> UploadAndMapImagesAsync(IEnumerable<IFormFile>? files,
+                                                             int establishmentId)
     {
         if (files == null || !files.Any())
-        {
-            _logger.LogInformation("No se encontraron archivos para subir para el establecimiento ID {Id}", establishmentId);
             return new List<Images>();
-        }
 
         var fileList = files.ToList();
         var uploadTasks = fileList
-            .Select(file => _cloudinaryHelper.UploadImageAsync(file, establishmentId))
+            .Select(file => _cloudinary.UploadImageAsync(file, establishmentId))
             .ToList();
 
         var uploadResults = await Task.WhenAll(uploadTasks);
@@ -152,7 +177,10 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
             });
         }
 
-        _logger.LogInformation("{Count} imágenes subidas correctamente para establecimiento ID {Id}", images.Count, establishmentId);
+        _logger.LogInformation("{Count} imágenes subidas para establecimiento ID {Id}",
+                               images.Count, establishmentId);
         return images;
     }
+
+    #endregion
 }

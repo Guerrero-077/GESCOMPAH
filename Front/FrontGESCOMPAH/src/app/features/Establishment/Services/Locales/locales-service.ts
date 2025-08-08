@@ -1,6 +1,10 @@
+// ----------------------------
+// 1.  Servicio de Establecimientos – CRUD + Update con imágenes
+// ----------------------------
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+
 import { environment } from '../../../../../environments/environment.development';
 import {
   EstablishmentCreate,
@@ -10,11 +14,13 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class LocalesService {
-  private urlBase = `${environment.apiURL}/Establishments`;
+  /** Base URL del API (apiURL + /Establishments) */
+  private readonly urlBase = `${environment.apiURL}/Establishments`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  /** Obtener todos los establecimientos (admin o público) */
+  /** --------------------------------------------------  CRUD  ----------------------------------------------------- */
+  /** Obtener todos los establecimientos  */
   getAll(): Observable<EstablishmentSelect[]> {
     return this.http.get<EstablishmentSelect[]>(this.urlBase);
   }
@@ -24,67 +30,72 @@ export class LocalesService {
     return this.http.get<EstablishmentSelect>(`${this.urlBase}/${id}`);
   }
 
-  /** Crear un nuevo establecimiento con imágenes */
-  create(establishment: EstablishmentCreate): Observable<EstablishmentSelect> {
-    const formData = this.buildFormData(establishment);
-    return this.http.post<EstablishmentSelect>(this.urlBase, formData);
-  }
-
-  /** Actualizar un establecimiento, incluyendo imágenes nuevas y existentes */
-  update(establishment: EstablishmentUpdate): Observable<EstablishmentSelect> {
-    if (!establishment.id) throw new Error('Establishment ID is required for update');
-
-    const formData = this.buildFormData(establishment);
-    return this.http.put<EstablishmentSelect>(
-      `${this.urlBase}/${establishment.id}`,
-      formData
-    );
-  }
-
   /** Eliminar un establecimiento por ID */
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.urlBase}/${id}`);
   }
 
+  /** ------------------------  CREATE  ------------------------- */
+  create(est: EstablishmentCreate): Observable<EstablishmentSelect> {
+    const fd = this.buildFormData(est);
+    return this.http.post<EstablishmentSelect>(this.urlBase, fd);
+  }
+
+  /** ------------------------  UPDATE  ------------------------- */
+  update(est: EstablishmentUpdate): Observable<EstablishmentSelect> {
+    if (!est.id) throw new Error('ID del establecimiento es obligatorio');
+
+    const fd = this.buildFormData(est);
+    return this.http.put<EstablishmentSelect>(`${this.urlBase}/${est.id}`, fd);
+  }
+
   /**
-   * Armar el objeto FormData compatible con multipart/form-data para el backend.
-   * Aplica tanto para creación como para edición.
+   * *FormData* de multipart/form‑data
+   *
+   * Se encarga de montar el objeto que el *ASP.NET Core* espera.
+   * <br><br>
+   * <b>Campos que envía</b>
+   * | Campo | Tipo | Comentario |
+   * |-------|------|------------|
+   * | name   | string | mandatory |
+   * | description | string | mandatory |
+   * | areaM2 | number |
+   * | rentValueBase | number |
+   * | plazaId | number |
+   * | address | string (opcional) |
+   *
+   * • Cuando se trata de *CREATE* se envía la colección `files` con los nuevos archivos.<br>
+   * • Cuando se trata de *UPDATE* se envían `images` (nuevos archivos) y `imagesToDelete` (publicId de las que se borran).
    */
-  private buildFormData(est: EstablishmentCreate | EstablishmentUpdate): FormData {
-    const form = new FormData();
+  private buildFormData(dto: EstablishmentCreate | EstablishmentUpdate): FormData {
+    const data = new FormData();
 
-    // Datos básicos
-    form.append('name', est.name);
-    form.append('description', est.description);
-    form.append('areaM2', est.areaM2.toString());
-    form.append('rentValueBase', est.rentValueBase.toString());
-    form.append('plazaId', est.plazaId.toString());
-    if ('address' in est && est.address) {
-      form.append('address', est.address);
+    /* ---------------------------------  Campos básicos  -------------------------------- */
+    if (dto.name) data.append('name', dto.name);
+    if (dto.description) data.append('description', dto.description);
+    if (dto.areaM2 !== undefined) data.append('areaM2', dto.areaM2.toString());
+    if (dto.rentValueBase !== undefined) data.append('rentValueBase', dto.rentValueBase.toString());
+    if (dto.plazaId !== undefined) data.append('plazaId', dto.plazaId.toString());
+    if ('address' in dto && dto.address) data.append('address', dto.address);
+
+    /* ---------------------------------  Campos de actualización (opcional)  -------------------------------- */
+    if ('id' in dto) data.append('id', dto.id.toString());
+
+    /* ---------------------------------  Imágenes  -------------------------------- */
+    // 4️⃣  Nuevas imágenes (Crear y Update comparten la misma lógica)
+    if ('files' in dto && dto.files?.length) {
+      // Create – propiedad Files
+      dto.files.forEach(file => data.append('files', file, file.name));
+    } else if ('images' in dto && dto.images?.length) {
+      // Update – propiedad Images
+      dto.images.forEach(file => data.append('images', file, file.name));
     }
 
-    // Si es actualización
-    if ('id' in est) {
-      form.append('id', est.id.toString());
-
-      // Imágenes existentes que se mantienen
-      if (est.existingImages?.length) {
-        est.existingImages.forEach((img, i) => {
-          form.append(`existingImages[${i}].id`, img.id.toString());
-          form.append(`existingImages[${i}].fileName`, img.fileName);
-          form.append(`existingImages[${i}].filePath`, img.filePath);
-          form.append(`existingImages[${i}].publicId`, img.publicId);
-        });
-      }
+    // 5️⃣  Lista de publicId a borrar (solo en Update)
+    if ('imagesToDelete' in dto && dto.imagesToDelete?.length) {
+      data.append('imagesToDelete', JSON.stringify(dto.imagesToDelete));
     }
 
-    // Nuevas imágenes a subir
-    if (est.files?.length) {
-      est.files.forEach(file => {
-        form.append('files', file, file.name);
-      });
-    }
-
-    return form;
+    return data;
   }
 }

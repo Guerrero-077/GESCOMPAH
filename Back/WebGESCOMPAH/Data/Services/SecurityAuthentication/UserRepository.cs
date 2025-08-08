@@ -50,6 +50,20 @@ namespace Data.Services.SecurityAuthentication
             return await _dbSet.AnyAsync(u => u.Email == email && u.IsDeleted == false);
         }
 
+        public async Task<User?> GetByEmailProjectionAsync(string email)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Email == email)
+                .Select(u => new User
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    Password = u.Password
+                })
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _dbSet

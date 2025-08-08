@@ -41,7 +41,8 @@ namespace Utilities.Helpers.CloudinaryHelper
                 PublicId = publicId,
                 Overwrite = false,
                 UseFilename = false,
-                UniqueFilename = false
+                UniqueFilename = false,
+                Transformation = new Transformation().Quality("auto").FetchFormat("auto")
             };
 
             var result = await _cloudinary.UploadAsync(uploadParams);

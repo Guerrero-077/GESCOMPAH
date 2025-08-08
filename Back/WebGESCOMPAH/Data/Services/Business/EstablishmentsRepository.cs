@@ -10,7 +10,7 @@ namespace Data.Services.Business
     public class EstablishmentsRepository(
         ApplicationDbContext context,
         IImagesRepository imagesRepository)
-        : DataGeneric<Establishment>(context), IEstablishments
+        : DataGeneric<Establishment>(context), IEstablishmentsRepository
     {
         private readonly IImagesRepository _imagesRepository = imagesRepository;
 
@@ -65,23 +65,23 @@ namespace Data.Services.Business
             // Paso 2: Actualizar campos base
             _context.Entry(existing).CurrentValues.SetValues(entity);
 
-            // Paso 3: Si hay nuevas imágenes, gestionarlas
-            if (entity.Images.Any())
-            {
-                // Lógica conservadora: eliminar imágenes existentes y reemplazar
-                var existingImages = await _imagesRepository.GetByEstablishmentIdAsync(entity.Id);
-                foreach (var img in existingImages)
-                {
-                    await _imagesRepository.DeleteByPublicIdAsync(img.PublicId);
-                }
+            //// Paso 3: Si hay nuevas imágenes, gestionarlas
+            //if (entity.Images.Any())
+            //{
+            //    // Lógica conservadora: eliminar imágenes existentes y reemplazar
+            //    var existingImages = await _imagesRepository.GetByEstablishmentIdAsync(entity.Id);
+            //    foreach (var img in existingImages)
+            //    {
+            //        await _imagesRepository.DeleteByPublicIdAsync(img.PublicId);
+            //    }
 
-                foreach (var img in entity.Images)
-                {
-                    img.EstablishmentId = entity.Id;
-                }
+            //    foreach (var img in entity.Images)
+            //    {
+            //        img.EstablishmentId = entity.Id;
+            //    }
 
-                await _imagesRepository.AddAsync(entity.Images);
-            }
+            //    await _imagesRepository.AddAsync(entity.Images);
+            //}
 
             await _context.SaveChangesAsync();
             return existing;

@@ -40,7 +40,7 @@ namespace WebGESCOMPAH.Controllers.Module.Locations
             return await _service.GetByIdAsync(id);
         }
 
-        protected override async Task<DepartmentUpdateDto> UpdateAsync(int id, DepartmentUpdateDto dto)
+        protected override async Task<DepartmentSelectDto> UpdateAsync(int id, DepartmentUpdateDto dto)
         {
             return await _service.UpdateAsync(dto);
         }

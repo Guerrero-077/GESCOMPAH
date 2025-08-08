@@ -10,11 +10,8 @@ namespace Entity.DTOs.Implements.Business.EstablishmentDto
         public decimal RentValueBase { get; set; }
         public string Address { get; set; } = string.Empty;
         public int PlazaId { get; set; }
-
-        /// <summary>
-        /// Archivos de imagen asociados (máximo 5).
-        /// </summary>
-        public ICollection<IFormFile>? Files { get; set; }
+        public ICollection<IFormFile>? Files { get; set; }   // +5 máximo
     }
+
 
 }

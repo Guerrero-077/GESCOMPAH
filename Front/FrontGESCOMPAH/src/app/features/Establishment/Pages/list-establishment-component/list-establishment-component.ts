@@ -24,6 +24,7 @@ import { EstablishmentFormComponent } from '../Form/establishment-form-component
 })
 export class ListEstablishmentComponent {
   locales: EstablishmentSelect[] = [];
+  snackBar: any;
 
   constructor(
     private snackbar: MatSnackBar,
@@ -31,14 +32,12 @@ export class ListEstablishmentComponent {
     private localesService: LocalesService
   ) { }
 
-  ngOnInit(): void {
-    this.loadLocales();
-  }
+  ngOnInit(): void { this.loadLocales(); }
 
   loadLocales(): void {
     this.localesService.getAll().subscribe({
-      next: (data) => (this.locales = data),
-      error: (err) => this.snackbar.open('Error al cargar locales: ' + err.message, 'Cerrar')
+      next: data => (this.locales = data),
+      error: err => this.snackBar.open('Error al cargar locales: ' + err.message, 'Cerrar')
     });
   }
 
@@ -48,20 +47,28 @@ export class ListEstablishmentComponent {
       data: null
     });
 
+    dialogRef.afterClosed().subscribe(result => { if (result) this.loadLocales(); });
+  }
+
+  openEditDialog(est: EstablishmentSelect): void {
+    const dialogRef = this.dialog.open(EstablishmentFormComponent, {
+      width: '600px',
+      data: est            // <-- pasamos el registro que se va a editar
+    });
+
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) this.loadLocales();
+      if (result) this.loadLocales();   // → recargar la lista
     });
   }
 
   handleDelete(id: number): void {
     this.localesService.delete(id).subscribe({
       next: () => {
-        this.snackbar.open('Local eliminado exitosamente', 'Cerrar', { duration: 2000 });
+        this.snackBar.open('Local eliminado exitosamente', 'Cerrar', { duration: 2000 });
         this.loadLocales();
       },
-      error: (err) => {
-        this.snackbar.open('Error al eliminar: ' + err.message, 'Cerrar');
-      }
+      error: err => this.snackBar.open('Error al eliminar: ' + err.message, 'Cerrar')
     });
   }
+
 }

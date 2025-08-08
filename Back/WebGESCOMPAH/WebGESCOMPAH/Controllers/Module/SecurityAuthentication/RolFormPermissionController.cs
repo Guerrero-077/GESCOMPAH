@@ -39,7 +39,7 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
             return await _service.GetByIdAsync(id);
         }
 
-        protected override async Task<RolFormPermissionUpdateDto> UpdateAsync(int id, RolFormPermissionUpdateDto dto)
+        protected override async Task<RolFormPermissionSelectDto> UpdateAsync(int id, RolFormPermissionUpdateDto dto)
         {
             return await _service.UpdateAsync(dto);
         }

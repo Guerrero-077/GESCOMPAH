@@ -32,15 +32,15 @@ public class ImagesController : ControllerBase
     /// <summary>
     /// Reemplazar una imagen específica
     /// </summary>
-    [HttpPut("{imageId}")]
-    public async Task<IActionResult> ReplaceImage([FromForm] ImageUpdateDto dto)
-    {
-        if (dto.File == null)
-            return BadRequest("Debe proporcionar un archivo para reemplazo.");
+    //[HttpPut("{imageId}")]
+    //public async Task<IActionResult> ReplaceImage([FromForm] ImageUpdateDto dto)
+    //{
+    //    if (dto.File == null)
+    //        return BadRequest("Debe proporcionar un archivo para reemplazo.");
 
-        var updatedImage = await _imagesService.ReplaceImageAsync(dto.Id, dto.File);
-        return Ok(updatedImage);
-    }
+    //    var updatedImage = await _imagesService.ReplaceImageAsync(dto.Id, dto.File);
+    //    return Ok(updatedImage);
+    //}
 
     /// <summary>
     /// Eliminar una imagen por su ID

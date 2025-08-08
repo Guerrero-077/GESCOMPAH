@@ -41,7 +41,7 @@ public class RolController : BaseController<RolSelectDto, RolCreateDto, RolUpdat
         return await _service.GetByIdAsync(id);
     }
 
-    protected override async Task<RolUpdateDto> UpdateAsync(int id, RolUpdateDto dto)
+    protected override async Task<RolSelectDto> UpdateAsync(int id, RolUpdateDto dto)
     {
         return await _service.UpdateAsync(dto);
     }

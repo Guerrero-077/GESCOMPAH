@@ -61,7 +61,7 @@ namespace Business.Repository
                 throw new BusinessException("Error al crear el registro.", ex);
             }
         }
-        public override async Task<TDtoUpdate> UpdateAsync(TDtoUpdate dto)
+        public override async Task<TDtoGet> UpdateAsync(TDtoUpdate dto)
         {
             BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
 
@@ -69,7 +69,7 @@ namespace Business.Repository
             entity.InitializeLogicalState();
 
             var updated = await Data.UpdateAsync(entity);
-            return _mapper.Map<TDtoUpdate>(updated);
+            return _mapper.Map<TDtoGet>(updated);
         }
 
         public override async Task<bool> DeleteAsync(int id)

@@ -39,7 +39,7 @@ export class RolComponent implements OnInit {
   load() {
     this.rolService.getAll("rol").subscribe({
       next: (data) => {
-        console.log("Roles desde el servicio:", data); // <---- agrega aquí el log
+        console.log("Roles desde el servicio:", data);
         this.rols = data;
       }
     });

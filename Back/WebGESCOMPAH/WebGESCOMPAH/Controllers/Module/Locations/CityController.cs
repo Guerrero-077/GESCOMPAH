@@ -57,7 +57,7 @@ namespace WebGESCOMPAH.Controllers.Module.Locations
         {
             await _service.CreateAsync(dto);
         }
-        protected override async Task<CityUpdateDto> UpdateAsync(int id, CityUpdateDto dto)
+        protected override async Task<CitySelectDto> UpdateAsync(int id, CityUpdateDto dto)
         {
             return await _service.UpdateAsync(dto);
         }

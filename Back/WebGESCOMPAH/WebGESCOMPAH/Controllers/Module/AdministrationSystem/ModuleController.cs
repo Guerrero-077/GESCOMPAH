@@ -38,7 +38,7 @@ namespace WebGESCOMPAH.Controllers.Module.AdministrationSystem
             return await _service.GetByIdAsync(id);
         }
 
-        protected override async Task<ModuleUpdateDto> UpdateAsync(int id, ModuleUpdateDto dto)
+        protected override async Task<ModuleSelectDto> UpdateAsync(int id, ModuleUpdateDto dto)
         {
             return await _service.UpdateAsync(dto);
         }

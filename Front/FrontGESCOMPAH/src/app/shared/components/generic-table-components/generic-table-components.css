@@ -40,13 +40,13 @@ td button {
     background-color: #F4F7FC;
 }
 
-.custom-paginator .mat-paginator-range-label,
-.custom-paginator .mat-icon-button,
-.custom-paginator .mat-select-value {
-    color: #424242;
+.custom-paginator {
+    flex-shrink: 0;
+    background-color: #F4F7FC;
+    border-top: 1px solid #ddd;
 }
 
-.custom-paginator .mat-paginator-navigation-previous,
-.custom-paginator .mat-paginator-navigation-next {
-    color: #1565c0;
+.table-footer {
+    display: flex;
+    justify-content: flex-end;
 }

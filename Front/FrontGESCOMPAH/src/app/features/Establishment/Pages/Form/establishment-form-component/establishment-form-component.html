@@ -107,13 +107,14 @@
             <input type="file" #fileInput (change)="handleFileInput($event)" accept="image/*" multiple hidden>
         </div>
 
-        <!-- Contador de imágenes -->
+        <!-- Contador -->
         <div class="image-counter mt-2 mb-3">
-            <span class="counter-badge">{{ selectedFiles.length + existingImages.length }}/5 imágenes</span>
+            <span class="counter-badge">{{ selectedFiles.length + existingImagesFull.length }}/5 imágenes</span>
         </div>
 
-        <!-- Vista previa de imágenes - Versión compacta -->
+        <!-- Vista previa -->
         <div class="compact-image-grid">
+
             <!-- Imágenes existentes -->
             <div class="compact-image-container" *ngFor="let img of existingImagesFull; let i = index">
                 <img [src]="img.filePath" alt="Imagen existente" class="compact-image">
@@ -135,12 +136,14 @@
                 </div>
                 <span class="compact-image-label">Nueva</span>
             </div>
+
         </div>
+
 
         <div class="d-flex justify-content-between mt-4">
             <button mat-button matStepperPrevious>Anterior</button>
             <button mat-raised-button color="primary" (click)="onSubmit()"
-                [disabled]="(selectedFiles.length + existingImages.length) === 0 || isLoading">
+                [disabled]="(selectedFiles.length + existingImagesFull.length) === 0 || isLoading">
                 <span *ngIf="!isLoading">{{ isEdit ? 'Actualizar' : 'Crear' }}</span>
                 <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
             </button>

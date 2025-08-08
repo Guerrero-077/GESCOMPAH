@@ -2,11 +2,11 @@ import { Component, inject, OnInit } from '@angular/core';
 import { TenantsServices } from '../../../Services/Tenants/tenants-services';
 import { TableColumn } from '../../../../../shared/models/TableColumn.models';
 import { TenantsModels } from '../../../Models/Tenants.mode';
-// import { GenericTableComponents } from "../../../../../shared/components/generic-table-components/generic-table-components";
+import { GenericTableComponents } from "../../../../../shared/components/generic-table-components/generic-table-components";
 
 @Component({
   selector: 'app-tenants-component',
-  // imports: [GenericTableComponents],
+  imports: [GenericTableComponents],
   templateUrl: './tenants-component.html',
   styleUrl: './tenants-component.css'
 })

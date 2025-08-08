@@ -8,5 +8,7 @@ namespace Data.Interfaz.IDataImplemenent.SecurityAuthentication
         Task<RolUser> AsignateRolDefault(User user);
         Task<List<Rol>> GetRolesByUserIdAsync(int userId);
 
+        Task<List<string>> GetRoleNamesByUserIdAsync(int userId);
+
     }
 }
