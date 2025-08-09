@@ -1,0 +1,48 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
+import { TableColumn } from '../../../../shared/models/TableColumn.models';
+import { CityModel } from '../../models/city.models';
+import { CityService } from '../../services/city/city.service';
+
+@Component({
+  selector: 'app-city',
+  imports: [GenericTableComponent],
+  templateUrl: './city.component.html',
+  styleUrl: './city.component.css'
+})
+export class CityComponent implements OnInit {
+  private readonly service = inject(CityService);
+  Forms: CityModel[] = [];
+
+  columns: TableColumn<CityModel>[] = [];
+
+  ngOnInit(): void {
+    this.columns = [
+      { key: 'index', header: 'Nº', type: 'index' },
+      { key: 'name', header: 'Nombre' },
+      { key: 'departmentName', header: 'Departamento' },
+      { key: 'active', header: 'Active' }
+    ];
+    this.load();
+  }
+
+  load() {
+    this.service.getAll("city").subscribe({
+      next: (data) => (this.Forms = data),
+      error: (err) => console.error('Error al cargar:', err)
+    })
+  }
+
+  onEdit(row: CityModel) {
+    console.log('Editar:', row);
+  }
+
+  onDelete(row: CityModel) {
+    console.log('Eliminar:', row);
+  }
+
+  onView(row: CityModel) {
+    console.log('Ver:', row);
+  }
+
+}
