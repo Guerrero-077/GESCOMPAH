@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SIDEBAR_BY_ROLE, SidebarItem } from './sidebar.config';
-import { AuthService } from '../../../Core/Auth/auth-service';
 // import { AuthService } from '../services/auth.service';
 // import { MENU_BY_ROLE, MenuItem } from '../config/menu.config';
 

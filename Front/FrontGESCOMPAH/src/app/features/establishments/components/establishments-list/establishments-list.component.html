@@ -1,0 +1,25 @@
+<div class="container mt-4">
+
+    <!-- Botón para abrir el formulario en un modal -->
+    <div class="d-flex justify-content-end mb-4">
+        <button mat-raised-button color="primary" (click)="openCreateDialog()">
+            Nuevo establecimiento
+        </button>
+    </div>
+
+    <!-- Lista de locales -->
+    <div *ngIf="establishments.length > 0; else noEstablishment">
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <app-card *ngFor="let establishment of establishments" [local]="establishment" [showAvailableTag]="true"
+                (onDelete)="handleDelete(establishment.id)" (onUpdate)="loadLocales()">
+            </app-card>
+        </div>
+    </div>
+
+    <!-- Si no hay locales -->
+    <ng-template #noEstablishment>
+        <div class="text-center text-muted mt-4">
+            No hay locales registrados aún.
+        </div>
+    </ng-template>
+</div>

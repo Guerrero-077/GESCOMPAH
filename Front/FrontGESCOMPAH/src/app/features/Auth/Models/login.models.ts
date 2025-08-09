@@ -4,7 +4,7 @@ export interface LoginModel {
 }
 
 export interface LoginResponseModel {
-    id:    string;
+    id: string;
     email: string;
     roles: string[];
 }

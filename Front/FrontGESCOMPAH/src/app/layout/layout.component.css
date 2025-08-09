@@ -1,0 +1,30 @@
+/* ===== Layout General ===== */
+.container-d {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background-color: #fff;
+}
+
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    padding: 3vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+    /* Scroll horizontal solo aquí */
+    max-width: 100%;
+    /* Nunca sobrepasa el ancho del contenedor */
+    box-sizing: border-box;
+    /* El padding no aumenta el ancho */
+}
+
+.main-content>* {
+    min-width: 0;
+    /* Evita que los hijos flex se desborden */
+}

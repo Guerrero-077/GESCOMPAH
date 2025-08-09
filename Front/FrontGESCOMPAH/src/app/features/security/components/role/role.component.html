@@ -1,0 +1,10 @@
+<div class="row d-flex justify-content-center">
+    <app-generic-table [data]="rols" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
+        (view)="onView($event)" (create)="onCreateNew()">
+    </app-generic-table>
+
+
+    <ng-template #estadoTemplate let-row>
+        <span class="badge badge-success">Activo</span>
+    </ng-template>
+</div>

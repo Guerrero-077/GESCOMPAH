@@ -1,17 +1,14 @@
 import { Routes } from '@angular/router';
-import { LayoutComponent } from './features/layout.component';
+import { CityListComponent } from './features/config/components/city-list/city-list.component';
+import { DepartmentListComponent } from './features/config/components/department-list/department-list.component';
 import { DashboardComponent } from './features/dashboard/Pages/dashboard/dashboard-component/dashboard-component';
-import { EstablishmentFormComponent } from './features/Establishment/Pages/Form/establishment-form-component/establishment-form-component';
-import { ListEstablishmentComponent } from './features/Establishment/Pages/list-establishment-component/list-establishment-component';
-import { RolComponent } from './features/ModelSecurity/Pages/Rol/rol-component/rol-component';
-import { FormComponent } from './features/ModelSecurity/Pages/Form/form-component/form-component';
-import { PermissionComponent } from './features/ModelSecurity/Pages/Permission/permission-component/permission-component';
-import { MainComponent } from './features/Establishment/Pages/main-component/main-component';
-import { MainSistemSegurity } from './features/ModelSecurity/Pages/main/main-sistem-segurity/main-sistem-segurity';
-import { TenantsComponent } from './features/Tenants/Pages/Tenants/tenants-component/tenants-component';
-import { CityComponent } from './features/Config/Pages/City/city-component/city-component';
-import { MainConfig } from './features/Config/Pages/Main/main-config/main-config';
-import { DepartmentsCitiesComponent } from './features/Config/Pages/Main/departments-cities-component/departments-cities-component';
+import { EstablishmentsListComponent } from './features/establishments/components/establishments-list/establishments-list.component';
+import { SquaresEstablishmentsComponent } from './features/establishments/pages/squares-establishments/squares-establishments.component';
+import { TenantsListComponent } from './features/tenants/pages/tenants-list/tenants-list.component';
+import { ModelSecurityComponent } from './features/security/pages/model-security/model-security.component';
+import { RoleComponent } from './features/security/components/role/role.component';
+import { FormComponent } from './features/security/components/form/form.component';
+import { LayoutComponent } from './layout/layout.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'Auth/login', pathMatch: 'full' },
@@ -19,7 +16,7 @@ export const routes: Routes = [
   {
     path: 'Auth',
     loadChildren: () =>
-      import('./features/Auth/auth.routes').then((m) => m.AUTH_ROUTES),
+      import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   // {
   //   path: 'Establishment',
@@ -32,23 +29,19 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'main', component: MainComponent },
-      { path: 'Establishment', component: ListEstablishmentComponent },
-      { path: 'tenants', component: TenantsComponent },
-      { path: 'mainSistemSegurity', component: MainSistemSegurity },
-      { path: 'city', component: CityComponent },
-      { path: 'mainConfig', component: MainConfig },
-      { path: 'departmentCities', component: DepartmentsCitiesComponent },
-      { path: 'rol', component: RolComponent },
+      { path: 'main', component: SquaresEstablishmentsComponent },
+      { path: 'Establishment', component: EstablishmentsListComponent },
+      { path: 'tenants', component: TenantsListComponent },
+      { path: 'mainSistemSegurity', component: ModelSecurityComponent },
+      { path: 'city', component: CityListComponent },
+      // { path: 'mainConfig', component: MainConfig },
+      { path: 'departmentCities', component: DepartmentListComponent },
+      { path: 'rol', component: RoleComponent },
       { path: 'form', component: FormComponent },
-      { path: 'rol', component: RolComponent },
 
     ],
     data: { role: 'Administrador' },
   },
 
-  { path: 'Rol', component: RolComponent },
-  { path: 'Form', component: FormComponent },
-  { path: 'Permission', component: PermissionComponent },
-  { path: 'form', component: FormComponent },
+
 ];

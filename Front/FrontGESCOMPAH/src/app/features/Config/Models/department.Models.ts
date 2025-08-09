@@ -1,4 +1,4 @@
-export interface DepartmentModels { 
-    name:   string;
+export interface DepartmentModel {
+    name: string;
     active: boolean;
 }

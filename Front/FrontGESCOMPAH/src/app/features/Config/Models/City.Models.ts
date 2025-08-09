@@ -1,5 +1,5 @@
-export interface CityModels {
-    name:           string;
+export interface CityModel {
+    name: string;
     departmentName: string;
-    active:         boolean;
+    active: boolean;
 }
