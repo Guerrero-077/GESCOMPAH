@@ -1,6 +1,7 @@
 ﻿using Business.Interfaces.Implements.Utilities;
 using Business.Services.Utilities;
 using Entity.DTOs.Implements.Utilities.Images;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Utilities.Exceptions;
@@ -8,6 +9,7 @@ using Utilities.Exceptions;
 namespace Web.Controllers.Utilities;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class ImagesController : ControllerBase
 {

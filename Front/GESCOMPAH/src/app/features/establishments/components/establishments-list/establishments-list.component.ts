@@ -1,5 +1,5 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CardComponent } from "../../../../shared/components/card/card.component";
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -8,12 +8,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
-import { EstablishmentSelect } from '../../models/establishment.models';
-import { FormEstablishmentComponent } from '../form-establishment/form-establishment.component';
-import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
+import { CardComponent } from "../../../../shared/components/card/card.component";
+import { EstablishmentSelect } from '../../models/establishment.models';
 import { EstablishmentStore } from '../../services/establishment/establishment.store';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { FormEstablishmentComponent } from '../form-establishment/form-establishment.component';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
+
 
 @Component({
   selector: 'app-establishments-list',
@@ -28,7 +29,6 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatStepperModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
   ],
   templateUrl: './establishments-list.component.html',
   styleUrl: './establishments-list.component.css',
@@ -40,7 +40,7 @@ export class EstablishmentsListComponent {
   constructor(
     private dialog: MatDialog,
     private store: EstablishmentStore,
-    private snackbar: MatSnackBar
+    private sweetAlert: SweetAlertService
   ) {
     this.establishments$ = this.store.establishments$;
   }
@@ -60,9 +60,13 @@ export class EstablishmentsListComponent {
   }
 
   handleDelete(id: number): void {
-    this.store.delete(id).subscribe({
-      next: () => {
-        this.snackbar.open('Local eliminado exitosamente', 'Cerrar', { duration: 2000 });
+    this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(result => {
+      if (result.isConfirmed) {
+        this.store.delete(id).subscribe({
+          next: () => {
+            this.sweetAlert.showNotification('Éxito', 'Local eliminado exitosamente', 'success');
+          }
+        });
       }
     });
   }

@@ -7,13 +7,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatStepperModule } from '@angular/material/stepper';
 import { EstablishmentCreate, EstablishmentSelect, EstablishmentUpdate, ImageSelectDto } from '../../models/establishment.models';
 import { SquareModel } from '../../models/squares.models';
 import { EstablishmentStore } from '../../services/establishment/establishment.store';
 import { ImageService } from '../../services/image/image.service';
 import { SquareService } from '../../services/square/square.service';
+import {SweetAlertService} from '../../../../shared/Services/sweet-alert/sweet-alert.service'
 
 @Component({
     selector: 'app-form-establishment',
@@ -62,7 +62,7 @@ export class FormEstablishmentComponent {
         private imageService: ImageService,
         private plazasSrv: SquareService,
         private dialogRef: MatDialogRef<FormEstablishmentComponent>,
-        private snackBar: MatSnackBar,
+        private sweetAlert: SweetAlertService,
         @Optional() @Inject(MAT_DIALOG_DATA) public data?: EstablishmentSelect
     ) {
         this.isEdit = !!data?.id;
@@ -145,7 +145,7 @@ export class FormEstablishmentComponent {
         const totalImages = this.selectedFiles.length + this.existingImagesFull.length;
         const remainingSlots = this.MAX_IMAGES - totalImages;
         if (remainingSlots <= 0) {
-            this.snackBar.open(`Máximo ${this.MAX_IMAGES} imágenes permitidas`, 'Cerrar', { duration: 3000 });
+            this.sweetAlert.showNotification('Límite de imágenes', `Máximo ${this.MAX_IMAGES} imágenes permitidas`, 'warning');
             return;
         }
 
@@ -163,7 +163,7 @@ export class FormEstablishmentComponent {
         });
 
         if (errors.length) {
-            this.snackBar.open(errors.join('\n'), 'Cerrar', { duration: 6000 });
+            this.sweetAlert.showNotification('Error en archivos', errors.join('\n'), 'error');
         }
 
         this.selectedFiles.push(...newFiles);
@@ -184,15 +184,18 @@ export class FormEstablishmentComponent {
 
         if (isExisting) {
             const image = this.existingImagesFull[index];
-            if (!confirm('¿Eliminar esta imagen permanentemente?')) return;
-
-            this.isDeletingImage = true;
-            this.imageService.logicalDeleteImage(image.publicId).subscribe({
-                next: () => {
-                    this.existingImagesFull.splice(index, 1);
-                    this.isDeletingImage = false;
-                },
-                error: () => (this.isDeletingImage = false),
+            this.sweetAlert.showConfirm('¿Eliminar esta imagen?', 'Esta acción no se puede deshacer').then(result => {
+                if (result.isConfirmed) {
+                    this.isDeletingImage = true;
+                    this.imageService.logicalDeleteImage(image.publicId).subscribe({
+                        next: () => {
+                            this.existingImagesFull.splice(index, 1);
+                            this.isDeletingImage = false;
+                            this.sweetAlert.showNotification('Éxito', 'Imagen eliminada exitosamente', 'success');
+                        },
+                        error: () => (this.isDeletingImage = false),
+                    });
+                }
             });
         } else {
             this.selectedFiles.splice(index, 1);
@@ -204,12 +207,12 @@ export class FormEstablishmentComponent {
     onSubmit(): void {
         if (this.generalGroup.invalid || this.ubicacionGroup.invalid) {
             this.markAllTouched();
-            this.snackBar.open('Completa todos los campos requeridos', 'Cerrar', { duration: 3000 });
+            this.sweetAlert.showNotification('Campos incompletos', 'Completa todos los campos requeridos', 'warning');
             return;
         }
 
         if (this.selectedFiles.length === 0 && this.existingImagesFull.length === 0) {
-            this.snackBar.open('Debe agregar al menos una imagen', 'Cerrar', { duration: 3000 });
+            this.sweetAlert.showNotification('Sin imágenes', 'Debe agregar al menos una imagen', 'warning');
             return;
         }
 

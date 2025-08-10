@@ -1,6 +1,5 @@
 ﻿using Business.Interfaces.Implements.Persons;
 using Entity.DTOs.Implements.Persons.Peron;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebGESCOMPAH.Controllers.Base;

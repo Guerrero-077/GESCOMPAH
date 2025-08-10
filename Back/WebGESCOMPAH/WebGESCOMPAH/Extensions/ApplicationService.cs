@@ -35,6 +35,7 @@ using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
 using Mapster;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
+using WebGESCOMPAH.Infrastructure;
 using WebGESCOMPAH.Middleware;
 using WebGESCOMPAH.Middleware.Handlers;
 
@@ -99,6 +100,9 @@ namespace WebGESCOMPAH.Extensions
 
             // JWT 
             services.AddScoped<IToken, TokenBusiness>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddSingleton<IAuthCookieFactory, AuthCookieFactory>();
+
             services.AddMemoryCache();
 
 

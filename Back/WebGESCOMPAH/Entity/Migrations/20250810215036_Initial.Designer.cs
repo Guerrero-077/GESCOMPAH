@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250809230702_Initial")]
+    [Migration("20250810215036_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -1372,6 +1372,43 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             Name = "Eliminar"
                         });
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.SecurityAuthentication.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReplacedByTokenHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.SecurityAuthentication.Rol", b =>

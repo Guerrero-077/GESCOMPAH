@@ -2,6 +2,7 @@
 using Business.Mapping;
 using CloudinaryDotNet;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Interfaces;
 using Entity.DTOs.Services;
 using Entity.DTOs.Validations.Entity.DTOs.Validators.SecurityAuthentication;
@@ -10,6 +11,7 @@ using Utilities.Helpers.CloudinaryHelper;
 using WebGESCOMPAH.Extensions;
 using WebGESCOMPAH.Middleware;
 using WebGESCOMPAH.Middleware.Handlers;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +26,11 @@ builder.Services.AddSwaggerGen();
 
 // CORS, JWT, DB, Servicios personalizados
 builder.Services.AddCustomCors(builder.Configuration);
+
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<CookieSettings>(builder.Configuration.GetSection("Cookie"));
+
+
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddDatabase(builder.Configuration);

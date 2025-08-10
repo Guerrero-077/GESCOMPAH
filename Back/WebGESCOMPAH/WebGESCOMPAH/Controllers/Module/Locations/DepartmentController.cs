@@ -1,13 +1,13 @@
 ﻿using Business.Interfaces.Implements.Location;
-using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Location.Department;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebGESCOMPAH.Controllers.Base;
 
 namespace WebGESCOMPAH.Controllers.Module.Locations
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class DepartmentController : BaseController<DepartmentSelectDto, DepartmentCreateDto, DepartmentUpdateDto, IDepartmentService>
     {

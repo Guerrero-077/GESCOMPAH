@@ -121,6 +121,24 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TokenHash = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
+                    ReplacedByTokenHash = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -682,6 +700,16 @@ namespace Entity.Migrations
                 filter: "[Document] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_TokenHash",
+                table: "RefreshTokens",
+                column: "TokenHash");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Roles_Name",
                 table: "Roles",
                 column: "Name",
@@ -741,6 +769,9 @@ namespace Entity.Migrations
 
             migrationBuilder.DropTable(
                 name: "PasswordResetCodes");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "RolFormPermissions");

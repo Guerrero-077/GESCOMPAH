@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, OnInit } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { SidebarItem, BackendMenuItem, BackendSubMenuItem } from './sidebar.config';
-import { PermissionService } from '../../../core/service/permission/permission.service'; // Import PermissionService
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/service/auth/auth.service';
+import { PermissionService } from '../../../core/service/permission/permission.service'; // Import PermissionService
+import { BackendMenuItem, SidebarItem } from './sidebar.config';
 
 
 @Component({
@@ -43,7 +43,7 @@ export class SidebarComponent implements OnInit {
       menuItem.forms.forEach(form => {
         children.push({
           label: form.name,
-          icon: '', // Sub-items might not have icons, or you can map them
+          icon: '', // Sub-items might not have icons, or you   can map them
           route: `/Admin/${form.route}` // Prefix with /Admin/
         });
       });

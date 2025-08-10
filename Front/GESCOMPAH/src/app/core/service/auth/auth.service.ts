@@ -24,29 +24,43 @@ export class AuthService {
   }
 
   Login(Objeto: LoginModel): Observable<any> {
-    return this.http.post<any>(this.urlBase + 'Login', Objeto).pipe(
-      tap(() => {
-        this.GetMe().subscribe(user => {
-          this.permissionService.setUserProfile(user);
-        });
+    return this.http.post<any>(this.urlBase + 'Login', Objeto, { withCredentials: true }).pipe(
+      tap(response => {
+        // response.user es el UserMeDto completo
+        this.permissionService.setUserProfile(response.user);
       })
     );
   }
+
+
 
   GetMe(): Observable<User> {
-    return this.http.get<User>(this.urlBase + 'me').pipe(
+    return this.http.get<User>(this.urlBase + 'me', { withCredentials: true }).pipe(
       tap(user => {
-        this.permissionService.setUserProfile(user);
+        if (user) {
+          this.permissionService.setUserProfile(user);
+        }
       })
     );
   }
 
+
   logout(): Observable<any> {
-    return this.http.post(this.urlBase + 'Logout', {}).pipe(
+    return this.http.post(this.urlBase + 'Logout', {}, { withCredentials: true }).pipe(
       tap(() => {
         this.permissionService.setUserProfile(null);
         this.router.navigate(['/']);
       })
     );
   }
+
+  RefreshToken(): Observable<any> {
+    return this.http.post<any>(this.urlBase + 'Refresh-Token', {}, { withCredentials: true }).pipe(
+      tap(response => {
+        this.permissionService.setUserProfile(response.user);
+      })
+    );
+  }
+
+
 }

@@ -6,15 +6,16 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { SweetAlertService } from '../../shared/Services/sweet-alert/sweet-alert.service'
+
 
 export const errorInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
-  const snackbar = inject(MatSnackBar);
+  const sweetAlert = inject(SweetAlertService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -28,10 +29,7 @@ export const errorInterceptor: HttpInterceptorFn = (
         errorMessage = `Error Código: ${error.status}, Mensaje: ${error.message}`;
       }
 
-      snackbar.open(errorMessage, 'Cerrar', {
-        duration: 5000,
-        panelClass: ['error-snackbar'] // Opcional: para estilos custom
-      });
+      sweetAlert.showNotification('Error', errorMessage, 'error');
 
       return throwError(() => error);
     })

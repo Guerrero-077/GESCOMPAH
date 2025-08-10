@@ -1,10 +1,12 @@
 ﻿using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebGESCOMPAH.Controllers.Module.Business
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class EstablishmentsController : ControllerBase
     {

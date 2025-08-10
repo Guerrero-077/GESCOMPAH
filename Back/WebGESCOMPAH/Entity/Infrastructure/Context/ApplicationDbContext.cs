@@ -32,6 +32,14 @@ namespace Entity.Infrastructure.Context
                  .OnDelete(DeleteBehavior.Cascade);
             });
 
+            modelBuilder.Entity<RefreshToken>(ent =>
+            {
+                ent.HasKey(e => e.Id);
+                ent.HasIndex(e => e.TokenHash).IsUnique(false);
+                ent.HasIndex(e => e.UserId);
+                ent.Property(e => e.TokenHash).IsRequired().HasMaxLength(128);
+            });
+
             //Data init
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Images>().HasQueryFilter(img => !img.IsDeleted);
@@ -60,6 +68,6 @@ namespace Entity.Infrastructure.Context
         public DbSet<Establishment> Establishment { get; set; }
         public DbSet<Images> Images { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
-
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     }
 }

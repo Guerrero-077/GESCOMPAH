@@ -8,7 +8,7 @@ using WebGESCOMPAH.Controllers.Base;
 namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Produces("application/json")]
 
     [Route("api/[controller]")]
