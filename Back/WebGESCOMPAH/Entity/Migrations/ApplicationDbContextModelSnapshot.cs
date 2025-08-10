@@ -105,30 +105,50 @@ namespace Entity.Migrations
                             Id = 1,
                             Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Gestión de usuarios",
+                            Description = "Vista general del dashboard",
                             IsDeleted = false,
-                            Name = "Usuarios",
-                            Route = "/admin/users"
+                            Name = "Vista General",
+                            Route = "dashboard"
                         },
                         new
                         {
                             Id = 2,
                             Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Gestión de roles",
+                            Description = "Ver y gestionar establecimientos",
                             IsDeleted = false,
-                            Name = "Roles",
-                            Route = "/admin/roles"
+                            Name = "Lista de Establecimientos",
+                            Route = "establishments/main"
                         },
                         new
                         {
                             Id = 3,
                             Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Gestión de locales",
+                            Description = "Gestión de arrendatarios",
                             IsDeleted = false,
-                            Name = "Locales",
-                            Route = "/locales"
+                            Name = "Arrendatarios",
+                            Route = "tenants"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Configuración de modelos de seguridad",
+                            IsDeleted = false,
+                            Name = "Modelos de Seguridad",
+                            Route = "security/main"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Ajustes principales del sistema",
+                            IsDeleted = false,
+                            Name = "Configuración Principal",
+                            Route = "settings/main"
                         });
                 });
 
@@ -183,7 +203,7 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FormId = 2,
                             IsDeleted = false,
-                            ModuleId = 1
+                            ModuleId = 2
                         },
                         new
                         {
@@ -192,7 +212,25 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FormId = 3,
                             IsDeleted = false,
-                            ModuleId = 2
+                            ModuleId = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 4,
+                            IsDeleted = false,
+                            ModuleId = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 5,
+                            IsDeleted = false,
+                            ModuleId = 5
                         });
                 });
 
@@ -243,20 +281,50 @@ namespace Entity.Migrations
                             Id = 1,
                             Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Módulo de gestión administrativa",
-                            Icon = "shield-lock",
+                            Description = "Panel de control principal",
+                            Icon = "home",
                             IsDeleted = false,
-                            Name = "Administración"
+                            Name = "Dashboard"
                         },
                         new
                         {
                             Id = 2,
                             Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Módulo de gestión de locales municipales",
-                            Icon = "store-front",
+                            Description = "Gestión de establecimientos",
+                            Icon = "store",
                             IsDeleted = false,
-                            Name = "Locales"
+                            Name = "Establecimientos"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Gestión de arrendatarios",
+                            Icon = "people",
+                            IsDeleted = false,
+                            Name = "Arrendatarios"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Gestión de seguridad y permisos",
+                            Icon = "security",
+                            IsDeleted = false,
+                            Name = "Seguridad"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Configuración general del sistema",
+                            Icon = "settings",
+                            IsDeleted = false,
+                            Name = "Configuración"
                         });
                 });
 
@@ -1516,6 +1584,86 @@ namespace Entity.Migrations
                             Active = true,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FormId = 3,
+                            IsDeleted = false,
+                            PermissionId = 4,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 4,
+                            IsDeleted = false,
+                            PermissionId = 1,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 4,
+                            IsDeleted = false,
+                            PermissionId = 2,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 4,
+                            IsDeleted = false,
+                            PermissionId = 3,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 4,
+                            IsDeleted = false,
+                            PermissionId = 4,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 5,
+                            IsDeleted = false,
+                            PermissionId = 1,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 5,
+                            IsDeleted = false,
+                            PermissionId = 2,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 5,
+                            IsDeleted = false,
+                            PermissionId = 3,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Active = true,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FormId = 5,
                             IsDeleted = false,
                             PermissionId = 4,
                             RolId = 1

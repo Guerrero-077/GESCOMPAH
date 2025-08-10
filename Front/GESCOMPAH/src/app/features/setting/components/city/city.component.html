@@ -1,8 +1,11 @@
-<app-generic-table [data]="Forms" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
-    (view)="onView($event)">
-</app-generic-table>
+<div class="container mt-4">
 
-
-<ng-template #estadoTemplate let-row>
-    <span class="badge badge-success">Activo</span>
-</ng-template>
+    <!-- Tabla de ciudades -->
+    <app-generic-table
+        [columns]="columns"
+        [data]="cities$ | async"
+        (edit)="openEditDialog($event)"
+        (delete)="handleDelete($event)"
+        (create)="openCreateDialog()"
+    ></app-generic-table>
+</div>

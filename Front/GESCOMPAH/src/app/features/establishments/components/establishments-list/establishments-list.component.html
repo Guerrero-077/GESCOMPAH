@@ -7,19 +7,32 @@
         </button>
     </div>
 
-    <!-- Lista de locales -->
-    <div *ngIf="establishments.length > 0; else noEstablishment">
-        <div class="d-flex flex-wrap gap-3 justify-content-center">
-            <app-card *ngFor="let establishment of establishments" [local]="establishment" [showAvailableTag]="true"
-                (onDelete)="handleDelete(establishment.id)" (onUpdate)="loadLocales()">
-            </app-card>
+    <!-- Contenedor principal con el pipe Async -->
+    <div *ngIf="establishments$ | async as establishments; else loading">
+        <!-- Lista de locales -->
+        <div *ngIf="establishments.length > 0; else noEstablishment">
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                <app-card *ngFor="let establishment of establishments" 
+                          [local]="establishment" 
+                          [showAvailableTag]="true"
+                          (onDelete)="handleDelete(establishment.id)" 
+                          (onUpdate)="openEditDialog(establishment)">
+                </app-card>
+            </div>
         </div>
+
+        <!-- Si no hay locales -->
+        <ng-template #noEstablishment>
+            <div class="text-center text-muted mt-4">
+                No hay locales registrados aún.
+            </div>
+        </ng-template>
     </div>
 
-    <!-- Si no hay locales -->
-    <ng-template #noEstablishment>
-        <div class="text-center text-muted mt-4">
-            No hay locales registrados aún.
+    <!-- Template de Carga -->
+    <ng-template #loading>
+        <div class="d-flex justify-content-center mt-4">
+            <mat-spinner></mat-spinner>
         </div>
     </ng-template>
 </div>

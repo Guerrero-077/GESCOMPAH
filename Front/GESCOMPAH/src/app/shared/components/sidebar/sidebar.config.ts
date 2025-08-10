@@ -1,22 +1,22 @@
 export interface SidebarItem {
   label: string;
   icon: string;
-  route: string;
+  route?: string; // Make route optional
+  children?: SidebarItem[]; // Add children property for nesting
 }
 
-export const SIDEBAR_BY_ROLE: Record<string, SidebarItem[]> = {
-  admin: [
-    { label: 'Dashboard', icon: 'home', route: 'dashboard' },
-    { label: 'Propiedades', icon: 'description', route: 'main' },
-    { label: 'Arrendatarios', icon: 'person', route: 'tenants' },
-    { label: 'Contratos', icon: 'assignment', route: 'contratos' },
-    { label: 'Citas', icon: 'event', route: 'citas' },
-    { label: 'Reportes', icon: 'bar_chart', route: 'reportes' },
-    { label: 'SistemSegurity', icon: 'security', route: 'mainSistemSegurity' },
-    { label: 'Configuración', icon: 'settings', route: 'mainConfig' }
-  ],
-  arrendamiento: [
-    { label: 'Dashboard', icon: 'home', route: '/dashboard' },
-    { label: 'Citas', icon: 'event', route: '/citas' }
-  ]
-};
+export interface BackendSubMenuItem {
+  id: number;
+  name: string;
+  description: string;
+  route: string;
+  permissions: string[];
+}
+
+export interface BackendMenuItem {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  forms: BackendSubMenuItem[];
+}

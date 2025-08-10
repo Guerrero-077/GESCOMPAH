@@ -1,8 +1,11 @@
+import { Observable } from "rxjs";
+
 export interface DynamicFormField {
     name: string;
     type: 'text' | 'date' | 'hidden' | 'select' | 'textarea' | 'checkbox';
     required: boolean;
     options?: { value: string | number; label: string }[];
+    // loadOptions?: () => Observable<{ value: string | number; label: string }[]>; // Removed from here
 }
 
 
@@ -43,14 +46,15 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
         { name: 'Establishment', type: 'select', options: [], required: true },
     ],
     'City': [
-        { name: 'Id', type: 'hidden', required: false },
-        { name: 'Name', type: 'text', required: true },
-        { name: 'Department', type: 'select', options: [], required: true },
+        { name: 'id', type: 'hidden', required: false },
+        { name: 'name', type: 'text', required: true },
+        { name: 'departmentId', type: 'select', required: true }, // Removed loadOptions
+        { name: 'active', type: 'checkbox', required: true }
     ],
     'Department': [
-        { name: 'Id', type: 'hidden', required: false },
-        { name: 'Name', type: 'text', required: true },
-        //{name: 'active', type: 'checkbox', required: true}
+        { name: 'id', type: 'hidden', required: false },
+        { name: 'name', type: 'text', required: true },
+        { name: 'active', type: 'checkbox', required: true }
     ],
     'Person': [
         { name: 'Id', type: 'hidden', required: false },

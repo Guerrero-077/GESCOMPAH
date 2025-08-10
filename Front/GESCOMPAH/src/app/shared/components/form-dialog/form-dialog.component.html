@@ -1,9 +1,10 @@
-<h2 mat-dialog-title>Editar {{ formType }}</h2>
+<h2 mat-dialog-title>{{ dialogTitle }}</h2>
 
 <mat-dialog-content class="mat-dialog-content">
-  <app-dymanic-forms [formType]="formType" [initialData]="entity" (formSubmit)="close($event)"></app-dymanic-forms>
+  <app-dymanic-forms #dynamicForm [formType]="data.formType" [initialData]="data.entity" (formSubmit)="close($event)"></app-dymanic-forms>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close color="warn">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="dynamicForm.onSubmit()">Guardar</button>
 </mat-dialog-actions>

@@ -24,7 +24,7 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
                 new FormModule { 
                     Id = 2, 
                     FormId = 2, 
-                    ModuleId = 1,  
+                    ModuleId = 2,  
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 
@@ -32,7 +32,23 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
                 new FormModule { 
                     Id = 3, 
                     FormId = 3, 
-                    ModuleId = 2,  
+                    ModuleId = 3,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                },  // Locales -> Locales
+                new FormModule { 
+                    Id = 4, 
+                    FormId = 4, 
+                    ModuleId = 4,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                },  // Locales -> Locales
+                new FormModule { 
+                    Id = 5, 
+                    FormId = 5, 
+                    ModuleId = 5,  
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 

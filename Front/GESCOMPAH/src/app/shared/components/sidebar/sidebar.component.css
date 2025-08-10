@@ -1,34 +1,99 @@
+.icon-label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .sidebar {
   width: 240px;
-  background: white;
+  background: #fff;
   border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
   height: 100vh;
   justify-content: space-between;
-} 
+  box-shadow: 2px 0 8px rgba(44, 62, 80, 0.04);
+}
+
 .header {
   background-color: #2E7D32;
   color: white;
-  padding: 1rem;
+  padding: 1.5rem 1rem 1rem 1rem;
   text-align: center;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
 }
+
 .menu {
-  list-style: none;
   padding: 0;
   height: 100vh;
+  background: transparent;
 }
-.menu li {
+
+/* Estilo base para los mat-list-item */
+.menu .mat-list-item {
   padding: 1rem;
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  border-radius: 0 20px 20px 0;
+  transition: background 0.2s;
+  color: #222;
 }
-.menu li.active {
+
+.menu .mat-list-item.active {
   background: #E8F5E9;
   border-left: 4px solid #2E7D32;
+  color: #2E7D32;
 }
+
+.sidebar-expansion-panel {
+  background: transparent !important;
+  box-shadow: none !important;
+  margin-bottom: 0.5rem;
+  border-radius: 0 20px 20px 0;
+}
+
+.sidebar-expansion-panel .mat-expansion-panel-header {
+  padding: 0 1rem;
+  min-height: 48px;
+  border-radius: 0 20px 20px 0;
+  background: #f5f5f5;
+  color: #222;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.sidebar-expansion-panel.mat-expanded .mat-expansion-panel-header {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.submenu {
+  padding-left: 1.5rem;
+  margin: 0;
+  background: #f9f9f9;
+  border-left: 2px solid #e0e0e0;
+  border-radius: 0 0 20px 0;
+}
+
+.submenu .mat-list-item {
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  font-size: 0.95em;
+  border-radius: 0 20px 20px 0;
+  color: #222;
+}
+
+.submenu .mat-list-item.active {
+  background: #e0f2f1;
+  border-left: 3px solid #26a69a;
+  color: #26a69a;
+}
+
 .logout {
   padding: 1rem;
   cursor: pointer;
@@ -36,4 +101,14 @@
   align-items: center;
   gap: 10px;
   border-top: 1px solid #ddd;
+  color: #2E7D32;
+  font-weight: 600;
+  background: #f9f9f9;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  transition: background 0.2s;
+}
+
+.logout:hover {
+  background: #E8F5E9;
 }

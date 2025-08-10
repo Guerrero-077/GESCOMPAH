@@ -13,22 +13,53 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
             builder.HasData(
                 new Module { 
                     Id = 1, 
-                    Name = "Administración", 
-                    Description = "Módulo de gestión administrativa", 
-                    Icon = "shield-lock", 
+                    Name = "Dashboard", 
+                    Description = "Panel de control principal", 
+                    Icon = "home", 
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 
                 },
                 new Module { 
                     Id = 2, 
-                    Name = "Locales", 
-                    Description = "Módulo de gestión de locales municipales", 
-                    Icon = "store-front", 
+                    Name = "Establecimientos", 
+                    Description = "Gestión de establecimientos", 
+                    Icon = "store", 
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 
+                },
+                new Module
+                {
+                    Id = 3,
+                    Name = "Arrendatarios",
+                    Description = "Gestión de arrendatarios",
+                    Icon = "people",
+                    IsDeleted = false,
+                    Active = true,
+                    CreatedAt = seedDate
+                },
+                new Module
+                {
+                    Id=4,
+                    Name = "Seguridad",
+                    Description= "Gestión de seguridad y permisos",
+                    Icon= "security",
+                    IsDeleted = false,
+                    Active = true,
+                    CreatedAt = seedDate
+                },
+                new Module
+                {
+                    Id=5,
+                    Name = "Configuración",
+                    Description = "Configuración general del sistema",
+                    Icon = "settings",
+                    IsDeleted = false,
+                    Active = true,
+                    CreatedAt = seedDate
                 }
+
             );
         }
     }

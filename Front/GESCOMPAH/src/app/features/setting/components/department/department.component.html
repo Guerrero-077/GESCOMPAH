@@ -1,1 +1,11 @@
-<p>department works!</p>
+<div class="container mt-4">
+
+    <!-- Tabla de departamentos -->
+    <app-generic-table
+        [columns]="columns"
+        [data]="departments$ | async"
+        (edit)="openEditDialog($event)"
+        (delete)="handleDelete($event)"
+        (create)="openCreateDialog()"
+    ></app-generic-table>
+</div>

@@ -1,14 +1,9 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './features/dashboard/Pages/dashboard/dashboard-component/dashboard-component';
-import { EstablishmentsListComponent } from './features/establishments/components/establishments-list/establishments-list.component';
-import { SquaresEstablishmentsComponent } from './features/establishments/pages/squares-establishments/squares-establishments.component';
-import { TenantsListComponent } from './features/tenants/pages/tenants-list/tenants-list.component';
-import { ModelSecurityComponent } from './features/security/pages/model-security/model-security.component';
-import { RoleComponent } from './features/security/components/role/role.component';
-import { FormComponent } from './features/security/components/form/form.component';
 import { LayoutComponent } from './layout/layout.component';
 import { CityComponent } from './features/setting/components/city/city.component';
 import { DepartmentComponent } from './features/setting/components/department/department.component';
+import { MainSettingsComponent } from './features/setting/pages/main-settings/main-settings.component';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: 'Auth/login', pathMatch: 'full' },
@@ -28,16 +23,32 @@ export const routes: Routes = [
     component: LayoutComponent,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'main', component: SquaresEstablishmentsComponent },
-      { path: 'Establishment', component: EstablishmentsListComponent },
-      { path: 'tenants', component: TenantsListComponent },
-      { path: 'mainSistemSegurity', component: ModelSecurityComponent },
-      { path: 'city', component: CityComponent },
-      // { path: 'mainConfig', component: MainConfig },
-      { path: 'departmentCities', component: DepartmentComponent },
-      { path: 'rol', component: RoleComponent },
-      { path: 'form', component: FormComponent },
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
+      },
+      {
+        path: 'establishments',
+        loadChildren: () =>
+          import('./features/establishments/establishments.routes').then((m) => m.ESTABLISHMENTS_ROUTES),
+      },
+      {
+        path: 'tenants',
+        loadChildren: () =>
+          import('./features/tenants/tenants.routes').then((m) => m.TENANTS_ROUTES),
+      },
+      {
+        path: 'security',
+        loadChildren: () =>
+          import('./features/security/security.routes').then((m) => m.SECURITY_ROUTES),
+      },
+
+    {
+        path: 'settings',
+        loadChildren: () =>
+          import('./features/setting/setting.routes').then((m) => m.SETTING_ROUTES),
+      },
 
     ],
     data: { role: 'Administrador' },

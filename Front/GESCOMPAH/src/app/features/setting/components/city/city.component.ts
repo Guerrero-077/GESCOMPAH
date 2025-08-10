@@ -1,48 +1,98 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { CityModel } from '../../models/city.models';
-import { CityService } from '../../services/city/city.service';
+import { CityStore } from '../../services/city/city.store';
+import { Observable } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
+import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 @Component({
   selector: 'app-city',
-  imports: [GenericTableComponent],
+  standalone: true,
+  imports: [
+    CommonModule,
+    GenericTableComponent,
+    MatButtonModule,
+    MatIconModule,
+    MatSnackBarModule
+  ],
   templateUrl: './city.component.html',
-  styleUrl: './city.component.css'
+  styleUrl: './city.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CityComponent implements OnInit {
-  private readonly service = inject(CityService);
-  Forms: CityModel[] = [];
+  cities$: Observable<CityModel[]>;
+  columns: TableColumn<CityModel>[] = [
+    { key: 'id', header: 'ID' },
+    { key: 'name', header: 'Nombre' },
+    { key: 'departmentName', header: 'Departamento' },
+    { key: 'active', header: 'Activo', type: 'boolean' }
+  ];
 
-  columns: TableColumn<CityModel>[] = [];
+  constructor(
+    private store: CityStore,
+    private dialog: MatDialog,
+    private snackbar: MatSnackBar
+  ) {
+    this.cities$ = this.store.cities$;
+  }
 
   ngOnInit(): void {
-    this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
-      { key: 'name', header: 'Nombre' },
-      { key: 'departmentName', header: 'Departamento' },
-      { key: 'active', header: 'Active' }
-    ];
-    this.load();
+    // Columns are initialized directly now
   }
 
-  load() {
-    this.service.getAll("city").subscribe({
-      next: (data) => (this.Forms = data),
-      error: (err) => console.error('Error al cargar:', err)
-    })
+  openCreateDialog(): void {
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      width: '400px',
+      data: {
+        entity: {},
+        formType: 'City'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.create(result).subscribe({
+          next: () => {
+            this.snackbar.open('Ciudad creada exitosamente', 'Cerrar', { duration: 2000 });
+          }
+        });
+      }
+    });
   }
 
-  onEdit(row: CityModel) {
-    console.log('Editar:', row);
+  openEditDialog(row: CityModel): void {
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      width: '400px',
+      data: {
+        entity: row,
+        formType: 'City'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.update(result).subscribe({
+          next: () => {
+            this.snackbar.open('Ciudad actualizada exitosamente', 'Cerrar', { duration: 2000 });
+          }
+        });
+      }
+    });
   }
 
-  onDelete(row: CityModel) {
-    console.log('Eliminar:', row);
+  handleDelete(row: CityModel): void {
+    if (row.id) {
+      this.store.delete(row.id).subscribe({
+        next: () => {
+          this.snackbar.open('Ciudad eliminada exitosamente', 'Cerrar', { duration: 2000 });
+        }
+      });
+    }
   }
-
-  onView(row: CityModel) {
-    console.log('Ver:', row);
-  }
-
 }

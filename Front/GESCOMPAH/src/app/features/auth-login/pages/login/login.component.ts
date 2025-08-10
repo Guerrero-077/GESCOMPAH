@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core'; // Add OnInit
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -15,10 +15,16 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit { // Implement OnInit
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+
+  constructor() {
+  }
+
+  ngOnInit(): void {
+  }
 
   formLogin = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -27,7 +33,7 @@ export class LoginComponent {
 
   me() {
     this.auth.GetMe().subscribe({
-      next: (data) => console.log(data),
+      next: (data) => {},
       error: (err) => {
         Swal.fire({
           icon: 'error',
@@ -46,15 +52,8 @@ export class LoginComponent {
     this.auth.Login({ email, password }).subscribe({
       next: (data) => {
         if (data != null) {
-          this.router.navigateByUrl('/Admin');
+          this.router.navigateByUrl('/Admin/dashboard');
 
-          console.log(this.me());
-
-          Swal.fire({
-            icon: 'success',
-            title: '¡Hecho!',
-            text: 'Login Exitoso!'
-          });
         } else {
           Swal.fire({
             icon: 'error',

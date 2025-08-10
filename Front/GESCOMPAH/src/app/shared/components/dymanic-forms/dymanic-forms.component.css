@@ -1,20 +1,38 @@
-.dynamic-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+.dynamic-form-container {
+    padding: 16px;
+}
+
+.form-field-wrapper {
+    margin-bottom: 16px;
 }
 
 .full-width {
     width: 100%;
 }
 
-.field-label {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    display: block;
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
-.form-actions {
-    margin-top: 1.5rem;
-    text-align: right;
+/* Optional: Adjust MatFormField density */
+.mat-form-field-wrapper {
+    padding-bottom: 0.5em !important;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 1em 0 0.5em 0 !important;
+}
+
+.mat-form-field-label {
+    top: 0.8em !important;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-label {
+    margin-top: -0.25em !important;
+}
+
+.mat-form-field-subscript-wrapper {
+    padding: 0 !important;
 }

@@ -70,7 +70,7 @@ export class EstablishmentService {
     if (dto.areaM2 !== undefined) data.append('areaM2', dto.areaM2.toString());
     if (dto.rentValueBase !== undefined) data.append('rentValueBase', dto.rentValueBase.toString());
     if (dto.plazaId !== undefined) data.append('plazaId', dto.plazaId.toString());
-    if ('address' in dto && dto.address) data.append('address', dto.address);
+    if (dto.address !== null && dto.address !== undefined) data.append('address', dto.address);
 
     /* ---------------------------------  Campos de actualización (opcional)  -------------------------------- */
     if ('id' in dto) data.append('id', dto.id.toString());

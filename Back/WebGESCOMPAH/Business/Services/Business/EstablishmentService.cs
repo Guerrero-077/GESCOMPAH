@@ -90,6 +90,7 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
             entity.Name = dto.Name ?? entity.Name;
             entity.Description = dto.Description ?? entity.Description;
             entity.AreaM2 = dto.AreaM2 != default ? dto.AreaM2 : entity.AreaM2;
+            entity.Address = dto.Address ?? entity.Address;
             entity.RentValueBase = dto.RentValueBase != default ? dto.RentValueBase : entity.RentValueBase;
             entity.PlazaId = dto.PlazaId != default ? dto.PlazaId : entity.PlazaId;
 

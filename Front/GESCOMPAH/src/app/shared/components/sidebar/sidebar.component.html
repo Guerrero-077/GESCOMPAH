@@ -1,17 +1,42 @@
 <div class="sidebar">
-    <div class="header">
-      <h3>GESCOMPAH</h3>
-      <p>Palermo Locales</p>
-    </div>
+  <div class="header">
+    <h3>GESCOMPAH</h3>
+    <p>Palermo Locales</p>
+  </div>
 
-    <ul class="menu">
-      <li *ngFor="let item of menu" routerLinkActive="active" [routerLink]="item.route">
-        <span class="material-icons">{{ item.icon }}</span>
-        {{ item.label }}
-      </li>
-    </ul>
 
-    <div class="logout" (click)="cerrarSesion()">
-      <span class="material-icons">logout</span> Cerrar Sesión
-    </div>
+
+  <mat-accordion class="menu" multi="false">
+    <ng-container *ngFor="let item of menu; let i = index">
+      <ng-container *ngIf="!item.children || item.children.length === 0">
+        <a mat-list-item routerLinkActive="active" [routerLink]="item.route">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </a>
+      </ng-container>
+      <ng-container *ngIf="item.children && item.children.length > 0">
+        <mat-expansion-panel class="sidebar-expansion-panel" [expanded]="expandedIndex === i"
+          (opened)="expandedIndex = i" (closed)="expandedIndex = -1" hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <span class="icon-label-wrapper">
+                <mat-icon>{{ item.icon }}</mat-icon>
+                <span>{{ item.label }}</span>
+              </span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-nav-list class="submenu">
+            <a mat-list-item *ngFor="let child of item.children" routerLinkActive="active" [routerLink]="child.route">
+              <mat-icon>{{ child.icon }}</mat-icon>
+              <span>{{ child.label }}</span>
+            </a>
+          </mat-nav-list>
+        </mat-expansion-panel>
+      </ng-container>
+    </ng-container>
+  </mat-accordion>
+
+  <div class="logout" (click)="cerrarSesion()">
+    <mat-icon>logout</mat-icon> Cerrar Sesión
+  </div>
 </div>

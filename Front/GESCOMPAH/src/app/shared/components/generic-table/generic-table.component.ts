@@ -15,6 +15,7 @@ import { TableColumn } from '../../models/TableColumn.models';
 
 @Component({
   selector: 'app-generic-table',
+  standalone: true,
   imports: [
     CommonModule,
     MatTableModule,
@@ -32,7 +33,7 @@ import { TableColumn } from '../../models/TableColumn.models';
   styleUrl: './generic-table.component.css'
 })
 export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  @Input() data: T[] = [];
+  @Input() data: T[] | null = null;
   @Input() columns: TableColumn<T>[] = [];
   @Input() createButtonLabel = 'Crear';
 
