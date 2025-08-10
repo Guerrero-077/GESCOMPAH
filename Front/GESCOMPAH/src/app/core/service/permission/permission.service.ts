@@ -11,8 +11,8 @@ export class PermissionService {
   userProfile$: Observable<User | null> = this.userProfileSubject.asObservable();
 
   constructor() {
-    // For mocking purposes during development
-    this.userProfileSubject.next(USER_PROFILE_MOCK as User);
+    // For mocking purposes during development, uncomment the line below:
+    // this.userProfileSubject.next(USER_PROFILE_MOCK as User);
   }
 
   setUserProfile(profile: User | null): void {
