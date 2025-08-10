@@ -20,8 +20,6 @@
   color: white;
   padding: 1.5rem 1rem 1rem 1rem;
   text-align: center;
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
   box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
 }
 
@@ -112,3 +110,41 @@
 .logout:hover {
   background: #E8F5E9;
 }
+
+
+/* Quitar sombra, borde y esquinas redondeadas del expansion panel */
+::ng-deep .mat-expansion-panel {
+  box-shadow: none !important;   /* Quita la sombra */
+  border: none !important;       /* Quita el borde */
+  border-radius: 0 !important;   /* Quita esquinas redondeadas */
+  background-color: transparent !important; /* Quita color de fondo */
+}
+
+/* Quitar borde inferior entre panels */
+::ng-deep .mat-expansion-panel:not([class*=mat-elevation-z]) {
+  border-bottom: none !important;
+}
+
+/* Quitar fondo gris al hacer hover */
+::ng-deep .mat-expansion-panel-header:hover {
+  background-color: transparent !important;
+}
+
+/* Quitar borde y padding del nav-list */
+::ng-deep .mat-nav-list,
+::ng-deep .mat-list-base {
+  padding: 0;
+  border: none !important;
+  background-color: transparent !important;
+}
+
+/* Quitar padding interno de cada item */
+::ng-deep .mat-list-item {
+  padding: 4px 8px !important;
+}
+
+/* Quitar fondo gris al hacer hover en los items */
+::ng-deep .mat-list-item:hover {
+  background-color: transparent !important;
+}
+

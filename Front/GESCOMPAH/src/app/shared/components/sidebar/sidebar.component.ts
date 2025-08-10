@@ -23,8 +23,9 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.permissionService.userProfile$.subscribe(userProfile => {
+      console.log(userProfile);
       if (userProfile && userProfile.menu) {
-        this.menu = this.transformMenu(userProfile.menu);
+        this.menu = this.transformMenu(userProfile.menu, userProfile.roles[0]);
       } else {
         this.menu = [];
       }
@@ -35,24 +36,17 @@ export class SidebarComponent implements OnInit {
     console.log('Cerrar sesión');
   }
 
-  private transformMenu(backendMenu: BackendMenuItem[]): SidebarItem[] {
-    const sidebarItems: SidebarItem[] = [];
-    backendMenu.forEach(menuItem => {
-      const children: SidebarItem[] = [];
-      menuItem.forms.forEach(form => {
-        children.push({
-          label: form.name,
-          icon: '', // Sub-items might not have icons, or you can map them
-          route: `/Admin/${form.route}` // Prefix with /Admin/
-        });
-      });
-
-      sidebarItems.push({
-        label: menuItem.name,
-        icon: menuItem.icon,
-        children: children
-      });
-    });
-    return sidebarItems;
+  private transformMenu(backendMenu: BackendMenuItem[], role: string): SidebarItem[] {
+    const prefix = role === 'Administrador' ? '/Admin' : '/Tenant';
+    
+    return backendMenu.map(menuItem => ({
+      label: menuItem.name,
+      icon: menuItem.icon,
+      children: menuItem.forms.map(form => ({
+        label: form.name,
+        icon: '',
+        route: `${prefix}/${form.route}`.replace(/\/+$/, '') // limpia barras
+      }))
+    }));
   }
 }

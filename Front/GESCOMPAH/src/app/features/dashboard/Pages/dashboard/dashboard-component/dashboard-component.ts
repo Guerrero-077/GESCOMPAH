@@ -9,5 +9,5 @@ import { CardInfoComponent } from '../../../components/card-info/card-info.compo
   styleUrl: './dashboard-component.css'
 })
 export class DashboardComponent {
-
+  
 }
