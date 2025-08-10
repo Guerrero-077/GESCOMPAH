@@ -15,6 +15,11 @@ export class PermissionService {
     this.userProfileSubject.next(USER_PROFILE_MOCK as User);
   }
 
+  // Getter to safely access the current value
+  public get currentUserProfile(): User | null {
+    return this.userProfileSubject.value;
+  }
+
   setUserProfile(profile: User | null): void {
     this.userProfileSubject.next(profile);
   }
