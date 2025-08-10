@@ -1,24 +1,11 @@
-hr {
-    border: none;
-    height: 1px;
-    background-color: #ccc;
-    margin: 0;
-
-}
-
-.row {
-    align-items: center;
-    /* vertical center para todos los row */
-}
-
-
-
 .local-card {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     width: 300px;
-    height: 350px;
+    /* height: 350px; */ /* Removed fixed height */
+    display: flex;
+    flex-direction: column;
 }
 
 .local-card:hover {
@@ -29,7 +16,7 @@ hr {
 .image-container {
     height: 150px;
     overflow: hidden;
-    /* padding: 0.5rem; */
+    padding: 0.25rem; /* Reduced padding */
 }
 
 .local-image {
@@ -46,105 +33,104 @@ hr {
 
 .availability-tag {
     position: absolute;
-    top: 20px;
-    right: 25px;
+    top: 10px; /* Adjusted position */
+    right: 15px; /* Adjusted position */
     background: #4CAF50;
     color: white;
-    padding: 5px 12px;
+    padding: 3px 8px; /* Reduced padding */
     border-radius: 16px;
-    font-size: 12px;
+    font-size: 10px; /* Reduced font size */
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .card-content {
-    padding: 0;
-    margin: 0;
+    padding: 0.75rem; /* Reduced padding */
 }
 
 .local-name {
-    font-size: 16px;
+    font-size: 1.15rem; /* Slightly reduced font size */
     font-weight: 600;
     color: #1a1a1a;
-    /* margin: 0 0 16px 0;I */
+    margin-bottom: 0.25rem; /* Reduced margin */
     line-height: 1.3;
-    padding: 10px;
-    margin: 0;
+}
+
+.description {
+    font-size: 0.8rem; /* Slightly reduced font size */
+    color: #555;
+    margin-bottom: 0.75rem; /* Reduced margin */
+    line-height: 1.4;
+    height: 3em; /* Limit description to 2 lines */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    /* gap: 16px; */
-    /* margin-bottom: 10px; */
-    /* padding: 0; */
-
-    /* margin: 0; */
-    margin: 10px;
+    gap: 0.75rem; /* Reduced gap */
+    margin-bottom: 0.75rem; /* Reduced margin */
 }
 
 .info-item {
     display: flex;
     flex-direction: column;
-    /* padding: 10px; */
-
 }
 
 .ellipsis {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 150px;
 }
 
 .info-label {
-    font-size: 12px;
+    font-size: 0.7rem; /* Slightly reduced font size */
     color: #666;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    /* margin-bottom: 4px;  */
-    /* padding: 10px; */
-
+    margin-bottom: 0.15rem; /* Reduced margin */
 }
 
 .info-value {
-    font-size: 14px;
+    font-size: 0.85rem; /* Slightly reduced font size */
     color: #1a1a1a;
     font-weight: 500;
     word-break: break-word;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* padding: 10px; */
+}
 
+.card-divider {
+    border: none;
+    height: 1px;
+    background-color: #eee;
+    margin: 0.75rem 0; /* Reduced margin */
 }
 
 .rent-section {
-    margin-bottom: 20px;
-    padding-top: 16px;
+    margin-bottom: 0;
 }
 
 .rent-label {
-    font-size: 12px;
+    font-size: 0.7rem; /* Slightly reduced font size */
     color: #666;
     font-weight: 500;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 0.15rem; /* Reduced margin */
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .rent-price {
-    font-size: 22px;
+    font-size: 1.2rem; /* Slightly reduced font size */
     font-weight: 700;
     color: #2E7D32;
     line-height: 1.2;
 }
 
 .footer {
-    margin: 10px;
+    margin-top: 0.75rem; /* Reduced margin */
 }
 
 /* Responsive */
@@ -153,21 +139,15 @@ hr {
         max-width: 100%;
     }
 
-    /* 
-    .info-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    } */
-
     .card-content {
-        padding: 16px;
+        padding: 0.75rem;
     }
 
     .local-name {
-        font-size: 16px;
+        font-size: 1rem;
     }
 
     .rent-price {
-        font-size: 20px;
+        font-size: 1.1rem;
     }
 }

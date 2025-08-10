@@ -4,27 +4,31 @@ using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace Business.CustomJWT
-    {
+{
     public class TokenBusiness : IToken
     {
-        private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
         private readonly IRolUserRepository _rolUserRepository;
         private readonly IMemoryCache _cache;
+        private readonly JwtSettings _jwtSettings;
 
-        public TokenBusiness(IConfiguration config, IUserRepository userRepo, IRolUserRepository rolRepo, IMemoryCache cache)
+        public TokenBusiness(
+            IUserRepository userRepo,
+            IRolUserRepository rolRepo,
+            IMemoryCache cache,
+            IOptions<JwtSettings> jwtSettings)
         {
-            _configuration = config;
             _userRepository = userRepo;
             _rolUserRepository = rolRepo;
             _cache = cache;
+            _jwtSettings = jwtSettings.Value;
         }
 
         public async Task<string> GenerateToken(LoginDto dto)
@@ -47,25 +51,25 @@ namespace Business.CustomJWT
 
             // 4. Construcción de claims
             var claims = new List<Claim>
-    {
-        new Claim("Id", user.Id.ToString()),
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Email, user.Email)
-    };
+            {
+                new Claim("Id", user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
             claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
             // 5. Creación de token JWT firmado con clave simétrica
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:key"]!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var jwt = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:exp"])),
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
-
     }
-
 }

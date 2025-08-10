@@ -1,4 +1,5 @@
-﻿using Business.Mapping;
+﻿using Business.CustomJWT;
+using Business.Mapping;
 using CloudinaryDotNet;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Entity.DTOs.Interfaces;
@@ -23,6 +24,7 @@ builder.Services.AddSwaggerGen();
 
 // CORS, JWT, DB, Servicios personalizados
 builder.Services.AddCustomCors(builder.Configuration);
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddDatabase(builder.Configuration);

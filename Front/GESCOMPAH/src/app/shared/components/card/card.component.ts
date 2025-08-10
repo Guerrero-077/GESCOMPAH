@@ -41,12 +41,12 @@ export class CardComponent {
   handleEdit(): void {
     const dialogRef = this.dialog.open(FormEstablishmentComponent, {
       width: '800px',
-      data: this.local // Pasamos los datos del local a editar
+      data: this.local // datos local a editar
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.onUpdate.emit(); // Emitir evento cuando se actualiza correctamente
+        this.onUpdate.emit(); // Emitir actualiza correctamente
       }
     });
 

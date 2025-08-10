@@ -60,6 +60,25 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
             return Ok(new { isSuccess = true, token, message = "Login exitoso" });
         }
 
+        [HttpPost("logout")]
+        [ProducesResponseType(200)]
+        public IActionResult Logout()
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // igual que en login
+                SameSite = SameSiteMode.None,
+                Path = "/" // por defecto es "/", pero mejor hacerlo explícito
+            };
+
+            Response.Cookies.Delete("access_token", cookieOptions);
+
+            return Ok(new { mensaje = "Inicio de sesión exitoso" });
+        }
+
+
+
         [Authorize]
         [HttpGet("me")]
         [ProducesResponseType(200)]
@@ -75,13 +94,6 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
             return Ok(currentUserDto);
         }
 
-        [HttpPost("logout")]
-        [ProducesResponseType(200)]
-        public IActionResult Logout()
-        {
-            Response.Cookies.Delete("access_token");
-            return Ok(new { message = "Sesión cerrada" });
-        }
 
         [HttpPost("recuperar/enviar-codigo")]
         [ProducesResponseType(200)]

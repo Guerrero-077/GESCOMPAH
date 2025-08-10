@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
 import { User } from '../../../shared/models/user.model';
@@ -13,6 +14,7 @@ import { PermissionService } from '../permission/permission.service';
 export class AuthService {
   private http = inject(HttpClient);
   private permissionService = inject(PermissionService);
+  private router = inject(Router);
   private urlBase = environment.apiURL + '/Auth/';
 
   constructor() { }
@@ -35,6 +37,15 @@ export class AuthService {
     return this.http.get<User>(this.urlBase + 'me').pipe(
       tap(user => {
         this.permissionService.setUserProfile(user);
+      })
+    );
+  }
+
+  logout(): Observable<any> {
+    return this.http.post(this.urlBase + 'Logout', {}).pipe(
+      tap(() => {
+        this.permissionService.setUserProfile(null);
+        this.router.navigate(['/']);
       })
     );
   }

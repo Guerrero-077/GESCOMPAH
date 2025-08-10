@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364);
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.landing-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  padding: 2rem;
+}
+
+.content-wrapper {
+  max-width: 800px;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 3rem;
+}
+
+.login-button {
+  display: inline-block;
+  padding: 15px 35px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-3px);
+}

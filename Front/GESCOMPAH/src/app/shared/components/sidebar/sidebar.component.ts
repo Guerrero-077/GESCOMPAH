@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { SidebarItem, BackendMenuItem, BackendSubMenuItem } from './sidebar.config';
 import { PermissionService } from '../../../core/service/permission/permission.service'; // Import PermissionService
+import { AuthService } from '../../../core/service/auth/auth.service';
 
 
 @Component({
@@ -19,7 +20,7 @@ export class SidebarComponent implements OnInit {
   expandedIndex = -1;
   menu: SidebarItem[] = [];
 
-  constructor(private permissionService: PermissionService) { } // Inject PermissionService
+  constructor(private permissionService: PermissionService, private authService: AuthService) { } // Inject services
 
   ngOnInit(): void {
     this.permissionService.userProfile$.subscribe(userProfile => {
@@ -32,7 +33,7 @@ export class SidebarComponent implements OnInit {
   }
 
   cerrarSesion() {
-    console.log('Cerrar sesión');
+    this.authService.logout().subscribe();
   }
 
   private transformMenu(backendMenu: BackendMenuItem[]): SidebarItem[] {

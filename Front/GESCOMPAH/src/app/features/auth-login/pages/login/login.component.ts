@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit { // Implement OnInit
     this.auth.Login({ email, password }).subscribe({
       next: (data) => {
         if (data != null) {
-          this.router.navigateByUrl('/Admin/dashboard');
+          this.router.navigate(['/Admin/dashboard']);
 
         } else {
           Swal.fire({
