@@ -66,7 +66,7 @@ namespace Business.Repository
             BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
 
             var entity = _mapper.Map<TEntity>(dto);
-            entity.InitializeLogicalState();
+            // No forzar IsDeleted=false en update; respetar el estado actual o validarlo en reglas de negocio
 
             var updated = await Data.UpdateAsync(entity);
             return _mapper.Map<TDtoGet>(updated);

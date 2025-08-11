@@ -1,7 +1,7 @@
-﻿using Entity.DTOs.Implements.SecurityAuthentication.Auth;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using FluentValidation;
 
-namespace Entity.DTOs.Validations
+namespace Entity.DTOs.Validations.SecurityAuthentication.Auth
 {
     
     public class LoginDtoValidator : AbstractValidator<LoginDto>

@@ -1,17 +1,17 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../service/auth/auth.service';
+import { PermissionService } from '../service/permission/permission.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const router = inject(Router);
+  const permissionService = inject(PermissionService);
 
   const isApiRequest = req.url.startsWith(environment.apiURL);
 
-  // Siempre enviamos credenciales (cookies)
+  // Siempre enviamos credenciales (cookies) en llamadas a la API
   if (isApiRequest) {
     req = req.clone({ withCredentials: true });
   }
@@ -26,9 +26,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             return next(req);
           }),
           catchError((refreshError) => {
-            // Si falla el refresh, redirigir al login
-            authService.logout().subscribe();
-            router.navigate(['/login']);
+            // Si falla el refresh, limpiar sesión sin redirigir para no interrumpir rutas públicas
+            permissionService.setUserProfile(null);
             return throwError(() => refreshError);
           })
         );

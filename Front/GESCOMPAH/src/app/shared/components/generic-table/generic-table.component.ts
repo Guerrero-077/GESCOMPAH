@@ -30,7 +30,7 @@ import { TableColumn } from '../../models/TableColumn.models';
     FormsModule
   ],
   templateUrl: './generic-table.component.html',
-  styleUrl: './generic-table.component.css'
+  styleUrls: ['./generic-table.component.css']
 })
 export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() data: T[] | null = null;

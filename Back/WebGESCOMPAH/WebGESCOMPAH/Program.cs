@@ -1,17 +1,12 @@
-﻿using Business.CustomJWT;
-using Business.Mapping;
+﻿using FluentValidation.AspNetCore;
 using CloudinaryDotNet;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Interfaces;
 using Entity.DTOs.Services;
-using Entity.DTOs.Validations.Entity.DTOs.Validators.SecurityAuthentication;
+using Entity.DTOs.Validations.SecurityAuthentication.Auth;
 using FluentValidation;
 using Utilities.Helpers.CloudinaryHelper;
 using WebGESCOMPAH.Extensions;
-using WebGESCOMPAH.Middleware;
-using WebGESCOMPAH.Middleware.Handlers;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +33,7 @@ builder.Services.AddDatabase(builder.Configuration);
 // Validaciones y CQRS
 builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 // Cloudinary
 var cloudinaryConfig = builder.Configuration.GetSection("Cloudinary");
@@ -50,21 +46,14 @@ cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
 builder.Services.AddScoped<CloudinaryUtility>();
 
-// Mapster
-MapsterConfig.Register();
 
 // --------------------------
 // MANEJO DE EXCEPCIONES
 // --------------------------
 
 // Registro de Handlers personalizados
-builder.Services.AddScoped<IExceptionHandler, BusinessExceptionHandler>();
-builder.Services.AddScoped<IExceptionHandler, EntityNotFoundExceptionHandler>();
-builder.Services.AddScoped<IExceptionHandler, UnauthorizedAccessHandler>();
-builder.Services.AddScoped<IExceptionHandler, ExternalServiceExceptionHandler>();
 
 // Registro del middleware como scoped
-builder.Services.AddScoped<ExceptionMiddleware>();
 
 // --------------------------
 // APP Y PIPELINE HTTP

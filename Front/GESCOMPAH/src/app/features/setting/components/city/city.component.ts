@@ -22,7 +22,7 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
     MatIconModule,
   ],
   templateUrl: './city.component.html',
-  styleUrl: './city.component.css',
+  styleUrls: ['./city.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CityComponent implements OnInit {

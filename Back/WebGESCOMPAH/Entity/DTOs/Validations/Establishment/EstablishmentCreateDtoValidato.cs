@@ -1,7 +1,7 @@
-﻿using Entity.DTOs.Implements.Business.EstablishmentDto;
+using Entity.DTOs.Implements.Business.EstablishmentDto;
 using FluentValidation;
 
-namespace Entity.DTOs.Validations
+namespace Entity.DTOs.Validations.Establishment
 {
     public class EstablishmentCreateDtoValidator : AbstractValidator<EstablishmentCreateDto>
     {

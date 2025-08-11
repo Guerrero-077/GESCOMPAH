@@ -14,7 +14,7 @@ import { BackendMenuItem, SidebarItem } from './sidebar.config';
   standalone: true,
   imports: [CommonModule, RouterModule, MatListModule, MatIconModule, MatExpansionModule],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.css'
+  styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
   expandedIndex = -1;

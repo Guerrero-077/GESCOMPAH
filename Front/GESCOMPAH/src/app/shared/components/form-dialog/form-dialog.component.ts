@@ -9,7 +9,7 @@ import { FormType } from '../dymanic-forms/dymanic-forms.config';
   standalone: true,
   imports: [DymanicFormsComponent, MatDialogTitle, MatDialogActions, MatDialogModule, MatButtonModule],
   templateUrl: './form-dialog.component.html',
-  styleUrl: './form-dialog.component.css'
+  styleUrls: ['./form-dialog.component.css']
 })
 export class FormDialogComponent implements OnInit {
 

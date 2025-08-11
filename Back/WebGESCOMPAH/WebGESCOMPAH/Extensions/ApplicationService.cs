@@ -102,6 +102,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IToken, TokenBusiness>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddSingleton<IAuthCookieFactory, AuthCookieFactory>();
+            services.AddScoped<Microsoft.AspNetCore.Identity.IPasswordHasher<Entity.Domain.Models.Implements.SecurityAuthentication.User>, Microsoft.AspNetCore.Identity.PasswordHasher<Entity.Domain.Models.Implements.SecurityAuthentication.User>>();
 
             services.AddMemoryCache();
 

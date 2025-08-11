@@ -4,7 +4,10 @@
     {
         public static IServiceCollection AddCustomCors(this IServiceCollection services, IConfiguration configuration)
         {
-            var allowedOrigins = configuration.GetValue<string>("OrigenesPermitidos")!.Split(",");
+            var allowedOrigins = configuration.GetValue<string>("OrigenesPermitidos")!
+                .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                .Select(o => o.Trim())
+                .ToArray();
 
             services.AddCors(options =>
             {

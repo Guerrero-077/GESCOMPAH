@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 import { User } from '../../../shared/models/user.model';
 import { LoginModel } from '../../../features/auth-login/models/login.models';
 import { RegisterModel } from '../../../features/auth-login/models/register.models';
@@ -49,7 +49,7 @@ export class AuthService {
     return this.http.post(this.urlBase + 'Logout', {}, { withCredentials: true }).pipe(
       tap(() => {
         this.permissionService.setUserProfile(null);
-        this.router.navigate(['/']);
+        this.router.navigate(['/Auth/login']);
       })
     );
   }

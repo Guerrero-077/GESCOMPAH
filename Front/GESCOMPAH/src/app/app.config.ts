@@ -6,11 +6,13 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { AuthService } from './core/service/auth/auth.service';
-import { catchError, of } from 'rxjs';
+import { catchError, of, firstValueFrom } from 'rxjs';
 
 export function initializeApp(authService: AuthService) {
-  return () => authService.GetMe().pipe(
-    catchError(() => of(null)) // Si no hay sesión, sigue
+  return () => firstValueFrom(
+    authService.GetMe().pipe(
+      catchError(() => of(null)) // Si no hay sesión, sigue
+    )
   );
 }
 
@@ -19,7 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(
       withFetch(),
-      withInterceptors([authInterceptor, errorInterceptor])
+      withInterceptors([errorInterceptor, authInterceptor])
     ),
     {
       provide: APP_INITIALIZER,
