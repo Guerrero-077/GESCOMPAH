@@ -24,8 +24,9 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.permissionService.userProfile$.subscribe(userProfile => {
+      console.log(userProfile);
       if (userProfile && userProfile.menu) {
-        this.menu = this.transformMenu(userProfile.menu);
+        this.menu = this.transformMenu(userProfile.menu, userProfile.roles[0]);
       } else {
         this.menu = [];
       }

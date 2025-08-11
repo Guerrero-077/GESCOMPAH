@@ -8,13 +8,8 @@
   </div>
   <div class="card-progress">
     <div class="progress-bar-background">
-      <div
-        class="progress-bar-fill"
-        [style.width.%]="percentage"
-      ></div>
+      <div class="progress-bar-fill" [style.width.%]="percentage"></div>
+      <p class="progress-text">{{ percentage }}% ocupados</p>
     </div>
-
-    <p class="progress-text">{{ percentage }}% ocupados</p>
-
   </div>
 </div>

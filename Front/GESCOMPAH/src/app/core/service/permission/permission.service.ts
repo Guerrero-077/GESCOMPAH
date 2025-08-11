@@ -12,7 +12,7 @@ export class PermissionService {
 
   constructor() {
     // For mocking purposes during development, uncomment the line below:
-    // this.userProfileSubject.next(USER_PROFILE_MOCK as User);
+    this.userProfileSubject.next(USER_PROFILE_MOCK as User);
   }
 
   // Getter to safely access the current value
