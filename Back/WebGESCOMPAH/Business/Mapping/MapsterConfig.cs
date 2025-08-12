@@ -134,9 +134,15 @@ namespace Business.Mapping
 
             
             config.NewConfig<RegisterDto, Person>()
-                .Ignore(dest => dest.Id); 
+                .Ignore(dest => dest.Id);
 
-            
+            config.NewConfig<UserCreateDto, User>()
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.Person)
+                .Ignore(dest => dest.RolUsers) 
+                .IgnoreNullValues(true);
+
+
             config.NewConfig<User, UserDto>()
                 .Map(dest => dest.Person, src => src.Person)
                 .Map(dest => dest.Roles, src => src.RolUsers.Select(r => r.Rol.Name).ToList());

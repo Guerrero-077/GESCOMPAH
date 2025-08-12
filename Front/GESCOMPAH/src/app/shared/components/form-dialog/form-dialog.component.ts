@@ -18,7 +18,7 @@ export class FormDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { entity: any; formType: FormType; title: string }
+    @Inject(MAT_DIALOG_DATA) public data: { entity: any; formType: FormType; title: string; selectOptions?: Record<string, any[]> }
   ) { }
 
   ngOnInit(): void {

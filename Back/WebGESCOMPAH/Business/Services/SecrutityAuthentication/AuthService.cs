@@ -15,37 +15,25 @@ using Utilities.Messaging.Interfaces;
 
 namespace Business.Services.SecrutityAuthentication
 {
-    public class AuthService : IAuthService
+    public class AuthService(
+        IUserRepository userData,
+        ILogger<AuthService> logger,
+        IRolUserRepository rolUserData,
+        IMapper mapper,
+        ISendCode emailService,
+        IPasswordResetCodeRepository passwordResetRepo,
+        IValidatorService validator,
+        IUserMeRepository IUserMeRepository
+            ) : IAuthService
     {
-        private readonly IUserMeRepository _IUserMeRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IRolUserRepository _rolUserData;
-        private readonly ILogger<AuthService> _logger;
-        private readonly IMapper _mapper;
-        private readonly ISendCode _emailService;
-        private readonly IPasswordResetCodeRepository _passwordResetRepo;
-        private readonly IValidatorService _validator;
-
-        public AuthService(
-            IUserRepository userData,
-            ILogger<AuthService> logger,
-            IRolUserRepository rolUserData,
-            IMapper mapper,
-            ISendCode emailService,
-            IPasswordResetCodeRepository passwordResetRepo,
-            IValidatorService validator,
-            IUserMeRepository IUserMeRepository
-            )
-        {
-            _logger = logger;
-            _userRepository = userData;
-            _rolUserData = rolUserData;
-            _mapper = mapper;
-            _emailService = emailService;
-            _passwordResetRepo = passwordResetRepo;
-            _validator = validator;
-            _IUserMeRepository = IUserMeRepository;
-        }
+        private readonly IUserMeRepository _IUserMeRepository = IUserMeRepository;
+        private readonly IUserRepository _userRepository = userData;
+        private readonly IRolUserRepository _rolUserData = rolUserData;
+        private readonly ILogger<AuthService> _logger = logger;
+        private readonly IMapper _mapper = mapper;
+        private readonly ISendCode _emailService = emailService;
+        private readonly IPasswordResetCodeRepository _passwordResetRepo = passwordResetRepo;
+        private readonly IValidatorService _validator = validator;
 
         public async Task<UserDto> RegisterAsync(RegisterDto dto)
         {

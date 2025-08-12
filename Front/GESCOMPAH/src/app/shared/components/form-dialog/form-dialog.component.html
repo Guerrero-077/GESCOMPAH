@@ -1,7 +1,7 @@
 <h2 mat-dialog-title>{{ dialogTitle }}</h2>
 
 <mat-dialog-content class="mat-dialog-content">
-  <app-dymanic-forms #dynamicForm [formType]="data.formType" [initialData]="data.entity" (formSubmit)="close($event)"></app-dymanic-forms>
+  <app-dymanic-forms #dynamicForm [formType]="data.formType" [initialData]="data.entity" [selectOptions]="data.selectOptions || {}" (formSubmit)="close($event)"></app-dymanic-forms>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

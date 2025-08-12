@@ -18,6 +18,7 @@ using Data.Interfaz.DataBasic;
 using Data.Interfaz.IDataImplemenent.AdministrationSystem;
 using Data.Interfaz.IDataImplemenent.Business;
 using Data.Interfaz.IDataImplemenent.Location;
+using Data.Interfaz.IDataImplemenent.Persons;
 using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Data.Interfaz.IDataImplemenent.Utilities;
 using Data.Interfaz.Security;
@@ -25,6 +26,7 @@ using Data.Repository;
 using Data.Services.AdministratiosSystem;
 using Data.Services.Business;
 using Data.Services.Location;
+using Data.Services.Persons;
 using Data.Services.SecurityAuthentication;
 using Data.Services.Utilities;
 using Entity.Domain.Models.Implements.AdministrationSystem;
@@ -94,6 +96,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IFormModuleRepository, FormModuleRepository>();
             services.AddScoped<IRolUserRepository,  RolUserRepository>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
 
 
 

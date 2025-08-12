@@ -187,7 +187,7 @@ export class FormEstablishmentComponent {
             this.sweetAlert.showConfirm('¿Eliminar esta imagen?', 'Esta acción no se puede deshacer').then(result => {
                 if (result.isConfirmed) {
                     this.isDeletingImage = true;
-                    this.imageService.logicalDeleteImage(image.publicId).subscribe({
+                    this.imageService.deleteImagesByPublicIds([image.publicId]).subscribe({
                         next: () => {
                             this.existingImagesFull.splice(index, 1);
                             this.isDeletingImage = false;

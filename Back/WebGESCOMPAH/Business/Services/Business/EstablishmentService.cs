@@ -19,7 +19,6 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
     private readonly IEstablishmentsRepository _repo;
     private readonly IImagesRepository _imagesRepo;
     private readonly CloudinaryUtility _cloudinary;
-    private readonly IMapper _mapper;
     private readonly ILogger<EstablishmentService> _logger;
     private readonly ApplicationDbContext _context;
 
@@ -33,7 +32,6 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
     {
         _repo = repo;
         _imagesRepo = imagesRepo;
-        _mapper = mapper;
         _cloudinary = cloudinary;
         _logger = logger;
         _context = context;
@@ -207,6 +205,7 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
         var uploadResults = await Task.WhenAll(uploadTasks);
 
         var images = new List<Images>();
+
         for (int i = 0; i < fileList.Count; i++)
         {
             images.Add(new Images
@@ -220,6 +219,7 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
 
         _logger.LogInformation("{Count} imágenes subidas para establecimiento ID {Id}",
                                images.Count, establishmentId);
+       
         return images;
     }
 

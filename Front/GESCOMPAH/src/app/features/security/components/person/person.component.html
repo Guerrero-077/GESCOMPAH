@@ -1,0 +1,11 @@
+<div class="row d-flex justify-content-center">
+  <app-generic-table [data]="persons" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
+    (view)="onView($event)" (create)="onCreateNew()">
+  </app-generic-table>
+
+  <ng-template #estadoTemplate let-row>
+    <span class="badge" [ngClass]="row.active ? 'badge-success' : 'badge-danger'">
+      {{ row.active ? 'Activo' : 'Inactivo' }}
+    </span>
+  </ng-template>
+</div>

@@ -17,7 +17,6 @@ import { BackendMenuItem, SidebarItem } from './sidebar.config';
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
-  expandedIndex = -1;
   menu: SidebarItem[] = [];
 
   constructor(private permissionService: PermissionService, private authService: AuthService) { } // Inject services
@@ -26,7 +25,7 @@ export class SidebarComponent implements OnInit {
     this.permissionService.userProfile$.subscribe(userProfile => {
       console.log(userProfile);
       if (userProfile && userProfile.menu) {
-        this.menu = this.transformMenu(userProfile.menu, userProfile.roles[0]);
+        this.menu = this.transformMenu(userProfile.menu);
       } else {
         this.menu = [];
       }
@@ -44,7 +43,7 @@ export class SidebarComponent implements OnInit {
       menuItem.forms.forEach(form => {
         children.push({
           label: form.name,
-          icon: '', // Sub-items might not have icons, or you   can map them
+          icon: '',
           route: `/Admin/${form.route}` // Prefix with /Admin/
         });
       });

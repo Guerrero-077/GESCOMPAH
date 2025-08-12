@@ -142,8 +142,14 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     return (this.dataSource?.data?.length || 0) > 0;
   }
 
-  onEdit(row: T) { this.edit.emit(row); }
-  onDelete(row: T) { this.delete.emit(row); }
+  onEdit(row: T) {
+    console.log('GenericTableComponent: Emitting edit event with row:', row);
+    this.edit.emit(row);
+  }
+  onDelete(row: T) {
+    console.log('GenericTableComponent: Emitting delete event with row:', row);
+    this.delete.emit(row);
+  }
   onView(row: T) { this.view.emit(row); }
   onCreate() { this.create.emit(); }
 

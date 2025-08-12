@@ -45,8 +45,10 @@ namespace Data.Services.Utilities
             if (image == null) return false;
 
             _dbSet.Remove(image);
+            await _context.SaveChangesAsync();
             return true;
         }
+
 
         public async Task<bool> DeleteLogicalByPublicIdAsync(string publicId)
         {

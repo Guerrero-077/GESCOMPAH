@@ -41,6 +41,9 @@ export class DymanicFormsComponent implements OnInit {
   constructor(private fb: FormBuilder) { }
 
   ngOnInit() {
+    console.log('DymanicFormsComponent - initialData:', this.initialData);
+    console.log('DymanicFormsComponent - selectOptions:', this.selectOptions);
+
     this.fields = formSchemas[this.formType].map(field => ({ ...field }));
 
     this.fields.forEach(field => {
@@ -58,13 +61,29 @@ export class DymanicFormsComponent implements OnInit {
     const formControls: any = {};
 
     this.fields.forEach(field => {
+      let initialValue = this.initialData?.[field.name];
+      if (initialValue === undefined) {
+        if (field.type === 'select' && field.multiple) {
+          initialValue = [];
+        } else if (field.type === 'checkbox') {
+          initialValue = false;
+        } else {
+          initialValue = null;
+        }
+      }
       formControls[field.name] = [
-        this.initialData?.[field.name] ?? '',
+        initialValue,
         field.required ? Validators.required : []
       ];
     });
 
     this.form = this.fb.group(formControls);
+
+    if (this.formType === 'User' && this.initialData && this.initialData.id) {
+      // This is an edit operation, make password not required
+      this.form.get('password')?.clearValidators();
+      this.form.get('password')?.updateValueAndValidity();
+    }
 
     // Set initial value for departmentId if it exists in initialData
     if (this.formType === 'City' && this.initialData && this.initialData.departmentId) {
@@ -80,7 +99,16 @@ export class DymanicFormsComponent implements OnInit {
     if (this.formType === 'City' && this.initialData && typeof this.initialData.active === 'boolean') {
       this.form.get('active')?.setValue(this.initialData.active);
     }
+
+    console.log('DymanicFormsComponent - form.value after init:', this.form.value);
   }
+
+  compareById(o1: any, o2: any): boolean {
+    console.log(`compareById - o1: ${o1} (type: ${typeof o1}), o2: ${o2} (type: ${typeof o2})`);
+    if (o1 == null || o2 == null) return false;
+    return String(o1) === String(o2);
+  }
+
 
   onSubmit() {
     if (this.form.valid) {

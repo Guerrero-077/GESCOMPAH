@@ -24,6 +24,28 @@ namespace Data.Services.SecurityAuthentication
 
 
 
+        public async Task<User?> GetUserWithFullContextAsync(int userId)
+        {
+            // Trae usuario + persona + roles + rol->rolFormPermissions -> form -> formmodule -> module -> permission
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId)
+                .Include(u => u.Person)
+                .Include(u => u.RolUsers)
+                    .ThenInclude(ru => ru.Rol)
+                        .ThenInclude(r => r.RolFormPermissions)
+                            .ThenInclude(rfp => rfp.Form)
+                                .ThenInclude(f => f.FormModules)
+                                    .ThenInclude(fm => fm.Module)
+                .Include(u => u.RolUsers)
+                    .ThenInclude(ru => ru.Rol)
+                        .ThenInclude(r => r.RolFormPermissions)
+                            .ThenInclude(rfp => rfp.Permission)
+                .SingleOrDefaultAsync();
+        }
+
+
+
         public async Task<IEnumerable<RolUser>> GetUserRolesWithPermissionsAsync(int userId)
         {
             return await _context.RolUsers

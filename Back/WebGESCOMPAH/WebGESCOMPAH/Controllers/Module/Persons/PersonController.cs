@@ -11,7 +11,7 @@ namespace WebGESCOMPAH.Controllers.Module.Persons
     [ApiController]
     public class PersonController : BaseController<PersonSelectDto, PersonDto, PersonUpdateDto, IPersonService>
     {
-        public PersonController(IPersonService service, ILogger logger) : base(service, logger)
+        public PersonController(IPersonService service, ILogger<PersonController> logger) : base(service, logger)
         {
         }
 
