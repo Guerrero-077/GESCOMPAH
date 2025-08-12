@@ -16,7 +16,10 @@ export class GenericService<T> { // Pendiente por agregar los demas Dtos
   }
 
   getById(entidad: string, id: number): Observable<T> {
-    return this.http.get<T>(`${this.urlBase}${entidad}` + id);
+    // Previous implementation concatenated the id without a slash,
+    // producing URLs like `.../Entidad5` which are invalid.
+    // Ensure the id is separated by a `/` to match REST conventions.
+    return this.http.get<T>(`${this.urlBase}${entidad}/${id}`);
   }
 
   Add(entidad: string, dto: T): Observable<T> {
