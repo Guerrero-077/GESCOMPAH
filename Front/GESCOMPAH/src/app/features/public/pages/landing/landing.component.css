@@ -6,6 +6,7 @@
   /* background-color: #2E7D32; */
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
 }
 
 .landing-container {
@@ -44,6 +45,7 @@
 
 .login-button {
   display: inline-block;
+  width: 45%;
   text-align: center;
   padding: 15px 35px;
   font-size: 1.2rem;
@@ -60,4 +62,24 @@
 .login-button:hover {
   background-color: #0056b3;
   transform: translateY(-3px);
+}
+
+.text-green{
+  color: #146530; 
+}
+
+.text-marmol{
+  color: #646464;
+}
+
+.imagen-local{
+  width: 90%;
+  height: 100%;
+  /* border: 1px #000 solid; */
+  border-radius: 15px;
+  display: block;
+}
+
+.bg-green{
+  background-color: #f0fdf4;
 }
