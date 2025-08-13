@@ -1,0 +1,33 @@
+.custom-card {
+    border: 1px solid #d1e7dd; /* Verde muy claro */
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    max-width: 400px;
+    max-height: 225px;
+    background-color: white;
+    transition: 100ms;
+}
+
+.custom-card:hover{
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+}
+
+.custom-card .icon {
+    font-size: 48px;
+    color: #c99400; /* Amarillo café */
+    margin-bottom: 0.5rem;
+}
+
+.custom-card .card-title {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #146c43; /* Verde oscuro */
+    margin-bottom: 0.5rem;
+}
+
+.custom-card .card-text {
+    font-size: 0.95rem;
+    color: #333;
+    line-height: 1.5;
+}
