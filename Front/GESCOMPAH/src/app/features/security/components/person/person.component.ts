@@ -10,8 +10,8 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 
 import { PersonService } from '../../services/person/person.service';
 import { Person } from '../../models/person.models';
-// ⚠ Ajusta la ruta según tu proyecto
 import { CityService } from '../../../setting/services/city/city.service';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-person',
@@ -25,6 +25,8 @@ export class PersonComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
   private readonly cityService = inject(CityService);
+  private readonly sweetAllertService = inject(SweetAlertService);
+
 
   persons: Person[] = [];
   columns: TableColumn<Person>[] = [];
@@ -62,7 +64,7 @@ export class PersonComponent implements OnInit {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
-        entity: { ...row },               // idealmente: { ...row, cityId: row.cityId }
+        entity: { ...row },
         formType: 'Person',
         selectOptions: { cityId: cityOptions }
       }
@@ -71,8 +73,14 @@ export class PersonComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.personService.updatePerson(row.id, result).subscribe({
-          next: () => this.load(),
-          error: err => console.error('Error actualizando persona:', err)
+          next: () => {
+            this.load()
+            this.sweetAllertService.showNotification('Actualización Exitosa', 'Persona actualizada correctamente.', 'success');
+          },
+          error: err => {
+            console.error('Error actualizando persona:', err)
+            this.sweetAllertService.showNotification('Error', 'No se pudo actualizar la persona.', 'error');
+          }
         });
       }
     });
@@ -93,8 +101,14 @@ export class PersonComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
         this.personService.createPerson(result).subscribe({
-          next: () => this.load(),
-          error: err => console.error('Error creando persona:', err)
+          next: () => {
+            this.load()
+            this.sweetAllertService.showNotification('Creación Exitosa', 'Persona creada exitosamente.', 'success');
+          },
+          error: err => {
+            console.error('Error creando persona:', err)
+            this.sweetAllertService.showNotification('Error', 'No se pudo crear la persona.', 'error');
+          }
         });
       }
     });
@@ -110,8 +124,14 @@ export class PersonComponent implements OnInit {
 
     if (confirmed) {
       this.personService.deletePerson(row.id).subscribe({
-        next: () => this.load(),
-        error: err => console.error('Error eliminando persona:', err)
+        next: () => {
+          this.load()
+          this.sweetAllertService.showNotification('Eliminación Exitosa', 'Persona eliminada exitosamente.', 'success');
+        },
+        error: err => {
+          console.error('Error eliminando persona:', err)
+          this.sweetAllertService.showNotification('Error', 'No se pudo eliminar la persona.', 'error');
+        }
       });
     }
   }

@@ -6,6 +6,7 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { ModulesModule } from '../../models/module.models';
 import { ModuleService } from '../../services/module/module.service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-module',
@@ -16,6 +17,7 @@ import { FormDialogComponent } from '../../../../shared/components/form-dialog/f
 export class ModuleComponent implements OnInit {
   private readonly moduleService = inject(ModuleService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAllertService = inject(SweetAlertService);
 
   Forms: ModulesModule[] = [];
 
@@ -56,8 +58,12 @@ export class ModuleComponent implements OnInit {
           next: () => {
             console.log('Módulo actualizado correctamente');
             this.load();
+            this.sweetAllertService.showNotification('Actualización Exitosa', 'Módulo actualizado exitosamente.', 'success');
           },
-          error: err => console.error('Error actualizando el módulo:', err)
+          error: err => {
+            console.error('Error actualizando el módulo:', err)
+            this.sweetAllertService.showNotification('Error', 'No se pudo actualizar el módulo.', 'error');
+          }
         });
       }
     });
@@ -76,8 +82,12 @@ export class ModuleComponent implements OnInit {
         next: () => {
           console.log('Módulo eliminado correctamente');
           this.load();
+          this.sweetAllertService.showNotification('Eliminación Exitosa', 'Módulo eliminado exitosamente.', 'success');
         },
-        error: err => console.error('Error eliminando el módulo:', err)
+        error: err => {
+          console.error('Error eliminando el módulo:', err)
+          this.sweetAllertService.showNotification('Error', 'No se pudo eliminar el módulo.', 'error');
+        }
       });
     }
   }
@@ -87,7 +97,7 @@ export class ModuleComponent implements OnInit {
       width: '600px',
       data: {
         entity: {},
-        formType: 'Module' // o 'User', 'Product', etc.
+        formType: 'Module'
       }
     });
 
@@ -95,6 +105,10 @@ export class ModuleComponent implements OnInit {
       if (result) {
         this.moduleService.Add("Module", result).subscribe(res => {
           this.load();
+          this.sweetAllertService.showNotification('Creación Exitosa', 'Módulo creado exitosamente.', 'success');
+        }, err => {
+          console.error('Error creando el módulo:', err);
+          this.sweetAllertService.showNotification('Error', 'No se pudo crear el módulo.', 'error');
         });
       }
     });

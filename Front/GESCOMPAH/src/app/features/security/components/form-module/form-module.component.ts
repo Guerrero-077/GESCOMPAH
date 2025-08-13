@@ -11,6 +11,7 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { FormModuleSelectDto, FormModuleCreateDto, FormModuleUpdateDto } from '../../models/form-module..models';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-form-module',
@@ -25,6 +26,7 @@ export class FormModuleComponent implements OnInit {
   private readonly moduleService = inject(ModuleService);
   private readonly dialog = inject(MatDialog);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAlertService = inject(SweetAlertService);
 
   items: FormModuleSelectDto[] = [];
 
@@ -98,8 +100,15 @@ export class FormModuleComponent implements OnInit {
         };
 
         this.formModuleService.create(payload).subscribe({
-          next: () => this.load(),
-          error: err => console.error('Error creando FormModule:', err)
+          next: () => {
+
+            this.load(),
+              this.sweetAlertService.showNotification('Creación Exitosa', 'Relación Form–Module creada exitosamente.', 'success');
+          },
+          error: err => {
+            console.error('Error creando FormModule:', err);
+            this.sweetAlertService.showNotification('Error', 'No se pudo crear la relación Form–Module.', 'error');
+          }
         });
       });
     });
@@ -117,13 +126,10 @@ export class FormModuleComponent implements OnInit {
     })
       .pipe(
         map(({ formOpts, moduleOpts, current }) => {
-          // current = FormModuleSelectDto (no trae ids), por lo general necesitarás un endpoint que devuelva formId/moduleId.
-          // Si tu API de GET by id devuelve { id, formId, moduleId, active }, usa eso.
-          // Aquí asumo que tienes ese endpoint; si no, debes resolver los IDs en el back o ampliar el SelectDto.
           const initial = {
             id: current.id,
-            formId: (current as any).formId,       // <-- ideal si tu API los expone
-            moduleId: (current as any).moduleId,   // <-- ideal si tu API los expone
+            formId: (current as any).formId,
+            moduleId: (current as any).moduleId,
             active: current.active
           };
           return { formOpts, moduleOpts, initial };
@@ -157,8 +163,14 @@ export class FormModuleComponent implements OnInit {
           };
 
           this.formModuleService.update(id, payload).subscribe({
-            next: () => this.load(),
-            error: err => console.error('Error actualizando FormModule:', err)
+            next: () => {
+              this.load(),
+                this.sweetAlertService.showNotification('Actualización Exitosa', 'Relación Form–Module actualizada exitosamente.', 'success');
+            },
+            error: err => {
+              console.error('Error actualizando FormModule:', err)
+              this.sweetAlertService.showNotification('Error', 'No se pudo actualizar la relación Form–Module.', 'error');
+            }
           });
         });
       });
@@ -176,8 +188,14 @@ export class FormModuleComponent implements OnInit {
     if (!confirmed) return;
 
     this.formModuleService.deleteLogical(row.id).subscribe({
-      next: () => this.load(),
-      error: err => console.error('Error eliminando FormModule:', err)
+      next: () => {
+        this.load(),
+          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Relación Form–Module eliminada exitosamente.', 'success');
+      },
+      error: err => {
+        console.error('Error eliminando FormModule:', err);
+        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar la relación Form–Module.', 'error');
+      }
     });
   }
 

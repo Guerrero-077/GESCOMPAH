@@ -12,6 +12,7 @@ import { RolUserService } from '../../services/rol-user/rol-user.service';
 import { UserService } from '../../services/user/user.service';
 import { RolUserListDto, RolUserCreateDto, RolUserUpdatePayload } from '../../models/rol-user.models';
 import { RoleService } from '../../services/role/role.service';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-rol-user',
@@ -25,6 +26,7 @@ export class RolUserComponent implements OnInit {
   private readonly rolService = inject(RoleService);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
+  private readonly sweetAlertService = inject(SweetAlertService);
 
   rolUsers: RolUserListDto[] = [];
   columns: TableColumn<RolUserListDto>[] = [];
@@ -105,8 +107,14 @@ export class RolUserComponent implements OnInit {
         };
 
         this.rolUserService.create(payload).subscribe({
-          next: () => this.load(),
-          error: err => console.error('Error creando RolUser:', err)
+          next: () => {
+            this.load()
+            this.sweetAlertService.showNotification('Creación Exitosa', 'Rol-Usuario creado exitosamente.', 'success');
+          },
+          error: err => {
+            console.error('Error creando RolUser:', err)
+            this.sweetAlertService.showNotification('Error', 'No se pudo crear la asignación Rol-Usuario.', 'error');
+          }
         });
       });
     });
@@ -168,8 +176,14 @@ export class RolUserComponent implements OnInit {
           };
 
           this.rolUserService.update(id, payload).subscribe({
-            next: () => this.load(),
-            error: err => console.error('Error actualizando RolUser:', err)
+            next: () => {
+              this.load()
+              this.sweetAlertService.showNotification('Actualización Exitosa', 'Rol-Usuario actualizado exitosamente.', 'success');
+            },
+            error: err => {
+              console.error('Error actualizando RolUser:', err)
+              this.sweetAlertService.showNotification('Error', 'No se pudo actualizar la asignación Rol-Usuario.', 'error');
+            }
           });
         });
 
@@ -190,8 +204,14 @@ export class RolUserComponent implements OnInit {
 
     if (confirmed) {
       this.rolUserService.deleteLogical(row.id).subscribe({
-        next: () => this.load(),
-        error: err => console.error('Error eliminando RolUser:', err)
+        next: () => {
+          this.load()
+          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Asignación Rol-Usuario eliminada exitosamente.', 'success');
+        },
+        error: err => {
+          console.error('Error eliminando RolUser:', err)
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar la asignación Rol-Usuario.', 'error');
+        }
       });
     }
   }

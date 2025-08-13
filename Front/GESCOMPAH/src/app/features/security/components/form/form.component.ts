@@ -6,6 +6,7 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { FormModule } from '../../models/form.models';
 import { FormService } from '../../services/form/form.service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-form',
@@ -16,6 +17,8 @@ import { FormDialogComponent } from '../../../../shared/components/form-dialog/f
 export class FormComponent implements OnInit {
   private readonly formService = inject(FormService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAlertService = inject(SweetAlertService);
+
 
   Forms: FormModule[] = [];
   selectedForm: any = null;
@@ -60,10 +63,12 @@ export class FormComponent implements OnInit {
         const id = row.id;
         this.formService.Update("form", id, result).subscribe({
           next: () => {
-            console.log('Formulario actualizado correctamente');
             this.load();
+            this.sweetAlertService.showNotification('Actualización Exitosa', 'Formulario actualizado exitosamente.', 'success');
           },
-          error: err => console.error('Error actualizando el formulario:', err)
+          error: err => {
+            this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el formulario.', 'error');
+          }
         });
       }
     });
@@ -82,10 +87,13 @@ export class FormComponent implements OnInit {
     if (confirmed) {
       this.formService.DeleteLogical('Form', row.id).subscribe({
         next: () => {
-          console.log('Form eliminado correctamente');
+          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Formulario eliminado exitosamente.', 'success');
           this.load();
         },
-        error: err => console.error('Error eliminando el form:', err)
+        error: err => {
+          console.error('Error eliminando el formulario:', err);
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el formulario.', 'error');
+        }
       });
     }
   }
@@ -99,7 +107,7 @@ export class FormComponent implements OnInit {
       width: '600px',
       data: {
         entity: {},
-        formType: 'Form' // o 'User', 'Product', etc.
+        formType: 'Form'
       }
     });
 
@@ -107,6 +115,10 @@ export class FormComponent implements OnInit {
       if (result) {
         this.formService.Add("form", result).subscribe(res => {
           this.load();
+          this.sweetAlertService.showNotification('Creación Exitosa', 'Formulario creado exitosamente.', 'success');
+        }, err => {
+          console.error('Error creando el formulario:', err);
+          this.sweetAlertService.showNotification('Error', 'No se pudo crear el formulario.', 'error');
         });
       }
     });

@@ -82,9 +82,9 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
   ],
   'RolFormPermission': [
     { name: 'Id', type: 'hidden', required: false },
-    { name: 'Rol', type: 'select', options: [], required: true },
-    { name: 'FormModule', type: 'select', options: [], required: true },
-    { name: 'Permission', type: 'select', options: [], required: true },
+    { name: 'rolId', type: 'select', options: [], required: true },
+    { name: 'formId', type: 'select', options: [], required: true },
+    { name: 'permissionId', type: 'select', options: [], required: true },
     //{name: 'active', type: 'checkbox', required: true}
   ],
   'RolUser': [

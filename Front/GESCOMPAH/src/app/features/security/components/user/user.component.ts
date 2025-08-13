@@ -12,6 +12,7 @@ import { PersonService } from '../../services/person/person.service';
 import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-user',
@@ -24,6 +25,8 @@ export class UserComponent implements OnInit {
   private readonly personService = inject(PersonService);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
+  private readonly sweetAlertService = inject(SweetAlertService);
+
 
   users: UserListDto[] = [];
   columns: TableColumn<UserListDto>[] = [];
@@ -50,7 +53,6 @@ export class UserComponent implements OnInit {
     const id = row.id;
 
     const initial = {
-      id,                 // <-- IMPORTANTE para que password deje de ser requerida
       email: row.email,
       password: ''
     };
@@ -59,8 +61,7 @@ export class UserComponent implements OnInit {
       width: '600px',
       data: {
         entity: initial,
-        formType: 'User'   // <-- usar 'User'
-        // sin selectOptions.personId en edición
+        formType: 'User'
       }
     });
 
@@ -70,7 +71,18 @@ export class UserComponent implements OnInit {
         email: (result.email ?? initial.email)?.trim(),
         ...(result.password ? { password: result.password } : {})
       };
-      this.userService.updateUser(id, payload).subscribe({ next: () => this.load() });
+      this.userService.updateUser(id, payload).subscribe(
+        {
+          next: () => {
+            this.load();
+            this.sweetAlertService.showNotification('Actualización Exitosa', 'Usuario actualizado exitosamente.', 'success');
+          },
+          error: err => {
+            console.error('Error al actualizar el usuario:', err);
+
+          }
+        }
+      );
     });
   }
 
@@ -92,7 +104,7 @@ export class UserComponent implements OnInit {
         width: '600px',
         data: {
           entity: initial,
-          formType: 'User',                 // <-- usar 'User' (no 'UserCreate')
+          formType: 'User',
           selectOptions: { personId: people }
         }
       });
@@ -104,12 +116,21 @@ export class UserComponent implements OnInit {
           password: result.password,
           personId: +result.personId
         };
-        this.userService.createUser(payload).subscribe({ next: () => this.load() });
+        this.userService.createUser(payload).subscribe({
+          next: () => {
+
+            this.load();
+            this.sweetAlertService.showNotification('Creación Exitosa', 'Usuario creado exitosamente.', 'success');
+          },
+          error: err => {
+            console.error('Error al crear el usuario:', err);
+          }
+        });
       });
     });
   }
 
-  
+
   // DELETE
   async onDelete(row: UserListDto) {
     const confirmed = await this.confirmDialog.confirm({
@@ -121,8 +142,14 @@ export class UserComponent implements OnInit {
 
     if (confirmed) {
       this.userService.deleteUser(row.id).subscribe({
-        next: () => this.load(),
-        error: err => console.error('Error eliminando el usuario:', err)
+        next: () => {
+          this.load()
+          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
+        },
+        error: err => {
+          console.error('Error eliminando el usuario:', err)
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el usuario.', 'error');
+        }
       });
     }
   }
