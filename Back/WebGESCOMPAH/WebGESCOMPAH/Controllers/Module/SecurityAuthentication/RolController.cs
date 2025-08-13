@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebGESCOMPAH.Controllers.Base;
 
 [ApiController]
-//[Authorize]
+[Authorize]
 [Route("api/[controller]")]
 [Produces("application/json")]
 

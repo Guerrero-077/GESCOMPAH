@@ -6,6 +6,7 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { PermissionModule } from '../../models/permission.models';
 import { PermissionService } from '../../services/permission/permission.service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-permission',
@@ -16,6 +17,7 @@ import { FormDialogComponent } from '../../../../shared/components/form-dialog/f
 export class PermissionComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAlertService = inject(SweetAlertService);
 
   permissions: PermissionModule[] = [];
 
@@ -62,8 +64,12 @@ export class PermissionComponent implements OnInit {
           next: () => {
             console.log('permission actualizado correctamente');
             this.load();
+            this.sweetAlertService.showNotification('Actualización Exitosa', 'Permission actualizado correctamente.', 'success');
           },
-          error: err => console.error('Error actualizando el permission:', err)
+          error: err => {
+            console.error('Error actualizando el permission:', err)
+            this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el permission.', 'error');
+          }
         });
       }
     });
@@ -82,6 +88,10 @@ export class PermissionComponent implements OnInit {
       if (result) {
         this.permissionService.Add("permission", result).subscribe(res => {
           this.load();
+          this.sweetAlertService.showNotification('Creación Exitosa', 'Permission creado exitosamente.', 'success');
+        }, err => {
+          console.error('Error creando el permission:', err);
+          this.sweetAlertService.showNotification('Error', 'No se pudo crear el permission.', 'error');
         });
       }
     });
@@ -103,8 +113,13 @@ export class PermissionComponent implements OnInit {
         next: () => {
           console.log('Permission eliminado correctamente');
           this.load();
+          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Permission eliminado exitosamente.', 'success');
         },
-        error: err => console.error('Error eliminando el permission:', err)
+        error: err => {
+          console.error('Error eliminando el permission:', err)
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el permission.', 'error');
+
+        }
       });
     }
   }

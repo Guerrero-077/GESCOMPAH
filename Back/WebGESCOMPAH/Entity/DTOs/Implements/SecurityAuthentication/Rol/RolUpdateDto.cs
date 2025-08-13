@@ -1,8 +1,9 @@
-﻿namespace Entity.DTOs.Implements.SecurityAuthentication.Rol
+﻿using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.SecurityAuthentication.Rol
 {
-    public class RolUpdateDto
+    public class RolUpdateDto : BaseDto
     {
-        public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
     }

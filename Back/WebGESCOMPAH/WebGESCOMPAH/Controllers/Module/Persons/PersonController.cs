@@ -1,6 +1,5 @@
 ﻿using Business.Interfaces.Implements.Persons;
 using Entity.DTOs.Implements.Persons.Peron;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebGESCOMPAH.Controllers.Base;
@@ -12,7 +11,7 @@ namespace WebGESCOMPAH.Controllers.Module.Persons
     [ApiController]
     public class PersonController : BaseController<PersonSelectDto, PersonDto, PersonUpdateDto, IPersonService>
     {
-        public PersonController(IPersonService service, ILogger logger) : base(service, logger)
+        public PersonController(IPersonService service, ILogger<PersonController> logger) : base(service, logger)
         {
         }
 
@@ -31,14 +30,14 @@ namespace WebGESCOMPAH.Controllers.Module.Persons
         }
      
 
-        protected override Task<bool> DeleteAsync(int id)
+        protected override async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _service.DeleteAsync(id);
         }
 
-        protected override Task<bool> DeleteLogicAsync(int id)
+        protected override async Task<bool> DeleteLogicAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _service.DeleteLogicAsync(id);
         }
 
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entity.DTOs.Base;
+using Microsoft.AspNetCore.Mvc;
 using Utilities.Exceptions;
 
 namespace WebGESCOMPAH.Controllers.Base
@@ -104,6 +105,12 @@ namespace WebGESCOMPAH.Controllers.Base
         {
             try
             {
+                if (dto is null)
+                    return BadRequest(new { message = "El cuerpo de la solicitud es requerido." });
+
+                // Si el DTO de update tiene Id, lo sobreescribimos con el de la ruta (única fuente de verdad)
+                if (dto is BaseDto withId)
+                    withId.Id = id;
 
                 var updated = await UpdateAsync(id, dto);
                 if (updated == null)

@@ -1,6 +1,6 @@
 ﻿using Business.Interfaces.Implements.Location;
-using Business.Services.Location;
 using Entity.DTOs.Implements.Location.City;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using WebGESCOMPAH.Controllers.Base;
@@ -8,6 +8,7 @@ using WebGESCOMPAH.Controllers.Base;
 namespace WebGESCOMPAH.Controllers.Module.Locations
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class CityController : BaseController<CitySelectDto, CityCreateDto, CityUpdateDto, ICityService>
     {

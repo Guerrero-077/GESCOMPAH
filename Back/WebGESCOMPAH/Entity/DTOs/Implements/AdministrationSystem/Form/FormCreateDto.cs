@@ -1,6 +1,6 @@
 ﻿namespace Entity.DTOs.Implements.AdministrationSystem.Form
 {
-    public class FormCreateDto
+    public class FormCreateDto : IFormDto
     {
         public string Name { get; set; }
         public string Description { get; set; }

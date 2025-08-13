@@ -1,14 +1,14 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Permission;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebGESCOMPAH.Controllers.Base;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     [Produces("application/json")]
 
     public class PermissionController : BaseController<PermissionSelectDto, PermissionCreateDto, PermissionUpdateDto, IPermissionService>

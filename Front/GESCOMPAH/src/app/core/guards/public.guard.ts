@@ -8,7 +8,7 @@ export const publicGuard: CanActivateFn = (route, state) => {
 
   if (permissionService.currentUserProfile) {
     // Si el usuario ya está logueado, redirige al dashboard, reemplazando la URL en el historial
-    router.navigate(['/Admin/dashboard'], { replaceUrl: true });
+    router.navigate(['/admin/dashboard'], { replaceUrl: true });
     return false;
   }
 

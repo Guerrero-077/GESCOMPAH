@@ -18,6 +18,7 @@ using Data.Interfaz.DataBasic;
 using Data.Interfaz.IDataImplemenent.AdministrationSystem;
 using Data.Interfaz.IDataImplemenent.Business;
 using Data.Interfaz.IDataImplemenent.Location;
+using Data.Interfaz.IDataImplemenent.Persons;
 using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Data.Interfaz.IDataImplemenent.Utilities;
 using Data.Interfaz.Security;
@@ -25,6 +26,7 @@ using Data.Repository;
 using Data.Services.AdministratiosSystem;
 using Data.Services.Business;
 using Data.Services.Location;
+using Data.Services.Persons;
 using Data.Services.SecurityAuthentication;
 using Data.Services.Utilities;
 using Entity.Domain.Models.Implements.AdministrationSystem;
@@ -35,6 +37,7 @@ using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
 using Mapster;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
+using WebGESCOMPAH.Infrastructure;
 using WebGESCOMPAH.Middleware;
 using WebGESCOMPAH.Middleware.Handlers;
 
@@ -93,12 +96,17 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IFormModuleRepository, FormModuleRepository>();
             services.AddScoped<IRolUserRepository,  RolUserRepository>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
 
 
 
 
             // JWT 
             services.AddScoped<IToken, TokenBusiness>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddSingleton<IAuthCookieFactory, AuthCookieFactory>();
+            services.AddScoped<Microsoft.AspNetCore.Identity.IPasswordHasher<Entity.Domain.Models.Implements.SecurityAuthentication.User>, Microsoft.AspNetCore.Identity.PasswordHasher<Entity.Domain.Models.Implements.SecurityAuthentication.User>>();
+
             services.AddMemoryCache();
 
 

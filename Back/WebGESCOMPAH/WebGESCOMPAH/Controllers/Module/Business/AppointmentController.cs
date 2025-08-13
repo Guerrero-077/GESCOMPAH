@@ -1,5 +1,4 @@
 ﻿using Business.Interfaces.Implements.Business;
-using Business.Interfaces.Implements.Location;
 using Entity.DTOs.Implements.Business.Appointment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebGESCOMPAH.Controllers.Module.Business
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class AppointmentController : Controller
     {

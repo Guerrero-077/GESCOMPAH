@@ -1,8 +1,9 @@
-﻿namespace Entity.DTOs.Implements.AdministrationSystem.Module
+﻿using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.AdministrationSystem.Module
 {
-    public class ModuleUpdateDto
+    public class ModuleUpdateDto : BaseDto, IModuleDto
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Icon { get; set; }

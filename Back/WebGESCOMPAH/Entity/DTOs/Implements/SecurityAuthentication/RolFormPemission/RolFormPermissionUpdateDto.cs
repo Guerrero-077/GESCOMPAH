@@ -1,8 +1,9 @@
-﻿namespace Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission
+﻿using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission
 {
-    public class RolFormPermissionUpdateDto
+    public class RolFormPermissionUpdateDto : BaseDto
     {
-        public int Id { get; set; }
         public int RolId { get; set; }
 
         public int FormId { get; set; }

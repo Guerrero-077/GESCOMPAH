@@ -9,7 +9,7 @@ import { FormType } from '../dymanic-forms/dymanic-forms.config';
   standalone: true,
   imports: [DymanicFormsComponent, MatDialogTitle, MatDialogActions, MatDialogModule, MatButtonModule],
   templateUrl: './form-dialog.component.html',
-  styleUrl: './form-dialog.component.css'
+  styleUrls: ['./form-dialog.component.css']
 })
 export class FormDialogComponent implements OnInit {
 
@@ -18,7 +18,7 @@ export class FormDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { entity: any; formType: FormType; title: string }
+    @Inject(MAT_DIALOG_DATA) public data: { entity: any; formType: FormType; title: string; selectOptions?: Record<string, any[]> }
   ) { }
 
   ngOnInit(): void {

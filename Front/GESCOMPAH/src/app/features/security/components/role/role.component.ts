@@ -6,6 +6,7 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { RoleModule } from '../../models/role.models';
 import { RoleService } from '../../services/role/role.service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-role',
@@ -18,6 +19,7 @@ export class RoleComponent implements OnInit {
 
   private readonly rolService = inject(RoleService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAlertService = inject(SweetAlertService);
 
   rols: RoleModule[] = [];
 
@@ -67,8 +69,8 @@ export class RoleComponent implements OnInit {
 
         this.rolService.Update("rol", id, result).subscribe({
           next: () => {
-            console.log('Rol actualizado correctamente');
             this.load();
+            this.sweetAlertService.showNotification('Actualización Exitosa', 'Rol actualizado exitosamente.', 'success');
           },
           error: err => console.error('Error actualizando el rol:', err)
         });
@@ -90,6 +92,10 @@ export class RoleComponent implements OnInit {
       if (result) {
         this.rolService.Add("rol", result).subscribe(res => {
           this.load();
+          this.sweetAlertService.showNotification('Creación Exitosa', 'Rol creado exitosamente.', 'success');
+        }, err => {
+          console.error('Error creando el rol:', err);
+          this.sweetAlertService.showNotification('Error', 'No se pudo crear el rol.', 'error');
         });
       }
     });
@@ -108,9 +114,15 @@ export class RoleComponent implements OnInit {
       this.rolService.DeleteLogical('Rol', row.id).subscribe({
         next: () => {
           console.log('Rol eliminado correctamente');
-          this.load();
+          {
+            this.load()
+            this.sweetAlertService.showNotification('Eliminación Exitosa', 'Rol eliminado exitosamente.', 'success');
+          };
         },
-        error: err => console.error('Error eliminando el rol:', err)
+        error: err => {
+          console.error('Error eliminando el rol:', err)
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el rol.', 'error');
+        }
       });
     }
   }

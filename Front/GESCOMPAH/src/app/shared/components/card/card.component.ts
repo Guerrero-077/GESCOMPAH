@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-card',
   imports: [ButtonComponent, CommonModule],
   templateUrl: './card.component.html',
-  styleUrl: './card.component.css'
+  styleUrls: ['./card.component.css']
 })
 export class CardComponent {
   @Input() local!: EstablishmentSelect;
@@ -23,7 +23,10 @@ export class CardComponent {
   constructor(private dialog: MatDialog) { }
 
   get primaryImage(): string {
-    return this.local?.images?.[0]?.filePath || 'assets/images/placeholder.jpg';
+    const imageUrl = this.local?.images?.[0]?.filePath || 'assets/images/placeholder.jpg';
+    console.log('Primary Image URL:', imageUrl);
+    // Append a timestamp to the URL to bypass browser caching
+    return imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
   }
 
   get formattedRent(): string {

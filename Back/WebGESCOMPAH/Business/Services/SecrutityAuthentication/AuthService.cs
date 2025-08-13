@@ -12,83 +12,75 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Utilities.Exceptions;
 using Utilities.Messaging.Interfaces;
+using Microsoft.Extensions.Caching.Memory; // ⬅️ NUEVO
+using System.Linq; // DistinctBy
 
 namespace Business.Services.SecrutityAuthentication
 {
-    public class AuthService : IAuthService
+    /// <summary>
+    /// Servicio de autenticación y construcción de contexto de usuario (/me).
+    /// Ahora con cache de /me mediante IMemoryCache (TTL por defecto: 10 minutos).
+    /// </summary>
+    public class AuthService(
+        IUserRepository userData,
+        ILogger<AuthService> logger,
+        IRolUserRepository rolUserData,
+        IMapper mapper,
+        ISendCode emailService,
+        IPasswordResetCodeRepository passwordResetRepo,
+        IValidatorService validator,
+        IUserMeRepository IUserMeRepository,
+        IMemoryCache memoryCache // ⬅️ NUEVO
+            ) : IAuthService
     {
-        private readonly IUserMeRepository _IUserMeRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IRolUserRepository _rolUserData;
-        private readonly ILogger<AuthService> _logger;
-        private readonly IMapper _mapper;
-        private readonly ISendCode _emailService;
-        private readonly IPasswordResetCodeRepository _passwordResetRepo;
-        private readonly IValidatorService _validator;
+        private readonly IUserMeRepository _IUserMeRepository = IUserMeRepository;
+        private readonly IUserRepository _userRepository = userData;
+        private readonly IRolUserRepository _rolUserData = rolUserData;
+        private readonly ILogger<AuthService> _logger = logger;
+        private readonly IMapper _mapper = mapper;
+        private readonly ISendCode _emailService = emailService;
+        private readonly IPasswordResetCodeRepository _passwordResetRepo = passwordResetRepo;
+        private readonly IValidatorService _validator = validator;
+        private readonly IMemoryCache _cache = memoryCache; // ⬅️ NUEVO
 
-        public AuthService(
-            IUserRepository userData,
-            ILogger<AuthService> logger,
-            IRolUserRepository rolUserData,
-            IMapper mapper,
-            ISendCode emailService,
-            IPasswordResetCodeRepository passwordResetRepo,
-            IValidatorService validator,
-            IUserMeRepository IUserMeRepository
-            )
-        {
-            _logger = logger;
-            _userRepository = userData;
-            _rolUserData = rolUserData;
-            _mapper = mapper;
-            _emailService = emailService;
-            _passwordResetRepo = passwordResetRepo;
-            _validator = validator;
-            _IUserMeRepository = IUserMeRepository;
-        }
+        // Claves de cache (usa un prefijo para evitar colisiones)
+        private static string MeKey(int userId) => $"me:{userId}";
 
         public async Task<UserDto> RegisterAsync(RegisterDto dto)
         {
             try
             {
-                // Validar entrada (FluentValidation u otra)
                 await _validator.ValidateAsync(dto);
 
-                // Validar existencia de email
                 if (await _userRepository.ExistsByEmailAsync(dto.Email))
                     throw new BusinessException("El correo ya está registrado.");
 
-                // Mapear DTO a entidades
                 var person = _mapper.Map<Entity.Domain.Models.Implements.Persons.Person>(dto);
                 var user = _mapper.Map<User>(dto);
 
-                // Encriptar contraseña de forma segura
                 var hasher = new PasswordHasher<User>();
                 user.Password = hasher.HashPassword(user, dto.Password);
 
-                // Relación con persona
                 user.Person = person;
 
-                // Persistir usuario
                 await _userRepository.AddAsync(user);
 
-                // Asignar rol por defecto
                 await _rolUserData.AsignateRolDefault(user);
 
-                // Recuperar el usuario con sus relaciones
                 var createdUser = await _userRepository.GetByIdAsync(user.Id);
                 if (createdUser is null)
                     throw new BusinessException("Error interno: no se pudo recuperar el usuario tras registrarlo.");
+
+                // Invalida cache defensivamente por si hay lecturas inmediatas del usuario recién creado
+                InvalidateUserCache(user.Id);
 
                 return _mapper.Map<UserDto>(createdUser);
             }
             catch (Exception ex)
             {
-                // Aquí puedes loguear el error si tienes logger inyectado
                 throw new BusinessException($"Error en el registro del usuario: {ex.Message}", ex);
             }
         }
-
 
         public async Task RequestPasswordResetAsync(string email)
         {
@@ -119,44 +111,34 @@ namespace Business.Services.SecrutityAuthentication
             var hasher = new PasswordHasher<User>();
             user.Password = hasher.HashPassword(user, dto.NewPassword);
 
-            //user.Password = EncriptePassword.EncripteSHA256(dto.NewPassword);
             await _userRepository.UpdateAsync(user);
 
             record.IsUsed = true;
             await _passwordResetRepo.UpdateAsync(record);
+
+            // Contraseña cambió → invalida /me por si tu UI muestra info derivada
+            InvalidateUserCache(user.Id);
         }
 
-
-
-
-
         /// <summary>
-        /// Construye el contexto de usuario con información detallada, roles, permisos y estructura de menú.
+        /// Construye el contexto de usuario (/me). Si existe en cache, lo devuelve.
+        /// Politica: AbsoluteExpiration = 10 min (ajustable).
         /// </summary>
-        /// <param name="userId">Identificador único del usuario.</param>
-        /// <returns>
-        /// Objeto <see cref="UserMeDto"/> con toda la información contextual del usuario.
-        /// </returns>
-        /// <exception cref="BusinessException">
-        /// Se lanza cuando no se encuentra el usuario especificado.
-        /// </exception>
-        /// <remarks>
-        /// Este método:
-        /// 1. Obtiene datos básicos del usuario
-        /// 2. Recupera y filtra roles activos
-        /// 3. Construye la estructura de permisos
-        /// 4. Organiza los módulos y formularios para el menú
-        /// </remarks>
         public async Task<UserMeDto> BuildUserContextAsync(int userId)
         {
-            // 1. Obtener usuario principal (con patrón null-coalescing throw)
+            var cacheKey = MeKey(userId);
+
+            if (_cache.TryGetValue(cacheKey, out UserMeDto cached))
+                return cached;
+
+            // 1) Usuario con persona
             var user = await _IUserMeRepository.GetUserWithPersonAsync(userId)
                         ?? throw new BusinessException("Usuario no encontrado");
 
-            // 2. Obtener roles con sus permisos
+            // 2) Roles con permisos (estado actual)
             var userRoles = await _IUserMeRepository.GetUserRolesWithPermissionsAsync(userId);
 
-            // 3. Filtrar roles activos no eliminados (con DistinctBy para evitar duplicados)
+            // 3) Filtrar roles activos y únicos
             var roles = userRoles
                 .Where(ur => ur.Active && !ur.IsDeleted)
                 .Select(ur => ur.Rol)
@@ -164,11 +146,12 @@ namespace Business.Services.SecrutityAuthentication
                 .DistinctBy(r => r.Id)
                 .ToList();
 
-            var roleNames = roles.Select(r => r.Name).ToList();
+            var roleNames = roles.Select(r => r.Name)
+                                 .Where(n => !string.IsNullOrWhiteSpace(n))
+                                 .Distinct()
+                                 .ToList();
 
-            // 4. Construir diccionario de permisos:
-            //    - Key: ID de formulario
-            //    - Value: Conjunto de permisos para ese formulario
+            // 4) Construir permisos por formulario y set global
             var formPermissions = new Dictionary<int, HashSet<string>>();
             var permissions = new HashSet<string>();
 
@@ -176,22 +159,23 @@ namespace Business.Services.SecrutityAuthentication
             {
                 foreach (var rfp in role.RolFormPermissions)
                 {
-                    if (string.IsNullOrWhiteSpace(rfp.Permission?.Name)) continue;
+                    var pName = rfp.Permission?.Name;
+                    if (string.IsNullOrWhiteSpace(pName)) continue;
 
-                    permissions.Add(rfp.Permission.Name);
+                    permissions.Add(pName);
 
                     if (!formPermissions.ContainsKey(rfp.FormId))
                         formPermissions[rfp.FormId] = new();
 
-                    formPermissions[rfp.FormId].Add(rfp.Permission.Name);
+                    formPermissions[rfp.FormId].Add(pName);
                 }
             }
 
-            // 5. Obtener formularios con sus módulos
+            // 5) Formularios + módulos
             var formIds = formPermissions.Keys.ToList();
             var formsWithModules = await _IUserMeRepository.GetFormsWithModulesByIdsAsync(formIds);
 
-            // 6. Organizar módulos con sus formularios y permisos
+            // 6) Armar módulos con formularios y permisos
             var modules = formsWithModules
                 .Where(f => f.FormModules.Any())
                 .GroupBy(f => f.FormModules.First().Module)
@@ -208,8 +192,8 @@ namespace Business.Services.SecrutityAuthentication
                     return module;
                 }).ToList();
 
-            // 7. Construir DTO final
-            return new UserMeDto
+            // 7) DTO final
+            var me = new UserMeDto
             {
                 Id = user.Id,
                 FullName = $"{user.Person.FirstName} {user.Person.LastName}",
@@ -218,6 +202,23 @@ namespace Business.Services.SecrutityAuthentication
                 Permissions = permissions.ToList(),
                 Menu = modules
             };
+
+            // 8) Guardar en cache
+            _cache.Set(cacheKey, me, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            });
+
+            return me;
+        }
+
+        /// <summary>
+        /// Invalida el cache del contexto de usuario (/me). 
+        /// Llama este método cuando actualices usuario, roles, permisos o menú.
+        /// </summary>
+        public void InvalidateUserCache(int userId)
+        {
+            _cache.Remove(MeKey(userId));
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Data.Interfaz.Security
         Task<User?> GetUserWithPersonAsync(int userId);
         Task<IEnumerable<RolUser>> GetUserRolesWithPermissionsAsync(int userId);
         Task<IEnumerable<Form>> GetFormsWithModulesByIdsAsync(List<int> formIds);
+        Task<User?> GetUserWithFullContextAsync(int userId);
 
     }
 }

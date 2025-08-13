@@ -7,9 +7,10 @@ import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
+
 
 @Component({
   selector: 'app-city',
@@ -19,10 +20,9 @@ import { FormDialogComponent } from '../../../../shared/components/form-dialog/f
     GenericTableComponent,
     MatButtonModule,
     MatIconModule,
-    MatSnackBarModule
   ],
   templateUrl: './city.component.html',
-  styleUrl: './city.component.css',
+  styleUrls: ['./city.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CityComponent implements OnInit {
@@ -37,7 +37,7 @@ export class CityComponent implements OnInit {
   constructor(
     private store: CityStore,
     private dialog: MatDialog,
-    private snackbar: MatSnackBar
+    private sweetAlert: SweetAlertService
   ) {
     this.cities$ = this.store.cities$;
   }
@@ -59,7 +59,7 @@ export class CityComponent implements OnInit {
       if (result) {
         this.store.create(result).subscribe({
           next: () => {
-            this.snackbar.open('Ciudad creada exitosamente', 'Cerrar', { duration: 2000 });
+            this.sweetAlert.showNotification('Éxito', 'Ciudad creada exitosamente', 'success');
           }
         });
       }
@@ -79,7 +79,7 @@ export class CityComponent implements OnInit {
       if (result) {
         this.store.update(result).subscribe({
           next: () => {
-            this.snackbar.open('Ciudad actualizada exitosamente', 'Cerrar', { duration: 2000 });
+            this.sweetAlert.showNotification('Éxito', 'Ciudad actualizada exitosamente', 'success');
           }
         });
       }
@@ -88,9 +88,13 @@ export class CityComponent implements OnInit {
 
   handleDelete(row: CityModel): void {
     if (row.id) {
-      this.store.delete(row.id).subscribe({
-        next: () => {
-          this.snackbar.open('Ciudad eliminada exitosamente', 'Cerrar', { duration: 2000 });
+      this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(result => {
+        if (result.isConfirmed) {
+          this.store.delete(row.id).subscribe({
+            next: () => {
+              this.sweetAlert.showNotification('Éxito', 'Ciudad eliminada exitosamente', 'success');
+            }
+          });
         }
       });
     }

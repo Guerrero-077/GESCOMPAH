@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, OnInit } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { SidebarItem, BackendMenuItem, BackendSubMenuItem } from './sidebar.config';
-import { PermissionService } from '../../../core/service/permission/permission.service'; // Import PermissionService
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/service/auth/auth.service';
+import { PermissionService } from '../../../core/service/permission/permission.service'; // Import PermissionService
+import { BackendMenuItem, SidebarItem } from './sidebar.config';
 
 
 @Component({
@@ -14,10 +14,9 @@ import { AuthService } from '../../../core/service/auth/auth.service';
   standalone: true,
   imports: [CommonModule, RouterModule, MatListModule, MatIconModule, MatExpansionModule],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.css'
+  styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
-  expandedIndex = -1;
   menu: SidebarItem[] = [];
 
   constructor(private permissionService: PermissionService, private authService: AuthService) { } // Inject services
@@ -26,7 +25,7 @@ export class SidebarComponent implements OnInit {
     this.permissionService.userProfile$.subscribe(userProfile => {
       console.log(userProfile);
       if (userProfile && userProfile.menu) {
-        this.menu = this.transformMenu(userProfile.menu, userProfile.roles[0]);
+        this.menu = this.transformMenu(userProfile.menu);
       } else {
         this.menu = [];
       }
@@ -37,17 +36,24 @@ export class SidebarComponent implements OnInit {
     this.authService.logout().subscribe();
   }
 
-  private transformMenu(backendMenu: BackendMenuItem[], role: string): SidebarItem[] {
-    const prefix = role === 'Administrador' ? '/Admin' : '/Tenant';
-    
-    return backendMenu.map(menuItem => ({
-      label: menuItem.name,
-      icon: menuItem.icon,
-      children: menuItem.forms.map(form => ({
-        label: form.name,
-        icon: '',
-        route: `${prefix}/${form.route}`.replace(/\/+$/, '') // limpia barras
-      }))
-    }));
+  private transformMenu(backendMenu: BackendMenuItem[]): SidebarItem[] {
+    const sidebarItems: SidebarItem[] = [];
+    backendMenu.forEach(menuItem => {
+      const children: SidebarItem[] = [];
+      menuItem.forms.forEach(form => {
+        children.push({
+          label: form.name,
+          icon: '',
+          route: `/admin/${form.route}` // Prefix with /Admin/
+        });
+      });
+
+      sidebarItems.push({
+        label: menuItem.name,
+        icon: menuItem.icon,
+        children: children
+      });
+    });
+    return sidebarItems;
   }
 }

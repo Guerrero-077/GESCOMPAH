@@ -1,8 +1,9 @@
-﻿namespace Entity.DTOs.Implements.Business.Plaza
+﻿using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.Business.Plaza
 {
-    public class UpdatePlazaActiveStatusDto
+    public class UpdatePlazaActiveStatusDto: BaseDto
     {
-        public int Id { get; set; }
         public bool Active { get; set; }
     }
 

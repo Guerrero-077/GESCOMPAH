@@ -1,6 +1,6 @@
 ﻿namespace Entity.DTOs.Implements.Business.Appointment
 {
-    public class AppointmentCreateDto
+    public class AppointmentCreateDto : IAppointmentDto
     {
         public string FullName { get; set; } = null!;
         public string Email { get; set; } = null!;

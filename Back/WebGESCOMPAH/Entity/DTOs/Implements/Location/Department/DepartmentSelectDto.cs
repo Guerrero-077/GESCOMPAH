@@ -1,8 +1,9 @@
-﻿namespace Entity.DTOs.Implements.Location.Department
+﻿using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.Location.Department
 {
-    public class DepartmentSelectDto
+    public class DepartmentSelectDto : BaseDto
     {
-        public int Id { get; set; }
         public string Name { get; set; }= null!;
         public bool Active { get; set; }
     }
