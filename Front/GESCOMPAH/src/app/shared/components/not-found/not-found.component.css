@@ -16,7 +16,7 @@ h1 {
   font-size: 10rem;
   margin: 0;
   font-weight: 900;
-  color: #dc3545;
+  color: #ca8a04;
 }
 
 h2 {
@@ -33,11 +33,12 @@ p {
 
 .button {
   display: inline-block;
+  width: 45vw;
   padding: 12px 24px;
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background-color: #007bff;
+  background-color: #2E7D32;
   border: none;
   border-radius: 5px;
   text-decoration: none;
@@ -45,5 +46,10 @@ p {
 }
 
 .button:hover {
-  background-color: #0056b3;
+  background-color: #108115;
+}
+
+img{
+  width: 150%;
+  height: 100%;
 }

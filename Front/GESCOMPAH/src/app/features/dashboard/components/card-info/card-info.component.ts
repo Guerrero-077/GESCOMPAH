@@ -9,13 +9,15 @@ import { Component, Input } from '@angular/core';
 })
 export class CardInfoComponent {
   @Input() title: string = '';
-  @Input() value: number = 0;  // valor actual
+  @Input() value: number = 0;  
   @Input() total: number = 0; // total para el cálculo
 
   get percentage(): number {
     if (this.total > 0) {
-      return Math.round((this.value / this.total) * 100);
+      let percentage = Math.round((this.value / this.total) * 100);
+      return percentage;
     }
     return 0;
   }
+
 }

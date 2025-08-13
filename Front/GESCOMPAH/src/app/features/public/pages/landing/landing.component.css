@@ -2,7 +2,8 @@
   display: block;
   height: 100vh;
   width: 100vw;
-  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364);
+  /* background: linear-gradient(-45deg, #0f2715, #204323, #5c642c); */
+  /* background-color: #2E7D32; */
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -14,10 +15,11 @@
   height: 100%;
   text-align: center;
   padding: 2rem;
+  
 }
 
 .content-wrapper {
-  max-width: 800px;
+  background: linear-gradient(to right, #146530, #167339);
 }
 
 .title {
@@ -42,16 +44,17 @@
 
 .login-button {
   display: inline-block;
+  text-align: center;
   padding: 15px 35px;
   font-size: 1.2rem;
   font-weight: 600;
   color: #fff;
-  background-color: #007bff;
+  background-color: #18812e;
   border: none;
   border-radius: 50px;
   text-decoration: none;
   transition: transform 0.2s ease-in-out, background-color 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 255, 13, 0.4);
 }
 
 .login-button:hover {
