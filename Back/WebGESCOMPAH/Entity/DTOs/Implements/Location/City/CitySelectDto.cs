@@ -1,6 +1,8 @@
-﻿namespace Entity.DTOs.Implements.Location.City
+﻿using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.Location.City
 {
-    public class CitySelectDto 
+    public class CitySelectDto : BaseDto, ICityDto
     {
         public string Name { get; set; }
         public string DepartmentName { get; set; }

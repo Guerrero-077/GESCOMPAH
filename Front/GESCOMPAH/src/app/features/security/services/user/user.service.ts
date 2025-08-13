@@ -1,12 +1,11 @@
+// services/user.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
-import { User, UserCreateDto, UserUpdateDto, UserListDto } from '../../models/user.models';
+import { UserListDto, UserCreateDto, UserUpdatePayload } from '../../models/user.models';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly apiUrl = `${environment.apiURL}/user`;
 
@@ -16,16 +15,17 @@ export class UserService {
     return this.http.get<UserListDto[]>(this.apiUrl);
   }
 
-  getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`);
+  // Tu back devuelve SelectDto para GetById:
+  getUserById(id: number): Observable<UserListDto> {
+    return this.http.get<UserListDto>(`${this.apiUrl}/${id}`);
   }
 
-  createUser(dto: UserCreateDto): Observable<User> {
-    return this.http.post<User>(this.apiUrl, dto);
+  createUser(dto: UserCreateDto): Observable<any> {
+    return this.http.post<any>(this.apiUrl, dto);
   }
 
-  updateUser(id: number, dto: UserUpdateDto): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, dto);
+  updateUser(id: number, payload: UserUpdatePayload) {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, payload);
   }
 
 

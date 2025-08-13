@@ -44,7 +44,7 @@ export class SidebarComponent implements OnInit {
         children.push({
           label: form.name,
           icon: '',
-          route: `/Admin/${form.route}` // Prefix with /Admin/
+          route: `/admin/${form.route}` // Prefix with /Admin/
         });
       });
 

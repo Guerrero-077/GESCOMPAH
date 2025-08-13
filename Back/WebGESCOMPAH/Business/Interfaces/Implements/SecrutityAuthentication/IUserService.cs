@@ -6,5 +6,6 @@ namespace Business.Interfaces.Implements.SecrutityAuthentication
 {
     public interface IUserService : IBusiness<UserSelectDto, UserCreateDto, UserUpdateDto>
     {
+        Task<UserCreateDto> CreateUserAsync(UserCreateDto dto);
     }
 }

@@ -1,10 +1,10 @@
-﻿using Entity.DTOs.Implements.Utilities.Images;
+﻿using Entity.DTOs.Base;
+using Entity.DTOs.Implements.Utilities.Images;
 
 namespace Entity.DTOs.Implements.Business.EstablishmentDto
 {
-    public class EstablishmentSelectDto
+    public class EstablishmentSelectDto : BaseDto
     {
-        public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public double AreaM2 { get; set; }

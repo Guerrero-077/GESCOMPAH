@@ -3,7 +3,7 @@ using Entity.DTOs.Implements.Business.Appointment;
 
 namespace Entity.DTOs.Validations.Appointment
 {
-    public abstract class AppointmentBaseDtoValidator<T> : AbstractValidator<T> where T : AppointmentBaseDto
+    public abstract class AppointmentBaseDtoValidator<T> : AbstractValidator<T> where T : IAppointmentDto
     {
         public AppointmentBaseDtoValidator()
         {

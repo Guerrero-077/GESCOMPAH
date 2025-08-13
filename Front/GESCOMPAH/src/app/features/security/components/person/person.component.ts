@@ -1,12 +1,17 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
+import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
+import { firstValueFrom } from 'rxjs';
+
+import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { Person } from '../../models/user.models';
+
 import { PersonService } from '../../services/person/person.service';
-import { CommonModule } from '@angular/common';
+import { Person } from '../../models/person.models';
+// ⚠ Ajusta la ruta según tu proyecto
+import { CityService } from '../../../setting/services/city/city.service';
 
 @Component({
   selector: 'app-person',
@@ -19,6 +24,7 @@ export class PersonComponent implements OnInit {
   private readonly personService = inject(PersonService);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
+  private readonly cityService = inject(CityService);
 
   persons: Person[] = [];
   columns: TableColumn<Person>[] = [];
@@ -36,44 +42,51 @@ export class PersonComponent implements OnInit {
     this.load();
   }
 
-  load() {
+  load(): void {
     this.personService.getPersons().subscribe({
-      next: (data) => {
-        console.log('Personas desde el servicio:', data);
-        this.persons = data;
-      },
+      next: (data) => this.persons = data,
       error: (err) => console.error('Error al cargar personas:', err)
     });
   }
 
-  onEdit(row: Person) {
+  // --- helpers ---
+  private async getCityOptions() {
+    const cities = await firstValueFrom(this.cityService.getAll("city"));
+    return cities.map((c: any) => ({ value: c.id, label: c.name }));
+  }
+
+  async onEdit(row: Person) {
+    const cityOptions = await this.getCityOptions();
+
+    // Si tu SelectDto aún no trae cityId, no habrá pre-selección (recomendado: incluirlo).
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
-        entity: row,
-        formType: 'Person'
+        entity: { ...row },               // idealmente: { ...row, cityId: row.cityId }
+        formType: 'Person',
+        selectOptions: { cityId: cityOptions }
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.personService.updatePerson(row.id, result).subscribe({
-          next: () => {
-            console.log('Persona actualizada correctamente');
-            this.load();
-          },
+          next: () => this.load(),
           error: err => console.error('Error actualizando persona:', err)
         });
       }
     });
   }
 
-  onCreateNew() {
+  async onCreateNew() {
+    const cityOptions = await this.getCityOptions();
+
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
         entity: {} as Person,
-        formType: 'Person'
+        formType: 'Person',
+        selectOptions: { cityId: cityOptions }
       }
     });
 
@@ -97,10 +110,7 @@ export class PersonComponent implements OnInit {
 
     if (confirmed) {
       this.personService.deletePerson(row.id).subscribe({
-        next: () => {
-          console.log('Persona eliminada correctamente');
-          this.load();
-        },
+        next: () => this.load(),
         error: err => console.error('Error eliminando persona:', err)
       });
     }

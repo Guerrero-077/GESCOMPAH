@@ -33,7 +33,7 @@ export class LoginComponent implements OnInit { // Implement OnInit
 
   me() {
     this.auth.GetMe().subscribe({
-      next: (data) => {},
+      next: (data) => { },
       error: (err) => {
         Swal.fire({
           icon: 'error',
@@ -44,29 +44,18 @@ export class LoginComponent implements OnInit { // Implement OnInit
     });
   }
 
+
   login() {
     if (this.formLogin.invalid) return;
+    const { email, password } = this.formLogin.getRawValue()!;
 
-    const { email, password } = this.formLogin.getRawValue();
-
-    this.auth.Login({ email, password }).subscribe({
-      next: (data) => {
-        if (data != null) {
-          this.router.navigate(['/Admin/dashboard']);
-
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Error creating user!'
-          });
-        }
-      },
+    this.auth.Login({ email: email!, password: password! }).subscribe({
+      next: () => this.router.navigate(['/admin/dashboard']),
       error: (err) => {
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: err?.message ?? 'Error inesperado'
+          text: err?.error?.message ?? 'Credenciales inválidas'
         });
       }
     });

@@ -52,12 +52,22 @@ namespace Business.Mapping
                     .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
 
 
+            // Entidad → DTO de selección
             config.NewConfig<Establishment, EstablishmentSelectDto>()
                 .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageSelectDto>>());
 
-
+            // DTO de creación → Entidad
             config.NewConfig<EstablishmentCreateDto, Establishment>()
-                .Ignore(dest => dest.Images);
+                .Ignore(dest => dest.Id)               // Se genera en DB
+                .Ignore(dest => dest.Images)           // Se manejan aparte
+                .Ignore(dest => dest.Active)           // Control de negocio
+                .IgnoreNullValues(true);
+
+            // DTO de actualización → Entidad (ignorar nulos y valores por defecto)
+            config.NewConfig<EstablishmentUpdateDto, Establishment>()
+                .Ignore(dest => dest.Images)   // Se manejan aparte
+                .Ignore(dest => dest.Active)   // No se actualiza desde DTO
+                .IgnoreNullValues(true);
 
 
 
@@ -75,9 +85,20 @@ namespace Business.Mapping
             // ============================================
             // Persons
             // ============================================
+            // Entidad -> DTO de selección (maneja City nullable)
+            config.NewConfig<Person, PersonSelectDto>()
+                .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty);
 
-            config.NewConfig<Person, PersonDto>();
+            // DTO de creación -> Entidad  (NO toca navegaciones)
+            config.NewConfig<PersonDto, Person>()
+                .Ignore(dest => dest.Id)    // lo genera DB
+                .Ignore(dest => dest.City)  // navegación
+                .IgnoreNullValues(false);   // para creación, aplica TODOS los campos
 
+            // DTO de actualización -> Entidad (patch-friendly)
+            config.NewConfig<PersonUpdateDto, Person>()
+                .Ignore(dest => dest.City)  // navegación
+                .IgnoreNullValues(true);    // no pises con nulls
 
             // ============================================
             // SecurityAuthentication
@@ -93,6 +114,14 @@ namespace Business.Mapping
 
             config.NewConfig<User, UserSelectDto>()
                .Map(dest => dest.PersonName, src => $"{src.Person.FirstName} {src.Person.LastName}");
+
+            config.NewConfig<UserUpdateDto, User>()
+                .IgnoreNullValues(true)   // no pises con null
+                .Ignore(d => d.Person)    // no toques navegaciones
+                .Ignore(d => d.RolUsers)
+                .Ignore(d => d.Password); // password se maneja en el servicio (hash)
+
+
 
 
             // ============================================
@@ -136,11 +165,6 @@ namespace Business.Mapping
             config.NewConfig<RegisterDto, Person>()
                 .Ignore(dest => dest.Id);
 
-            config.NewConfig<UserCreateDto, User>()
-                .Ignore(dest => dest.Id)
-                .Ignore(dest => dest.Person)
-                .Ignore(dest => dest.RolUsers) 
-                .IgnoreNullValues(true);
 
 
             config.NewConfig<User, UserDto>()

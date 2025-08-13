@@ -14,7 +14,11 @@
             [placeholder]="field.name | titlecase" [compareWith]="compareById">
             <mat-option *ngFor="let opt of field.options" [value]="opt.value">{{ opt.label }}</mat-option>
           </mat-select>
-          <textarea mat Input *ngSwitchCase="'textarea'" [formControlName]="field.name"></textarea>
+
+
+          <textarea matInput cdkTextareaAutosize [cdkAutosizeMinRows]="3" [cdkAutosizeMaxRows]="8"
+            *ngSwitchCase="'textarea'" [formControlName]="field.name"></textarea>
+
         </ng-container>
         <mat-error *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched">
           {{ field.name | titlecase }} es requerido.

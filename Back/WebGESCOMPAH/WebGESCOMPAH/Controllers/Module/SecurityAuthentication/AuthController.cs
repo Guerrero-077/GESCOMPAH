@@ -3,11 +3,9 @@ using Business.Interfaces.Implements.SecrutityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
-using Entity.DTOs.Implements.SecurityAuthentication.Me;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using WebGESCOMPAH.Infrastructure;
@@ -17,24 +15,22 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
         private readonly IAuthService _authService;
         private readonly IToken _tokenService;
-        private readonly IConfiguration _configuration;
         private readonly IAuthCookieFactory _cookieFactory;
         private readonly JwtSettings _jwt;
         private readonly CookieSettings _cookieSettings;
 
-        public AuthController(IAuthService authService,
-                              IToken tokenService,
-                              IAuthCookieFactory cookieFactory,
-                              IOptions<JwtSettings> jwtOptions,
-                              IOptions<CookieSettings> cookieOptions,
-                              ILogger<AuthController> logger)
-                              
+        public AuthController(
+            IAuthService authService,
+            IToken tokenService,
+            IAuthCookieFactory cookieFactory,
+            IOptions<JwtSettings> jwtOptions,
+            IOptions<CookieSettings> cookieOptions,
+            ILogger<AuthController> logger)
         {
             _authService = authService;
             _tokenService = tokenService;
@@ -44,11 +40,11 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
             _logger = logger;
         }
 
-
         [HttpPost("register")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Registrarse([FromBody] RegisterDto objeto)
         {
             await _authService.RegisterAsync(objeto);
@@ -57,35 +53,54 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 
         /// <summary>Login: genera access + refresh + csrf, guarda cookies HttpOnly.</summary>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto, CancellationToken ct)
         {
-            var (access, refresh, csrf, userContext) = await _tokenService.GenerateTokensAsync(dto);
+            // Ahora GenerateTokensAsync NO retorna userContext
+            var (access, refresh, csrf) = await _tokenService.GenerateTokensAsync(dto);
 
             var now = DateTime.UtcNow;
-            Response.Cookies.Append(_cookieSettings.AccessTokenName, access,
+
+            // Setear cookies usando tu fábrica (mismas opciones para escribir y borrar)
+            Response.Cookies.Append(
+                _cookieSettings.AccessTokenName,
+                access,
                 _cookieFactory.AccessCookieOptions(now.AddMinutes(_jwt.AccessTokenExpirationMinutes)));
-            Response.Cookies.Append(_cookieSettings.RefreshTokenName, refresh,
+
+            Response.Cookies.Append(
+                _cookieSettings.RefreshTokenName,
+                refresh,
                 _cookieFactory.RefreshCookieOptions(now.AddDays(_jwt.RefreshTokenExpirationDays)));
-            Response.Cookies.Append(_cookieSettings.CsrfCookieName, csrf,
+
+            Response.Cookies.Append(
+                _cookieSettings.CsrfCookieName,
+                csrf,
                 _cookieFactory.CsrfCookieOptions(now.AddDays(_jwt.RefreshTokenExpirationDays)));
 
+            // Respuesta mínima (el /auth/me devolverá el contexto completo cuando el front lo pida)
             return Ok(new
             {
                 isSuccess = true,
-                message = "Login exitoso",
-                user = userContext
+                message = "Login exitoso"
             });
         }
 
-        /// <summary>Renueva tokens (usa refresh token cookie + comprobación CSRF double-submit).</summary>
+
+        /// <summary>Renueva tokens (usa refresh cookie + comprobación CSRF double-submit).</summary>
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh()
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Refresh(CancellationToken ct)
         {
             var refreshCookie = Request.Cookies[_cookieSettings.RefreshTokenName];
             if (string.IsNullOrWhiteSpace(refreshCookie))
                 return Unauthorized();
 
-            // Validar header CSRF
+            // Validación CSRF (double-submit: header debe igualar cookie)
             if (!Request.Headers.TryGetValue("X-XSRF-TOKEN", out var headerValue))
                 return Forbid();
 
@@ -97,13 +112,20 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
             var (newAccess, newRefresh) = await _tokenService.RefreshAsync(refreshCookie, remoteIp);
 
             var now = DateTime.UtcNow;
-            // Borrar antiguas cookies (usamos mismas opciones para garantizar eliminación)
+
+            // Eliminar cookies anteriores con las MISMAS opciones (path/domain/samesite) para asegurar borrado
             Response.Cookies.Delete(_cookieSettings.AccessTokenName, _cookieFactory.AccessCookieOptions(now));
             Response.Cookies.Delete(_cookieSettings.RefreshTokenName, _cookieFactory.RefreshCookieOptions(now));
 
-            Response.Cookies.Append(_cookieSettings.AccessTokenName, newAccess,
+            // Escribir nuevas
+            Response.Cookies.Append(
+                _cookieSettings.AccessTokenName,
+                newAccess,
                 _cookieFactory.AccessCookieOptions(now.AddMinutes(_jwt.AccessTokenExpirationMinutes)));
-            Response.Cookies.Append(_cookieSettings.RefreshTokenName, newRefresh,
+
+            Response.Cookies.Append(
+                _cookieSettings.RefreshTokenName,
+                newRefresh,
                 _cookieFactory.RefreshCookieOptions(now.AddDays(_jwt.RefreshTokenExpirationDays)));
 
             return Ok(new { isSuccess = true });
@@ -111,6 +133,8 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 
         /// <summary>Logout: revoca refresh token y borra cookies.</summary>
         [HttpPost("logout")]
+        [AllowAnonymous] // puede hacerse sin estar autenticado si solo borra cookies
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
         {
             var refreshCookie = Request.Cookies[_cookieSettings.RefreshTokenName];
@@ -127,49 +151,49 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
             return Ok(new { message = "Sesión cerrada" });
         }
 
-
-
+        /// <summary>/me: retorna el contexto del usuario actual.</summary>
         [Authorize]
         [HttpGet("me")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                           ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            // Con la opción B del TokenBusiness, el identificador está en 'sub'
+            var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                   ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // fallback por si migras gradualmente
 
-            if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var userId))
                 return Unauthorized("Token inválido o expirado.");
 
             var currentUserDto = await _authService.BuildUserContextAsync(userId);
             return Ok(currentUserDto);
         }
 
+        /// <summary>Revoca el refresh token actual (si existe) y elimina la cookie.</summary>
         [HttpPost("revoke-token")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RevokeToken()
         {
-            var refreshToken = Request.Cookies["refresh_token"];
-            if (string.IsNullOrEmpty(refreshToken))
-                return BadRequest(new { message = "No refresh token provided" });
+            var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenName];
+            if (string.IsNullOrWhiteSpace(refreshToken))
+                return BadRequest(new { message = "No hay refresh token" });
 
             await _tokenService.RevokeRefreshTokenAsync(refreshToken);
 
-            Response.Cookies.Delete("refresh_token", new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None
-            });
+            var now = DateTime.UtcNow;
+            Response.Cookies.Delete(_cookieSettings.RefreshTokenName, _cookieFactory.RefreshCookieOptions(now));
 
-            return Ok(new { message = "Refresh token revoked" });
+            return Ok(new { message = "Refresh token revocado" });
         }
 
-
         [HttpPost("recuperar/enviar-codigo")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> EnviarCodigoAsync([FromBody] RequestResetDto dto)
         {
             await _authService.RequestPasswordResetAsync(dto.Email);
@@ -177,10 +201,11 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
         }
 
         [HttpPost("recuperar/confirmar")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ConfirmarCodigo([FromBody] ConfirmResetDto dto)
         {
             await _authService.ResetPasswordAsync(dto);

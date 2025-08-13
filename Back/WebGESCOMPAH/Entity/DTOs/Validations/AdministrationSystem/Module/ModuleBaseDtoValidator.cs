@@ -3,7 +3,7 @@ using Entity.DTOs.Implements.AdministrationSystem.Module;
 
 namespace Entity.DTOs.Validations.AdministrationSystem.Module
 {
-    public abstract class ModuleBaseDtoValidator<T> : AbstractValidator<T> where T : ModuleBaseDto
+    public abstract class ModuleBaseDtoValidator<T> : AbstractValidator<T> where T : IModuleDto
     {
         public ModuleBaseDtoValidator()
         {

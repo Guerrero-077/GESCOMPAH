@@ -30,14 +30,14 @@ namespace WebGESCOMPAH.Controllers.Module.Persons
         }
      
 
-        protected override Task<bool> DeleteAsync(int id)
+        protected override async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _service.DeleteAsync(id);
         }
 
-        protected override Task<bool> DeleteLogicAsync(int id)
+        protected override async Task<bool> DeleteLogicAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _service.DeleteLogicAsync(id);
         }
 
 

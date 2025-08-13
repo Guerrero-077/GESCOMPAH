@@ -1,8 +1,12 @@
-﻿namespace Entity.DTOs.Implements.Business.Plaza
+﻿using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.Business.Plaza
 {
-    public class PlazaUpdateDto : PlazaBaseDto
+    public class PlazaUpdateDto : BaseDto, IPlazaDto
     {
-        public int Id { get; set; }
-        public bool Active { get; set; } // Indicates if the plaza is active
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public string Location { get; set; } = null!;
+        public int Capacity { get; set; }
     }
 }

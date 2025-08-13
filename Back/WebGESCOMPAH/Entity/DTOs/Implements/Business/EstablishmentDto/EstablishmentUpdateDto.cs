@@ -1,11 +1,11 @@
-﻿    using Entity.DTOs.Implements.Utilities.Images;
+﻿using Entity.DTOs.Base;
+using Entity.DTOs.Implements.Utilities.Images;
     using Microsoft.AspNetCore.Http;
 
 namespace Entity.DTOs.Implements.Business.EstablishmentDto
 {
-    public class EstablishmentUpdateDto
+    public class EstablishmentUpdateDto : BaseDto
     {
-        public int Id { get; set; }          // <-- requerido
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string Address { get; set; } = null!;

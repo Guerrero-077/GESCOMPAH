@@ -20,7 +20,7 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 
         protected override async Task AddAsync(UserCreateDto dto)
         {
-            await _service.CreateAsync(dto);
+            await _service.CreateUserAsync(dto);
         }
 
         protected override async Task<bool> DeleteAsync(int id)

@@ -18,11 +18,11 @@ namespace Entity.Infrastructure.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            //modelBuilder.Entity<User>()
-            // .HasOne(u => u.Person)
-            // .WithOne(p => p.User)
-            // .HasForeignKey<User>(u => u.PersonId)
-            // .OnDelete(DeleteBehavior.Cascade); // o Restrict si no quieres borrado en cascada
+            modelBuilder.Entity<User>()
+             .HasOne(u => u.Person)
+             .WithOne(p => p.User)
+             .HasForeignKey<User>(u => u.PersonId)
+             .OnDelete(DeleteBehavior.Cascade); // o Restrict si no quieres borrado en cascada
 
             modelBuilder.Entity<Images>(e =>
             {

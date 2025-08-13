@@ -3,7 +3,7 @@ using Entity.DTOs.Implements.Location.City;
 
 namespace Entity.DTOs.Validations.City
 {
-    public class CityUpdateDtoValidator : CityBaseDtoValidator<CityUpdateDto>
+    public class CityUpdateDtoValidator : AbstractValidator<CityUpdateDto>
     {
         public CityUpdateDtoValidator()
         {

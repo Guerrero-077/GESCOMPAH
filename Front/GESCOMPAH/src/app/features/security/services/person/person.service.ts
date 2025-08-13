@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
-import { Person } from '../../models/user.models';
+import { Person, PersonCreate, PersonUpdate } from '../../models/person.models';
 
 @Injectable({
   providedIn: 'root'
@@ -16,19 +16,15 @@ export class PersonService {
     return this.http.get<Person[]>(this.apiUrl);
   }
 
-  getPersonById(id: number): Observable<Person> {
-    return this.http.get<Person>(`${this.apiUrl}/${id}`);
+  createPerson(payload: PersonCreate): Observable<Person> {
+    return this.http.post<Person>(this.apiUrl, payload);
   }
 
-  createPerson(person: Person): Observable<Person> {
-    return this.http.post<Person>(this.apiUrl, person);
+  updatePerson(id: number, payload: PersonUpdate): Observable<Person> {
+    return this.http.put<Person>(`${this.apiUrl}/${id}`, payload);
   }
 
-  updatePerson(id: number, person: Person): Observable<Person> {
-    return this.http.put<Person>(`${this.apiUrl}/${id}`, person);
-  }
-
-  deletePerson(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  deletePerson(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

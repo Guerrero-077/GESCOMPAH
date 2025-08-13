@@ -18,5 +18,13 @@ namespace Data.Services.Persons
                 .Include(e => e.City)
                 .ToListAsync();
         }
+        public async Task<Person?> GetByIdWithCityAsync(int id)
+        {
+            return await _dbSet
+                .Include(p => p.City)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
     }
 }

@@ -3,7 +3,7 @@ using Entity.DTOs.Implements.Business.Plaza;
 
 namespace Entity.DTOs.Validations.Plaza
 {
-    public abstract class PlazaBaseDtoValidator<T> : AbstractValidator<T> where T : PlazaBaseDto
+    public abstract class PlazaBaseDtoValidator<T> : AbstractValidator<T> where T : IPlazaDto
     {
         public PlazaBaseDtoValidator()
         {

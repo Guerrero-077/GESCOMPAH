@@ -3,7 +3,7 @@ using Entity.DTOs.Implements.AdministrationSystem.Form;
 
 namespace Entity.DTOs.Validations.Form
 {
-    public abstract class FormBaseDtoValidator<T> : AbstractValidator<T> where T : FormBaseDto
+    public abstract class FormBaseDtoValidator<T> : AbstractValidator<T> where T : IFormDto
     {
         public FormBaseDtoValidator()
         {

@@ -17,9 +17,17 @@ export class ImageService {
     return this.http.get<ImageSelectDto[]>(`${this.baseUrl}/establishment/${id}`);
   }
 
+
+
+
   /** Eliminar varias imágenes a la vez mediante sus publicId */
   deleteImagesByPublicIds(publicIds: string[]): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/multiple`, { body: publicIds });
+  }
+
+  /** Eliminar lógicamente una imagen por su Id */
+  deleteImageById(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
   /** Eliminar lógicamente una imagen por su publicId */

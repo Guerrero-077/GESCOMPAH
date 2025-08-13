@@ -11,6 +11,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   // Si no hay perfil, redirige a la página de login, reemplazando la URL en el historial
-  router.navigate(['/Auth/login'], { replaceUrl: true });
+  router.navigate(['/auth/login'], { replaceUrl: true });
   return false;
 };

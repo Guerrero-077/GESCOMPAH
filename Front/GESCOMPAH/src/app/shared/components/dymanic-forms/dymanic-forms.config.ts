@@ -32,10 +32,11 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
   ],
   'FormModule': [
     { name: 'id', type: 'hidden', required: false },
-    { name: 'form', type: 'select', options: [], required: true },
-    { name: 'module', type: 'select', options: [], required: true },
-    //{name: 'active', type: 'checkbox', required: true}
+    { name: 'formId', type: 'select', options: [], required: true },
+    { name: 'moduleId', type: 'select', options: [], required: true },
+    // { name: 'active', type: 'checkbox', required: true }
   ],
+
   'Appointment': [
     { name: 'id', type: 'hidden', required: false },
     { name: 'fullName', type: 'text', required: true },
@@ -58,14 +59,13 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
     { name: 'active', type: 'checkbox', required: true }
   ],
   'Person': [
-    { name: 'Id', type: 'hidden', required: false },
-    { name: 'FirstName', type: 'text', required: true },
-    { name: 'LastName', type: 'text', required: true },
-    { name: 'Document', type: 'text', required: false },
-    { name: 'Address', type: 'text', required: false },
-    { name: 'Phone', type: 'text', required: true },
-    { name: 'Department', type: 'select', options: [], required: true },
-    { name: 'City', type: 'select', options: [], required: true }
+    { name: 'id', type: 'hidden', required: false },
+    { name: 'firstName', type: 'text', required: true },
+    { name: 'lastName', type: 'text', required: true },
+    { name: 'document', type: 'text', required: false },
+    { name: 'address', type: 'text', required: false },
+    { name: 'phone', type: 'text', required: true },
+    { name: 'cityId', type: 'select', required: true }
   ],
 
   'Permission': [
@@ -88,17 +88,16 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
     //{name: 'active', type: 'checkbox', required: true}
   ],
   'RolUser': [
-    { name: 'Id', type: 'hidden', required: false },
-    { name: 'Rol', type: 'select', options: [], required: true },
-    { name: 'User', type: 'select', options: [], required: true },
-    //{name: 'active', type: 'checkbox', required: true}
-  ],
-  'User': [
-    { name: 'Id', type: 'hidden', required: false },
-    { name: 'Email', type: 'text', required: true },
-    { name: 'Password', type: 'text', required: true },
-    { name: 'personId', type: 'select', required: true },
-    { name: 'roleIds', type: 'select', required: true, multiple: true },
+    { name: 'id', type: 'hidden', required: false },
+    { name: 'userId', type: 'select', required: true },
+    { name: 'rolId', type: 'select', required: true },
+    { name: 'active', type: 'checkbox', required: true }
   ],
 
+  'User': [
+    { name: 'Id', type: 'hidden', required: false },
+    { name: 'email', type: 'text', required: true },
+    { name: 'password', type: 'text', required: true },
+    { name: 'personId', type: 'select', required: true }
+  ]
 }

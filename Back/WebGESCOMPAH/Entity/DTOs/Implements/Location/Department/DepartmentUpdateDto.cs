@@ -1,8 +1,9 @@
-﻿namespace Entity.DTOs.Implements.Location.Department
+﻿using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.Location.Department
 {
-    public class DepartmentUpdateDto
+    public class DepartmentUpdateDto : BaseDto
     {
-        public int Id { get; set; }
         public string Name { get; set; } = null!;
     }
 }

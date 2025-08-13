@@ -22,6 +22,8 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
     private readonly ILogger<EstablishmentService> _logger;
     private readonly ApplicationDbContext _context;
 
+    private const int MaxImages = 5;
+
     public EstablishmentService(
         IEstablishmentsRepository repo,
         IImagesRepository imagesRepo,
@@ -39,31 +41,26 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
 
     public override async Task<EstablishmentSelectDto> CreateAsync(EstablishmentCreateDto dto)
     {
-        if (dto.Files?.Count > 5)
-        {
-            _logger.LogWarning("Intento de crear establecimiento con más de 5 imágenes ({Count})", dto.Files.Count);
-            throw new BusinessException("Solo se permiten hasta 5 imágenes por establecimiento");
-        }
+        ValidateMaxImages(dto.Files?.Count ?? 0);
 
-        var entity = _mapper.Map<Establishment>(dto);
+        var entity = dto.Adapt<Establishment>();
 
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
             await _repo.AddAsync(entity);
-            await _context.SaveChangesAsync(); // Guarda para obtener Id
+            await _context.SaveChangesAsync();
 
             var images = await UploadAndMapImagesAsync(dto.Files, entity.Id);
-
             if (images.Any())
             {
                 await _imagesRepo.AddAsync(images);
-                await _context.SaveChangesAsync(); // Guarda imágenes
+                await _context.SaveChangesAsync();
             }
 
             await transaction.CommitAsync();
 
-            var result = _mapper.Map<EstablishmentSelectDto>(entity);
+            var result = entity.Adapt<EstablishmentSelectDto>();
             result.Images = images.Adapt<List<ImageSelectDto>>();
             return result;
         }
@@ -77,56 +74,34 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
 
     public override async Task<EstablishmentSelectDto> UpdateAsync(EstablishmentUpdateDto dto)
     {
-        var entity = await _repo.GetByIdAsync(dto.Id);
-        if (entity == null)
-            throw new NotFoundException("Establishment", $"No se encontró el establecimiento {dto.Id}");
+        var entity = await _repo.GetByIdAsync(dto.Id)
+            ?? throw new NotFoundException("Establishment", $"No se encontró el establecimiento {dto.Id}");
 
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            // Actualizar campos escalares
-            entity.Name = dto.Name ?? entity.Name;
-            entity.Description = dto.Description ?? entity.Description;
-            entity.AreaM2 = dto.AreaM2 != default ? dto.AreaM2 : entity.AreaM2;
-            entity.Address = dto.Address ?? entity.Address;
-            entity.RentValueBase = dto.RentValueBase != default ? dto.RentValueBase : entity.RentValueBase;
-            entity.PlazaId = dto.PlazaId != default ? dto.PlazaId : entity.PlazaId;
+            dto.Adapt(entity);
 
             await _repo.UpdateAsync(entity);
-            await _context.SaveChangesAsync();
 
-            if (dto.ImagesToDelete != null)
-            {
-                foreach (var publicId in dto.ImagesToDelete.Where(id => !string.IsNullOrWhiteSpace(id)))
-                {
-                    await _cloudinary.DeleteAsync(publicId);
-                    await _imagesRepo.DeleteLogicalByPublicIdAsync(publicId);
-                }
-                await _context.SaveChangesAsync();
-            }
+            if (dto.ImagesToDelete?.Any() == true)
+                await DeleteImagesAsync(dto.ImagesToDelete);
 
             if (dto.Images?.Any() == true)
             {
                 var validFiles = dto.Images.Where(f => f?.Length > 0).ToList();
 
-                var currentCount = await _imagesRepo.GetByEstablishmentIdAsync(dto.Id);
-                if (validFiles.Count + currentCount.Count > 5)
-                    throw new BusinessException($"Solo puede subir {5 - currentCount.Count} imágenes adicionales. Máximo 5 por establecimiento.");
+                var currentCount = (await _imagesRepo.GetByEstablishmentIdAsync(dto.Id)).Count;
+                ValidateMaxImages(validFiles.Count + currentCount, currentCount);
 
                 var newImages = await UploadAndMapImagesAsync(validFiles, entity.Id);
                 await _imagesRepo.AddAsync(newImages);
-                await _context.SaveChangesAsync();
             }
 
+            await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            var updated = await _repo.GetByIdAsync(dto.Id);
-            var resultDto = _mapper.Map<EstablishmentSelectDto>(updated!);
-            resultDto.Images = updated!.Images
-                .Select(i => new ImageSelectDto(i.Id, i.FileName, i.FilePath, i.PublicId, i.EstablishmentId))
-                .ToList();
-
-            return resultDto;
+            return (await _repo.GetByIdAsync(dto.Id))!.Adapt<EstablishmentSelectDto>();
         }
         catch (Exception ex)
         {
@@ -148,24 +123,15 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var images = await _imagesRepo.GetByEstablishmentIdAsync(id);
-
-            foreach (var image in images)
-            {
-                await _cloudinary.DeleteAsync(image.PublicId);
-                await _imagesRepo.DeleteLogicalByPublicIdAsync(image.PublicId);
-            }
-            await _context.SaveChangesAsync();
-
+            await DeleteImagesAsync((await _imagesRepo.GetByEstablishmentIdAsync(id)).Select(i => i.PublicId).ToList());
             var deleted = await _repo.DeleteLogicAsync(id);
+
             await _context.SaveChangesAsync();
-
-            if (deleted)
-                _logger.LogInformation("Establecimiento eliminado con ID {Id}", id);
-            else
-                _logger.LogError("Error al eliminar establecimiento con ID {Id}", id);
-
             await transaction.CommitAsync();
+
+            _logger.LogInformation(deleted
+                ? "Establecimiento eliminado con ID {Id}"
+                : "Error al eliminar establecimiento con ID {Id}", id);
 
             return deleted;
         }
@@ -179,47 +145,49 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
 
     #region Helpers
 
+    private void ValidateMaxImages(int totalImages, int currentCount = 0)
+    {
+        if (totalImages > MaxImages || totalImages > (MaxImages - currentCount))
+            throw new BusinessException($"Solo se permiten hasta {MaxImages} imágenes por establecimiento. Actualmente: {currentCount}.");
+    }
+
+    private async Task DeleteImagesAsync(IEnumerable<string> publicIds)
+    {
+        foreach (var publicId in publicIds.Where(id => !string.IsNullOrWhiteSpace(id)))
+        {
+            await _cloudinary.DeleteAsync(publicId);
+            await _imagesRepo.DeleteLogicalByPublicIdAsync(publicId);
+        }
+    }
+
     private async Task<List<Images>> UploadAndMapImagesAsync(IEnumerable<IFormFile>? files, int establishmentId)
     {
         if (files == null || !files.Any())
             return new List<Images>();
 
-        var fileList = files.ToList();
-
-        // Limitar concurrencia para no saturar Cloudinary
         var semaphore = new SemaphoreSlim(3);
-
-        var uploadTasks = fileList.Select(async file =>
+        var uploadTasks = files.Select(async file =>
         {
             await semaphore.WaitAsync();
             try
             {
-                return await _cloudinary.UploadImageAsync(file, establishmentId);
+                var uploadResult = await _cloudinary.UploadImageAsync(file, establishmentId);
+                return new Images
+                {
+                    FileName = file.FileName,
+                    FilePath = uploadResult.SecureUrl.AbsoluteUri,
+                    PublicId = uploadResult.PublicId,
+                    EstablishmentId = establishmentId
+                };
             }
             finally
             {
                 semaphore.Release();
             }
-        }).ToList();
+        });
 
-        var uploadResults = await Task.WhenAll(uploadTasks);
-
-        var images = new List<Images>();
-
-        for (int i = 0; i < fileList.Count; i++)
-        {
-            images.Add(new Images
-            {
-                FileName = fileList[i].FileName,
-                FilePath = uploadResults[i].SecureUrl.AbsoluteUri,
-                PublicId = uploadResults[i].PublicId,
-                EstablishmentId = establishmentId
-            });
-        }
-
-        _logger.LogInformation("{Count} imágenes subidas para establecimiento ID {Id}",
-                               images.Count, establishmentId);
-       
+        var images = (await Task.WhenAll(uploadTasks)).ToList();
+        _logger.LogInformation("{Count} imágenes subidas para establecimiento ID {Id}", images.Count, establishmentId);
         return images;
     }
 
