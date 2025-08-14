@@ -12,5 +12,8 @@ namespace Business.Services.AdministrationSystem
         public FormService(IDataGeneric<Form> data, IMapper mapper) : base(data, mapper)
         {
         }
+        // Aquí defines la llave “única” de negocio
+        protected override IQueryable<Form>? ApplyUniquenessFilter(IQueryable<Form> query, Form candidate)
+            => query.Where(f => f.Name == candidate.Name);
     }
 }

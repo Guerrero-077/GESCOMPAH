@@ -12,6 +12,7 @@ import { PersonService } from '../../services/person/person.service';
 import { CityService } from '../../../setting/services/city/city.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PersonSelectModel } from '../../models/person.models';
+import { PersonStore } from '../../services/person/person.store';
 
 @Component({
   selector: 'app-person',
@@ -21,14 +22,14 @@ import { PersonSelectModel } from '../../models/person.models';
 })
 export class PersonComponent implements OnInit {
 
-  private readonly personService = inject(PersonService);
+  private readonly personStore = inject(PersonStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
   private readonly cityService = inject(CityService);
   private readonly sweetAllertService = inject(SweetAlertService);
 
 
-  persons: PersonSelectModel[] = [];
+  persons$ = this.personStore.persons$;
   columns: TableColumn<PersonSelectModel>[] = [];
 
   ngOnInit(): void {
@@ -41,14 +42,6 @@ export class PersonComponent implements OnInit {
       { key: 'phone', header: 'Teléfono' },
       { key: 'cityName', header: 'Ciudad' }
     ];
-    this.load();
-  }
-
-  load(): void {
-    this.personService.getAll().subscribe({
-      next: (data) => this.persons = data,
-      error: (err) => console.error('Error al cargar personas:', err)
-    });
   }
 
   // --- helpers ---
@@ -72,9 +65,8 @@ export class PersonComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.personService.update(row.id, result).subscribe({
+        this.personStore.update(row.id, result).subscribe({
           next: () => {
-            this.load()
             this.sweetAllertService.showNotification('Actualización Exitosa', 'Persona actualizada correctamente.', 'success');
           },
           error: err => {
@@ -100,9 +92,8 @@ export class PersonComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.personService.create(result).subscribe({
+        this.personStore.create(result).subscribe({
           next: () => {
-            this.load()
             this.sweetAllertService.showNotification('Creación Exitosa', 'Persona creada exitosamente.', 'success');
           },
           error: err => {
@@ -123,9 +114,8 @@ export class PersonComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.personService.deleteLogic(row.id).subscribe({
+      this.personStore.deleteLogic(row.id).subscribe({
         next: () => {
-          this.load()
           this.sweetAllertService.showNotification('Eliminación Exitosa', 'Persona eliminada exitosamente.', 'success');
         },
         error: err => {

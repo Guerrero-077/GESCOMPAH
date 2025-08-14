@@ -5,5 +5,7 @@ namespace Data.Interfaz.IDataImplemenent.SecurityAuthentication
 {
     public interface IRolFormPermissionRepository : IDataGeneric<RolFormPermission>
     {
+        Task<List<int>> GetUserIdsByRoleIdAsync(int roleId);
+
     }
 }

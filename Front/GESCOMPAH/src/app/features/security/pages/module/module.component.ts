@@ -7,19 +7,21 @@ import { ModuleService } from '../../services/module/module.service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { ModuleSelectModel, ModuleUpdateModel } from '../../models/module.models';
+import { ModuleStore } from '../../services/module/module.store';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-module',
-  imports: [GenericTableComponent],
+  imports: [GenericTableComponent, CommonModule],
   templateUrl: './module.component.html',
   styleUrl: './module.component.css'
 })
 export class ModuleComponent implements OnInit {
-  private readonly moduleService = inject(ModuleService);
+  private readonly moduleStore = inject(ModuleStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAllertService = inject(SweetAlertService);
 
-  Forms: ModuleSelectModel[] = [];
+  modules$ = this.moduleStore.modules$;
 
   columns: TableColumn<ModuleSelectModel>[] = [];
   selectedForm: any = null;
@@ -32,14 +34,6 @@ export class ModuleComponent implements OnInit {
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' }
     ];
-    this.load();
-  }
-
-  load() {
-    this.moduleService.getAll().subscribe({
-      next: (data) => (this.Forms = data),
-      error: (err) => console.error('Error al cargar módulos:', err)
-    });
   }
 
   onEdit(row: ModuleUpdateModel) {
@@ -54,10 +48,9 @@ export class ModuleComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const id = row.id;
-        this.moduleService.update(id, result).subscribe({
+        this.moduleStore.update(id, result).subscribe({
           next: () => {
             console.log('Módulo actualizado correctamente');
-            this.load();
             this.sweetAllertService.showNotification('Actualización Exitosa', 'Módulo actualizado exitosamente.', 'success');
           },
           error: err => {
@@ -78,10 +71,9 @@ export class ModuleComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.moduleService.deleteLogic(row.id).subscribe({
+      this.moduleStore.deleteLogic(row.id).subscribe({
         next: () => {
           console.log('Módulo eliminado correctamente');
-          this.load();
           this.sweetAllertService.showNotification('Eliminación Exitosa', 'Módulo eliminado exitosamente.', 'success');
         },
         error: err => {
@@ -103,8 +95,7 @@ export class ModuleComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.moduleService.create(result).subscribe(res => {
-          this.load();
+        this.moduleStore.create(result).subscribe(res => {
           this.sweetAllertService.showNotification('Creación Exitosa', 'Módulo creado exitosamente.', 'success');
         }, err => {
           console.error('Error creando el módulo:', err);

@@ -1,33 +1,47 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { FormService } from '../../services/form/form.service';
-import { RoleService } from '../../services/role/role.service';
-import { RolFormPermissionService } from '../../services/rol-form-permission/rol-form-permission.service';
-import { PermissionService } from '../../services/permission/permission.service';
-import { MatDialog } from '@angular/material/dialog';
-import { catchError, of, map, forkJoin } from 'rxjs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { combineLatest, take } from 'rxjs';
+
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
-import { TableColumn } from '../../../../shared/models/TableColumn.models';
+import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
-import { RolFormPermissionCreateModel, RolFormPermissionSelectModel, RolFormPermissionUpdateModel } from '../../models/rol-form-permission.models';
+
+import {
+  RolFormPermissionCreateModel,
+  RolFormPermissionSelectModel,
+  RolFormPermissionUpdateModel
+} from '../../models/rol-form-permission.models';
+
+import { FormStore } from '../../services/form/form.store';
+import { PermissionStore } from '../../services/permission/permission.store';
+import { RolFormPermissionStore } from '../../services/rol-form-permission/rol-form-permission.store';
+import { RoleStore } from '../../services/role/role.store';
+
+import { TableColumn } from '../../../../shared/models/TableColumn.models';
 
 @Component({
+  standalone: true,
   selector: 'app-rol-form-permission',
-  imports: [GenericTableComponent],
   templateUrl: './rol-form-permission.component.html',
-  styleUrl: './rol-form-permission.component.css'
+  styleUrl: './rol-form-permission.component.css',
+  imports: [
+    CommonModule,
+    GenericTableComponent,
+    MatDialogModule
+  ]
 })
 export class RolFormPermissionComponent implements OnInit {
-  private readonly rolFormPermissionService = inject(RolFormPermissionService);
-  private readonly rolService = inject(RoleService);
-  private readonly formService = inject(FormService);
-  private readonly permissionService = inject(PermissionService);
+  private readonly rolFormPermissionStore = inject(RolFormPermissionStore);
+  private readonly roleStore = inject(RoleStore);
+  private readonly formStore = inject(FormStore);
+  private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  items: RolFormPermissionSelectModel[] = [];
+  items$ = this.rolFormPermissionStore.rolFormPermissions$;
 
   columns: TableColumn<RolFormPermissionSelectModel>[] = [
     { key: 'index', header: 'Nº', type: 'index' },
@@ -37,168 +51,124 @@ export class RolFormPermissionComponent implements OnInit {
     { key: 'active', header: 'Estado', type: 'boolean' }
   ];
 
-  ngOnInit(): void { this.load(); }
-
-  load(): void {
-    this.rolFormPermissionService.getAll().subscribe({
-      next: data => (this.items = data),
-      error: err => console.error('Error cargando RolFormPermission:', err)
-    });
+  ngOnInit(): void {
+    this.roleStore.loadAll();
+    this.formStore.loadAll();
+    this.permissionStore.loadAll();
+    this.rolFormPermissionStore.loadAll();
   }
 
-  // --- helpers para selects ---
-  private getRolOptions$() {
-    return this.rolService.getAll().pipe(
-      catchError(() => of([])),
-      map((mods: any[]) => mods.map(m => ({ value: m.id, label: m.name ?? m.rolName ?? `Rol ${m.id}` })))
-    );
-  }
-  private getFormOptions$() {
-    return this.formService.getAll().pipe(
-      catchError(() => of([])),
-      map((forms: any[]) => forms.map(f => ({ value: f.id, label: f.name ?? f.formName ?? `Form ${f.id}` })))
-    );
-  }
-
-  private getPermissionOptions$() {
-    return this.permissionService.getAll().pipe(
-      catchError(() => of([])),
-      map((mods: any[]) => mods.map(m => ({ value: m.id, label: m.name ?? m.permissionName ?? `Permission ${m.id}` })))
-    );
-  }
-
-  // --- CREATE ---
   onCreateNew(): void {
-    forkJoin({
-      rolOpts: this.getRolOptions$(),
-      formOpts: this.getFormOptions$(),
-      permissionOpts: this.getPermissionOptions$()
-    }).subscribe(({ rolOpts, formOpts, permissionOpts }) => {
-      if (!rolOpts.length || !formOpts.length || !permissionOpts.length) {
-        console.error('No hay opciones disponibles para Form/Module');
-        return;
-      }
-
-      const initial: { rolId: number; formId: number; permissionId: number; active: boolean } = {
-        rolId: rolOpts[0].value,
-        formId: formOpts[0].value,
-        permissionId: permissionOpts[0].value,
-        active: true
-      };
-
-      const dialogRef = this.dialog.open(FormDialogComponent, {
-        width: '600px',
-        data: {
-          entity: initial,
-          formType: 'RolFormPermission',
-          selectOptions: {
-            rolId: rolOpts,
-            formId: formOpts,
-            permissionId: permissionOpts
-          }
-        }
-      });
-
-      dialogRef.afterClosed().subscribe(async (result: any) => {
-        if (!result) return;
-
-        const payload: RolFormPermissionCreateModel = {
-          rolId: +result.rolId,
-          formId: +result.formId,
-          permissionId: +result.permissionId
-        };
-
-        this.rolFormPermissionService.create(payload).subscribe({
-          next: () => {
-            this.load();
-            this.sweetAlertService.showNotification('Creación Exitosa', 'La relación Rol-Formulario-Permiso ha sido creada.', 'success');
-          },
-          error: err => console.error('Error creando RolFormPermission:', err)
-        });
-      });
-    });
-  }
-
-  // --- EDIT ---
-  onEdit(row: RolFormPermissionSelectModel): void {
-    const id = row.id;
-
-    forkJoin({
-      rolOpts: this.getRolOptions$(),
-      formOpts: this.getFormOptions$(),
-      permissionOpts: this.getPermissionOptions$(),
-      current: this.rolFormPermissionService.getById(id)
-    })
-      .pipe(
-        map(({ rolOpts, formOpts, permissionOpts, current }) => {
-          const initial = {
-            id: current.id,
-            rolId: (current as any).rolId,
-            formId: (current as any).formId,
-            permissionId: (current as any).permissionId,
-            active: current.active
-          };
-          return { rolOpts, formOpts, permissionOpts, initial };
-        })
-      )
-      .subscribe(({ rolOpts, formOpts, permissionOpts, initial }) => {
-        if (!formOpts.length || !permissionOpts.length) {
-          console.error('No hay opciones disponibles para Form/Module');
-          return;
-        }
-
+    combineLatest([
+      this.roleStore.roles$,
+      this.formStore.forms$,
+      this.permissionStore.permissions$
+    ])
+      .pipe(take(1))
+      .subscribe(([roles, forms, permissions]) => {
         const dialogRef = this.dialog.open(FormDialogComponent, {
           width: '600px',
           data: {
-            entity: initial,
+            entity: { active: true },
             formType: 'RolFormPermission',
+            title: 'Nueva Asignación de Permisos',
             selectOptions: {
-              rolId: rolOpts,
-              formId: formOpts,
-              permissionId: permissionOpts
+              rolId: roles.map(r => ({ value: r.id, label: r.name })),
+              formId: forms.map(f => ({ value: f.id, label: f.name })),
+              permissionId: permissions.map(p => ({ value: p.id, label: p.name }))
             }
           }
         });
 
-        dialogRef.afterClosed().subscribe(async (result: any) => {
+        dialogRef.afterClosed().subscribe((result: any) => {
           if (!result) return;
 
-          const payload: RolFormPermissionUpdateModel = {
-            id,
+          const payload: RolFormPermissionCreateModel = {
             rolId: +result.rolId,
             formId: +result.formId,
             permissionId: +result.permissionId
           };
 
-          this.rolFormPermissionService.update(id, payload).subscribe({
+          this.rolFormPermissionStore.create(payload).subscribe({
             next: () => {
-              this.load();
-              this.sweetAlertService.showNotification('Actualización Exitosa', 'La relación Rol-Formulario-Permiso ha sido actualizada.', 'success');
+              this.sweetAlertService.showNotification('Creado', 'Relación creada con éxito.', 'success');
             },
-            error: err => console.error('Error actualizando RolFormPermission:', err)
+            error: err => {
+              console.error('Error creando:', err);
+              this.sweetAlertService.showNotification('Error', 'No se pudo crear.', 'error');
+            }
           });
         });
       });
   }
 
-  // --- DELETE ---
+  onEdit(row: RolFormPermissionSelectModel): void {
+    combineLatest([
+      this.roleStore.roles$,
+      this.formStore.forms$,
+      this.permissionStore.permissions$
+    ])
+      .pipe(take(1))
+      .subscribe(([roles, forms, permissions]) => {
+        const dialogRef = this.dialog.open(FormDialogComponent, {
+          width: '600px',
+          data: {
+            entity: row,
+            formType: 'RolFormPermission',
+            title: 'Editar Asignación de Permisos',
+            selectOptions: {
+              rolId: roles.map(r => ({ value: r.id, label: r.name })),
+              formId: forms.map(f => ({ value: f.id, label: f.name })),
+              permissionId: permissions.map(p => ({ value: p.id, label: p.name }))
+            }
+          }
+        });
+
+        dialogRef.afterClosed().subscribe((result: any) => {
+          if (!result) return;
+
+          const payload: RolFormPermissionUpdateModel = {
+            id: row.id,
+            rolId: +result.rolId,
+            formId: +result.formId,
+            permissionId: +result.permissionId
+          };
+
+          this.rolFormPermissionStore.update(payload).subscribe({
+            next: () => {
+              this.sweetAlertService.showNotification('Actualizado', 'Relación actualizada con éxito.', 'success');
+            },
+            error: err => {
+              console.error('Error actualizando:', err);
+              this.sweetAlertService.showNotification('Error', 'No se pudo actualizar.', 'error');
+            }
+          });
+        });
+      });
+  }
+
   async onDelete(row: RolFormPermissionSelectModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
-      title: 'Eliminar relación Form–Module',
-      text: `¿Eliminar el roL "${row.rolName}" del módulo "${row.formName} de ${row.permissionName}"?`,
+      title: 'Eliminar relación',
+      text: `¿Eliminar el rol "${row.rolName}" del formulario "${row.formName}" con permiso "${row.permissionName}"?`,
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar'
     });
 
     if (!confirmed) return;
 
-    this.rolFormPermissionService.deleteLogic(row.id).subscribe({
-      next: () => this.load(),
-      error: err => console.error('Error eliminando RolFormPermission:', err)
+    this.rolFormPermissionStore.deleteLogic(row.id).subscribe({
+      next: () => {
+        this.sweetAlertService.showNotification('Eliminado', 'Relación eliminada correctamente.', 'success');
+      },
+      error: err => {
+        console.error('Error eliminando:', err);
+        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar.', 'error');
+      }
     });
   }
 
   onView(row: RolFormPermissionSelectModel): void {
-    console.log('Detalle RolFormPermission:', row);
+    console.log('Vista detalle:', row);
   }
 }

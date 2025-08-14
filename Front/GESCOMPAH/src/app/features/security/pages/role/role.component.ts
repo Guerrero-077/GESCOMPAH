@@ -6,22 +6,24 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { RoleService } from '../../services/role/role.service';
-import { RoleSelectModel } from '../../models/role.models';
+import { RoleSelectModel, RoleUpdateModel } from '../../models/role.models';
+import { RoleStore } from '../../services/role/role.store';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-role',
-  imports: [GenericTableComponent],
+  imports: [GenericTableComponent, CommonModule],
   templateUrl: './role.component.html',
-  styleUrl: './role.component.css'
+  styleUrl: './role.component.css',
+  
 })
 export class RoleComponent implements OnInit {
 
-
-  private readonly rolService = inject(RoleService);
+  private readonly roleStore = inject(RoleStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  rols: RoleSelectModel[] = [];
+  roles$ = this.roleStore.roles$;
 
   columns: TableColumn<RoleSelectModel>[] = [];
   selectedForm: any = null;
@@ -33,25 +35,8 @@ export class RoleComponent implements OnInit {
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
-      { key: 'active', header: 'Active' }
+      { key: 'active', header: 'Active', type: 'boolean' }
     ];
-    this.load();
-  }
-
-  load() {
-    this.rolService.getAll().subscribe({
-      next: (data) => {
-        console.log("Roles desde el servicio:", data);
-        this.rols = data;
-      }
-    });
-
-    // this.rolService.getAllPruebas().subscribe({
-    //   next: (data) => (this.rols = data),
-    //   error: (err) => console.error('Error al cargar roles:', err)
-    // });
-
-
   }
 
   onEdit(row: RoleSelectModel) {
@@ -66,10 +51,9 @@ export class RoleComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const id = row.id;
-
-        this.rolService.update(id, result).subscribe({
+        const updateDto: RoleUpdateModel = { ...result, id };
+        this.roleStore.update(updateDto).subscribe({
           next: () => {
-            this.load();
             this.sweetAlertService.showNotification('Actualización Exitosa', 'Rol actualizado exitosamente.', 'success');
           },
           error: err => console.error('Error actualizando el rol:', err)
@@ -90,8 +74,7 @@ export class RoleComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.rolService.create(result).subscribe(res => {
-          this.load();
+        this.roleStore.create(result).subscribe(res => {
           this.sweetAlertService.showNotification('Creación Exitosa', 'Rol creado exitosamente.', 'success');
         }, err => {
           console.error('Error creando el rol:', err);
@@ -111,11 +94,10 @@ export class RoleComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.rolService.deleteLogic(row.id).subscribe({
+      this.roleStore.deleteLogic(row.id).subscribe({
         next: () => {
           console.log('Rol eliminado correctamente');
           {
-            this.load()
             this.sweetAlertService.showNotification('Eliminación Exitosa', 'Rol eliminado exitosamente.', 'success');
           };
         },

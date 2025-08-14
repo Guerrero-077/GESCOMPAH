@@ -3,24 +3,25 @@ import { GenericTableComponent } from "../../../../shared/components/generic-tab
 import { MatDialog } from '@angular/material/dialog';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { FormService } from '../../services/form/form.service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { FormSelectModel, FormUpdateModel } from '../../models/form.models';
+import { FormStore } from '../../services/form/form.store';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-form',
-  imports: [GenericTableComponent],
+  imports: [GenericTableComponent, CommonModule],
   templateUrl: './form.component.html',
-  styleUrl: './form.component.css'
+  styleUrl: './form.component.css',
+
 })
 export class FormComponent implements OnInit {
-  private readonly formService = inject(FormService);
+  private readonly formStore = inject(FormStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-
-  Forms: FormSelectModel[] = [];
+  forms$ = this.formStore.forms$;
   selectedForm: any = null;
 
   columns: TableColumn<FormSelectModel>[] = [];
@@ -33,20 +34,8 @@ export class FormComponent implements OnInit {
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
       { key: 'route', header: 'Route' },
-      { key: 'active', header: 'Active' }
+      { key: 'active', header: 'Active', type: 'boolean' }
     ];
-    this.load();
-  }
-
-  load() {
-    this.formService.getAll().subscribe({
-      next: (data) => (this.Forms = data),
-      error: (err) => console.error('Error al cargar formularios:', err)
-    })
-    // this.formService.getAllPruebas().subscribe({
-    //   next: (data) => (this.Forms = data),
-    //   error: (err) => console.error('Error al cargar formularios:', err)
-    // })
   }
 
   onEdit(row: FormUpdateModel) {
@@ -61,9 +50,9 @@ export class FormComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const id = row.id;
-        this.formService.update(id, result).subscribe({
+        const updateDto: FormUpdateModel = { ...result, id };
+        this.formStore.update(id, updateDto).subscribe({
           next: () => {
-            this.load();
             this.sweetAlertService.showNotification('Actualización Exitosa', 'Formulario actualizado exitosamente.', 'success');
           },
           error: err => {
@@ -74,8 +63,6 @@ export class FormComponent implements OnInit {
     });
   }
 
-
-
   async onDelete(row: FormSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar form',
@@ -85,10 +72,9 @@ export class FormComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.formService.deleteLogic(row.id).subscribe({
+      this.formStore.deleteLogic(row.id).subscribe({
         next: () => {
           this.sweetAlertService.showNotification('Eliminación Exitosa', 'Formulario eliminado exitosamente.', 'success');
-          this.load();
         },
         error: err => {
           console.error('Error eliminando el formulario:', err);
@@ -113,8 +99,7 @@ export class FormComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.formService.create(result).subscribe(res => {
-          this.load();
+        this.formStore.create(result).subscribe(res => {
           this.sweetAlertService.showNotification('Creación Exitosa', 'Formulario creado exitosamente.', 'success');
         }, err => {
           console.error('Error creando el formulario:', err);

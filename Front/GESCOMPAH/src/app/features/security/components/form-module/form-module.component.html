@@ -1,5 +1,5 @@
 <div class="row d-flex justify-content-center">
-    <app-generic-table [data]="items" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
+    <app-generic-table [data]="(formModules$ | async) || []" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
         (view)="onView($event)" (create)="onCreateNew()">
     </app-generic-table>
 

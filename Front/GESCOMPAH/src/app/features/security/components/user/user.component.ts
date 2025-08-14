@@ -12,7 +12,7 @@ import { catchError, map } from 'rxjs/operators';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { UserCreateModel, UserSelectModel, UserUpdateModel } from '../../models/user.models';
 import { PersonService } from '../../services/person/person.service';
-import { UserService } from '../../services/user/user.service';
+import { UserStore } from '../../services/user/user.store';
 
 @Component({
   selector: 'app-user',
@@ -21,14 +21,14 @@ import { UserService } from '../../services/user/user.service';
   styleUrl: './user.component.css'
 })
 export class UserComponent implements OnInit {
-  private readonly userService = inject(UserService);
+  private readonly userStore = inject(UserStore);
   private readonly personService = inject(PersonService);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
   private readonly sweetAlertService = inject(SweetAlertService);
 
 
-  users: UserSelectModel[] = [];
+  users$ = this.userStore.users$;
   columns: TableColumn<UserSelectModel>[] = [];
 
   ngOnInit(): void {
@@ -38,14 +38,6 @@ export class UserComponent implements OnInit {
       { key: 'email', header: 'Correo Electrónico' },
       { key: 'active', header: 'Estado' }
     ];
-    this.load();
-  }
-
-  load() {
-    this.userService.getAll().subscribe({
-      next: data => (this.users = data),
-      error: err => console.error('Error al cargar usuarios:', err)
-    });
   }
 
   // EDIT
@@ -71,10 +63,9 @@ export class UserComponent implements OnInit {
         email: (result.email ?? initial.email)?.trim(),
         ...(result.password ? { password: result.password } : {})
       };
-      this.userService.update(id, payload).subscribe(
+      this.userStore.update(id, payload).subscribe(
         {
           next: () => {
-            this.load();
             this.sweetAlertService.showNotification('Actualización Exitosa', 'Usuario actualizado exitosamente.', 'success');
           },
           error: err => {
@@ -116,10 +107,8 @@ export class UserComponent implements OnInit {
           password: result.password,
           personId: +result.personId
         };
-        this.userService.create(payload).subscribe({
+        this.userStore.create(payload).subscribe({
           next: () => {
-
-            this.load();
             this.sweetAlertService.showNotification('Creación Exitosa', 'Usuario creado exitosamente.', 'success');
           },
           error: err => {
@@ -141,9 +130,8 @@ export class UserComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.userService.deleteLogic(row.id).subscribe({
+      this.userStore.deleteLogic(row.id).subscribe({
         next: () => {
-          this.load()
           this.sweetAlertService.showNotification('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
         },
         error: err => {

@@ -1,34 +1,36 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { forkJoin, map, of, catchError } from 'rxjs';
+import { forkJoin, map, of, catchError, Observable, BehaviorSubject } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
-import { FormModuleService } from '../../services/form-module/form-module.service';
 import { FormService } from '../../services/form/form.service';
 import { ModuleService } from '../../services/module/module.service';
+import { FormModuleService } from '../../services/form-module/form-module.service';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
-import { FormModuleCreateModel, FormModuleSelectModel, FormModuleUpdateModel } from '../../models/form-module..models';
+import { FormModuleCreateModel, FormModuleSelectModel, FormModuleUpdateModel } from '../../models/form-module.model';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 @Component({
   selector: 'app-form-module',
   standalone: true,
-  imports: [GenericTableComponent],
+  imports: [GenericTableComponent, CommonModule],
   templateUrl: './form-module.component.html',
   styleUrl: './form-module.component.css'
 })
 export class FormModuleComponent implements OnInit {
-  private readonly formModuleService = inject(FormModuleService);
   private readonly formService = inject(FormService);
   private readonly moduleService = inject(ModuleService);
+  private readonly formModuleService = inject(FormModuleService);
   private readonly dialog = inject(MatDialog);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  items: FormModuleSelectModel[] = [];
+  private formModulesSubject = new BehaviorSubject<FormModuleSelectModel[]>([]);
+  formModules$ = this.formModulesSubject.asObservable();
 
   columns: TableColumn<FormModuleSelectModel>[] = [
     { key: 'index', header: 'Nº', type: 'index' },
@@ -37,24 +39,31 @@ export class FormModuleComponent implements OnInit {
     { key: 'active', header: 'Estado', type: 'boolean' }
   ];
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.loadFormModules();
+  }
 
-  load(): void {
+  private loadFormModules(): void {
     this.formModuleService.getAll().subscribe({
-      next: data => (this.items = data),
-      error: err => console.error('Error cargando FormModule:', err)
+      next: (data) => {
+        this.formModulesSubject.next(data as FormModuleSelectModel[]);
+      },
+      error: (err) => {
+        console.error('Error loading form modules:', err);
+        this.sweetAlertService.showNotification('Error', 'No se pudieron cargar las relaciones Form–Module.', 'error');
+      }
     });
   }
 
   // --- helpers para selects ---
-  private getFormOptions$() {
+  private getFormOptions$(): Observable<any[]> {
     return this.formService.getAll().pipe(
       catchError(() => of([])),
       map((forms: any[]) => forms.map(f => ({ value: f.id, label: f.name ?? f.formName ?? `Form ${f.id}` })))
     );
   }
 
-  private getModuleOptions$() {
+  private getModuleOptions$(): Observable<any[]> {
     return this.moduleService.getAll().pipe(
       catchError(() => of([])),
       map((mods: any[]) => mods.map(m => ({ value: m.id, label: m.name ?? m.moduleName ?? `Module ${m.id}` })))
@@ -69,6 +78,7 @@ export class FormModuleComponent implements OnInit {
     }).subscribe(({ formOpts, moduleOpts }) => {
       if (!formOpts.length || !moduleOpts.length) {
         console.error('No hay opciones disponibles para Form/Module');
+        this.sweetAlertService.showNotification('Advertencia', 'No hay opciones disponibles para Formularios o Módulos. Asegúrese de que existan.', 'warning');
         return;
       }
 
@@ -82,7 +92,7 @@ export class FormModuleComponent implements OnInit {
         width: '600px',
         data: {
           entity: initial,
-          formType: 'FormModule', // clave para tu DynamicForm
+          formType: 'FormModule',
           selectOptions: {
             formId: formOpts,
             moduleId: moduleOpts
@@ -93,7 +103,6 @@ export class FormModuleComponent implements OnInit {
       dialogRef.afterClosed().subscribe((result: any) => {
         if (!result) return;
 
-        // Normaliza el resultado del diálogo (depende de tu DynamicForm)
         const payload: FormModuleCreateModel = {
           formId: +result.formId,
           moduleId: +result.moduleId
@@ -101,9 +110,8 @@ export class FormModuleComponent implements OnInit {
 
         this.formModuleService.create(payload).subscribe({
           next: () => {
-
-            this.load(),
-              this.sweetAlertService.showNotification('Creación Exitosa', 'Relación Form–Module creada exitosamente.', 'success');
+            this.sweetAlertService.showNotification('Creación Exitosa', 'Relación Form–Module creada exitosamente.', 'success');
+            this.loadFormModules(); // Recargar la tabla
           },
           error: err => {
             console.error('Error creando FormModule:', err);
@@ -116,7 +124,6 @@ export class FormModuleComponent implements OnInit {
 
   // --- EDIT ---
   onEdit(row: FormModuleSelectModel): void {
-    // Necesitas el id del vínculo FormModule
     const id = row.id;
 
     forkJoin({
@@ -133,11 +140,17 @@ export class FormModuleComponent implements OnInit {
             active: current.active
           };
           return { formOpts, moduleOpts, initial };
+        }),
+        catchError(err => {
+          console.error('Error al obtener datos para edición:', err);
+          this.sweetAlertService.showNotification('Error', 'No se pudieron cargar los datos para editar la relación Form–Module.', 'error');
+          return of({ formOpts: [], moduleOpts: [], initial: {} as any }); // Return empty to prevent app crash
         })
       )
       .subscribe(({ formOpts, moduleOpts, initial }) => {
         if (!formOpts.length || !moduleOpts.length) {
           console.error('No hay opciones disponibles para Form/Module');
+          this.sweetAlertService.showNotification('Advertencia', 'No hay opciones disponibles para Formularios o Módulos. Asegúrese de que existan.', 'warning');
           return;
         }
 
@@ -164,8 +177,8 @@ export class FormModuleComponent implements OnInit {
 
           this.formModuleService.update(id, payload).subscribe({
             next: () => {
-              this.load(),
-                this.sweetAlertService.showNotification('Actualización Exitosa', 'Relación Form–Module actualizada exitosamente.', 'success');
+              this.sweetAlertService.showNotification('Actualización Exitosa', 'Relación Form–Module actualizada exitosamente.', 'success');
+              this.loadFormModules(); // Recargar la tabla
             },
             error: err => {
               console.error('Error actualizando FormModule:', err)
@@ -187,10 +200,10 @@ export class FormModuleComponent implements OnInit {
 
     if (!confirmed) return;
 
-    this.formModuleService.deleteLogic(row.id).subscribe({
+    this.formModuleService.delete(row.id).subscribe({
       next: () => {
-        this.load(),
-          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Relación Form–Module eliminada exitosamente.', 'success');
+        this.sweetAlertService.showNotification('Eliminación Exitosa', 'Relación Form–Module eliminada exitosamente.', 'success');
+        this.loadFormModules(); // Recargar la tabla
       },
       error: err => {
         console.error('Error eliminando FormModule:', err);

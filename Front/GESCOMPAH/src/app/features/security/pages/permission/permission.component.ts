@@ -7,19 +7,21 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PermissionService } from '../../services/permission/permission.service';
 import { PermissionSelectModel, PermissionUpdateModel } from '../../models/permission.models';
+import { PermissionStore } from '../../services/permission/permission.store';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-permission',
-  imports: [GenericTableComponent],
+  imports: [GenericTableComponent, CommonModule],
   templateUrl: './permission.component.html',
   styleUrl: './permission.component.css'
 })
 export class PermissionComponent implements OnInit {
-  private readonly permissionService = inject(PermissionService);
+  private readonly permissionStore = inject(PermissionStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  permissions: PermissionSelectModel[] = [];
+  permissions$ = this.permissionStore.permissions$;
 
   columns: TableColumn<PermissionSelectModel>[] = [];
   selectedForm: any = null;
@@ -31,23 +33,11 @@ export class PermissionComponent implements OnInit {
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
-      { key: 'active', header: 'Active' }
+      { key: 'active', header: 'Active', type: 'boolean' }
     ];
-    this.load();
   }
 
-  load() {
-    this.permissionService.getAll().subscribe({
-      next: (data) => (this.permissions = data),
-      error: (err) => console.error('Error:', err)
-    })
-    // this.permissionService.getAllPruebas().subscribe({
-    //   next: (data) => (this.permissions = data),
-    //   error: (err) => console.error('Error:', err)
-    // })
-  }
-
-  onEdit(row: PermissionUpdateModel) {
+  onEdit(row: PermissionSelectModel) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
@@ -57,18 +47,16 @@ export class PermissionComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.selectedForm = null;
       if (result) {
         const id = row.id;
-        this.permissionService.update( id, result).subscribe({
+        const updateDto: PermissionUpdateModel = { ...result, id };
+        this.permissionStore.update(updateDto).subscribe({
           next: () => {
-            console.log('permission actualizado correctamente');
-            this.load();
-            this.sweetAlertService.showNotification('Actualización Exitosa', 'Permission actualizado correctamente.', 'success');
+            this.sweetAlertService.showNotification('Actualización Exitosa', 'Permiso actualizado exitosamente.', 'success');
           },
-          error: err => {
-            console.error('Error actualizando el permission:', err)
-            this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el permission.', 'error');
+          error: (err: Error) => {
+            console.error('Error actualizando el permiso:', err);
+            this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el permiso.', 'error');
           }
         });
       }
@@ -80,45 +68,41 @@ export class PermissionComponent implements OnInit {
       width: '600px',
       data: {
         entity: {},
-        formType: 'Permission' // o 'User', 'Product', etc.
+        formType: 'Permission'
       }
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.permissionService.create(result).subscribe(res => {
-          this.load();
-          this.sweetAlertService.showNotification('Creación Exitosa', 'Permission creado exitosamente.', 'success');
-        }, err => {
-          console.error('Error creando el permission:', err);
-          this.sweetAlertService.showNotification('Error', 'No se pudo crear el permission.', 'error');
+        this.permissionStore.create(result).subscribe({
+          next: () => {
+            this.sweetAlertService.showNotification('Creación Exitosa', 'Permiso creado exitosamente.', 'success');
+          },
+          error: (err: Error) => {
+            console.error('Error creando el permiso:', err);
+            this.sweetAlertService.showNotification('Error', 'No se pudo crear el permiso.', 'error');
+          }
         });
       }
     });
   }
 
-
-
-
   async onDelete(row: PermissionSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
-      title: 'Eliminar permission',
-      text: `¿Deseas eliminar el permission "${row.name}"?`,
+      title: 'Eliminar permiso',
+      text: `¿Deseas eliminar el permiso "${row.name}"?`,
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
     });
 
     if (confirmed) {
-      this.permissionService.deleteLogic(row.id).subscribe({
+      this.permissionStore.deleteLogic(row.id).subscribe({
         next: () => {
-          console.log('Permission eliminado correctamente');
-          this.load();
-          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Permission eliminado exitosamente.', 'success');
+          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Permiso eliminado exitosamente.', 'success');
         },
-        error: err => {
-          console.error('Error eliminando el permission:', err)
-          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el permission.', 'error');
-
+        error: (err: Error) => {
+          console.error('Error al eliminar el permiso:', err);
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el permiso.', 'error');
         }
       });
     }

@@ -20,7 +20,7 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 
-                }, // Usuarios -> Administración
+                }, // Home -> DashBoard
                 new FormModule { 
                     Id = 2, 
                     FormId = 2, 
@@ -28,7 +28,7 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 
-                }, // Roles -> Administración
+                }, // Estblecimientos -> Establecimientos
                 new FormModule { 
                     Id = 3, 
                     FormId = 3, 
@@ -36,23 +36,57 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 
-                },  // Locales -> Locales
+                },  // Arrendatarios -> Arrendatarios
                 new FormModule { 
                     Id = 4, 
+                    FormId = 5, 
+                    ModuleId = 4,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                },  // Roles -> Security
+                new FormModule { 
+                    Id = 5, 
+                    FormId = 6, 
+                    ModuleId = 4,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                },  // forms -> Security
+                new FormModule { 
+                    Id = 6, 
+                    FormId = 7, 
+                    ModuleId = 4,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                },  // Modules -> Security
+                new FormModule { 
+                    Id = 7, 
+                    FormId = 8, 
+                    ModuleId = 4,  
+                    IsDeleted = false, 
+                    Active = true, 
+                    CreatedAt = seedDate 
+                },  // Permissions -> Security
+                new FormModule { 
+                    Id = 8, 
                     FormId = 4, 
                     ModuleId = 4,  
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 
-                },  // Locales -> Locales
+                },  // Modulo de seguridad -> Security
+
+
                 new FormModule { 
-                    Id = 5, 
-                    FormId = 5, 
+                    Id = 9, 
+                    FormId = 9, 
                     ModuleId = 5,  
                     IsDeleted = false, 
                     Active = true, 
                     CreatedAt = seedDate 
-                }  // Locales -> Locales
+                }  // Config -> Config
             );
         }
     }
