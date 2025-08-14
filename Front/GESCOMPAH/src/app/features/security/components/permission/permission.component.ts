@@ -1,12 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { MatDialog } from '@angular/material/dialog';
+import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { PermissionModule } from '../../models/permission.models';
-import { PermissionService } from '../../services/permission/permission.service';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { PermissionService } from '../../services/permission/permission.service';
+import { PermissionSelectModel, PermissionUpdateModel } from '../../models/permission.models';
 
 @Component({
   selector: 'app-permission',
@@ -19,9 +19,9 @@ export class PermissionComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  permissions: PermissionModule[] = [];
+  permissions: PermissionSelectModel[] = [];
 
-  columns: TableColumn<PermissionModule>[] = [];
+  columns: TableColumn<PermissionSelectModel>[] = [];
   selectedForm: any = null;
 
   constructor(private dialog: MatDialog) { }
@@ -37,7 +37,7 @@ export class PermissionComponent implements OnInit {
   }
 
   load() {
-    this.permissionService.getAll("permission").subscribe({
+    this.permissionService.getAll().subscribe({
       next: (data) => (this.permissions = data),
       error: (err) => console.error('Error:', err)
     })
@@ -47,7 +47,7 @@ export class PermissionComponent implements OnInit {
     // })
   }
 
-  onEdit(row: PermissionModule) {
+  onEdit(row: PermissionUpdateModel) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
@@ -60,7 +60,7 @@ export class PermissionComponent implements OnInit {
       this.selectedForm = null;
       if (result) {
         const id = row.id;
-        this.permissionService.Update("permission", id, result).subscribe({
+        this.permissionService.update( id, result).subscribe({
           next: () => {
             console.log('permission actualizado correctamente');
             this.load();
@@ -86,7 +86,7 @@ export class PermissionComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.permissionService.Add("permission", result).subscribe(res => {
+        this.permissionService.create(result).subscribe(res => {
           this.load();
           this.sweetAlertService.showNotification('Creación Exitosa', 'Permission creado exitosamente.', 'success');
         }, err => {
@@ -100,7 +100,7 @@ export class PermissionComponent implements OnInit {
 
 
 
-  async onDelete(row: PermissionModule) {
+  async onDelete(row: PermissionSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar permission',
       text: `¿Deseas eliminar el permission "${row.name}"?`,
@@ -109,7 +109,7 @@ export class PermissionComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.permissionService.DeleteLogical('Permission', row.id).subscribe({
+      this.permissionService.deleteLogic(row.id).subscribe({
         next: () => {
           console.log('Permission eliminado correctamente');
           this.load();
@@ -124,7 +124,7 @@ export class PermissionComponent implements OnInit {
     }
   }
 
-  onView(row: PermissionModule) {
+  onView(row: PermissionSelectModel) {
     console.log('Ver:', row);
   }
 

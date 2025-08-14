@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { TenantsModel } from '../../models/tenants.models';
 import { GenericService } from '../../../../core/service/generic/generic.service';
+import { TenantsCreateModel, TenantsSelectModel, TenantsUpdateModel } from '../../models/tenants.models';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TenantsService extends GenericService<TenantsModel> {
+export class TenantsService extends GenericService<TenantsSelectModel, TenantsCreateModel, TenantsUpdateModel> {
+  protected resource = 'person';
 
 }

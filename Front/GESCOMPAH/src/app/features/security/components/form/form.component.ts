@@ -3,10 +3,10 @@ import { GenericTableComponent } from "../../../../shared/components/generic-tab
 import { MatDialog } from '@angular/material/dialog';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { FormModule } from '../../models/form.models';
 import { FormService } from '../../services/form/form.service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { FormSelectModel, FormUpdateModel } from '../../models/form.models';
 
 @Component({
   selector: 'app-form',
@@ -20,10 +20,10 @@ export class FormComponent implements OnInit {
   private readonly sweetAlertService = inject(SweetAlertService);
 
 
-  Forms: FormModule[] = [];
+  Forms: FormSelectModel[] = [];
   selectedForm: any = null;
 
-  columns: TableColumn<FormModule>[] = [];
+  columns: TableColumn<FormSelectModel>[] = [];
 
   constructor(private dialog: MatDialog) { }
 
@@ -39,7 +39,7 @@ export class FormComponent implements OnInit {
   }
 
   load() {
-    this.formService.getAll("form").subscribe({
+    this.formService.getAll().subscribe({
       next: (data) => (this.Forms = data),
       error: (err) => console.error('Error al cargar formularios:', err)
     })
@@ -49,7 +49,7 @@ export class FormComponent implements OnInit {
     // })
   }
 
-  onEdit(row: FormModule) {
+  onEdit(row: FormUpdateModel) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
@@ -61,7 +61,7 @@ export class FormComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const id = row.id;
-        this.formService.Update("form", id, result).subscribe({
+        this.formService.update(id, result).subscribe({
           next: () => {
             this.load();
             this.sweetAlertService.showNotification('Actualización Exitosa', 'Formulario actualizado exitosamente.', 'success');
@@ -76,7 +76,7 @@ export class FormComponent implements OnInit {
 
 
 
-  async onDelete(row: FormModule) {
+  async onDelete(row: FormSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar form',
       text: `¿Deseas eliminar el form "${row.name}"?`,
@@ -85,7 +85,7 @@ export class FormComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.formService.DeleteLogical('Form', row.id).subscribe({
+      this.formService.deleteLogic(row.id).subscribe({
         next: () => {
           this.sweetAlertService.showNotification('Eliminación Exitosa', 'Formulario eliminado exitosamente.', 'success');
           this.load();
@@ -98,7 +98,7 @@ export class FormComponent implements OnInit {
     }
   }
 
-  onView(row: FormModule) {
+  onView(row: FormSelectModel) {
     console.log('Ver:', row);
   }
 
@@ -113,7 +113,7 @@ export class FormComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.formService.Add("form", result).subscribe(res => {
+        this.formService.create(result).subscribe(res => {
           this.load();
           this.sweetAlertService.showNotification('Creación Exitosa', 'Formulario creado exitosamente.', 'success');
         }, err => {

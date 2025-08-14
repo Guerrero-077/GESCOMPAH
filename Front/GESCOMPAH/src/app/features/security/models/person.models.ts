@@ -1,5 +1,5 @@
 // features/security/models/person.models.ts
-export interface Person {
+export interface PersonSelectModel {
   id: number;
   firstName: string;
   lastName: string;
@@ -9,7 +9,7 @@ export interface Person {
   cityName: string;   // viene desde SelectDto
 }
 
-export interface PersonCreate {
+export interface PersonCreateModel {
   firstName: string;
   lastName: string;
   document?: string;
@@ -18,4 +18,4 @@ export interface PersonCreate {
   cityId: number;
 }
 
-export interface PersonUpdate extends PersonCreate { }
+export interface PersonUpdateModel extends PersonCreateModel { }

@@ -3,7 +3,6 @@ import { FormService } from '../../services/form/form.service';
 import { RoleService } from '../../services/role/role.service';
 import { RolFormPermissionService } from '../../services/rol-form-permission/rol-form-permission.service';
 import { PermissionService } from '../../services/permission/permission.service';
-import { RolFormPermissionCreateDto, RolFormPermissionSelectDto, RolFormPermissionUpdateDto } from '../../models/rol-form-permission.models';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, of, map, forkJoin } from 'rxjs';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
@@ -11,6 +10,7 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { RolFormPermissionCreateModel, RolFormPermissionSelectModel, RolFormPermissionUpdateModel } from '../../models/rol-form-permission.models';
 
 @Component({
   selector: 'app-rol-form-permission',
@@ -27,9 +27,9 @@ export class RolFormPermissionComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  items: RolFormPermissionSelectDto[] = [];
+  items: RolFormPermissionSelectModel[] = [];
 
-  columns: TableColumn<RolFormPermissionSelectDto>[] = [
+  columns: TableColumn<RolFormPermissionSelectModel>[] = [
     { key: 'index', header: 'Nº', type: 'index' },
     { key: 'rolName', header: 'Rol' },
     { key: 'formName', header: 'Formulario' },
@@ -48,20 +48,20 @@ export class RolFormPermissionComponent implements OnInit {
 
   // --- helpers para selects ---
   private getRolOptions$() {
-    return this.rolService.getAll("rol").pipe(
+    return this.rolService.getAll().pipe(
       catchError(() => of([])),
       map((mods: any[]) => mods.map(m => ({ value: m.id, label: m.name ?? m.rolName ?? `Rol ${m.id}` })))
     );
   }
   private getFormOptions$() {
-    return this.formService.getAll("form").pipe(
+    return this.formService.getAll().pipe(
       catchError(() => of([])),
       map((forms: any[]) => forms.map(f => ({ value: f.id, label: f.name ?? f.formName ?? `Form ${f.id}` })))
     );
   }
 
   private getPermissionOptions$() {
-    return this.permissionService.getAll("permission").pipe(
+    return this.permissionService.getAll().pipe(
       catchError(() => of([])),
       map((mods: any[]) => mods.map(m => ({ value: m.id, label: m.name ?? m.permissionName ?? `Permission ${m.id}` })))
     );
@@ -102,7 +102,7 @@ export class RolFormPermissionComponent implements OnInit {
       dialogRef.afterClosed().subscribe(async (result: any) => {
         if (!result) return;
 
-        const payload: RolFormPermissionCreateDto = {
+        const payload: RolFormPermissionCreateModel = {
           rolId: +result.rolId,
           formId: +result.formId,
           permissionId: +result.permissionId
@@ -120,7 +120,7 @@ export class RolFormPermissionComponent implements OnInit {
   }
 
   // --- EDIT ---
-  onEdit(row: RolFormPermissionSelectDto): void {
+  onEdit(row: RolFormPermissionSelectModel): void {
     const id = row.id;
 
     forkJoin({
@@ -163,7 +163,7 @@ export class RolFormPermissionComponent implements OnInit {
         dialogRef.afterClosed().subscribe(async (result: any) => {
           if (!result) return;
 
-          const payload: RolFormPermissionUpdateDto = {
+          const payload: RolFormPermissionUpdateModel = {
             id,
             rolId: +result.rolId,
             formId: +result.formId,
@@ -182,7 +182,7 @@ export class RolFormPermissionComponent implements OnInit {
   }
 
   // --- DELETE ---
-  async onDelete(row: RolFormPermissionSelectDto): Promise<void> {
+  async onDelete(row: RolFormPermissionSelectModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar relación Form–Module',
       text: `¿Eliminar el roL "${row.rolName}" del módulo "${row.formName} de ${row.permissionName}"?`,
@@ -192,13 +192,13 @@ export class RolFormPermissionComponent implements OnInit {
 
     if (!confirmed) return;
 
-    this.rolFormPermissionService.deleteLogical(row.id).subscribe({
+    this.rolFormPermissionService.deleteLogic(row.id).subscribe({
       next: () => this.load(),
       error: err => console.error('Error eliminando RolFormPermission:', err)
     });
   }
 
-  onView(row: RolFormPermissionSelectDto): void {
+  onView(row: RolFormPermissionSelectModel): void {
     console.log('Detalle RolFormPermission:', row);
   }
 }

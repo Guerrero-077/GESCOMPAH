@@ -9,7 +9,7 @@ import { ModuleService } from '../../services/module/module.service';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
-import { FormModuleSelectDto, FormModuleCreateDto, FormModuleUpdateDto } from '../../models/form-module..models';
+import { FormModuleCreateModel, FormModuleSelectModel, FormModuleUpdateModel } from '../../models/form-module..models';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
@@ -28,9 +28,9 @@ export class FormModuleComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  items: FormModuleSelectDto[] = [];
+  items: FormModuleSelectModel[] = [];
 
-  columns: TableColumn<FormModuleSelectDto>[] = [
+  columns: TableColumn<FormModuleSelectModel>[] = [
     { key: 'index', header: 'Nº', type: 'index' },
     { key: 'formName', header: 'Formulario' },
     { key: 'moduleName', header: 'Módulo' },
@@ -48,14 +48,14 @@ export class FormModuleComponent implements OnInit {
 
   // --- helpers para selects ---
   private getFormOptions$() {
-    return this.formService.getAll("form").pipe(
+    return this.formService.getAll().pipe(
       catchError(() => of([])),
       map((forms: any[]) => forms.map(f => ({ value: f.id, label: f.name ?? f.formName ?? `Form ${f.id}` })))
     );
   }
 
   private getModuleOptions$() {
-    return this.moduleService.getAll("module").pipe(
+    return this.moduleService.getAll().pipe(
       catchError(() => of([])),
       map((mods: any[]) => mods.map(m => ({ value: m.id, label: m.name ?? m.moduleName ?? `Module ${m.id}` })))
     );
@@ -94,7 +94,7 @@ export class FormModuleComponent implements OnInit {
         if (!result) return;
 
         // Normaliza el resultado del diálogo (depende de tu DynamicForm)
-        const payload: FormModuleCreateDto = {
+        const payload: FormModuleCreateModel = {
           formId: +result.formId,
           moduleId: +result.moduleId
         };
@@ -115,7 +115,7 @@ export class FormModuleComponent implements OnInit {
   }
 
   // --- EDIT ---
-  onEdit(row: FormModuleSelectDto): void {
+  onEdit(row: FormModuleSelectModel): void {
     // Necesitas el id del vínculo FormModule
     const id = row.id;
 
@@ -156,7 +156,7 @@ export class FormModuleComponent implements OnInit {
         dialogRef.afterClosed().subscribe((result: any) => {
           if (!result) return;
 
-          const payload: FormModuleUpdateDto = {
+          const payload: FormModuleUpdateModel = {
             id,
             formId: +result.formId,
             moduleId: +result.moduleId
@@ -177,7 +177,7 @@ export class FormModuleComponent implements OnInit {
   }
 
   // --- DELETE ---
-  async onDelete(row: FormModuleSelectDto): Promise<void> {
+  async onDelete(row: FormModuleSelectModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar relación Form–Module',
       text: `¿Eliminar el formulario "${row.formName}" del módulo "${row.moduleName}"?`,
@@ -187,7 +187,7 @@ export class FormModuleComponent implements OnInit {
 
     if (!confirmed) return;
 
-    this.formModuleService.deleteLogical(row.id).subscribe({
+    this.formModuleService.deleteLogic(row.id).subscribe({
       next: () => {
         this.load(),
           this.sweetAlertService.showNotification('Eliminación Exitosa', 'Relación Form–Module eliminada exitosamente.', 'success');
@@ -199,7 +199,7 @@ export class FormModuleComponent implements OnInit {
     });
   }
 
-  onView(row: FormModuleSelectDto): void {
+  onView(row: FormModuleSelectModel): void {
     console.log('Detalle FormModule:', row);
   }
 }

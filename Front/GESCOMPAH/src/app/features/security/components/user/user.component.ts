@@ -1,18 +1,18 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
-import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 
-import { UserCreateDto, UserListDto, UserUpdatePayload } from '../../models/user.models';
-import { UserService } from '../../services/user/user.service';
-import { PersonService } from '../../services/person/person.service';
-import { catchError, map } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { UserCreateModel, UserSelectModel, UserUpdateModel } from '../../models/user.models';
+import { PersonService } from '../../services/person/person.service';
+import { UserService } from '../../services/user/user.service';
 
 @Component({
   selector: 'app-user',
@@ -28,8 +28,8 @@ export class UserComponent implements OnInit {
   private readonly sweetAlertService = inject(SweetAlertService);
 
 
-  users: UserListDto[] = [];
-  columns: TableColumn<UserListDto>[] = [];
+  users: UserSelectModel[] = [];
+  columns: TableColumn<UserSelectModel>[] = [];
 
   ngOnInit(): void {
     this.columns = [
@@ -42,14 +42,14 @@ export class UserComponent implements OnInit {
   }
 
   load() {
-    this.userService.getUsers().subscribe({
+    this.userService.getAll().subscribe({
       next: data => (this.users = data),
       error: err => console.error('Error al cargar usuarios:', err)
     });
   }
 
   // EDIT
-  onEdit(row: UserListDto) {
+  onEdit(row: UserSelectModel) {
     const id = row.id;
 
     const initial = {
@@ -67,11 +67,11 @@ export class UserComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (!result) return;
-      const payload: UserUpdatePayload = {
+      const payload: UserUpdateModel = {
         email: (result.email ?? initial.email)?.trim(),
         ...(result.password ? { password: result.password } : {})
       };
-      this.userService.updateUser(id, payload).subscribe(
+      this.userService.update(id, payload).subscribe(
         {
           next: () => {
             this.load();
@@ -88,13 +88,13 @@ export class UserComponent implements OnInit {
 
   // CREATE
   onCreateNew() {
-    this.personService.getPersons().pipe(
+    this.personService.getAll().pipe(
       catchError(() => of([])),
       map((persons: any[]) => persons.map(p => ({ value: p.id, label: `${p.firstName} ${p.lastName}` })))
     ).subscribe(people => {
       if (!people.length) { console.error('No hay personas disponibles'); return; }
 
-      const initial: UserCreateDto = {
+      const initial: UserCreateModel = {
         email: '',
         password: '',
         personId: people[0].value
@@ -111,12 +111,12 @@ export class UserComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe((result: any) => {
         if (!result) return;
-        const payload: UserCreateDto = {
+        const payload: UserCreateModel = {
           email: (result.email ?? '').trim(),
           password: result.password,
           personId: +result.personId
         };
-        this.userService.createUser(payload).subscribe({
+        this.userService.create(payload).subscribe({
           next: () => {
 
             this.load();
@@ -132,7 +132,7 @@ export class UserComponent implements OnInit {
 
 
   // DELETE
-  async onDelete(row: UserListDto) {
+  async onDelete(row: UserSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar Usuario',
       text: `¿Deseas eliminar al usuario "${row.personName}"?`,
@@ -141,7 +141,7 @@ export class UserComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.userService.deleteUser(row.id).subscribe({
+      this.userService.deleteLogic(row.id).subscribe({
         next: () => {
           this.load()
           this.sweetAlertService.showNotification('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
@@ -154,7 +154,7 @@ export class UserComponent implements OnInit {
     }
   }
 
-  onView(row: UserListDto) {
+  onView(row: UserSelectModel) {
     console.log('Ver usuario:', row);
   }
 

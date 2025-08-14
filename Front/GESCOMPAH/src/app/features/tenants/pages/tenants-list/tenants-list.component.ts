@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TenantsService } from '../../services/tenants/tenants.service';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { TenantsModel } from '../../models/tenants.models';
+import { TenantsSelectModel } from '../../models/tenants.models';
 
 @Component({
   selector: 'app-tenants-list',
@@ -12,9 +12,9 @@ import { TenantsModel } from '../../models/tenants.models';
 })
 export class TenantsListComponent implements OnInit {
   private readonly tenantsService = inject(TenantsService);
-  tenants: TenantsModel[] = [];
+  tenants: TenantsSelectModel[] = [];
 
-  columns: TableColumn < TenantsModel > [] =[];
+  columns: TableColumn < TenantsSelectModel > [] =[];
 
   ngOnInit(): void {
     this.columns = [
@@ -27,22 +27,22 @@ export class TenantsListComponent implements OnInit {
   }
 
   load() {
-    this.tenantsService.getAll("user").subscribe({
+    this.tenantsService.getAll().subscribe({
       next: (data) => (this.tenants = data),
       error: (err) => console.error('Error al cargar:', err)
     })
 
   }
 
-  onEdit(row: TenantsModel) {
+  onEdit(row: TenantsSelectModel) {
     console.log('Editar:', row);
   }
 
-  onDelete(row: TenantsModel) {
+  onDelete(row: TenantsSelectModel) {
     console.log('Eliminar:', row);
   }
 
-  onView(row: TenantsModel) {
+  onView(row: TenantsSelectModel) {
     console.log('Ver:', row);
   }
 

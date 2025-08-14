@@ -9,9 +9,9 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 
 import { PersonService } from '../../services/person/person.service';
-import { Person } from '../../models/person.models';
 import { CityService } from '../../../setting/services/city/city.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { PersonSelectModel } from '../../models/person.models';
 
 @Component({
   selector: 'app-person',
@@ -28,8 +28,8 @@ export class PersonComponent implements OnInit {
   private readonly sweetAllertService = inject(SweetAlertService);
 
 
-  persons: Person[] = [];
-  columns: TableColumn<Person>[] = [];
+  persons: PersonSelectModel[] = [];
+  columns: TableColumn<PersonSelectModel>[] = [];
 
   ngOnInit(): void {
     this.columns = [
@@ -45,7 +45,7 @@ export class PersonComponent implements OnInit {
   }
 
   load(): void {
-    this.personService.getPersons().subscribe({
+    this.personService.getAll().subscribe({
       next: (data) => this.persons = data,
       error: (err) => console.error('Error al cargar personas:', err)
     });
@@ -53,11 +53,11 @@ export class PersonComponent implements OnInit {
 
   // --- helpers ---
   private async getCityOptions() {
-    const cities = await firstValueFrom(this.cityService.getAll("city"));
+    const cities = await firstValueFrom(this.cityService.getAll());
     return cities.map((c: any) => ({ value: c.id, label: c.name }));
   }
 
-  async onEdit(row: Person) {
+  async onEdit(row: PersonSelectModel) {
     const cityOptions = await this.getCityOptions();
 
     // Si tu SelectDto aún no trae cityId, no habrá pre-selección (recomendado: incluirlo).
@@ -72,7 +72,7 @@ export class PersonComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.personService.updatePerson(row.id, result).subscribe({
+        this.personService.update(row.id, result).subscribe({
           next: () => {
             this.load()
             this.sweetAllertService.showNotification('Actualización Exitosa', 'Persona actualizada correctamente.', 'success');
@@ -92,7 +92,7 @@ export class PersonComponent implements OnInit {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
-        entity: {} as Person,
+        entity: {} as PersonSelectModel,
         formType: 'Person',
         selectOptions: { cityId: cityOptions }
       }
@@ -100,7 +100,7 @@ export class PersonComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.personService.createPerson(result).subscribe({
+        this.personService.create(result).subscribe({
           next: () => {
             this.load()
             this.sweetAllertService.showNotification('Creación Exitosa', 'Persona creada exitosamente.', 'success');
@@ -114,7 +114,7 @@ export class PersonComponent implements OnInit {
     });
   }
 
-  async onDelete(row: Person) {
+  async onDelete(row: PersonSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar Persona',
       text: `¿Deseas eliminar a "${row.firstName} ${row.lastName}"?`,
@@ -123,7 +123,7 @@ export class PersonComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.personService.deletePerson(row.id).subscribe({
+      this.personService.deleteLogic(row.id).subscribe({
         next: () => {
           this.load()
           this.sweetAllertService.showNotification('Eliminación Exitosa', 'Persona eliminada exitosamente.', 'success');
@@ -136,7 +136,7 @@ export class PersonComponent implements OnInit {
     }
   }
 
-  onView(row: Person) {
+  onView(row: PersonSelectModel) {
     console.log('Ver persona:', row);
   }
 }

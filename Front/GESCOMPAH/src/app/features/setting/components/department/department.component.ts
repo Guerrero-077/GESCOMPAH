@@ -1,15 +1,15 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { Observable } from 'rxjs';
+import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { DepartmentModel } from '../../models/department.models';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { DepartmentStore } from '../../services/department/department.store';
-import { Observable } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
-import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
+import { DepartmentSelectModel } from '../../models/department.models';
 
 
 @Component({
@@ -26,8 +26,8 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DepartmentComponent implements OnInit {
-  departments$: Observable<DepartmentModel[]>;
-  columns: TableColumn<DepartmentModel>[] = [
+  departments$: Observable<DepartmentSelectModel[]>;
+  columns: TableColumn<DepartmentSelectModel>[] = [
     { key: 'id', header: 'ID' },
     { key: 'name', header: 'Nombre' },
     { key: 'active', header: 'Activo', type: 'boolean' }
@@ -65,7 +65,7 @@ export class DepartmentComponent implements OnInit {
     });
   }
 
-  openEditDialog(row: DepartmentModel): void {
+  openEditDialog(row: DepartmentSelectModel): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '400px',
       data: {
@@ -85,7 +85,7 @@ export class DepartmentComponent implements OnInit {
     });
   }
 
-  handleDelete(row: DepartmentModel): void {
+  handleDelete(row: DepartmentSelectModel): void {
     if (row.id) {
       this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(result => {
         if (result.isConfirmed) {

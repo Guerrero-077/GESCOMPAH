@@ -59,7 +59,7 @@ export class DymanicFormsComponent implements OnInit {
     // Cargar opciones para selects
     this.fields.forEach(field => {
       if (field.name === 'departmentId' && this.formType === 'City') {
-        this.departmentService.getAll('Department').pipe(
+        this.departmentService.getAll().pipe(
           map(departments => departments.map((dep: any) => ({ value: dep.id, label: dep.name })))
         ).subscribe(options => { field.options = options; });
       } else if (field.type === 'select' && this.selectOptions[field.name]) {

@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { CityModel } from '../../models/city.models';
 import { CityStore } from '../../services/city/city.store';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
+import { CitySelectModel } from '../../models/city.models';
 
 
 @Component({
@@ -26,8 +26,8 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CityComponent implements OnInit {
-  cities$: Observable<CityModel[]>;
-  columns: TableColumn<CityModel>[] = [
+  cities$: Observable<CitySelectModel[]>;
+  columns: TableColumn<CitySelectModel>[] = [
     { key: 'id', header: 'ID' },
     { key: 'name', header: 'Nombre' },
     { key: 'departmentName', header: 'Departamento' },
@@ -66,7 +66,7 @@ export class CityComponent implements OnInit {
     });
   }
 
-  openEditDialog(row: CityModel): void {
+  openEditDialog(row: CitySelectModel): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '400px',
       data: {
@@ -86,7 +86,7 @@ export class CityComponent implements OnInit {
     });
   }
 
-  handleDelete(row: CityModel): void {
+  handleDelete(row: CitySelectModel): void {
     if (row.id) {
       this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(result => {
         if (result.isConfirmed) {

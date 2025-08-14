@@ -3,10 +3,10 @@ import { GenericTableComponent } from "../../../../shared/components/generic-tab
 import { MatDialog } from '@angular/material/dialog';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { ModulesModule } from '../../models/module.models';
 import { ModuleService } from '../../services/module/module.service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { ModuleSelectModel, ModuleUpdateModel } from '../../models/module.models';
 
 @Component({
   selector: 'app-module',
@@ -19,9 +19,9 @@ export class ModuleComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAllertService = inject(SweetAlertService);
 
-  Forms: ModulesModule[] = [];
+  Forms: ModuleSelectModel[] = [];
 
-  columns: TableColumn<ModulesModule>[] = [];
+  columns: TableColumn<ModuleSelectModel>[] = [];
   selectedForm: any = null;
 
   constructor(private dialog: MatDialog) { }
@@ -36,13 +36,13 @@ export class ModuleComponent implements OnInit {
   }
 
   load() {
-    this.moduleService.getAll('module').subscribe({
+    this.moduleService.getAll().subscribe({
       next: (data) => (this.Forms = data),
       error: (err) => console.error('Error al cargar módulos:', err)
     });
   }
 
-  onEdit(row: ModulesModule) {
+  onEdit(row: ModuleUpdateModel) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
@@ -54,7 +54,7 @@ export class ModuleComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const id = row.id;
-        this.moduleService.Update('module', id, result).subscribe({
+        this.moduleService.update(id, result).subscribe({
           next: () => {
             console.log('Módulo actualizado correctamente');
             this.load();
@@ -69,7 +69,7 @@ export class ModuleComponent implements OnInit {
     });
   }
 
-  async onDelete(row: ModulesModule) {
+  async onDelete(row: ModuleSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar módulo',
       text: `¿Deseas eliminar el módulo "${row.name}"?`,
@@ -78,7 +78,7 @@ export class ModuleComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.moduleService.DeleteLogical('Module', row.id).subscribe({
+      this.moduleService.deleteLogic(row.id).subscribe({
         next: () => {
           console.log('Módulo eliminado correctamente');
           this.load();
@@ -103,7 +103,7 @@ export class ModuleComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.moduleService.Add("Module", result).subscribe(res => {
+        this.moduleService.create(result).subscribe(res => {
           this.load();
           this.sweetAllertService.showNotification('Creación Exitosa', 'Módulo creado exitosamente.', 'success');
         }, err => {
@@ -115,7 +115,7 @@ export class ModuleComponent implements OnInit {
   }
 
 
-  onView(row: ModulesModule) {
+  onView(row: ModuleSelectModel) {
     console.log('Ver:', row);
   }
 }

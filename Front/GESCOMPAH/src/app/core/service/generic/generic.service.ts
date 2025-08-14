@@ -1,42 +1,52 @@
+// core/services/base-crud.service.ts
+import { inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment.development';
+// Ajusta este import a tu proyecto si no usas alias
+import { environment } from '../../../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class GenericService<T> { // Pendiente por agregar los demas Dtos
-  constructor(protected http: HttpClient) { }
-  urlBase = environment.apiURL + '/';
+export abstract class GenericService<
+  TModel,
+  TCreate = unknown,
+  TUpdate = Partial<TCreate>,
+  ID = number
+> {
+  protected readonly http = inject(HttpClient);
+  protected readonly baseUrl = (environment.apiURL as string).replace(/\/+$/, '');
+  protected abstract resource: string;
 
-
-  getAll(entidad: string): Observable<T[]> {
-    return this.http.get<T[]>(`${this.urlBase}${entidad}`);
+  protected url(...segments: (string | number | undefined)[]) {
+    const segs = [this.baseUrl, this.resource, ...segments.filter(s => s !== undefined && s !== '')];
+    return segs.join('/').replace(/([^:]\/)\/+/g, '$1');
   }
 
-  getById(entidad: string, id: number): Observable<T> {
-    // Previous implementation concatenated the id without a slash,
-    // producing URLs like `.../Entidad5` which are invalid.
-    // Ensure the id is separated by a `/` to match REST conventions.
-    return this.http.get<T>(`${this.urlBase}${entidad}/${id}`);
+  // GET api/{resource}
+  getAll(): Observable<TModel[]> {
+    return this.http.get<TModel[]>(this.url());
   }
 
-  Add(entidad: string, dto: T): Observable<T> {
-    return this.http.post<T>(`${this.urlBase}${entidad}`, dto);
+  // GET api/{resource}/{id}
+  getById(id: ID): Observable<TModel> {
+    return this.http.get<TModel>(this.url(id as any));
   }
 
-  Update(entidad: string, id: number, dto: T): Observable<T> {
-    return this.http.put<T>(`${this.urlBase}${entidad}/${id}`, dto);
+  // POST api/{resource}
+  create(dto: TCreate): Observable<TModel> {
+    return this.http.post<TModel>(this.url(), dto);
   }
 
-
-  Delete(entidad: string, id: number): Observable<T> {
-    return this.http.delete<T>(`${this.urlBase}${entidad}/${id}`);
+  // PUT api/{resource}/{id}
+  update(id: ID, dto: TUpdate): Observable<TModel> {
+    return this.http.put<TModel>(this.url(id as any), dto);
   }
 
-  DeleteLogical(entidad: string, id: number): Observable<T> {
-    const body = { isDeleted: true }; // o el campo que uses
-    return this.http.patch<T>(`${this.urlBase}${entidad}/${id}`, body);
+  // DELETE api/{resource}/{id}
+  delete(id: ID): Observable<void> {
+    return this.http.delete<void>(this.url(id as any));
+  }
+
+  // PATCH api/{resource}/{id}  (delete lógico SIN body)
+  deleteLogic(id: ID): Observable<void> {
+    return this.http.patch<void>(this.url(id as any), null);
   }
 }

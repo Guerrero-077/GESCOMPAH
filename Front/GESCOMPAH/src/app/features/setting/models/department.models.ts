@@ -1,4 +1,4 @@
-export interface DepartmentModel {
+export interface DepartmentSelectModel {
   id: number;
   name: string;
   active: boolean;

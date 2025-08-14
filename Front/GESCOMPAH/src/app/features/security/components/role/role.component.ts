@@ -1,12 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { MatDialog } from '@angular/material/dialog';
+import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { RoleModule } from '../../models/role.models';
-import { RoleService } from '../../services/role/role.service';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { RoleService } from '../../services/role/role.service';
+import { RoleSelectModel } from '../../models/role.models';
 
 @Component({
   selector: 'app-role',
@@ -21,9 +21,9 @@ export class RoleComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  rols: RoleModule[] = [];
+  rols: RoleSelectModel[] = [];
 
-  columns: TableColumn<RoleModule>[] = [];
+  columns: TableColumn<RoleSelectModel>[] = [];
   selectedForm: any = null;
 
   constructor(private dialog: MatDialog) { }
@@ -39,7 +39,7 @@ export class RoleComponent implements OnInit {
   }
 
   load() {
-    this.rolService.getAll("rol").subscribe({
+    this.rolService.getAll().subscribe({
       next: (data) => {
         console.log("Roles desde el servicio:", data);
         this.rols = data;
@@ -54,7 +54,7 @@ export class RoleComponent implements OnInit {
 
   }
 
-  onEdit(row: RoleModule) {
+  onEdit(row: RoleSelectModel) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
       data: {
@@ -67,7 +67,7 @@ export class RoleComponent implements OnInit {
       if (result) {
         const id = row.id;
 
-        this.rolService.Update("rol", id, result).subscribe({
+        this.rolService.update(id, result).subscribe({
           next: () => {
             this.load();
             this.sweetAlertService.showNotification('Actualización Exitosa', 'Rol actualizado exitosamente.', 'success');
@@ -90,7 +90,7 @@ export class RoleComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.rolService.Add("rol", result).subscribe(res => {
+        this.rolService.create(result).subscribe(res => {
           this.load();
           this.sweetAlertService.showNotification('Creación Exitosa', 'Rol creado exitosamente.', 'success');
         }, err => {
@@ -102,7 +102,7 @@ export class RoleComponent implements OnInit {
   }
 
 
-  async onDelete(row: RoleModule) {
+  async onDelete(row: RoleSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar rol',
       text: `¿Deseas eliminar el rol "${row.name}"?`,
@@ -111,7 +111,7 @@ export class RoleComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.rolService.DeleteLogical('Rol', row.id).subscribe({
+      this.rolService.deleteLogic(row.id).subscribe({
         next: () => {
           console.log('Rol eliminado correctamente');
           {
@@ -119,15 +119,15 @@ export class RoleComponent implements OnInit {
             this.sweetAlertService.showNotification('Eliminación Exitosa', 'Rol eliminado exitosamente.', 'success');
           };
         },
-        error: err => {
-          console.error('Error eliminando el rol:', err)
+        error: (err) => {
+          console.error('Error al eliminar el rol:', err);
           this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el rol.', 'error');
         }
       });
     }
   }
 
-  onView(row: RoleModule) {
+  onView(row: RoleSelectModel) {
     console.log('Ver:', row);
   }
 

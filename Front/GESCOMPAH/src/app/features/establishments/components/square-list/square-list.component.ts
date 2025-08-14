@@ -1,8 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { SquareModel } from '../../models/squares.models';
 import { SquareService } from '../../services/square/square.service';
+import { SquareSelectModel } from '../../models/squares.models';
 
 @Component({
   selector: 'app-square-list',
@@ -12,9 +12,9 @@ import { SquareService } from '../../services/square/square.service';
 })
 export class SquareListComponent implements OnInit {
   private readonly SquaresService = inject(SquareService);
-  Forms: SquareModel[] = [];
+  Forms: SquareSelectModel[] = [];
 
-  columns: TableColumn<SquareModel>[] = [];
+  columns: TableColumn<SquareSelectModel>[] = [];
 
   ngOnInit(): void {
     this.columns = [
@@ -29,21 +29,21 @@ export class SquareListComponent implements OnInit {
   }
 
   load() {
-    this.SquaresService.getAll("Plaza").subscribe({
+    this.SquaresService.getAll().subscribe({
       next: (data) => (this.Forms = data),
       error: (err) => console.error('Error al cargar formularios:', err)
     })
   }
 
-  onEdit(row: SquareModel) {
+  onEdit(row: SquareSelectModel) {
     console.log('Editar:', row);
   }
 
-  onDelete(row: SquareModel) {
+  onDelete(row: SquareSelectModel) {
     console.log('Eliminar:', row);
   }
 
-  onView(row: SquareModel) {
+  onView(row: SquareSelectModel) {
     console.log('Ver:', row);
   }
 
