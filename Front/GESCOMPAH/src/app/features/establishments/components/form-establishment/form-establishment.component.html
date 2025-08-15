@@ -1,152 +1,152 @@
 <mat-horizontal-stepper [linear]="true" #stepper>
-    <!-- Paso 1: Datos del establecimiento -->
-    <mat-step [stepControl]="generalGroup">
-        <form [formGroup]="generalGroup">
-            <ng-template matStepLabel>Datos del Local</ng-template>
+  <!-- Paso 1: Datos del establecimiento -->
+  <mat-step [stepControl]="generalGroup">
+    <form [formGroup]="generalGroup">
+      <ng-template matStepLabel>Datos del Local</ng-template>
 
-            <div class="info mb-4">
-                <h3>Información Básica del Local</h3>
-                <span>Ingrese la Información básica del nuevo local</span>
-            </div>
+      <div class="info mb-4">
+        <h3>Información Básica del Local</h3>
+        <span>Ingrese la Información básica del nuevo local</span>
+      </div>
 
-            <div class="d-flex">
-                <mat-form-field appearance="fill" class="w-100 me-3 mb-3">
-                    <mat-label>Nombre</mat-label>
-                    <input matInput formControlName="name" required>
-                    <mat-error *ngIf="generalGroup.get('name')?.hasError('required')">
-                        El nombre es obligatorio
-                    </mat-error>
-                </mat-form-field>
+      <div class="d-flex">
+        <mat-form-field appearance="outline" class="w-100 me-3 mb-3">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="name" required>
+          <mat-error *ngIf="generalGroup.get('name')?.hasError('required')">
+            El nombre es obligatorio
+          </mat-error>
+        </mat-form-field>
 
-                <mat-form-field appearance="fill" class="w-100 mb-3">
-                    <mat-label>Área (m²)</mat-label>
-                    <input matInput type="number" formControlName="areaM2" required min="0">
-                    <mat-error *ngIf="generalGroup.get('areaM2')?.hasError('required')">
-                        El área es obligatoria
-                    </mat-error>
-                    <mat-error *ngIf="generalGroup.get('areaM2')?.hasError('min')">
-                        El área no puede ser negativa
-                    </mat-error>
-                </mat-form-field>
-            </div>
+        <mat-form-field appearance="outline" class="w-100 mb-3">
+          <mat-label>Área (m²)</mat-label>
+          <input matInput type="number" formControlName="areaM2" required min="0">
+          <mat-error *ngIf="generalGroup.get('areaM2')?.hasError('required')">
+            El área es obligatoria
+          </mat-error>
+          <mat-error *ngIf="generalGroup.get('areaM2')?.hasError('min')">
+            El área no puede ser negativa
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-            <mat-form-field appearance="fill" class="w-100 mb-3">
-                <mat-label>Valor base de arriendo</mat-label>
-                <input matInput type="number" formControlName="rentValueBase" required min="0">
-                <mat-error *ngIf="generalGroup.get('rentValueBase')?.hasError('required')">
-                    El valor base es obligatorio
-                </mat-error>
-                <mat-error *ngIf="generalGroup.get('rentValueBase')?.hasError('min')">
-                    El valor no puede ser negativo
-                </mat-error>
-            </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100 mb-3">
+        <mat-label>Valor base de arriendo</mat-label>
+        <input matInput type="number" formControlName="rentValueBase" required min="0">
+        <mat-error *ngIf="generalGroup.get('rentValueBase')?.hasError('required')">
+          El valor base es obligatorio
+        </mat-error>
+        <mat-error *ngIf="generalGroup.get('rentValueBase')?.hasError('min')">
+          El valor no puede ser negativo
+        </mat-error>
+      </mat-form-field>
 
-            <mat-form-field appearance="fill" class="w-100 mb-3">
-                <mat-label>Descripción</mat-label>
-                <textarea matInput formControlName="description" required rows="3"></textarea>
-                <mat-error *ngIf="generalGroup.get('description')?.hasError('required')">
-                    La descripción es obligatoria
-                </mat-error>
-            </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100 mb-3">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="description" required rows="3"></textarea>
+        <mat-error *ngIf="generalGroup.get('description')?.hasError('required')">
+          La descripción es obligatoria
+        </mat-error>
+      </mat-form-field>
 
-            <div class="d-flex justify-content-end gap-2 mt-4">
-                <button mat-button matStepperNext [disabled]="generalGroup.invalid">Siguiente</button>
-            </div>
-        </form>
-    </mat-step>
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button mat-button matStepperNext [disabled]="generalGroup.invalid">Siguiente</button>
+      </div>
+    </form>
+  </mat-step>
 
-    <!-- Paso 2: Ubicación -->
-    <mat-step [stepControl]="ubicacionGroup">
-        <form [formGroup]="ubicacionGroup">
-            <ng-template matStepLabel>Ubicación</ng-template>
+  <!-- Paso 2: Ubicación -->
+  <mat-step [stepControl]="ubicacionGroup">
+    <form [formGroup]="ubicacionGroup">
+      <ng-template matStepLabel>Ubicación</ng-template>
 
-            <div class="info mb-4">
-                <h3>Ubicación del Local</h3>
-                <span>Seleccione la plaza y dirección del local</span>
-            </div>
+      <div class="info mb-4">
+        <h3>Ubicación del Local</h3>
+        <span>Seleccione la plaza y dirección del local</span>
+      </div>
 
-            <mat-form-field appearance="fill" class="w-100 mb-3">
-                <mat-label>Plaza</mat-label>
-                <mat-select formControlName="plazaId" required>
-                    <mat-option *ngFor="let plaza of Squares" [value]="plaza.id">
-                        {{ plaza.name }}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="ubicacionGroup.get('plazaId')?.hasError('required')">
-                    La plaza es obligatoria
-                </mat-error>
-            </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100 mb-3">
+        <mat-label>Plaza</mat-label>
+        <mat-select formControlName="plazaId" required>
+          <mat-option *ngFor="let plaza of Squares" [value]="plaza.id">
+            {{ plaza.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="ubicacionGroup.get('plazaId')?.hasError('required')">
+          La plaza es obligatoria
+        </mat-error>
+      </mat-form-field>
 
-            <mat-form-field appearance="fill" class="w-100 mb-3">
-                <mat-label>Dirección</mat-label>
-                <input matInput formControlName="address">
-            </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100 mb-3">
+        <mat-label>Dirección</mat-label>
+        <input matInput formControlName="address">
+      </mat-form-field>
 
-            <div class="d-flex justify-content-between mt-4">
-                <button mat-button matStepperPrevious>Anterior</button>
-                <button mat-button matStepperNext [disabled]="ubicacionGroup.invalid">Siguiente</button>
-            </div>
-        </form>
-    </mat-step>
+      <div class="d-flex justify-content-between mt-4">
+        <button mat-button matStepperPrevious>Anterior</button>
+        <button mat-button matStepperNext [disabled]="ubicacionGroup.invalid">Siguiente</button>
+      </div>
+    </form>
+  </mat-step>
 
-    <!-- Paso 3: Imágenes -->
-    <mat-step>
-        <ng-template matStepLabel>Imágenes</ng-template>
+  <!-- Paso 3: Imágenes -->
+  <mat-step>
+    <ng-template matStepLabel>Imágenes</ng-template>
 
-        <div class="info mb-4">
-            <h3>Imágenes del Local</h3>
-            <span>Suba imágenes del local (máximo 5)</span>
+    <div class="info mb-4">
+      <h3>Imágenes del Local</h3>
+      <span>Suba imágenes del local (máximo 5)</span>
+    </div>
+
+    <!-- Zona Drag & Drop -->
+    <div class="drop-zone" (dragover)="onDragOver($event)" (drop)="onFileDropped($event)"
+      (dragleave)="onDragLeave($event)" [class.dragover]="isDragging" (click)="fileInput.click()">
+      <mat-icon>cloud_upload</mat-icon>
+      <p>Arrastra imágenes aquí o haz clic para seleccionarlas</p>
+      <small>Formatos soportados: JPG, PNG (Máx. 5 imágenes)</small>
+      <input type="file" #fileInput (change)="handleFileInput($event)" accept="image/*" multiple hidden>
+    </div>
+
+    <!-- Contador -->
+    <div class="image-counter mt-2 mb-3">
+      <span class="counter-badge">{{ selectedFiles.length + existingImagesFull.length }}/5 imágenes</span>
+    </div>
+
+    <!-- Vista previa -->
+    <div class="compact-image-grid">
+
+      <!-- Imágenes existentes -->
+      <div class="compact-image-container" *ngFor="let img of existingImagesFull; let i = index">
+        <img [src]="img.filePath" alt="Imagen existente" class="compact-image">
+        <div class="compact-image-actions">
+          <button mat-icon-button color="warn" (click)="removeImage(i, true)" matTooltip="Eliminar">
+            <mat-icon class="compact-icon">delete</mat-icon>
+          </button>
         </div>
+        <span class="compact-image-label">Existente</span>
+      </div>
 
-        <!-- Zona Drag & Drop -->
-        <div class="drop-zone" (dragover)="onDragOver($event)" (drop)="onFileDropped($event)"
-            (dragleave)="onDragLeave($event)" [class.dragover]="isDragging" (click)="fileInput.click()">
-            <mat-icon>cloud_upload</mat-icon>
-            <p>Arrastra imágenes aquí o haz clic para seleccionarlas</p>
-            <small>Formatos soportados: JPG, PNG (Máx. 5 imágenes)</small>
-            <input type="file" #fileInput (change)="handleFileInput($event)" accept="image/*" multiple hidden>
+      <!-- Imágenes nuevas -->
+      <div class="compact-image-container" *ngFor="let imgPath of imagesPreview; let i = index">
+        <img [src]="imgPath" alt="Vista previa" class="compact-image">
+        <div class="compact-image-actions">
+          <button mat-icon-button color="warn" (click)="removeImage(i, false)" matTooltip="Eliminar">
+            <mat-icon class="compact-icon">delete</mat-icon>
+          </button>
         </div>
+        <span class="compact-image-label">Nueva</span>
+      </div>
 
-        <!-- Contador -->
-        <div class="image-counter mt-2 mb-3">
-            <span class="counter-badge">{{ selectedFiles.length + existingImagesFull.length }}/5 imágenes</span>
-        </div>
-
-        <!-- Vista previa -->
-        <div class="compact-image-grid">
-
-            <!-- Imágenes existentes -->
-            <div class="compact-image-container" *ngFor="let img of existingImagesFull; let i = index">
-                <img [src]="img.filePath" alt="Imagen existente" class="compact-image">
-                <div class="compact-image-actions">
-                    <button mat-icon-button color="warn" (click)="removeImage(i, true)" matTooltip="Eliminar">
-                        <mat-icon class="compact-icon">delete</mat-icon>
-                    </button>
-                </div>
-                <span class="compact-image-label">Existente</span>
-            </div>
-
-            <!-- Imágenes nuevas -->
-            <div class="compact-image-container" *ngFor="let imgPath of imagesPreview; let i = index">
-                <img [src]="imgPath" alt="Vista previa" class="compact-image">
-                <div class="compact-image-actions">
-                    <button mat-icon-button color="warn" (click)="removeImage(i, false)" matTooltip="Eliminar">
-                        <mat-icon class="compact-icon">delete</mat-icon>
-                    </button>
-                </div>
-                <span class="compact-image-label">Nueva</span>
-            </div>
-
-        </div>
+    </div>
 
 
-        <div class="d-flex justify-content-between mt-4">
-            <button mat-button matStepperPrevious>Anterior</button>
-            <button mat-raised-button color="primary" (click)="onSubmit()"
-                [disabled]="(selectedFiles.length + existingImagesFull.length) === 0 || isLoading">
-                <span *ngIf="!isLoading">{{ isEdit ? 'Actualizar' : 'Crear' }}</span>
-                <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-            </button>
-        </div>
-    </mat-step>
+    <div class="d-flex justify-content-between mt-4">
+      <button mat-button matStepperPrevious>Anterior</button>
+      <button mat-raised-button color="primary" (click)="onSubmit()"
+        [disabled]="(selectedFiles.length + existingImagesFull.length) === 0 || isLoading">
+        <span *ngIf="!isLoading">{{ isEdit ? 'Actualizar' : 'Crear' }}</span>
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      </button>
+    </div>
+  </mat-step>
 </mat-horizontal-stepper>

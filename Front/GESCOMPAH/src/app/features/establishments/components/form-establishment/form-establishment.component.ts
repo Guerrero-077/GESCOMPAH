@@ -86,8 +86,8 @@ export class FormEstablishmentComponent {
     this.generalGroup = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.maxLength(500)]],
-      rentValueBase: [0, [Validators.required, Validators.min(0)]],
-      areaM2: [0, [Validators.required, Validators.min(0)]],
+      rentValueBase: [0, [Validators.required, Validators.min(1)]],
+      areaM2: [0, [Validators.required, Validators.min(1)]],
     });
 
     this.ubicacionGroup = this.fb.group({

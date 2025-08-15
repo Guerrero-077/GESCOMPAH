@@ -1,5 +1,5 @@
 <div class="container">
-  <mat-horizontal-stepper [linear]="true">
+  <mat-horizontal-stepper class="card shadow p-4" [linear]="true">
 
     <!-- PASO 1: UBICACIÓN -->
     <mat-step [stepControl]="locationGroup">
@@ -10,9 +10,9 @@
           <span>Selecciona tu departamento y ciudad.</span>
         </div>
 
-        <mat-form-field appearance="fill" class="w-full">
+        <mat-form-field  appearance="outline" class="w-full">
           <mat-label>Departamento</mat-label>
-          <mat-select formControlName="departmentId" required>
+          <mat-select  formControlName="departmentId" required>
             <mat-option *ngFor="let d of (departments$ | async) ?? []" [value]="d.id">
               {{ d.name }}
             </mat-option>
@@ -22,7 +22,7 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="w-full">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Ciudad</mat-label>
           <mat-select formControlName="cityId" required>
             <mat-option *ngFor="let c of (cities$ | async) ?? []" [value]="c.id">
@@ -59,13 +59,13 @@
         </div>
 
         <div class="grid">
-          <mat-form-field appearance="fill" class="w-full">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Nombres</mat-label>
             <input matInput formControlName="firstName" required />
             <mat-error *ngIf="personGroup.get('firstName')?.hasError('required')">Requerido</mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" class="w-full">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Apellidos</mat-label>
             <input matInput formControlName="lastName" required />
             <mat-error *ngIf="personGroup.get('lastName')?.hasError('required')">Requerido</mat-error>
@@ -73,19 +73,19 @@
         </div>
 
         <div class="grid">
-          <mat-form-field appearance="fill" class="w-full">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Documento</mat-label>
             <input matInput formControlName="document" required />
             <mat-error *ngIf="personGroup.get('document')?.hasError('required')">Requerido</mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" class="w-full">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Teléfono</mat-label>
             <input matInput formControlName="phone" required />
             <mat-error *ngIf="personGroup.get('phone')?.hasError('required')">Requerido</mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" class="w-full">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Dirección</mat-label>
             <input matInput formControlName="address" required />
             <mat-error *ngIf="personGroup.get('address')?.hasError('required')">Requerido</mat-error>
@@ -110,7 +110,7 @@
           <span>Crea tu cuenta de usuario.</span>
         </div>
 
-        <mat-form-field appearance="fill" class="w-full">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Correo</mat-label>
           <input matInput type="email" formControlName="email" required />
           <mat-error *ngIf="accountGroup.get('email')?.hasError('email')">Correo inválido</mat-error>
@@ -118,13 +118,13 @@
         </mat-form-field>
 
         <div class="grid">
-          <mat-form-field appearance="fill" class="w-full">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Contraseña</mat-label>
             <input matInput type="password" formControlName="password" required />
             <mat-hint>Mín. 8 + mayús/minús/número/símbolo</mat-hint>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" class="w-full">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Confirmar contraseña</mat-label>
             <input matInput type="password" formControlName="confirmPassword" required />
             <mat-error *ngIf="accountGroup.hasError('passwordsMismatch')">
