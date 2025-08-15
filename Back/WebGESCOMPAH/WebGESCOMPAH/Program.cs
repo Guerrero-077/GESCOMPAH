@@ -10,9 +10,6 @@ using WebGESCOMPAH.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --------------------------
-// SERVICIOS (DI Container)
-// --------------------------
 
 // Controladores
 builder.Services.AddControllers();
@@ -47,6 +44,9 @@ builder.Services.AddSingleton(cloudinary);
 builder.Services.AddScoped<CloudinaryUtility>();
 
 
+
+var app = builder.Build();
+
 // --------------------------
 // MANEJO DE EXCEPCIONES
 // --------------------------
@@ -55,12 +55,12 @@ builder.Services.AddScoped<CloudinaryUtility>();
 
 // Registro del middleware como scoped
 
+// ✅ Middleware de excepciones (desde el contenedor de DI para evitar problemas de scope)
+app.UseMiddleware<ExceptionMiddleware>();
+
 // --------------------------
 // APP Y PIPELINE HTTP
 // --------------------------
-
-var app = builder.Build();
-
 // Swagger solo en desarrollo
 if (app.Environment.IsDevelopment())
 {
@@ -69,9 +69,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// ✅ Middleware de excepciones (desde el contenedor de DI para evitar problemas de scope)
-app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthentication();
 app.UseCors();

@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using WebGESCOMPAH.Middleware;
-using WebGESCOMPAH.Middleware.Handlers;
 
 public class ExceptionMiddleware : IMiddleware
 {
@@ -25,7 +24,7 @@ public class ExceptionMiddleware : IMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Excepción no manejada en la ruta: {Path}", context.Request.Path);
+            _logger.LogError(ex, "Excepción no manejada en {Path}", context.Request.Path);
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -34,10 +33,20 @@ public class ExceptionMiddleware : IMiddleware
     {
         context.Response.ContentType = "application/problem+json";
 
-        var handler = _handlers.FirstOrDefault(h => h.CanHandle(exception))
-                      ?? new DefaultExceptionHandler();
+        var handler = _handlers
+            .OrderBy(h => h.Priority)
+            .First(h => h.CanHandle(exception)); // siempre habrá al menos Default
 
-        var (problem, statusCode) = handler.Handle(exception, _env);
+        var (problem, statusCode) = handler.Handle(exception, _env, context);
+
+        // metadatos útiles
+        problem.Extensions ??= new Dictionary<string, object?>();
+        problem.Extensions["traceId"] = context.TraceIdentifier;
+        problem.Extensions["path"] = context.Request.Path.Value;
+        problem.Extensions["method"] = context.Request.Method;
+        if (context.Request.Headers.TryGetValue("X-Correlation-Id", out var corr))
+            problem.Extensions["correlationId"] = corr.ToString();
+
         context.Response.StatusCode = statusCode;
 
         var json = JsonSerializer.Serialize(problem, new JsonSerializerOptions

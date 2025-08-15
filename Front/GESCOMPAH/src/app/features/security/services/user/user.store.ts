@@ -64,4 +64,12 @@ export class UserStore {
       })
     );
   }
+
+  changeActiveStatus(id: number, active: boolean): Observable<UserSelectModel> {
+    return this.userService.changeActiveStatus(id, active).pipe(
+      tap(() => {
+        this.loadAll(); // Force refresh
+      })
+    );
+  }
 }

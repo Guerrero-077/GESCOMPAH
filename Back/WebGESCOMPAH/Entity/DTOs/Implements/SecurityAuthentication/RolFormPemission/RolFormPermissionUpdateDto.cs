@@ -9,5 +9,6 @@ namespace Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission
         public int FormId { get; set; }
 
         public int PermissionId { get; set; }
+        public bool Active { get; set; }
     }
 }

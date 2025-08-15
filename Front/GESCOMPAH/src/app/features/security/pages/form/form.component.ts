@@ -1,31 +1,36 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
+import { CommonModule } from '@angular/common';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { FormSelectModel, FormUpdateModel } from '../../models/form.models';
 import { FormStore } from '../../services/form/form.store';
-import { CommonModule } from '@angular/common';
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 
 @Component({
   selector: 'app-form',
-  imports: [GenericTableComponent, CommonModule],
+  imports: [GenericTableComponent, CommonModule, ToggleButtonComponent],
   templateUrl: './form.component.html',
   styleUrl: './form.component.css',
 
 })
 export class FormComponent implements OnInit {
+
+  // Dependencias inyectadas
   private readonly formStore = inject(FormStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
+  // Observable de formularios
   forms$ = this.formStore.forms$;
   selectedForm: any = null;
 
   columns: TableColumn<FormSelectModel>[] = [];
 
+  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -34,7 +39,12 @@ export class FormComponent implements OnInit {
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
       { key: 'route', header: 'Route' },
-      { key: 'active', header: 'Active', type: 'boolean' }
+      {
+        key: 'active',
+        header: 'Estado',
+        type: 'custom',           // tu GenericTable debe renderizar template cuando type === 'custom'
+        template: this.estadoTemplate
+      }
     ];
   }
 
@@ -109,4 +119,29 @@ export class FormComponent implements OnInit {
     });
   }
 
+  // ----- Toggle estado (activo/inactivo) -----
+  onToggleActive(row: FormSelectModel, e: { checked: boolean }) {
+    const previous = row.active;
+    row.active = e.checked;
+    this.formStore.changeActiveStatus(row.id, e.checked).subscribe({
+      next: (updated) => {
+        // sincronizar con lo que devuelve el backend
+        row.active = updated.active ?? row.active;
+        this.sweetAlertService.showNotification(
+          'Éxito',
+          `Formulario ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        // revertir si falla
+        row.active = previous;
+        this.sweetAlertService.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
+    });
+  }
 }

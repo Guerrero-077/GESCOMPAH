@@ -19,8 +19,8 @@ export class TenantsListComponent implements OnInit {
   ngOnInit(): void {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
-      { key: 'personName', header: 'Nombre' },
-      { key: 'email', header: 'Correo' },
+      { key: 'userEmail', header: 'Nombre' },
+      { key: 'rolName', header: 'Correo' },
       { key: 'active', header: 'Active' }
     ];
     this.load();
@@ -28,9 +28,14 @@ export class TenantsListComponent implements OnInit {
 
   load() {
     this.tenantsService.getAll().subscribe({
-      next: (data) => (this.tenants = data),
+      next: (data) => (
+        this.tenants = data,
+        console.log(data)
+      ),
       error: (err) => console.error('Error al cargar:', err)
     })
+
+
 
   }
 

@@ -6,23 +6,20 @@ namespace WebGESCOMPAH.Middleware.Handlers
 {
     public class EntityNotFoundExceptionHandler : IExceptionHandler
     {
-        public bool CanHandle(Exception exception) =>
-            exception is EntityNotFoundException;
+        public int Priority => 30;
+        public bool CanHandle(Exception exception) => exception is EntityNotFoundException;
 
-        public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env)
+        public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env, HttpContext http)
         {
-            var notFoundException = (EntityNotFoundException)exception;
-
             var statusCode = (int)HttpStatusCode.NotFound;
-
             var problem = new ProblemDetails
             {
                 Status = statusCode,
                 Title = "Recurso no encontrado.",
-                Detail = notFoundException.Message,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4"
+                Detail = exception.Message,
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
+                Instance = http.Request.Path
             };
-
             return (problem, statusCode);
         }
     }

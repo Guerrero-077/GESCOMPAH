@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { combineLatest, take } from 'rxjs';
 
@@ -32,7 +32,7 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
     MatDialogModule
   ]
 })
-export class RolFormPermissionComponent implements OnInit {
+export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   private readonly rolFormPermissionStore = inject(RolFormPermissionStore);
   private readonly roleStore = inject(RoleStore);
   private readonly formStore = inject(FormStore);
@@ -43,14 +43,27 @@ export class RolFormPermissionComponent implements OnInit {
 
   items$ = this.rolFormPermissionStore.rolFormPermissions$;
 
+
   columns: TableColumn<RolFormPermissionSelectModel>[] = [
     { key: 'index', header: 'Nº', type: 'index' },
     { key: 'rolName', header: 'Rol' },
     { key: 'formName', header: 'Formulario' },
-    { key: 'permissionName', header: 'Permisos' },
-    { key: 'active', header: 'Estado', type: 'boolean' }
+    { key: 'permissionName', header: 'Permisos' }
   ];
 
+  @ViewChild('estadoTemplate') estadoTemplate!: TemplateRef<any>;
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  ngAfterViewInit(): void {
+    // ahora sí podemos agregar la columna que usa el template
+    this.columns = [
+      ...this.columns,
+      { key: 'active', header: 'Estado', template: this.estadoTemplate } // 👈 clave del campo boolean
+    ];
+
+    // Si la tabla ya se renderizó, forzamos detección para que vea la nueva columna
+    this.cdr.detectChanges();
+  }
   ngOnInit(): void {
     this.roleStore.loadAll();
     this.formStore.loadAll();
@@ -102,7 +115,7 @@ export class RolFormPermissionComponent implements OnInit {
       });
   }
 
-  onEdit(row: RolFormPermissionSelectModel): void {
+  onEdit(row: RolFormPermissionUpdateModel): void {
     combineLatest([
       this.roleStore.roles$,
       this.formStore.forms$,
@@ -131,7 +144,8 @@ export class RolFormPermissionComponent implements OnInit {
             id: row.id,
             rolId: +result.rolId,
             formId: +result.formId,
-            permissionId: +result.permissionId
+            permissionId: +result.permissionId,
+            active: result.active !== undefined ? result.active : row.active // Mantener el estado actual si no se cambia
           };
 
           this.rolFormPermissionStore.update(payload).subscribe({

@@ -35,7 +35,15 @@ import { TableColumn } from '../../models/TableColumn.models';
 export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() data: T[] | null = null;
   @Input() columns: TableColumn<T>[] = [];
-  @Input() createButtonLabel = 'Crear';
+  @Input() createButtonLabel = '+ Crear';
+  @Input() titulo = 'Tabla Genérica';
+  @Input() subTitulo = 'Subtítulo de la tabla';
+
+  /** 👉 Botón de filtros (opcional y configurable) */
+  @Input() showFilterButton = true;                 // Mostrar/ocultar botón
+  @Input() filterParams: any = {};                  // Parámetros que provee el padre
+  @Input() filterTooltip: string = 'Filtros';       // Tooltip del botón
+  @Output() filterClick = new EventEmitter<any>();  // Evento al hacer clic en filtros
 
   @Output() edit = new EventEmitter<T>();
   @Output() delete = new EventEmitter<T>();
@@ -91,7 +99,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
 
       // si el paginator ya está, actualizar su length y pageIndex si es necesario
       if (this._paginator) {
-        // asegurar que pageIndex sea válido (ej: si la nueva data es más pequeña)
         const pageSize = this._paginator.pageSize || 5;
         const maxPageIndex = Math.max(0, Math.ceil(this.dataSource.data.length / pageSize) - 1);
         if (this._paginator.pageIndex > maxPageIndex) {
@@ -105,7 +112,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
       this.connectPaginator();
 
       // forzar que MatTableDataSource recalcule
-      // (método "privado" pero comúnmente usado)
       try { (this.dataSource as any)._updateChangeSubscription(); } catch { }
 
       // forzar CD para que Angular reevalúe la vista (importante cuando aparece paginator después)
@@ -114,7 +120,7 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   }
 
   ngAfterViewInit() {
-    // componentes present at view init will be connected by setters,
+    // componentes presentes al iniciar la vista se conectarán por setters,
     // pero por seguridad conectamos aquí también:
     this.connectSort();
     this.connectPaginator();
@@ -123,7 +129,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   private connectPaginator() {
     if (this._paginator) {
       this.dataSource.paginator = this._paginator;
-      // asegurar long actual
       this._paginator.length = this.dataSource.data.length;
     }
   }
@@ -136,6 +141,11 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
 
   onFilterChange(value: string) {
     this.filterSubject.next(value);
+  }
+
+  /** 👉 Click en el botón de filtros: emite al padre con los params actuales */
+  onFilterClick() {
+    this.filterClick.emit(this.filterParams);
   }
 
   get hasData(): boolean {

@@ -64,4 +64,12 @@ export class PermissionStore {
       })
     );
   }
+
+  changeActiveStatus(id: number, active: boolean): Observable<PermissionSelectModel> {
+    return this.permissionService.changeActiveStatus(id, active).pipe(
+      tap(() => {
+        this.loadAll(); // Force refresh
+      })
+    );
+  }
 }

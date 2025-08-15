@@ -51,12 +51,12 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
     { name: 'id', type: 'hidden', required: false },
     { name: 'name', type: 'text', required: true },
     { name: 'departmentId', type: 'select', required: true }, // Removed loadOptions
-    { name: 'active', type: 'checkbox', required: true }
+    // { name: 'active', type: 'checkbox', required: true }
   ],
   'Department': [
     { name: 'id', type: 'hidden', required: false },
     { name: 'name', type: 'text', required: true },
-    { name: 'active', type: 'checkbox', required: true }
+    // { name: 'active', type: 'checkbox', required: true }
   ],
   'Person': [
     { name: 'id', type: 'hidden', required: false },
@@ -85,14 +85,14 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
     { name: 'rolId', type: 'select', options: [], required: true },
     { name: 'formId', type: 'select', options: [], required: true },
     { name: 'permissionId', type: 'select', options: [], required: true },
-    { name: 'active', type: 'checkbox', required: true }
+    // { name: 'active', type: 'checkbox', required: true }
   ],
 
   'RolUser': [
     { name: 'id', type: 'hidden', required: false },
     { name: 'userId', type: 'select', required: true },
     { name: 'rolId', type: 'select', required: true },
-    { name: 'active', type: 'checkbox', required: true }
+    // { name: 'active', type: 'checkbox', required: true }
   ],
 
   'User': [

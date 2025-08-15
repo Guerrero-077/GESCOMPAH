@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { MatDialog } from '@angular/material/dialog';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
@@ -9,10 +9,11 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 import { ModuleSelectModel, ModuleUpdateModel } from '../../models/module.models';
 import { ModuleStore } from '../../services/module/module.store';
 import { CommonModule } from '@angular/common';
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 
 @Component({
   selector: 'app-module',
-  imports: [GenericTableComponent, CommonModule],
+  imports: [GenericTableComponent, CommonModule, ToggleButtonComponent],
   templateUrl: './module.component.html',
   styleUrl: './module.component.css'
 })
@@ -26,13 +27,23 @@ export class ModuleComponent implements OnInit {
   columns: TableColumn<ModuleSelectModel>[] = [];
   selectedForm: any = null;
 
-  constructor(private dialog: MatDialog) { }
+  // 👇 Capturamos el template del HTML
+  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
+
+  constructor(private dialog: MatDialog, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
-      { key: 'description', header: 'Descripción' }
+      { key: 'description', header: 'Descripción' },
+      { key: 'route', header: 'Route' },
+      {
+        key: 'active',
+        header: 'Estado',
+        type: 'custom',
+        template: this.estadoTemplate
+      }
     ];
   }
 
@@ -108,5 +119,31 @@ export class ModuleComponent implements OnInit {
 
   onView(row: ModuleSelectModel) {
     console.log('Ver:', row);
+  }
+
+  // ----- Toggle estado (activo/inactivo) -----
+  onToggleActive(row: ModuleSelectModel, e: { checked: boolean }) {
+    const previous = row.active;
+    row.active = e.checked;
+    this.moduleStore.changeActiveStatus(row.id, e.checked).subscribe({
+      next: (updated) => {
+        // sincronizar con lo que devuelve el backend
+        row.active = updated.active ?? row.active;
+        this.sweetAllertService.showNotification(
+          'Éxito',
+          `Modulo ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        // revertir si falla
+        row.active = previous;
+        this.sweetAllertService.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
+    });
   }
 }

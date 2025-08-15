@@ -1,21 +1,22 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSlideToggle } from "@angular/material/slide-toggle";
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
-import { RoleService } from '../../services/role/role.service';
 import { RoleSelectModel, RoleUpdateModel } from '../../models/role.models';
 import { RoleStore } from '../../services/role/role.store';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-role',
-  imports: [GenericTableComponent, CommonModule],
+  imports: [GenericTableComponent, CommonModule, ToggleButtonComponent],
   templateUrl: './role.component.html',
   styleUrl: './role.component.css',
-  
+
 })
 export class RoleComponent implements OnInit {
 
@@ -28,6 +29,8 @@ export class RoleComponent implements OnInit {
   columns: TableColumn<RoleSelectModel>[] = [];
   selectedForm: any = null;
 
+  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
+
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -35,7 +38,12 @@ export class RoleComponent implements OnInit {
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
-      { key: 'active', header: 'Active', type: 'boolean' }
+      {
+        key: 'active',
+        header: 'Estado',
+        type: 'custom',           // tu GenericTable debe renderizar template cuando type === 'custom'
+        template: this.estadoTemplate
+      }
     ];
   }
 
@@ -113,4 +121,33 @@ export class RoleComponent implements OnInit {
     console.log('Ver:', row);
   }
 
+
+  // ----- Toggle estado (activo/inactivo) -----
+  onToggleActive(row: RoleSelectModel, e: { checked: boolean }) {
+    const previous = row.active;
+    row.active = e.checked; // Optimistic UI
+
+    // Asegúrate de tener en tu UserStore un método:
+    // changeActiveStatus(id: number, active: boolean): Observable<UserSelectModel>
+    this.roleStore.changeActiveStatus(row.id, e.checked).subscribe({
+      next: (updated) => {
+        // sincronizar con lo que devuelve el backend
+        row.active = updated.active ?? row.active;
+        this.sweetAlertService.showNotification(
+          'Éxito',
+          `Rol ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        // revertir si falla
+        row.active = previous;
+        this.sweetAlertService.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
+    });
+  }
 }

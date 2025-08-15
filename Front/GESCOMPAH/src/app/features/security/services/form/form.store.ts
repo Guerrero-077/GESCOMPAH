@@ -64,4 +64,11 @@ export class FormStore {
       })
     );
   }
+  changeActiveStatus(id: number, active: boolean): Observable<FormSelectModel> {
+    return this.formService.changeActiveStatus(id, active).pipe(
+      tap(() => {
+        this.loadAll(); // Force refresh
+      })
+    );
+  }
 }

@@ -20,4 +20,6 @@ export interface RolFormPermissionUpdateModel {
   rolId: number;
   formId: number;
   permissionId: number;
+  active: boolean;
+
 }

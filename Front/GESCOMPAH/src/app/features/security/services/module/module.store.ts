@@ -64,4 +64,11 @@ export class ModuleStore {
       })
     );
   }
+  changeActiveStatus(id: number, active: boolean): Observable<ModuleSelectModel> {
+    return this.moduleService.changeActiveStatus(id, active).pipe(
+      tap(() => {
+        this.loadAll(); // Force refresh
+      })
+    );
+  }
 }

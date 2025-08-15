@@ -1,5 +1,6 @@
 ﻿using Data.Interfaz.DataBasic;
 using Entity.Domain.Models.ModelBase;
+using Entity.DTOs.Implements.Business.Plaza;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Utilities.Exceptions;
@@ -177,5 +178,21 @@ namespace Business.Repository
                 throw new BusinessException($"Error al eliminar lógicamente el registro con ID {id}.", ex);
             }
         }
+
+        public override async Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active)
+        {
+            var entity = await Data.GetByIdAsync(id);
+            if (entity == null)
+                throw new KeyNotFoundException($"No se encontró la plaza con ID {id}");
+
+            if (entity.Active != active)
+            {
+                entity.Active = active;
+                await Data.UpdateAsync(entity);
+            }
+
+            return _mapper.Map<TDtoGet>(entity);
+        }
+
     }
 }

@@ -47,6 +47,12 @@ export abstract class GenericService<
 
   // PATCH api/{resource}/{id}  (delete lógico SIN body)
   deleteLogic(id: ID): Observable<void> {
-    return this.http.patch<void>(this.url(id as any), null);
+    return this.http.patch<void>(`${this.url(id as any)}/soft-delete`, null);
+  }
+
+  /** PATCH /api/{resource}/{id}/estado  Body: { active: boolean }  -> devuelve TModel actualizado */
+  changeActiveStatus(id: ID, active: boolean): Observable<TModel> {
+    const body = { active };
+    return this.http.patch<TModel>(this.url(id as any, 'estado'), body);
   }
 }

@@ -10,39 +10,11 @@ using WebGESCOMPAH.Controllers.Base;
 [Produces("application/json")]
 
 
-public class RolController : BaseController<RolSelectDto, RolCreateDto, RolUpdateDto, IRolService>
+public class RolController : BaseController<RolSelectDto, RolCreateDto, RolUpdateDto>
 {
     public RolController(IRolService service, ILogger<RolController> logger) : base(service, logger)
     {
     }
 
-    protected override async Task AddAsync(RolCreateDto dto)
-    {
-        await _service.CreateAsync(dto);
-    }
 
-    protected override async Task<bool> DeleteAsync(int id)
-    {
-        return await _service.DeleteAsync(id);
-    }
-
-    protected override async Task<bool> DeleteLogicAsync(int id)
-    {
-        return await _service.DeleteLogicAsync(id);
-    }
-
-    protected override async Task<IEnumerable<RolSelectDto>> GetAllAsync()
-    {
-        return await _service.GetAllAsync();
-    }
-
-    protected override async Task<RolSelectDto?> GetByIdAsync(int id)
-    {
-        return await _service.GetByIdAsync(id);
-    }
-
-    protected override async Task<RolSelectDto> UpdateAsync(int id, RolUpdateDto dto)
-    {
-        return await _service.UpdateAsync(dto);
-    }
 }

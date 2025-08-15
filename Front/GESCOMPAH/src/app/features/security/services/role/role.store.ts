@@ -64,4 +64,12 @@ export class RoleStore {
       })
     );
   }
+
+  changeActiveStatus(id: number, active: boolean): Observable<RoleSelectModel> {
+    return this.roleService.changeActiveStatus(id, active).pipe(
+      tap(() => {
+        this.loadAll(); // Force refresh
+      })
+    );
+  }
 }

@@ -5,6 +5,8 @@
 
 
   <ng-template #estadoTemplate let-row>
-    <span class="badge badge-success">Activo</span>
+    <span class="badge" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+      {{ row.active ? 'Activo' : 'Inactivo' }}
+    </span>
   </ng-template>
 </div>

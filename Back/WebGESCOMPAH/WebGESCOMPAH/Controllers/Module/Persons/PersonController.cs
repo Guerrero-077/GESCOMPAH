@@ -9,42 +9,10 @@ namespace WebGESCOMPAH.Controllers.Module.Persons
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
-    public class PersonController : BaseController<PersonSelectDto, PersonDto, PersonUpdateDto, IPersonService>
+    public class PersonController : BaseController<PersonSelectDto, PersonDto, PersonUpdateDto>
     {
         public PersonController(IPersonService service, ILogger<PersonController> logger) : base(service, logger)
         {
-        }
-
-        protected override async Task<IEnumerable<PersonSelectDto>> GetAllAsync()
-        {
-            return await _service.GetAllAsync();
-        }
-
-        protected override async Task<PersonSelectDto?> GetByIdAsync(int id)
-        {
-            return await _service.GetByIdAsync(id);
-        }
-        protected override async Task AddAsync(PersonDto dto)
-        {
-            await _service.CreateAsync(dto);
-        }
-     
-
-        protected override async Task<bool> DeleteAsync(int id)
-        {
-            return await _service.DeleteAsync(id);
-        }
-
-        protected override async Task<bool> DeleteLogicAsync(int id)
-        {
-            return await _service.DeleteLogicAsync(id);
-        }
-
-
-
-        protected override async Task<PersonSelectDto> UpdateAsync(int id, PersonUpdateDto dto)
-        {
-            return await _service.UpdateAsync(dto);
         }
     }
 }

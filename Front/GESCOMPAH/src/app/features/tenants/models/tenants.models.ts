@@ -1,13 +1,13 @@
 export interface TenantsSelectModel {
-    personName: string;
-    email: string;
-    active: boolean;
+  personName: string;
+  email: string;
+  active: boolean;
 }
 export interface TenantsCreateModel {
-    email: string;
+  email: string;
 }
 export interface TenantsUpdateModel {
-    personId: number;
-    email: string;
-    active: boolean;
+  personId: number;
+  email: string;
+  active: boolean;
 }

@@ -1,9 +1,21 @@
 <div class="row d-flex justify-content-center">
-    <app-generic-table [data]="permissions$ | async" [columns]="columns" (edit)="onEdit($event)"
-        (delete)="onDelete($event)" (view)="onView($event)" (create)="onCreateNew()">
-    </app-generic-table>
+  <app-generic-table [data]="permissions$ | async" [columns]="columns" [titulo]="'Gestión de Permisos'"
+    [subTitulo]="'Administra los permisos del sistema'" [createButtonLabel]="'Nuevo Permiso'" (edit)="onEdit($event)"
+    (delete)="onDelete($event)" (view)="onView($event)" (create)="onCreateNew()">
+  </app-generic-table>
 
-    <ng-template #estadoTemplate let-row>
-        <span class="badge badge-success">Activo</span>
-    </ng-template>
+
+  <ng-template #estadoTemplate let-row>
+    <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
+      <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+        {{ row.active ? 'Activo' : 'Inactivo' }}
+      </span>
+
+      <app-toggle-button-component class="align-middle" [checked]="row.active"
+        (changed)="onToggleActive(row, { checked: $event })" [size]="20" [onColor]="'#16a34a'" [offColor]="'#ef4444'"
+        [thumb]="'#ffffff'">
+      </app-toggle-button-component>
+
+    </div>
+  </ng-template>
 </div>
