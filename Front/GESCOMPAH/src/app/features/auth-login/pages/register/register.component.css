@@ -1,0 +1,68 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.info {
+    margin-bottom: 1rem;
+}
+
+.info h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-color-black);
+}
+
+.info span {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+}
+
+.step-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.text-danger {
+    color: var(--danger-color);
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    text-align: right;
+}
+
+::ng-deep .mat-step-header .mat-step-icon-selected {
+    background-color: var(--primary-color) !important;
+    color: var(--text-color-black) !important;
+}
+
+::ng-deep .mat-step-header .mat-step-icon {
+    background-color: var(--primary-color) !important;
+    color: black !important;
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+    background-color: white !important;
+}
+
+::ng-deep .mat-raised-button.mat-primary {
+    background-color: var(--primary-color);
+    color: var(--text-color-black);
+}
+
+::ng-deep .mat-step-label {
+    color: #16A34A !important;
+}

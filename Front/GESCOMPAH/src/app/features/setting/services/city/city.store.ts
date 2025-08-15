@@ -32,6 +32,15 @@ export class CityStore {
       })
     ).subscribe();
   }
+  loadByDepartment(departmentId: number) {
+    this.cityService.getCitiesByDepartment(departmentId).pipe(
+      tap(data => this.cities = data),
+      catchError(err => {
+        console.error('Error loading cities by department', err);
+        return throwError(() => err);
+      })
+    ).subscribe();
+  }
 
   create(city: CityCreate): Observable<CitySelectModel> {
     return this.cityService.create(city).pipe(

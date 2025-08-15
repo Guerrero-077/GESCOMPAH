@@ -8,7 +8,7 @@ using WebGESCOMPAH.Controllers.Base;
 namespace WebGESCOMPAH.Controllers.Module.Locations
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class CityController : BaseController<CitySelectDto, CityCreateDto, CityUpdateDto>
     {
@@ -18,7 +18,7 @@ namespace WebGESCOMPAH.Controllers.Module.Locations
             _service = service;
         }
 
-        [HttpGet("Department/City/{id}")]
+        [HttpGet("CityWithDepartment/{id}")]
         //[ProducesResponseType(typeof(TDto), 200)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]

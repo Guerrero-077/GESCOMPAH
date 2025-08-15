@@ -5,7 +5,7 @@ namespace Entity.Domain.Models.Implements.Business
 {
     public class ContractTerms : BaseModel
     {
-        public Double ValueWwigts { get; set; }
+        public Double ValueWeights { get; set; }
         public Double ValueUVT { get; set; }
         public enum Frequency
         {
