@@ -13,9 +13,9 @@ namespace Business.Services.AdministrationSystem
           IFormMouduleService
     {
         private readonly IFormModuleRepository _repo;
-        private readonly IAuthService _auth;
+        private readonly IUserContextService _auth;
 
-        public FormModuleService(IFormModuleRepository data, IMapper mapper, IAuthService auth)
+        public FormModuleService(IFormModuleRepository data, IMapper mapper, IUserContextService auth)
             : base(data, mapper)
         {
             _repo = data;
@@ -32,7 +32,7 @@ namespace Business.Services.AdministrationSystem
 
             // Invalidar caché de usuarios que tengan permisos sobre ese form
             var userIds = await _repo.GetUserIdsByFormIdAsync(dto.FormId);
-            foreach (var uid in userIds) _auth.InvalidateUserCache(uid);
+            foreach (var uid in userIds) _auth.InvalidateCache(uid);
 
             return result;
         }
@@ -42,7 +42,7 @@ namespace Business.Services.AdministrationSystem
             var result = await base.UpdateAsync(dto);
 
             var userIds = await _repo.GetUserIdsByFormIdAsync(dto.FormId);
-            foreach (var uid in userIds) _auth.InvalidateUserCache(uid);
+            foreach (var uid in userIds) _auth.InvalidateCache(uid);
 
             return result;
         }
@@ -55,7 +55,7 @@ namespace Business.Services.AdministrationSystem
             if (ok && fm != null)
             {
                 var userIds = await _repo.GetUserIdsByFormIdAsync(fm.FormId);
-                foreach (var uid in userIds) _auth.InvalidateUserCache(uid);
+                foreach (var uid in userIds) _auth.InvalidateCache(uid);
             }
 
             return ok;

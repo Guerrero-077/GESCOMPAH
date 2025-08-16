@@ -51,6 +51,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IPasswordResetCodeRepository, PasswordResetCodeRepository>();
             //services.AddScoped<EncriptePassword>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUserContextService, UserContextService>();
 
             //Services
             services.AddScoped<IPersonService, PersonService>();

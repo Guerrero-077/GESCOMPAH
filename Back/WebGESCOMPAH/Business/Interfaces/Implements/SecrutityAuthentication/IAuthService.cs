@@ -10,6 +10,5 @@ namespace Business.Interfaces.Implements.SecrutityAuthentication
         Task RequestPasswordResetAsync(string email);   
         Task ResetPasswordAsync(ConfirmResetDto dto);
         Task<UserMeDto> BuildUserContextAsync(int userId);
-        void InvalidateUserCache(int userId);
     }
 }

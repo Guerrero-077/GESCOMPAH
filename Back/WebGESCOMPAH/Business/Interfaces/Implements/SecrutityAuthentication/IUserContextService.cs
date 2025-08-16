@@ -5,5 +5,6 @@ namespace Business.Interfaces.Implements.SecrutityAuthentication
     public interface IUserContextService
     {
         Task<UserMeDto> BuildUserContextAsync(int userId);
+        void InvalidateCache(int userId);
     }
 }

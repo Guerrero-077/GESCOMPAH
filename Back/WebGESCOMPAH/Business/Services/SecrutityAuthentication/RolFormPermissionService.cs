@@ -12,9 +12,9 @@ namespace Business.Services.SecrutityAuthentication
           IRolFormPermissionService
     {
         private readonly IRolFormPermissionRepository _repo;
-        private readonly IAuthService _auth;
+        private readonly IUserContextService _auth;
 
-        public RolFormPermissionService(IRolFormPermissionRepository data, IMapper mapper, IAuthService auth)
+        public RolFormPermissionService(IRolFormPermissionRepository data, IMapper mapper, IUserContextService auth)
             : base(data, mapper)
         {
             _repo = data;
@@ -27,7 +27,7 @@ namespace Business.Services.SecrutityAuthentication
 
             // Invalidar caché de los usuarios que tienen ese rol
             var userIds = await _repo.GetUserIdsByRoleIdAsync(dto.RolId);
-            foreach (var uid in userIds) _auth.InvalidateUserCache(uid);
+            foreach (var uid in userIds) _auth.InvalidateCache(uid);
 
             return result;
         }
@@ -37,7 +37,7 @@ namespace Business.Services.SecrutityAuthentication
             var result = await base.UpdateAsync(dto);
 
             var userIds = await _repo.GetUserIdsByRoleIdAsync(dto.RolId);
-            foreach (var uid in userIds) _auth.InvalidateUserCache(uid);
+            foreach (var uid in userIds) _auth.InvalidateCache(uid);
 
             return result;
         }
@@ -51,7 +51,7 @@ namespace Business.Services.SecrutityAuthentication
             if (ok && rfp != null)
             {
                 var userIds = await _repo.GetUserIdsByRoleIdAsync(rfp.RolId);
-                foreach (var uid in userIds) _auth.InvalidateUserCache(uid);
+                foreach (var uid in userIds) _auth.InvalidateCache(uid);
             }
 
             return ok;
