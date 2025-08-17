@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { RolFormPermissionSelectModel, RolFormPermissionCreateModel, RolFormPermissionUpdateModel } from '../../models/rol-form-permission.models';
+import { RolFormPermissionGroupedModel, RolFormPermissionSelectModel, RolFormPermissionCreateModel, RolFormPermissionUpdateModel } from '../../models/rol-form-permission.models';
 import { environment } from '../../../../../environments/environment';
 
 @Injectable({
@@ -16,6 +16,16 @@ export class RolFormPermissionService {
     const segs = [this.baseUrl, this.resource, ...segments.filter(s => s !== undefined && s !== '')];
     return segs.join('/').replace(/([^:]\/)\/+/g, '$1');
   }
+
+  // --- NUEVOS MÉTODOS ---
+  getAllGrouped(): Observable<RolFormPermissionGroupedModel[]> {
+    return this.http.get<RolFormPermissionGroupedModel[]>(this.url('grouped'));
+  }
+
+  deleteByGroup(rolId: number, formId: number): Observable<void> {
+    return this.http.delete<void>(this.url('group', rolId, formId));
+  }
+  // --- FIN DE NUEVOS MÉTODOS ---
 
   getAll(): Observable<RolFormPermissionSelectModel[]> {
     return this.http.get<RolFormPermissionSelectModel[]>(this.url());

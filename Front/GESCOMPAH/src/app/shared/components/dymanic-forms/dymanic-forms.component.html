@@ -1,33 +1,60 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="dynamic-form-container">
   <div *ngFor="let field of fields" class="form-field-wrapper">
-    <!-- Render the form field only if it's not of type 'hidden' -->
     <ng-container *ngIf="field.type !== 'hidden'">
-      <mat-form-field *ngIf="field.type !== 'checkbox'" appearance="outline" class="full-width">
-        <mat-label>{{ field.name | titlecase }}</mat-label>
+
+      <!-- Campos que NO son checkbox/checkbox-list, dentro de mat-form-field -->
+      <mat-form-field *ngIf="field.type !== 'checkbox' && field.type !== 'checkbox-list'" appearance="outline"
+        class="full-width">
+        <mat-label>{{ field.label ?? (field.name | titlecase) }}</mat-label>
+
         <ng-container [ngSwitch]="field.type">
           <input matInput *ngSwitchCase="'text'" [formControlName]="field.name"
             [type]="field.name === 'password' ? 'password' : 'text'" />
+
           <input matInput *ngSwitchCase="'date'" [formControlName]="field.name" type="date" />
 
-
           <mat-select *ngSwitchCase="'select'" [formControlName]="field.name" [multiple]="field.multiple"
-            [placeholder]="field.name | titlecase" [compareWith]="compareById">
-            <mat-option *ngFor="let opt of field.options" [value]="opt.value">{{ opt.label }}</mat-option>
+            [compareWith]="compareById">
+            <mat-option *ngFor="let opt of field.options" [value]="opt.value">
+              {{ opt.label }}
+            </mat-option>
           </mat-select>
-
 
           <textarea matInput cdkTextareaAutosize [cdkAutosizeMinRows]="3" [cdkAutosizeMaxRows]="8"
             *ngSwitchCase="'textarea'" [formControlName]="field.name"></textarea>
-
         </ng-container>
+
         <mat-error *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched">
-          {{ field.name | titlecase }} es requerido.
+          {{ field.label ?? (field.name | titlecase) }} es requerido.
         </mat-error>
       </mat-form-field>
 
-      <mat-slide-toggle *ngIf="field.type === 'checkbox'" [formControlName]="field.name" color="primary">
-        {{ field.name | titlecase }}
-      </mat-slide-toggle>
+      <!-- Checkbox BOOLEANO simple -->
+      <mat-checkbox *ngIf="field.type === 'checkbox'" [formControlName]="field.name" color="primary">
+        {{ field.label ?? (field.name | titlecase) }}
+      </mat-checkbox>
+      <mat-error *ngIf="field.type === 'checkbox' &&
+                        form.get(field.name)?.invalid &&
+                        form.get(field.name)?.touched">
+        {{ field.label ?? (field.name | titlecase) }} es requerido.
+      </mat-error>
+
+      <!-- Checkbox LIST (FormGroup con claves = ids) -->
+      <div *ngIf="field.type === 'checkbox-list'" class="checkbox-list-block">
+        <label class="mat-body-1">{{ field.label ?? (field.name | titlecase) }}</label>
+
+        <div [formGroupName]="field.name" class="checkbox-list">
+          <mat-checkbox *ngFor="let opt of field.options; trackBy: trackByOption" [formControlName]="opt.value">
+            {{ opt.label }}
+          </mat-checkbox>
+        </div>
+
+        <mat-error *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched">
+          Selecciona al menos una opción.
+        </mat-error>
+      </div>
+
     </ng-container>
   </div>
+
 </form>

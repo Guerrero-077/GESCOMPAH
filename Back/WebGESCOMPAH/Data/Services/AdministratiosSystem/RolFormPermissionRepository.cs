@@ -20,6 +20,13 @@ namespace Data.Services.AdministratiosSystem
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<RolFormPermission>> GetByRolAndFormAsync(int rolId, int formId)
+        {
+            return await _dbSet
+                .Where(e => e.RolId == rolId && e.FormId == formId && !e.IsDeleted)
+                .ToListAsync();
+        }
+
         public override async Task<RolFormPermission?> GetByIdAsync(int id)
         {
             return await _dbSet.AsNoTracking()

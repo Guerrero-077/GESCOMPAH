@@ -10,7 +10,7 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 
 import {
   RolFormPermissionCreateModel,
-  RolFormPermissionSelectModel,
+  RolFormPermissionGroupedModel, // <--- USAR EL MODELO AGRUPADO
   RolFormPermissionUpdateModel
 } from '../../models/rol-form-permission.models';
 
@@ -41,34 +41,41 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
+  // El store ahora debería devolver los items agrupados
   items$ = this.rolFormPermissionStore.rolFormPermissions$;
 
+  // ViewChild para las plantillas de la tabla
+  @ViewChild('permissionsTemplate') permissionsTemplate!: TemplateRef<any>;
+  @ViewChild('estadoTemplate') estadoTemplate!: TemplateRef<any>;
 
-  columns: TableColumn<RolFormPermissionSelectModel>[] = [
+  // Las columnas ahora se basan en el modelo agrupado
+  columns: TableColumn<RolFormPermissionGroupedModel>[] = [
     { key: 'index', header: 'Nº', type: 'index' },
     { key: 'rolName', header: 'Rol' },
     { key: 'formName', header: 'Formulario' },
-    { key: 'permissionName', header: 'Permisos' }
+    // La columna de permisos usará un template
+    { key: 'permissions', header: 'Permisos' }
   ];
 
-  @ViewChild('estadoTemplate') estadoTemplate!: TemplateRef<any>;
   constructor(private cdr: ChangeDetectorRef) { }
 
-  ngAfterViewInit(): void {
-    // ahora sí podemos agregar la columna que usa el template
-    this.columns = [
-      ...this.columns,
-      { key: 'active', header: 'Estado', template: this.estadoTemplate } // 👈 clave del campo boolean
-    ];
-
-    // Si la tabla ya se renderizó, forzamos detección para que vea la nueva columna
-    this.cdr.detectChanges();
-  }
   ngOnInit(): void {
+    // Cargar datos necesarios para los diálogos
     this.roleStore.loadAll();
     this.formStore.loadAll();
     this.permissionStore.loadAll();
+    // Esto debería llamar al endpoint /grouped
     this.rolFormPermissionStore.loadAll();
+  }
+
+  ngAfterViewInit(): void {
+    // Asignar los templates a las columnas después de que la vista se inicialice
+    this.columns = [
+      ...this.columns.filter(c => c.key !== 'permissions'),
+      { key: 'permissions', header: 'Permisos', template: this.permissionsTemplate },
+      { key: 'active', header: 'Estado', template: this.estadoTemplate }
+    ];
+    this.cdr.detectChanges();
   }
 
   onCreateNew(): void {
@@ -88,7 +95,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
             selectOptions: {
               rolId: roles.map(r => ({ value: r.id, label: r.name })),
               formId: forms.map(f => ({ value: f.id, label: f.name })),
-              permissionId: permissions.map(p => ({ value: p.id, label: p.name }))
+              permissionIds: permissions.map(p => ({ value: p.id, label: p.name }))
             }
           }
         });
@@ -99,7 +106,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           const payload: RolFormPermissionCreateModel = {
             rolId: +result.rolId,
             formId: +result.formId,
-            permissionId: +result.permissionId
+            permissionIds: result.permissionIds
           };
 
           this.rolFormPermissionStore.create(payload).subscribe({
@@ -115,7 +122,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       });
   }
 
-  onEdit(row: RolFormPermissionUpdateModel): void {
+  onEdit(row: RolFormPermissionGroupedModel): void {
     combineLatest([
       this.roleStore.roles$,
       this.formStore.forms$,
@@ -123,16 +130,24 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
     ])
       .pipe(take(1))
       .subscribe(([roles, forms, permissions]) => {
+        // Pre-seleccionar los permisos que el grupo ya tiene
+        const entityForDialog = {
+          rolId: row.rolId,
+          formId: row.formId,
+          active: row.active,
+          permissionIds: row.permissions.map(p => p.permissionId)
+        };
+
         const dialogRef = this.dialog.open(FormDialogComponent, {
           width: '600px',
           data: {
-            entity: row,
+            entity: entityForDialog,
             formType: 'RolFormPermission',
             title: 'Editar Asignación de Permisos',
             selectOptions: {
               rolId: roles.map(r => ({ value: r.id, label: r.name })),
               formId: forms.map(f => ({ value: f.id, label: f.name })),
-              permissionId: permissions.map(p => ({ value: p.id, label: p.name }))
+              permissionIds: permissions.map(p => ({ value: p.id, label: p.name }))
             }
           }
         });
@@ -141,11 +156,11 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           if (!result) return;
 
           const payload: RolFormPermissionUpdateModel = {
-            id: row.id,
+            id: 0, // El ID ya no es relevante para un grupo, pero el DTO lo requiere
             rolId: +result.rolId,
             formId: +result.formId,
-            permissionId: +result.permissionId,
-            active: result.active !== undefined ? result.active : row.active // Mantener el estado actual si no se cambia
+            permissionIds: result.permissionIds,
+            active: result.active
           };
 
           this.rolFormPermissionStore.update(payload).subscribe({
@@ -161,28 +176,29 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       });
   }
 
-  async onDelete(row: RolFormPermissionSelectModel): Promise<void> {
+  async onDelete(row: RolFormPermissionGroupedModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
-      title: 'Eliminar relación',
-      text: `¿Eliminar el rol "${row.rolName}" del formulario "${row.formName}" con permiso "${row.permissionName}"?`,
+      title: 'Eliminar Grupo de Permisos',
+      text: `¿Eliminar todos los permisos del rol "${row.rolName}" para el formulario "${row.formName}"?`,
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar'
     });
 
     if (!confirmed) return;
 
-    this.rolFormPermissionStore.deleteLogic(row.id).subscribe({
+    // Llamar al nuevo método del store para borrar por grupo
+    this.rolFormPermissionStore.deleteByGroup(row.rolId, row.formId).subscribe({
       next: () => {
-        this.sweetAlertService.showNotification('Eliminado', 'Relación eliminada correctamente.', 'success');
+        this.sweetAlertService.showNotification('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success');
       },
       error: err => {
         console.error('Error eliminando:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar.', 'error');
+        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el grupo.', 'error');
       }
     });
   }
 
-  onView(row: RolFormPermissionSelectModel): void {
+  onView(row: RolFormPermissionGroupedModel): void {
     console.log('Vista detalle:', row);
   }
 }
