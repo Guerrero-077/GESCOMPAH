@@ -6,6 +6,6 @@ import { TenantsCreateModel, TenantsSelectModel, TenantsUpdateModel } from '../.
   providedIn: 'root'
 })
 export class TenantsService extends GenericService<TenantsSelectModel, TenantsCreateModel, TenantsUpdateModel> {
-  protected resource = 'rolUser';
+  protected resource = 'user';
 
 }

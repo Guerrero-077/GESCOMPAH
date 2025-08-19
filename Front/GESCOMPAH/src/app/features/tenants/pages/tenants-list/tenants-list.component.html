@@ -1,8 +1,13 @@
-<app-generic-table [data]="tenants" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
-    (view)="onView($event)">
+<app-generic-table [data]="tenants" [columns]="columns" [titulo]="'Gestión de Usuario'"
+  [subTitulo]="'Gesione los usuarios del sistema'" [createButtonLabel]="'Crear Usuario'" (edit)="onEdit($event)"
+  (delete)="onDelete($event)" (view)="onView($event)">
+  <ng-template #userTemplate let-row>
+    <div>{{ row.personName }}</div>
+    <small>{{ row.email }}</small>
+  </ng-template>
 </app-generic-table>
 
 
 <ng-template #estadoTemplate let-row>
-    <span class="badge badge-success">Activo</span>
+  <span class="badge badge-success">Activo</span>
 </ng-template>

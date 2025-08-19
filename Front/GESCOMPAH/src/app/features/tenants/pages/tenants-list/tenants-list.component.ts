@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TenantsService } from '../../services/tenants/tenants.service';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
@@ -14,13 +14,22 @@ export class TenantsListComponent implements OnInit {
   private readonly tenantsService = inject(TenantsService);
   tenants: TenantsSelectModel[] = [];
 
-  columns: TableColumn < TenantsSelectModel > [] =[];
+  columns: TableColumn<TenantsSelectModel>[] = [];
+  @ViewChild('userTemplate', { static: true }) userTemplate!: TemplateRef<any>;
 
   ngOnInit(): void {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
-      { key: 'userEmail', header: 'Nombre' },
-      { key: 'rolName', header: 'Correo' },
+      {
+        key: 'email',
+        header: 'User',
+        template: this.userTemplate
+      },
+      { key: 'personDocument', header: 'N° Documento' },
+
+      { key: 'personPhone', header: 'Telefono' },
+      { key: 'personAddress', header: 'Dirección' },
+      { key: 'roles', header: 'Rol' },
       { key: 'active', header: 'Active' }
     ];
     this.load();
@@ -34,8 +43,6 @@ export class TenantsListComponent implements OnInit {
       ),
       error: (err) => console.error('Error al cargar:', err)
     })
-
-
 
   }
 

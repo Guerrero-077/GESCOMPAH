@@ -113,7 +113,8 @@ namespace Business.Mapping
             config.NewConfig<RolUser, RolUserSelectDto>();
 
             config.NewConfig<User, UserSelectDto>()
-               .Map(dest => dest.PersonName, src => $"{src.Person.FirstName} {src.Person.LastName}");
+               .Map(dest => dest.PersonName, src => $"{src.Person.FirstName} {src.Person.LastName}")
+               .Map(dest => dest.CityName, src => src.Person.City.Name);
 
             config.NewConfig<UserUpdateDto, User>()
                 .IgnoreNullValues(true)   // no pises con null

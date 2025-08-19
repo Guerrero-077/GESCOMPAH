@@ -77,7 +77,6 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped(typeof(IDataGeneric<>), typeof(DataGeneric<>));
 
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IRolUserRepository, RolUserRepository>();
             services.AddScoped<IRolFormPermissionRepository, RolFormPermissionRepository>();
 
 

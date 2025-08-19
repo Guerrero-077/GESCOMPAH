@@ -10,13 +10,11 @@
     {
         public class EstablishmentsRepository : DataGeneric<Establishment>, IEstablishmentsRepository
         {
-            private readonly ApplicationDbContext _context;
             private readonly IImagesRepository _imagesRepository;
 
             public EstablishmentsRepository(ApplicationDbContext context, IImagesRepository imagesRepository)
                 : base(context)
             {
-                _context = context ?? throw new ArgumentNullException(nameof(context));
                 _imagesRepository = imagesRepository ?? throw new ArgumentNullException(nameof(imagesRepository));
             }
 

@@ -1,6 +1,7 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Business.Repository;
 using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
+using Data.Services.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.User;
 using MapsterMapper;
@@ -14,13 +15,41 @@ namespace Business.Services.SecrutityAuthentication
     {
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IUserRepository _users; // opcional pero útil si necesitas includes
+        private readonly IRolUserRepository _rolUserRepository;
 
-        public UserService(IUserRepository data, IMapper mapper, IPasswordHasher<User> passwordHasher)
+        public UserService(IUserRepository data, IMapper mapper, IPasswordHasher<User> passwordHasher, IRolUserRepository rolUserRepository)
             : base(data, mapper)
         {
             _passwordHasher = passwordHasher;
             _users = data;
+            _rolUserRepository = rolUserRepository;
         }
+
+
+        public override async Task<IEnumerable<UserSelectDto>> GetAllAsync()
+        {
+            try
+            {
+                var users = await _users.GetAllAsync();
+
+                var result = new List<UserSelectDto>();
+
+                foreach (var user in users)
+                {
+                    var dto = _mapper.Map<UserSelectDto>(user);
+                    dto.Roles = await _rolUserRepository.GetRoleNamesByUserIdAsync(user.Id);    
+                    result.Add(dto);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException("Error al obtener los registros.", ex);
+            }
+        }
+
+
 
         // CREATE: siempre hashear antes de guardar
         public async Task<UserCreateDto> CreateUserAsync(UserCreateDto dto)

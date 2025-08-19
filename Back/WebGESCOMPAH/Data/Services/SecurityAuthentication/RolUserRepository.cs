@@ -51,12 +51,13 @@ namespace Data.Services.SecurityAuthentication
                 .ToListAsync();
         }
 
-        public async Task<List<string>> GetRoleNamesByUserIdAsync(int userId)
+        public async Task<IEnumerable<string>> GetRoleNamesByUserIdAsync(int userId)
         {
             return await _context.RolUsers
                 .AsNoTracking()
-                .Where(ur => ur.UserId == userId)
-                .Select(ur => ur.Rol.Name)
+                .Where(ru => ru.UserId == userId && !string.IsNullOrWhiteSpace(ru.Rol.Name))
+                .Select(ru => ru.Rol.Name)
+                .Distinct()
                 .ToListAsync();
         }
 
