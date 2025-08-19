@@ -1,18 +1,17 @@
 <div class="table-wrapper p-3">
 
   <div class="header m-2">
-    <h3 class="m-0 p-0">{{titulo}}</h3>
-    <span class="m-0 p-0">{{subTitulo}}</span>
+    <h3 class="m-0 p-0">{{ titulo }}</h3>
+    <span class="m-0 p-0">{{ subTitulo }}</span>
   </div>
 
   <!-- 📌 Header -->
   <div class="table-header d-flex justify-content-between align-items-center">
 
     <div>
-
-
-      <!-- Botón de filtro -->
-      <button mat-icon-button matTooltip="Filtros" color="primary" (click)="onFilterClick()">
+      <!-- Botón de filtro (opcional) -->
+      <button *ngIf="showFilterButton" mat-icon-button [matTooltip]="filterTooltip" color="primary"
+        (click)="onFilterClick()">
         <mat-icon>filter_list</mat-icon>
       </button>
 
@@ -21,12 +20,14 @@
         <mat-label>Buscar</mat-label>
         <input matInput [(ngModel)]="filterKey" (ngModelChange)="onFilterChange($event)" placeholder="Buscar...">
       </mat-form-field>
-
     </div>
-    <!-- Botón crear -->
-    <button mat-button class="button-save" (click)="onCreate()">
-      {{ createButtonLabel }}
-    </button>
+
+    <!-- Botón crear (solo Admin con permiso CREAR) -->
+    <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
+      <button mat-button class="button-save" (click)="onCreate()">
+        {{ createButtonLabel }}
+      </button>
+    </ng-container>
   </div>
 
   <!-- 📌 Tabla si hay datos -->
@@ -52,24 +53,33 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Detalles</th>
         <td mat-cell *matCellDef="let row">
+          <!-- Ver: siempre visible (si quieres protegerlo, envuélvelo también) -->
           <button mat-icon-button matTooltip="Ver" (click)="onView(row)">
             <mat-icon>visibility</mat-icon>
           </button>
 
-          <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon>more_vert</mat-icon>
-          </button>
+          <!-- Menú solo si tiene EDITAR o ELIMINAR -->
+          <ng-container *appHasRoleAndPermission="'Administrador'; perms: ['EDITAR','ELIMINAR']; mode: 'any'">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
 
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="onEdit(row)">
-              <mat-icon>edit</mat-icon>
-              Editar
-            </button>
-            <button mat-menu-item (click)="onDelete(row)">
-              <mat-icon>delete</mat-icon>
-              Eliminar
-            </button>
-          </mat-menu>
+            <mat-menu #menu="matMenu">
+              <!-- Editar -->
+              <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
+                <button mat-menu-item (click)="onEdit(row)">
+                  <mat-icon>edit</mat-icon> Editar
+                </button>
+              </ng-container>
+
+              <!-- Eliminar -->
+              <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'ELIMINAR'">
+                <button mat-menu-item (click)="onDelete(row)">
+                  <mat-icon>delete</mat-icon> Eliminar
+                </button>
+              </ng-container>
+            </mat-menu>
+          </ng-container>
         </td>
       </ng-container>
 
@@ -81,12 +91,10 @@
   </div>
 
   <!-- 📌 Footer (solo si hay datos) -->
-  <!-- Footer (solo si hay datos) -->
   <div class="table-footer" *ngIf="hasData">
     <mat-paginator class="custom-paginator" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons>
     </mat-paginator>
   </div>
-
 
   <!-- 📌 Si no hay datos -->
   <ng-template #noDataTemplate>
@@ -95,6 +103,5 @@
       <div class="no-data-text">No hay registros disponibles.</div>
     </div>
   </ng-template>
-
 
 </div>
