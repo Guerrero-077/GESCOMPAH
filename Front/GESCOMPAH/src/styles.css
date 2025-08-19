@@ -2,3 +2,21 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.text-green{
+    color: #146530; 
+}
+
+.text-marmol{
+    color: #646464;
+}
+
+.bg-green{
+    background-color: #f0fdf4;
+}
+
+.lincese{
+    font-size: 0.8rem;
+    padding-top: 5rem;
+    text-align: center;
+}

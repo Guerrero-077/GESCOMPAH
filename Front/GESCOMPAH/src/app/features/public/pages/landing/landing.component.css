@@ -64,14 +64,6 @@
   transform: translateY(-3px);
 }
 
-.text-green{
-  color: #146530; 
-}
-
-.text-marmol{
-  color: #646464;
-}
-
 .imagen-local{
   width: 90%;
   height: 100%;
@@ -80,6 +72,3 @@
   display: block;
 }
 
-.bg-green{
-  background-color: #f0fdf4;
-}
