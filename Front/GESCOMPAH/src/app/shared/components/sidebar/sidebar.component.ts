@@ -19,7 +19,7 @@ import { BackendMenuItem, SidebarItem } from './sidebar.config';
 export class SidebarComponent implements OnInit {
   menu: SidebarItem[] = [];
 
-  constructor(private permissionService: PermissionService, private authService: AuthService) { } // Inject services
+  constructor(private permissionService: PermissionService, private authService: AuthService) { }
 
   ngOnInit(): void {
     this.permissionService.userProfile$.subscribe(userProfile => {

@@ -36,7 +36,7 @@ export class FormStore {
   create(form: FormCreateModel): Observable<FormSelectModel> {
     return this.formService.create(form).pipe(
       tap(() => {
-        this.loadAll(); // Force refresh
+        this.loadAll();
       })
     );
   }
@@ -44,7 +44,7 @@ export class FormStore {
   update(id: number, updateDto: FormUpdateModel): Observable<FormSelectModel> {
     return this.formService.update(id, updateDto).pipe(
       tap(() => {
-        this.loadAll(); // Force refresh
+        this.loadAll();
       })
     );
   }
@@ -60,14 +60,14 @@ export class FormStore {
   deleteLogic(id: number): Observable<void> {
     return this.formService.deleteLogic(id).pipe(
       tap(() => {
-        this.loadAll(); // Force refresh
+        this.loadAll();
       })
     );
   }
   changeActiveStatus(id: number, active: boolean): Observable<FormSelectModel> {
     return this.formService.changeActiveStatus(id, active).pipe(
       tap(() => {
-        this.loadAll(); // Force refresh
+        this.loadAll();
       })
     );
   }

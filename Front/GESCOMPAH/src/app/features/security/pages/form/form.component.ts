@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { catchError, EMPTY, filter, map, switchMap, take, tap } from 'rxjs';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { FormSelectModel, FormUpdateModel } from '../../models/form.models';
 import { FormStore } from '../../services/form/form.store';
-import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 
 @Component({
   selector: 'app-form',
@@ -51,27 +52,38 @@ export class FormComponent implements OnInit {
   onEdit(row: FormUpdateModel) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
-      data: {
-        entity: row,
-        formType: 'Form'
-      }
+      data: { entity: row, formType: 'Form' }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const id = row.id;
-        const updateDto: FormUpdateModel = { ...result, id };
-        this.formStore.update(id, updateDto).subscribe({
-          next: () => {
-            this.sweetAlertService.showNotification('Actualización Exitosa', 'Formulario actualizado exitosamente.', 'success');
-          },
-          error: err => {
-            this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el formulario.', 'error');
-          }
-        });
-      }
-    });
+    dialogRef.afterClosed().pipe(
+      filter((result): result is Partial<FormUpdateModel> => !!result),
+
+      map(result => ({ id: row.id, ...result } as FormUpdateModel)),
+
+      switchMap(dto => this.formStore.update(dto.id, dto)),
+
+      take(1),
+
+      tap(() => {
+        this.sweetAlertService.showNotification(
+          'Actualización Exitosa',
+          'Formulario actualizado exitosamente.',
+          'success'
+        );
+      }),
+
+      catchError(err => {
+        console.error('Error actualizando el formulario:', err);
+        this.sweetAlertService.showNotification(
+          'Error',
+          'No se pudo actualizar el formulario.',
+          'error'
+        );
+        return EMPTY;
+      })
+    ).subscribe();
   }
+
 
   async onDelete(row: FormSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
@@ -101,23 +113,32 @@ export class FormComponent implements OnInit {
   onCreateNew() {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
-      data: {
-        entity: {},
-        formType: 'Form'
-      }
+      data: { entity: {}, formType: 'Form' }
     });
 
-    dialogRef.afterClosed().subscribe((result: any) => {
-      if (result) {
-        this.formStore.create(result).subscribe(res => {
-          this.sweetAlertService.showNotification('Creación Exitosa', 'Formulario creado exitosamente.', 'success');
-        }, err => {
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) return;
+
+      this.formStore.create(result).pipe(take(1)).subscribe({
+        next: () => {
+          this.sweetAlertService.showNotification(
+            'Creación Exitosa',
+            'Formulario creado exitosamente.',
+            'success'
+          );
+        },
+        error: (err) => {
           console.error('Error creando el formulario:', err);
-          this.sweetAlertService.showNotification('Error', 'No se pudo crear el formulario.', 'error');
-        });
-      }
+          this.sweetAlertService.showNotification(
+            'Error',
+            'No se pudo crear el formulario.',
+            'error'
+          );
+        }
+      });
     });
   }
+
 
   // ----- Toggle estado (activo/inactivo) -----
   onToggleActive(row: FormSelectModel, e: { checked: boolean }) {

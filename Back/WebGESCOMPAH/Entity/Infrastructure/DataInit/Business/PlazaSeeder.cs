@@ -17,7 +17,6 @@ namespace Entity.Infrastructure.DataInit.Business
                     Name = "Plaza Central",
                     Description = "Espacio principal para eventos masivos",
                     Location = "Centro Ciudad",
-                    Capacity = 5000,
                     Active = true,
                     IsDeleted = false,
                     CreatedAt = seedDate
@@ -28,7 +27,6 @@ namespace Entity.Infrastructure.DataInit.Business
                     Name = "Plaza Norte",
                     Description = "Zona adecuada para ferias temporales",
                     Location = "Zona Norte",
-                    Capacity = 3000,
                     Active = true,
                     IsDeleted = false,
                     CreatedAt = seedDate

@@ -1,7 +1,14 @@
 <div class="row d-flex justify-content-center">
-  <app-generic-table [data]="forms$ | async" [columns]="columns" [titulo]="'Gestión de Formularios'"
-    [subTitulo]="'Administra los forumularios del sistema'" [createButtonLabel]="'Nuevo Formulario'"
-    (edit)="onEdit($event)" (delete)="onDelete($event)" (view)="onView($event)" (create)="onCreateNew()">
+  <app-generic-table
+    [data]="forms$ | async"
+    [columns]="columns"
+    [titulo]="'Gestión de Formularios'"
+    [subTitulo]="'Administra los forumularios del sistema'"
+    [createButtonLabel]="'Nuevo Formulario'"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (view)="onView($event)"
+    (create)="onCreateNew()">
   </app-generic-table>
 
 

@@ -19,8 +19,8 @@ namespace Entity.DTOs.Validations.Plaza
                 .NotEmpty().WithMessage("La ubicación es obligatoria.")
                 .MaximumLength(200);
 
-            RuleFor(x => x.Capacity)
-                .GreaterThanOrEqualTo(0).WithMessage("La capacidad no puede ser negativa.");
+            //RuleFor(x => x.Capacity)
+            //    .GreaterThanOrEqualTo(0).WithMessage("La capacidad no puede ser negativa.");
         }
     }
 }

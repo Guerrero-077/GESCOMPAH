@@ -7,11 +7,4 @@ import { SquareCreateModel, SquareSelectModel, SquareUpdateModel } from '../../m
 })
 export class SquareService extends GenericService<SquareSelectModel, SquareCreateModel, SquareUpdateModel> {
   protected resource = 'plaza';
-
-  // You can add any additional methods specific to square service here
-  // For example, if you need to fetch squares by a specific criteria
-  // getSquaresByCriteria(criteria: any): Observable<SquareSelectModel[]> {
-  //   return this.http.get<SquareSelectModel[]>(`${this.baseUrl}/${this.resource}/criteria`, { params: criteria });
-  // }
-
 }

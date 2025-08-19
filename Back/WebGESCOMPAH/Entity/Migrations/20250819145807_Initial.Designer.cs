@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250819025547_Initial")]
+    [Migration("20250819145807_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -597,9 +597,6 @@ namespace Entity.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Capacity")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -627,7 +624,6 @@ namespace Entity.Migrations
                         {
                             Id = 1,
                             Active = true,
-                            Capacity = 5000,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Espacio principal para eventos masivos",
                             IsDeleted = false,
@@ -638,7 +634,6 @@ namespace Entity.Migrations
                         {
                             Id = 2,
                             Active = true,
-                            Capacity = 3000,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Zona adecuada para ferias temporales",
                             IsDeleted = false,

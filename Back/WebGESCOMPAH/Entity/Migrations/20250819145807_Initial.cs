@@ -108,7 +108,6 @@ namespace Entity.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Capacity = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -492,11 +491,11 @@ namespace Entity.Migrations
 
             migrationBuilder.InsertData(
                 table: "plaza",
-                columns: new[] { "Id", "Active", "Capacity", "CreatedAt", "Description", "IsDeleted", "Location", "Name" },
+                columns: new[] { "Id", "Active", "CreatedAt", "Description", "IsDeleted", "Location", "Name" },
                 values: new object[,]
                 {
-                    { 1, true, 5000, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Espacio principal para eventos masivos", false, "Centro Ciudad", "Plaza Central" },
-                    { 2, true, 3000, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Zona adecuada para ferias temporales", false, "Zona Norte", "Plaza Norte" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Espacio principal para eventos masivos", false, "Centro Ciudad", "Plaza Central" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Zona adecuada para ferias temporales", false, "Zona Norte", "Plaza Norte" }
                 });
 
             migrationBuilder.InsertData(

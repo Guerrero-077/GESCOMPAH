@@ -20,16 +20,25 @@
                 _imagesRepository = imagesRepository ?? throw new ArgumentNullException(nameof(imagesRepository));
             }
 
-            public override async Task<IEnumerable<Establishment>> GetAllAsync()
-            {
-                return await _dbSet
-                    .Where(e => !e.IsDeleted)
-                    .Include(e => e.Plaza)
-                    .Include(e => e.Images)
-                    .ToListAsync();
-            }
+        public override async Task<IEnumerable<Establishment>> GetAllAsync()
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Where(e =>
+                    e.Active                       // Establecimiento activo
+                    && !e.IsDeleted                // Establecimiento no borrado
+                    && e.Plaza != null             // Por si la relación no es requerida
+                    && e.Plaza.Active              // Plaza activa
+                    && !e.Plaza.IsDeleted          // Plaza no borrada
+                )
+                .Include(e => e.Plaza)
+                .Include(e => e.Images
+                    .Where(img => img.Active && !img.IsDeleted)) 
+                .ToListAsync();
+        }
 
-            public override async Task<Establishment?> GetByIdAsync(int id)
+
+        public override async Task<Establishment?> GetByIdAsync(int id)
             {
                 return await _dbSet
                     .Where(e => e.Id == id && !e.IsDeleted)
