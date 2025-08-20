@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder, FormGroup,
@@ -12,7 +12,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, catchError, distinctUntilChanged, finalize, of, switchMap, tap, map } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
@@ -20,7 +21,6 @@ import { AuthService } from '../../../../core/service/auth/auth.service';
 import { CitySelectModel } from '../../../setting/models/city.models';
 import { CityService } from '../../../setting/services/city/city.service';
 import { DepartmentStore } from '../../../setting/services/department/department.store';
-
 
 @Component({
   selector: 'app-register',
@@ -47,6 +47,8 @@ export class RegisterComponent implements OnInit {
   private cityService = inject(CityService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
   // catálogos
   departments$ = this.deptStore.departments$;
   private _cities = new BehaviorSubject<CitySelectModel[]>([]);
@@ -55,16 +57,18 @@ export class RegisterComponent implements OnInit {
   // estado UI
   submitting = signal(false);
   submitError = signal<string | null>(null);
+  loadingCities = signal(false);
 
   // ====== FORM ROOT ======
   form: FormGroup = this.fb.group({
-    // Paso 1: Ubicación (solo ids aquí)
+    // Paso 1: Ubicación
     location: this.fb.group({
       departmentId: [null, Validators.required],
-      cityId: [null, Validators.required],
+      // deshabilitado solo si NO hay departamento
+      cityId: [{ value: null, disabled: true }, [Validators.required, Validators.min(1)]],
     }),
 
-    // Paso 2: Persona (campos que el backend exige como obligatorios)
+    // Paso 2: Persona
     person: this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
@@ -84,25 +88,79 @@ export class RegisterComponent implements OnInit {
     }, { validators: passwordsMatch('password', 'confirmPassword') }),
   });
 
-  // ===== GETTERS =====
+  // GETTERS
   get locationGroup(): FormGroup { return this.form.get('location') as FormGroup; }
   get personGroup(): FormGroup { return this.form.get('person') as FormGroup; }
   get accountGroup(): FormGroup { return this.form.get('account') as FormGroup; }
-
-  // atajos de controles
   get email() { return this.accountGroup.get('email')!; }
-  get password() { return this.accountGroup.get('password')!; }
+
+  // comparación tolerante a tipos para mat-select
+  compareById = (a: any, b: any) => {
+    if (a == null || b == null) return false;
+    return String(a) === String(b);
+  };
 
   ngOnInit(): void {
-    this.locationGroup.get('departmentId')!.valueChanges.subscribe((deptId: number | null) => {
-      this.locationGroup.get('cityId')!.reset();
-      if (deptId) {
-        this.cityService.getCitiesByDepartment(deptId).subscribe({
-          next: cities => this._cities.next(cities),
-          error: () => this._cities.next([])
-        });
-      } else {
+    const deptCtrl = this.locationGroup.get('departmentId')!;
+    const cityCtrl = this.locationGroup.get('cityId')!;
+
+    // Reaccionar al departamento
+    deptCtrl.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      distinctUntilChanged(),
+      tap((deptId) => {
+        // reset y estado de carga
+        cityCtrl.reset({ value: null, disabled: !deptId }, { emitEvent: false });
+        // si hay dept, el control debe quedar habilitado SIEMPRE (aunque no haya ciudades)
+        if (deptId) cityCtrl.enable({ emitEvent: false }); else cityCtrl.disable({ emitEvent: false });
         this._cities.next([]);
+        this.loadingCities.set(!!deptId);
+      }),
+      switchMap((deptId: number | string | null) => {
+        const id = deptId == null ? null : Number(deptId);
+        if (!id || Number.isNaN(id)) {
+          return of([]).pipe(finalize(() => this.loadingCities.set(false)));
+        }
+        return this.cityService.getCitiesByDepartment(id).pipe(
+          map((res: any) => {
+            const raw = Array.isArray(res) ? res
+              : Array.isArray(res?.data) ? res.data
+                : Array.isArray(res?.items) ? res.items
+                  : Array.isArray(res?.result) ? res.result
+                    : [];
+            return raw.map((c: any) => ({
+              id: Number(c.id ?? c.cityId ?? c.value),
+              name: String(c.name ?? c.cityName ?? c.label ?? '').trim(),
+            })).filter((c: any) => !!c.id && !!c.name);
+          }),
+          catchError(() => of([])),
+          finalize(() => this.loadingCities.set(false))
+        );
+      })
+    ).subscribe((list: CitySelectModel[]) => {
+      // Actualiza catálogo
+      this._cities.next(list);
+
+      // Importante:
+      // - si HAY dept: cityId debe estar habilitado SIEMPRE
+      // - si NO hay ciudades: forzamos error "required" para bloquear el paso
+      const cityCtrl = this.locationGroup.get('cityId')!;
+      if (this.locationGroup.get('departmentId')?.value) {
+        cityCtrl.enable({ emitEvent: false });
+        if (list.length === 0) {
+          cityCtrl.setErrors({ required: true });
+          cityCtrl.markAsTouched();
+        } else {
+          // si hay ciudades y el valor actual no es válido, dejamos el required normal actuar
+          if (cityCtrl.value == null || Number(cityCtrl.value) < 1) {
+            cityCtrl.setErrors({ required: true });
+          } else {
+            // limpia errores si seleccionó algo válido
+            if (cityCtrl.valid) cityCtrl.setErrors(null);
+          }
+        }
+      } else {
+        cityCtrl.disable({ emitEvent: false });
       }
     });
   }
@@ -115,7 +173,6 @@ export class RegisterComponent implements OnInit {
     }
     this.submitting.set(true);
 
-    // normalizar email a minúsculas
     const emailLower = String(this.email.value ?? '').trim().toLowerCase();
     this.email.setValue(emailLower, { emitEvent: false });
 
@@ -123,7 +180,6 @@ export class RegisterComponent implements OnInit {
     const p = this.personGroup.value;
     const acc = this.accountGroup.value;
 
-    // ===== Payload PLANO que espera tu backend =====
     const payload = {
       firstName: p.firstName,
       lastName: p.lastName,
@@ -132,25 +188,18 @@ export class RegisterComponent implements OnInit {
       address: p.address,
       email: emailLower,
       password: acc.password,
-      cityId: Number(loc.cityId)
+      cityId: Number(loc.cityId ?? 0)
     };
 
     this.auth.Register(payload as any).subscribe({
       next: () => {
-        this.submitting.set(false);
-        this.form.reset();},
-      complete: () => {
         this.router.navigate(['/auth/login']);
-        this.submitting.set(false);
         this.form.reset();
+        this.submitting.set(false);
       },
       error: (err) => {
         this.submitting.set(false);
-        // Intenta leer modelState del backend y mostrar mensaje amigable
-        const msg =
-          err?.error?.title ||
-          err?.error?.message ||
-          'No se pudo registrar el usuario';
+        const msg = err?.error?.title || err?.error?.message || 'No se pudo registrar el usuario';
         this.submitError.set(msg);
       }
     });
@@ -169,4 +218,3 @@ function hasUpper() { return (c: AbstractControl) => /[A-Z]/.test(c.value || '')
 function hasLower() { return (c: AbstractControl) => /[a-z]/.test(c.value || '') ? null : { lower: true }; }
 function hasDigit() { return (c: AbstractControl) => /\d/.test(c.value || '') ? null : { digit: true }; }
 function hasSymbol() { return (c: AbstractControl) => /[\W_]/.test(c.value || '') ? null : { symbol: true }; }
-

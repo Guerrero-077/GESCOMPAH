@@ -2,8 +2,10 @@
 
 namespace Entity.DTOs.Implements.SecurityAuthentication.User
 {
-    public sealed class UserUpdateDto : BaseDto
+    public class UserProvisioningUpdateDto : BaseDto
     {
+
+        // Persona
         public required string FirstName { get; init; }
         public required string LastName { get; init; }
         public required string Document { get; init; }
@@ -13,8 +15,9 @@ namespace Entity.DTOs.Implements.SecurityAuthentication.User
 
         // Usuario
         public required string Email { get; init; }
+        public string? Password { get; init; } // null => no cambia
 
+        // Roles
         public IReadOnlyList<int> RoleIds { get; init; } = Array.Empty<int>();
-
     }
 }

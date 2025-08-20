@@ -23,8 +23,9 @@ import { RolUserCreateModel, RolUserSelectModel } from '../../models/rol-user.mo
 export class RolUserComponent implements OnInit {
   private readonly rolUserService = inject(RolUserService);
   private readonly userService = inject(UserService);
-  private readonly rolService = inject(RoleService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+
+  
   private readonly dialog = inject(MatDialog);
   private readonly sweetAlertService = inject(SweetAlertService);
 
@@ -62,7 +63,7 @@ export class RolUserComponent implements OnInit {
   }
 
   private getRoleOptions$() {
-    return this.rolService.getAll().pipe(
+    return this.rolUserService.getAll().pipe(
       catchError(() => of([])),
       map((roles: any[]) => roles.map(r => ({ value: r.id, label: r.name })))
     );

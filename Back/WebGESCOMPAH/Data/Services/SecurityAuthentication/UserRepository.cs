@@ -16,6 +16,7 @@
         public override async Task<IEnumerable<User>> GetAllAsync()
         {
             return await _dbSet
+                .Where(u => !u.IsDeleted)
                 .Include(u => u.Person)
                 .ThenInclude(p => p.City)
                 .ToListAsync();
@@ -25,6 +26,7 @@
             {
                 return await _dbSet
                     .Include(u => u.Person)
+                        .ThenInclude(p => p.City)
                     .Include(u => u.RolUsers)
                         .ThenInclude(ru => ru.Rol)
                     .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false);

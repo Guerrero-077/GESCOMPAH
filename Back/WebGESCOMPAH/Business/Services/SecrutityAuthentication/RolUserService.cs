@@ -10,8 +10,13 @@ namespace Business.Services.SecrutityAuthentication
 {
     public class RolUserService : BusinessGeneric<RolUserSelectDto, RolUserCreateDto, RolUserUpdateDto, RolUser>, IRolUserService
     {
+        private readonly IRolUserRepository _repository;
         public RolUserService(IRolUserRepository data, IMapper mapper) : base(data, mapper)
         {
+            _repository = data;
         }
+
+        public Task ReplaceUserRolesAsync(int userId, IEnumerable<int> roleIds)
+    => _repository.ReplaceUserRolesAsync(userId, roleIds);
     }
 }

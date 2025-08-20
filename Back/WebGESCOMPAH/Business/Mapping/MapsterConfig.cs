@@ -97,6 +97,7 @@ namespace Business.Mapping
 
             // DTO de actualización -> Entidad (patch-friendly)
             config.NewConfig<PersonUpdateDto, Person>()
+                .Ignore(dest => dest.Id)  // Ignora el Id para evitar modificar la clave primaria
                 .Ignore(dest => dest.City)  // navegación
                 .IgnoreNullValues(true);    // no pises con nulls
 
@@ -114,13 +115,32 @@ namespace Business.Mapping
 
             config.NewConfig<User, UserSelectDto>()
                .Map(dest => dest.PersonName, src => $"{src.Person.FirstName} {src.Person.LastName}")
-               .Map(dest => dest.CityName, src => src.Person.City.Name);
+               .Map(dest => dest.PersonId, src => src.PersonId)
+               .Map(dest => dest.PersonDocument, src => src.Person.Document)
+               .Map(dest => dest.PersonAddress, src => src.Person.Address)
+               .Map(dest => dest.PersonPhone, src => src.Person.Phone)
+               .Map(dest => dest.CityId, src => src.Person.CityId)
+               .Map(dest => dest.CityName, src => src.Person.City != null ? src.Person.City.Name : string.Empty)
+               .Map(dest => dest.Email, src => src.Email)
+               .Map(dest => dest.Active, src => !src.IsDeleted);
 
-            config.NewConfig<UserUpdateDto, User>()
-                .IgnoreNullValues(true)   // no pises con null
-                .Ignore(d => d.Person)    // no toques navegaciones
-                .Ignore(d => d.RolUsers)
-                .Ignore(d => d.Password); // password se maneja en el servicio (hash)
+            config.NewConfig<UserCreateDto, User>()
+                .Ignore(dest => dest.Id);
+
+
+            config.NewConfig<UserCreateDto, Person>()
+                .Ignore(dest => dest.Id);
+
+            config.NewConfig<UserUpdateDto, User>();
+
+            config.NewConfig<UserUpdateDto, Person>()
+                .Ignore(dest => dest.Id) // No modificar la PK
+                .Map(dest => dest.FirstName, src => src.FirstName)
+                .Map(dest => dest.LastName, src => src.LastName)
+                .Map(dest => dest.Document, src => src.Document)
+                .Map(dest => dest.Phone, src => src.Phone)
+                .Map(dest => dest.Address, src => src.Address)
+                .Map(dest => dest.CityId, src => src.CityId);
 
 
 

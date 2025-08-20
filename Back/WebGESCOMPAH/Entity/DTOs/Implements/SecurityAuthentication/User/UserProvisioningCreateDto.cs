@@ -1,9 +1,8 @@
-﻿using Entity.DTOs.Base;
-
-namespace Entity.DTOs.Implements.SecurityAuthentication.User
+﻿namespace Entity.DTOs.Implements.SecurityAuthentication.User
 {
-    public sealed class UserUpdateDto : BaseDto
+    public class UserProvisioningCreateDto
     {
+        // Persona
         public required string FirstName { get; init; }
         public required string LastName { get; init; }
         public required string Document { get; init; }
@@ -13,8 +12,10 @@ namespace Entity.DTOs.Implements.SecurityAuthentication.User
 
         // Usuario
         public required string Email { get; init; }
+        public required string Password { get; init; }
 
-        public IReadOnlyList<int> RoleIds { get; init; } = Array.Empty<int>();
+        // Roles
+        public IReadOnlyList<int>? RoleIds { get; init; }
 
     }
 }

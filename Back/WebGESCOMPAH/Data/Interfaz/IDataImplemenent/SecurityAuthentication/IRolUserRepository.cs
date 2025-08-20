@@ -10,5 +10,7 @@ namespace Data.Interfaz.IDataImplemenent.SecurityAuthentication
 
         Task<IEnumerable<string>> GetRoleNamesByUserIdAsync(int userId);
 
+
+        Task ReplaceUserRolesAsync(int userId, IEnumerable<int> roleIds);
     }
 }
