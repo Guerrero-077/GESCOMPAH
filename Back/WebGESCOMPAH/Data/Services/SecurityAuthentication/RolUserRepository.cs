@@ -51,14 +51,57 @@ namespace Data.Services.SecurityAuthentication
                 .ToListAsync();
         }
 
-        public async Task<List<string>> GetRoleNamesByUserIdAsync(int userId)
+        public async Task<IEnumerable<string>> GetRoleNamesByUserIdAsync(int userId)
         {
             return await _context.RolUsers
                 .AsNoTracking()
-                .Where(ur => ur.UserId == userId)
-                .Select(ur => ur.Rol.Name)
+                .Where(ru => ru.UserId == userId
+                          && ru.Active
+                          && !string.IsNullOrWhiteSpace(ru.Rol.Name))
+                .Select(ru => ru.Rol.Name)
+                .Distinct()
                 .ToListAsync();
         }
+
+
+
+        public async Task ReplaceUserRolesAsync(int userId, IEnumerable<int> roleIds)
+        {
+            var distinctIds = (roleIds ?? Enumerable.Empty<int>())
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList();
+
+            // Traer roles actuales del usuario
+            var current = await _context.RolUsers
+                .Where(ru => ru.UserId == userId)
+                .ToListAsync();
+
+            // Calcula sets
+            var currentIds = current.Select(c => c.RolId).ToHashSet();
+            var toAdd = distinctIds.Where(id => !currentIds.Contains(id)).ToList();
+            var toRemove = current.Where(c => !distinctIds.Contains(c.RolId)).ToList();
+
+            // Quitar (hard delete); si prefieres soft, marca Active = false
+            if (toRemove.Count > 0)
+            {
+                _context.RolUsers.RemoveRange(toRemove);
+            }
+
+            // Agregar
+            foreach (var rid in toAdd)
+            {
+                _context.RolUsers.Add(new RolUser
+                {
+                    UserId = userId,
+                    RolId = rid,
+                    Active = true
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
 
 
     }

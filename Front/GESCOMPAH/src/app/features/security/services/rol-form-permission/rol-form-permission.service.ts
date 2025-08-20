@@ -1,35 +1,53 @@
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { RolFormPermissionGroupedModel, RolFormPermissionSelectModel, RolFormPermissionCreateModel, RolFormPermissionUpdateModel } from '../../models/rol-form-permission.models';
 import { environment } from '../../../../../environments/environment';
-import { RolFormPermissionSelectDto, RolFormPermissionCreateDto, RolFormPermissionUpdateDto } from '../../models/rol-form-permission.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RolFormPermissionService {
-  // Additional methods specific to RolUser can be added here
   private readonly http = inject(HttpClient);
+  private readonly baseUrl = (environment.apiURL as string).replace(/\/+$/, '');
+  private resource = 'rolFormPermission';
 
-  private readonly baseUrl = `${environment.apiURL}/rolFormPermission`;
-
-  getAll(): Observable<RolFormPermissionSelectDto[]> {
-    return this.http.get<RolFormPermissionSelectDto[]>(this.baseUrl);
+  private url(...segments: (string | number | undefined)[]) {
+    const segs = [this.baseUrl, this.resource, ...segments.filter(s => s !== undefined && s !== '')];
+    return segs.join('/').replace(/([^:]\/)\/+/g, '$1');
   }
 
-  getById(id: number): Observable<RolFormPermissionSelectDto> {
-    return this.http.get<RolFormPermissionSelectDto>(`${this.baseUrl}/${id}`);
+  // --- NUEVOS MÉTODOS ---
+  getAllGrouped(): Observable<RolFormPermissionGroupedModel[]> {
+    return this.http.get<RolFormPermissionGroupedModel[]>(this.url('grouped'));
   }
 
-  create(payload: RolFormPermissionCreateDto): Observable<RolFormPermissionSelectDto> {
-    return this.http.post<RolFormPermissionSelectDto>(this.baseUrl, payload);
+  deleteByGroup(rolId: number, formId: number): Observable<void> {
+    return this.http.delete<void>(this.url('group', rolId, formId));
+  }
+  // --- FIN DE NUEVOS MÉTODOS ---
+
+  getAll(): Observable<RolFormPermissionSelectModel[]> {
+    return this.http.get<RolFormPermissionSelectModel[]>(this.url());
   }
 
-  update(id: number, payload: RolFormPermissionUpdateDto): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${id}`, payload);
+  getById(id: number): Observable<RolFormPermissionSelectModel> {
+    return this.http.get<RolFormPermissionSelectModel>(this.url(id));
   }
 
-  deleteLogical(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  create(dto: RolFormPermissionCreateModel): Observable<RolFormPermissionSelectModel> {
+    return this.http.post<RolFormPermissionSelectModel>(this.url(), dto);
+  }
+
+  update(id: number, dto: RolFormPermissionUpdateModel): Observable<RolFormPermissionSelectModel> {
+    return this.http.put<RolFormPermissionSelectModel>(this.url(id), dto);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(this.url(id));
+  }
+
+  deleteLogic(id: number): Observable<void> {
+    return this.http.patch<void>(this.url(id), null);
   }
 }

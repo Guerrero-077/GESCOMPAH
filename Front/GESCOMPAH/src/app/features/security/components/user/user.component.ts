@@ -1,61 +1,88 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+
+import { of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-
-import { UserCreateDto, UserListDto, UserUpdatePayload } from '../../models/user.models';
-import { UserService } from '../../services/user/user.service';
-import { PersonService } from '../../services/person/person.service';
-import { catchError, map } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { CommonModule } from '@angular/common';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+
+import { UserCreateModel, UserSelectModel, UserUpdateModel } from '../../models/user.models';
+import { PersonService } from '../../services/person/person.service';
+import { UserStore } from '../../services/user/user.store';
 
 @Component({
   selector: 'app-user',
-  imports: [CommonModule, GenericTableComponent],
+  standalone: true,
+  imports: [CommonModule, GenericTableComponent, MatSlideToggleModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })
 export class UserComponent implements OnInit {
-  private readonly userService = inject(UserService);
+  private readonly userStore = inject(UserStore);
   private readonly personService = inject(PersonService);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
   private readonly sweetAlertService = inject(SweetAlertService);
+  
+  @ViewChild('estadoTemplate', { static: true }) estadoTpl!: TemplateRef<any>;
 
-
-  users: UserListDto[] = [];
-  columns: TableColumn<UserListDto>[] = [];
+  users$ = this.userStore.users$;
+  columns: TableColumn<UserSelectModel>[] = [];
 
   ngOnInit(): void {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'personName', header: 'Nombre Completo' },
       { key: 'email', header: 'Correo Electrónico' },
-      { key: 'active', header: 'Estado' }
+      {
+        key: 'active',
+        header: 'Estado',
+        type: 'custom',           // tu GenericTable debe renderizar template cuando type === 'custom'
+        template: this.estadoTpl  // <-- TemplateRef (no string)
+      }
     ];
-    this.load();
   }
 
-  load() {
-    this.userService.getUsers().subscribe({
-      next: data => (this.users = data),
-      error: err => console.error('Error al cargar usuarios:', err)
+  // ----- Toggle estado (activo/inactivo) -----
+  onToggleActive(row: UserSelectModel, e: MatSlideToggleChange) {
+    const previous = row.active;
+    row.active = e.checked; // Optimistic UI
+
+    // Asegúrate de tener en tu UserStore un método:
+    // changeActiveStatus(id: number, active: boolean): Observable<UserSelectModel>
+    this.userStore.changeActiveStatus(row.id, e.checked).subscribe({
+      next: (updated) => {
+        // sincronizar con lo que devuelve el backend
+        row.active = updated.active ?? row.active;
+        this.sweetAlertService.showNotification(
+          'Éxito',
+          `Usuario ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        // revertir si falla
+        row.active = previous;
+        this.sweetAlertService.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
     });
   }
 
-  // EDIT
-  onEdit(row: UserListDto) {
+  // ----- EDIT -----
+  onEdit(row: UserSelectModel) {
     const id = row.id;
-
-    const initial = {
-      email: row.email,
-      password: ''
-    };
+    const initial = { email: row.email, password: '' };
 
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -67,34 +94,34 @@ export class UserComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (!result) return;
-      const payload: UserUpdatePayload = {
+      const payload: UserUpdateModel = {
         email: (result.email ?? initial.email)?.trim(),
         ...(result.password ? { password: result.password } : {})
       };
-      this.userService.updateUser(id, payload).subscribe(
-        {
-          next: () => {
-            this.load();
-            this.sweetAlertService.showNotification('Actualización Exitosa', 'Usuario actualizado exitosamente.', 'success');
-          },
-          error: err => {
-            console.error('Error al actualizar el usuario:', err);
-
-          }
+      this.userStore.update(id, payload).subscribe({
+        next: () => {
+          this.sweetAlertService.showNotification(
+            'Actualización Exitosa',
+            'Usuario actualizado exitosamente.',
+            'success'
+          );
+        },
+        error: err => {
+          console.error('Error al actualizar el usuario:', err);
         }
-      );
+      });
     });
   }
 
-  // CREATE
+  // ----- CREATE -----
   onCreateNew() {
-    this.personService.getPersons().pipe(
+    this.personService.getAll().pipe(
       catchError(() => of([])),
       map((persons: any[]) => persons.map(p => ({ value: p.id, label: `${p.firstName} ${p.lastName}` })))
     ).subscribe(people => {
       if (!people.length) { console.error('No hay personas disponibles'); return; }
 
-      const initial: UserCreateDto = {
+      const initial: UserCreateModel = {
         email: '',
         password: '',
         personId: people[0].value
@@ -111,16 +138,18 @@ export class UserComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe((result: any) => {
         if (!result) return;
-        const payload: UserCreateDto = {
+        const payload: UserCreateModel = {
           email: (result.email ?? '').trim(),
           password: result.password,
           personId: +result.personId
         };
-        this.userService.createUser(payload).subscribe({
+        this.userStore.create(payload).subscribe({
           next: () => {
-
-            this.load();
-            this.sweetAlertService.showNotification('Creación Exitosa', 'Usuario creado exitosamente.', 'success');
+            this.sweetAlertService.showNotification(
+              'Creación Exitosa',
+              'Usuario creado exitosamente.',
+              'success'
+            );
           },
           error: err => {
             console.error('Error al crear el usuario:', err);
@@ -130,9 +159,8 @@ export class UserComponent implements OnInit {
     });
   }
 
-
-  // DELETE
-  async onDelete(row: UserListDto) {
+  // ----- DELETE (soft delete) -----
+  async onDelete(row: UserSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar Usuario',
       text: `¿Deseas eliminar al usuario "${row.personName}"?`,
@@ -141,21 +169,23 @@ export class UserComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.userService.deleteUser(row.id).subscribe({
+      this.userStore.deleteLogic(row.id).subscribe({
         next: () => {
-          this.load()
-          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
+          this.sweetAlertService.showNotification(
+            'Eliminación Exitosa',
+            'Usuario eliminado exitosamente.',
+            'success'
+          );
         },
         error: err => {
-          console.error('Error eliminando el usuario:', err)
+          console.error('Error eliminando el usuario:', err);
           this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el usuario.', 'error');
         }
       });
     }
   }
 
-  onView(row: UserListDto) {
+  onView(row: UserSelectModel) {
     console.log('Ver usuario:', row);
   }
-
 }

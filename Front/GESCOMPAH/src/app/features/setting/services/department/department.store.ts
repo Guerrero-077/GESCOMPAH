@@ -1,30 +1,30 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { DepartmentModel, DepartmentCreate, DepartmentUpdate } from '../../models/department.models';
+import { DepartmentSelectModel, DepartmentCreate, DepartmentUpdate } from '../../models/department.models';
 import { DepartmentService } from './department.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DepartmentStore {
-  private readonly _departments = new BehaviorSubject<DepartmentModel[]>([]);
+  private readonly _departments = new BehaviorSubject<DepartmentSelectModel[]>([]);
   readonly departments$ = this._departments.asObservable();
 
   constructor(private departmentService: DepartmentService) {
     this.loadAll();
   }
 
-  private get departments(): DepartmentModel[] {
+  private get departments(): DepartmentSelectModel[] {
     return this._departments.getValue();
   }
 
-  private set departments(val: DepartmentModel[]) {
+  private set departments(val: DepartmentSelectModel[]) {
     this._departments.next(val);
   }
 
   loadAll() {
-    this.departmentService.getAll("Department").pipe(
+    this.departmentService.getAll().pipe(
       tap(data => this.departments = data),
       catchError(err => {
         console.error('Error loading departments', err);
@@ -33,24 +33,24 @@ export class DepartmentStore {
     ).subscribe();
   }
 
-  create(department: DepartmentCreate): Observable<DepartmentModel> {
-    return this.departmentService.Add("Department", department as DepartmentModel).pipe(
+  create(department: DepartmentCreate): Observable<DepartmentSelectModel> {
+    return this.departmentService.create(department as DepartmentSelectModel).pipe(
       tap(() => {
         this.loadAll(); // Force refresh
       })
     );
   }
 
-  update(updateDto: DepartmentUpdate): Observable<DepartmentModel> {
-    return this.departmentService.Update("Department", updateDto.id, updateDto).pipe(
+  update(updateDto: DepartmentUpdate): Observable<DepartmentSelectModel> {
+    return this.departmentService.update(updateDto.id, updateDto).pipe(
       tap(() => {
         this.loadAll(); // Force refresh
       })
     );
   }
 
-  delete(id: number): Observable<DepartmentModel> {
-    return this.departmentService.Delete("Department", id).pipe(
+  delete(id: number): Observable<void> {
+    return this.departmentService.delete(id).pipe(
       tap(() => {
         this.departments = this.departments.filter(d => d.id !== id);
       })

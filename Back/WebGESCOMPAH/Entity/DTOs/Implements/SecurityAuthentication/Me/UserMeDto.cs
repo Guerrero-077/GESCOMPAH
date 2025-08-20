@@ -8,7 +8,7 @@
 
 
         public IEnumerable<string> Roles { get; set; } = [];
-        public IEnumerable<string> Permissions { get; set; } = [];
+        //public IEnumerable<string> Permissions { get; set; } = [];
 
         public IEnumerable<MenuModuleDto> Menu { get; set; } = [];
     }

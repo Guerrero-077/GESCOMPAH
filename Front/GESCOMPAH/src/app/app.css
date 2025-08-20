@@ -1,19 +1,27 @@
-.container-d {
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    background-color: #fff;
+::ng-deep .mat-step-header .mat-step-icon-selected {
+  background-color: var(--primary-color) !important;
+  color: var(--text-color-black) !important;
 }
 
-.content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+::ng-deep .mat-step-header .mat-step-icon {
+  background-color: var(--primary-color) !important;
+  color: black !important;
 }
 
-.main-content {
-    padding: 3vh;
-    display: flex;
-    flex-direction: column;
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: white !important;
+}
+
+::ng-deep .mat-raised-button.mat-primary {
+  background-color: var(--primary-color);
+  color: var(--text-color-black);
+}
+
+::ng-deep .mat-step-label {
+  color: black !important;
+}
+
+::ng-deep .mat-step-header[aria-selected="true"] .mat-step-label {
+  color: #16A34A !important;
 }
 

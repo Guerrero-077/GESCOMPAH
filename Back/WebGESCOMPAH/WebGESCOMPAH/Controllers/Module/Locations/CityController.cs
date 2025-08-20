@@ -8,25 +8,17 @@ using WebGESCOMPAH.Controllers.Base;
 namespace WebGESCOMPAH.Controllers.Module.Locations
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
-    public class CityController : BaseController<CitySelectDto, CityCreateDto, CityUpdateDto, ICityService>
+    public class CityController : BaseController<CitySelectDto, CityCreateDto, CityUpdateDto>
     {
+        private readonly ICityService _service;
         public CityController(ICityService service, ILogger<CityController> logger) : base(service, logger)
         {
-        }
-        protected override async Task<IEnumerable<CitySelectDto>> GetAllAsync()
-        {
-            return await _service.GetAllAsync();
+            _service = service;
         }
 
-        protected override async Task<CitySelectDto?> GetByIdAsync(int id)
-        {
-            return await _service.GetByIdAsync(id);
-        }
-
-
-        [HttpGet("Department/City/{id}")]
+        [HttpGet("CityWithDepartment/{id}")]
         //[ProducesResponseType(typeof(TDto), 200)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -44,33 +36,14 @@ namespace WebGESCOMPAH.Controllers.Module.Locations
             }
             catch (ValidationException ex)
             {
-                _logger.LogWarning(ex, "Validación fallida con ID: {Id}", id);
+                Logger.LogWarning(ex, "Validación fallida con ID: {Id}", id);
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener el ID {Id}", id);
+                Logger.LogError(ex, "Error al obtener el ID {Id}", id);
                 return StatusCode(500, new { message = "Error interno del servidor." });
             }
-        }
-
-        protected override async Task AddAsync(CityCreateDto dto)
-        {
-            await _service.CreateAsync(dto);
-        }
-        protected override async Task<CitySelectDto> UpdateAsync(int id, CityUpdateDto dto)
-        {
-            return await _service.UpdateAsync(dto);
-        }
-
-        protected override async Task<bool> DeleteAsync(int id)
-        {
-            return await _service.DeleteAsync(id);
-        }
-
-        protected override async Task<bool> DeleteLogicAsync(int id)
-        {
-            return await _service.DeleteLogicAsync(id);
         }
 
 

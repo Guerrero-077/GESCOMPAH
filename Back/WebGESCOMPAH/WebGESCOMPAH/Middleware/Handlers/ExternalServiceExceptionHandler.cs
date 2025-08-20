@@ -6,23 +6,20 @@ namespace WebGESCOMPAH.Middleware.Handlers
 {
     public class ExternalServiceExceptionHandler : IExceptionHandler
     {
-        public bool CanHandle(Exception exception) =>
-            exception is ExternalServiceException;
+        public int Priority => 50;
+        public bool CanHandle(Exception exception) => exception is ExternalServiceException;
 
-        public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env)
+        public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env, HttpContext http)
         {
-            var externalError = (ExternalServiceException)exception;
-
             var statusCode = (int)HttpStatusCode.ServiceUnavailable;
-
             var problem = new ProblemDetails
             {
                 Status = statusCode,
                 Title = "Error en servicio externo.",
-                Detail = externalError.Message,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.4"
+                Detail = exception.Message,
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.4",
+                Instance = http.Request.Path
             };
-
             return (problem, statusCode);
         }
     }

@@ -10,9 +10,9 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { RolUserService } from '../../services/rol-user/rol-user.service';
 import { UserService } from '../../services/user/user.service';
-import { RolUserListDto, RolUserCreateDto, RolUserUpdatePayload } from '../../models/rol-user.models';
 import { RoleService } from '../../services/role/role.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { RolUserCreateModel, RolUserSelectModel } from '../../models/rol-user.models';
 
 @Component({
   selector: 'app-rol-user',
@@ -23,13 +23,14 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 export class RolUserComponent implements OnInit {
   private readonly rolUserService = inject(RolUserService);
   private readonly userService = inject(UserService);
-  private readonly rolService = inject(RoleService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+
+  
   private readonly dialog = inject(MatDialog);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  rolUsers: RolUserListDto[] = [];
-  columns: TableColumn<RolUserListDto>[] = [];
+  rolUsers: RolUserSelectModel[] = [];
+  columns: TableColumn<RolUserSelectModel>[] = [];
 
   ngOnInit(): void {
     this.columns = [
@@ -50,7 +51,7 @@ export class RolUserComponent implements OnInit {
 
   // -- helpers para selects --
   private getUserOptions$() {
-    return this.userService.getUsers().pipe(
+    return this.userService.getAll().pipe(
       catchError(() => of([])),
       map((users: any[]) =>
         users.map(u => ({
@@ -62,7 +63,7 @@ export class RolUserComponent implements OnInit {
   }
 
   private getRoleOptions$() {
-    return this.rolService.getAll("rol").pipe(
+    return this.rolUserService.getAll().pipe(
       catchError(() => of([])),
       map((roles: any[]) => roles.map(r => ({ value: r.id, label: r.name })))
     );
@@ -79,7 +80,7 @@ export class RolUserComponent implements OnInit {
         return;
       }
 
-      const initial: RolUserCreateDto = {
+      const initial: RolUserCreateModel = {
         userId: userOpts[0].value,
         rolId: roleOpts[0].value,
         active: true
@@ -100,7 +101,7 @@ export class RolUserComponent implements OnInit {
       dialogRef.afterClosed().subscribe((result: any) => {
         if (!result) return;
 
-        const payload: RolUserCreateDto = {
+        const payload: RolUserCreateModel = {
           userId: +result.userId,
           rolId: +result.rolId,
           active: !!result.active
@@ -121,7 +122,7 @@ export class RolUserComponent implements OnInit {
   }
 
   // EDIT
-  onEdit(row: RolUserListDto) {
+  onEdit(row: RolUserSelectModel) {
     const id = row.id;
 
     forkJoin({
@@ -194,7 +195,7 @@ export class RolUserComponent implements OnInit {
 
 
   // DELETE
-  async onDelete(row: RolUserListDto) {
+  async onDelete(row: RolUserSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar Asignación Rol-Usuario',
       text: `¿Deseas eliminar el rol "${row.rolName}" del usuario "${row.userEmail}"?`,
@@ -203,7 +204,7 @@ export class RolUserComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.rolUserService.deleteLogical(row.id).subscribe({
+      this.rolUserService.deleteLogic(row.id).subscribe({
         next: () => {
           this.load()
           this.sweetAlertService.showNotification('Eliminación Exitosa', 'Asignación Rol-Usuario eliminada exitosamente.', 'success');
@@ -216,7 +217,7 @@ export class RolUserComponent implements OnInit {
     }
   }
 
-  onView(row: RolUserListDto) {
+  onView(row: RolUserSelectModel) {
     console.log('Ver RolUser:', row);
   }
 }

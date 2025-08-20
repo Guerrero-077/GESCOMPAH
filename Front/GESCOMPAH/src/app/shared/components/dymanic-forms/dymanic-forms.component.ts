@@ -1,14 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { FormType, formSchemas } from './dymanic-forms.config';
-import { DepartmentService } from '../../../features/setting/services/department/department.service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { map } from 'rxjs/operators';
+
+import { FormType, formSchemas, DynamicFormField } from './dymanic-forms.config';
+import { DepartmentService } from '../../../features/setting/services/department/department.service';
+
+type Option = { value: string | number; label: string };
 
 @Component({
   selector: 'app-dymanic-forms',
@@ -16,11 +28,12 @@ import { map } from 'rxjs/operators';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatSlideToggleModule,
+    TextFieldModule,
     MatButtonModule,
     MatSelectModule,
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatCheckboxModule,
   ],
   templateUrl: './dymanic-forms.component.html',
   styleUrl: './dymanic-forms.component.css',
@@ -28,92 +41,155 @@ import { map } from 'rxjs/operators';
 export class DymanicFormsComponent implements OnInit {
   @Input() formType!: FormType;
   @Input() initialData: any = {};
-  @Input() selectOptions: Record<string, any[]> = {};
+  @Input() selectOptions: Record<string, Option[]> = {};
 
   @Output() formSubmit = new EventEmitter<any>();
 
   form!: FormGroup;
-  fields: any[] = [];
+  fields: DynamicFormField[] = [];
 
   private departmentService = inject(DepartmentService);
 
   constructor(private fb: FormBuilder) { }
 
   ngOnInit() {
-    console.log('DymanicFormsComponent - initialData:', this.initialData);
-    console.log('DymanicFormsComponent - selectOptions:', this.selectOptions);
+    // 1) Clona schema
+    this.fields = formSchemas[this.formType].map(f => ({ ...f }));
 
-    // Clonar schema
-    this.fields = formSchemas[this.formType].map(field => ({ ...field }));
-
-    // ---- Reglas específicas por tipo ----
+    // reglas por tipo
     const isUser = this.formType === 'User';
-    const isUserEdit = isUser && !!this.initialData?.id;   // si viene id => edición
+    const isUserEdit = isUser && !!this.initialData?.id;
 
-    // Para User EDIT: ocultar personId (no se cambia en update)
     if (isUserEdit) {
       const personField = this.fields.find(f => f.name === 'personId');
       if (personField) personField.type = 'hidden';
     }
 
-    // Cargar opciones para selects
+    // 2) Cargar opciones de selects/checkbox-list
     this.fields.forEach(field => {
       if (field.name === 'departmentId' && this.formType === 'City') {
-        this.departmentService.getAll('Department').pipe(
-          map(departments => departments.map((dep: any) => ({ value: dep.id, label: dep.name })))
-        ).subscribe(options => { field.options = options; });
-      } else if (field.type === 'select' && this.selectOptions[field.name]) {
-        field.options = this.selectOptions[field.name];
+        this.departmentService.getAll().pipe(
+          map(depts => depts.map((d: any) => ({ value: d.id, label: d.name } as Option)))
+        ).subscribe(options => this.setOptionsForField(field.name, options));
+      } else if ((field.type === 'select' || field.type === 'checkbox-list') && this.selectOptions[field.name]) {
+        this.setOptionsForField(field.name, this.selectOptions[field.name]);
       }
     });
 
-    // Construcción de controles
-    const formControls: Record<string, any> = {};
+    // 3) Construcción inicial de controles
+    const controls: Record<string, any> = {};
     this.fields.forEach(field => {
-      // Valor inicial
-      let initialValue = this.initialData?.[field.name];
-      if (initialValue === undefined) {
-        if (field.type === 'select' && field.multiple) initialValue = [];
-        else if (field.type === 'checkbox') initialValue = false;
-        else initialValue = null;
-      }
+      const init = this.initialData?.[field.name];
 
-      // Si el campo es hidden, NO forzamos required
-      const validators = [];
-      if (field.required && field.type !== 'hidden') {
-        validators.push(Validators.required);
+      switch (field.type) {
+        case 'checkbox-list': {
+          // Creamos un FormGroup vacío; luego se reconcilia cuando tengamos options
+          const fg = new FormGroup({});
+          if (field.required) fg.addValidators(atLeastOneTrueInGroupValidator);
+          controls[field.name] = fg;
+          break;
+        }
+        default: {
+          let value = init;
+          if (value === undefined) {
+            if (field.type === 'select' && field.multiple) value = [];
+            else if (field.type === 'checkbox') value = false;
+            else value = null;
+          }
+          const validators = [];
+          if (field.required && field.type !== 'hidden') {
+            // Para checkbox simple, usa requiredTrue (consentimiento/flags)
+            validators.push(field.type === 'checkbox' ? Validators.requiredTrue : Validators.required);
+          }
+          controls[field.name] = [value, validators];
+          break;
+        }
       }
-
-      // Password: el schema lo pone required; si es edición, se quita más abajo
-      formControls[field.name] = [initialValue, validators];
     });
 
-    this.form = this.fb.group(formControls);
+    this.form = this.fb.group(controls);
 
-    // ---- Ajustes post-creación del form ----
+    // 4) Ajustes post-creación
     if (isUserEdit) {
-      // Edición de User: password opcional
       this.form.get('password')?.clearValidators();
       this.form.get('password')?.updateValueAndValidity();
 
-      // personId oculto y sin validaciones
       this.form.get('personId')?.clearValidators();
       this.form.get('personId')?.updateValueAndValidity();
     }
 
-    // City: set departmentId si viene
     if (this.formType === 'City' && this.initialData?.departmentId) {
       this.form.get('departmentId')?.setValue(this.initialData.departmentId);
     }
 
-    // Department / City: set active si viene
     if ((this.formType === 'Department' || this.formType === 'City')
       && typeof this.initialData?.active === 'boolean') {
       this.form.get('active')?.setValue(this.initialData.active);
     }
 
-    console.log('DymanicFormsComponent - form.value after init:', this.form.value);
+    // Reconciliar checkbox-list para campos que ya tenían options antes de construir
+    this.fields.filter(f => f.type === 'checkbox-list').forEach(f => {
+      this.reconcileCheckboxListGroup(f.name);
+    });
   }
+
+  // ===== Helpers de opciones/checkbox-list =====
+
+  private sortOptionsById(opts: Option[]) {
+    return [...(opts ?? [])].sort((a, b) => Number(a.value) - Number(b.value));
+  }
+
+  private getField(name: string) {
+    return this.fields.find(f => f.name === name);
+  }
+
+  /** Fija options (ordenadas) y reconcilia el FormGroup del checkbox-list */
+  private setOptionsForField(fieldName: string, options: Option[]) {
+    const field = this.getField(fieldName);
+    if (!field) return;
+    field.options = this.sortOptionsById(options ?? []);
+    if (field.type === 'checkbox-list' && this.form) {
+      this.reconcileCheckboxListGroup(fieldName);
+    }
+  }
+
+  /** Crea/actualiza el FormGroup (clave = id) preservando checks por ID */
+  private reconcileCheckboxListGroup(fieldName: string) {
+    const field = this.getField(fieldName);
+    if (!field || field.type !== 'checkbox-list') return;
+
+    const options = field.options ?? [];
+    const group = this.form.get(fieldName) as FormGroup;
+    if (!group) return;
+
+    // set de seleccionados desde initialData (para primera carga)
+    const selectedFromInit = new Set(
+      Array.isArray(this.initialData?.[fieldName])
+        ? (this.initialData[fieldName] as (string | number)[]).map(String)
+        : []
+    );
+
+    // Crear controles faltantes / preservar existentes
+    for (const opt of options) {
+      const key = String(opt.value);
+      if (!group.contains(key)) {
+        const initialChecked = selectedFromInit.has(key) || false;
+        group.addControl(key, this.fb.control<boolean>(initialChecked));
+      }
+    }
+
+    // Quitar controles que ya no existen en options
+    Object.keys(group.controls).forEach(ctrlKey => {
+      const stillExists = options.some(o => String(o.value) === ctrlKey);
+      if (!stillExists) group.removeControl(ctrlKey);
+    });
+
+    group.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+  }
+
+  trackByOption = (_: number, opt: Option) => String(opt.value);
+
+  // ===== Utils =====
 
   compareById(o1: any, o2: any): boolean {
     if (o1 == null || o2 == null) return false;
@@ -121,10 +197,32 @@ export class DymanicFormsComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.form.valid) {
-      this.formSubmit.emit(this.form.getRawValue()); // usar getRawValue por seguridad
-    } else {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
     }
+
+    const raw = this.form.getRawValue();
+    const result: any = { ...raw };
+
+    // Normaliza checkbox-list: FormGroup { [id]: boolean } -> number[]
+    for (const field of this.fields) {
+      if (field.type === 'checkbox-list') {
+        const fg = this.form.get(field.name) as FormGroup;
+        const opts = field.options ?? [];
+        const ids = opts
+          .filter(o => (fg.get(String(o.value)) as FormControl<boolean>)?.value === true)
+          .map(o => (typeof o.value === 'string' && !isNaN(+o.value) ? +o.value : o.value));
+        result[field.name] = ids;
+      }
+    }
+
+    this.formSubmit.emit(result);
   }
+}
+
+/** Validador: al menos un true dentro de un FormGroup<boolean> */
+function atLeastOneTrueInGroupValidator(c: AbstractControl) {
+  const v = c.value as Record<string, boolean>;
+  return Object.values(v || {}).some(Boolean) ? null : { required: true };
 }

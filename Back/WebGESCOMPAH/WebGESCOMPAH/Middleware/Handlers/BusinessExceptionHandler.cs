@@ -6,23 +6,20 @@ namespace WebGESCOMPAH.Middleware.Handlers
 {
     public class BusinessExceptionHandler : IExceptionHandler
     {
-        public bool CanHandle(Exception exception) =>
-            exception is BusinessException;
+        public int Priority => 20;
+        public bool CanHandle(Exception exception) => exception is BusinessException;
 
-        public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env)
+        public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env, HttpContext http)
         {
-            var businessException = (BusinessException)exception;
-
-            var statusCode = (int)HttpStatusCode.BadRequest;
-
+            var statusCode = (int)HttpStatusCode.Conflict; // antes: 400
             var problem = new ProblemDetails
             {
                 Status = statusCode,
                 Title = "Error de negocio.",
-                Detail = businessException.Message,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                Detail = exception.Message,
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8",
+                Instance = http.Request.Path
             };
-
             return (problem, statusCode);
         }
     }

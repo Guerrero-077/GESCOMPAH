@@ -5,5 +5,7 @@ namespace Data.Interfaz.IDataImplemenent.AdministrationSystem
 {
     public interface IFormModuleRepository : IDataGeneric<FormModule>
     {
+        Task<List<int>> GetUserIdsByFormIdAsync(int formId);
+
     }
 }

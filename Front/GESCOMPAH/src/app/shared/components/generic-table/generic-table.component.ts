@@ -12,6 +12,7 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { TableColumn } from '../../models/TableColumn.models';
+import { HasRoleAndPermissionDirective } from '../../../core/Directives/HasRoleAndPermission.directive';
 
 @Component({
   selector: 'app-generic-table',
@@ -27,7 +28,8 @@ import { TableColumn } from '../../models/TableColumn.models';
     MatButtonModule,
     MatMenuModule,
     MatTooltipModule,
-    FormsModule
+    FormsModule,
+    HasRoleAndPermissionDirective
   ],
   templateUrl: './generic-table.component.html',
   styleUrls: ['./generic-table.component.css']
@@ -35,7 +37,15 @@ import { TableColumn } from '../../models/TableColumn.models';
 export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() data: T[] | null = null;
   @Input() columns: TableColumn<T>[] = [];
-  @Input() createButtonLabel = 'Crear';
+  @Input() createButtonLabel = '+ Crear';
+  @Input() titulo = 'Tabla Genérica';
+  @Input() subTitulo = 'Subtítulo de la tabla';
+
+  /** 👉 Botón de filtros (opcional y configurable) */
+  @Input() showFilterButton = true;
+  @Input() filterParams: any = {};
+  @Input() filterTooltip: string = 'Filtros';
+  @Output() filterClick = new EventEmitter<any>();
 
   @Output() edit = new EventEmitter<T>();
   @Output() delete = new EventEmitter<T>();
@@ -49,7 +59,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   private filterSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  // Guardamos referencias internas y las conectamos mediante setters
   private _paginator?: MatPaginator;
   private _sort?: MatSort;
 
@@ -75,7 +84,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
       takeUntil(this.destroy$)
     ).subscribe(value => {
       this.dataSource.filter = value.trim().toLowerCase();
-      // cuando filtras, volver a la primera página
       if (this._paginator) { this._paginator.firstPage(); }
     });
   }
@@ -86,12 +94,9 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     }
 
     if (changes['data']) {
-      // asignar datos
       this.dataSource.data = this.data || [];
 
-      // si el paginator ya está, actualizar su length y pageIndex si es necesario
       if (this._paginator) {
-        // asegurar que pageIndex sea válido (ej: si la nueva data es más pequeña)
         const pageSize = this._paginator.pageSize || 5;
         const maxPageIndex = Math.max(0, Math.ceil(this.dataSource.data.length / pageSize) - 1);
         if (this._paginator.pageIndex > maxPageIndex) {
@@ -100,22 +105,16 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
         this._paginator.length = this.dataSource.data.length;
       }
 
-      // reconectar sort/paginator por si se crearon después
       this.connectSort();
       this.connectPaginator();
 
-      // forzar que MatTableDataSource recalcule
-      // (método "privado" pero comúnmente usado)
       try { (this.dataSource as any)._updateChangeSubscription(); } catch { }
 
-      // forzar CD para que Angular reevalúe la vista (importante cuando aparece paginator después)
       this.cdr.detectChanges();
     }
   }
 
   ngAfterViewInit() {
-    // componentes present at view init will be connected by setters,
-    // pero por seguridad conectamos aquí también:
     this.connectSort();
     this.connectPaginator();
   }
@@ -123,7 +122,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   private connectPaginator() {
     if (this._paginator) {
       this.dataSource.paginator = this._paginator;
-      // asegurar long actual
       this._paginator.length = this.dataSource.data.length;
     }
   }
@@ -138,16 +136,18 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     this.filterSubject.next(value);
   }
 
+  onFilterClick() {
+    this.filterClick.emit(this.filterParams);
+  }
+
   get hasData(): boolean {
     return (this.dataSource?.data?.length || 0) > 0;
   }
 
   onEdit(row: T) {
-    console.log('GenericTableComponent: Emitting edit event with row:', row);
     this.edit.emit(row);
   }
   onDelete(row: T) {
-    console.log('GenericTableComponent: Emitting delete event with row:', row);
     this.delete.emit(row);
   }
   onView(row: T) { this.view.emit(row); }

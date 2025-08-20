@@ -5,10 +5,10 @@ namespace WebGESCOMPAH.Middleware.Handlers
 {
     public class ValidationExceptionHandler : IExceptionHandler
     {
-        public bool CanHandle(Exception exception) =>
-            exception is FluentValidation.ValidationException;
+        public int Priority => 10;
+        public bool CanHandle(Exception exception) => exception is FluentValidation.ValidationException;
 
-        public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env)
+        public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env, HttpContext http)
         {
             var ex = (FluentValidation.ValidationException)exception;
 
@@ -19,11 +19,10 @@ namespace WebGESCOMPAH.Middleware.Handlers
             {
                 Status = (int)HttpStatusCode.BadRequest,
                 Title = "Errores de validación.",
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Instance = http.Request.Path
             };
-
             return (problem, problem.Status ?? 400);
         }
     }
-
 }

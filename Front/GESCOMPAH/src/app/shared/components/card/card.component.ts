@@ -24,7 +24,7 @@ export class CardComponent {
 
   get primaryImage(): string {
     const imageUrl = this.local?.images?.[0]?.filePath || 'assets/images/placeholder.jpg';
-    console.log('Primary Image URL:', imageUrl);
+    // console.log('Primary Image URL:', imageUrl);
     // Append a timestamp to the URL to bypass browser caching
     return imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
   }

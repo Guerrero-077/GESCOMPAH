@@ -19,7 +19,7 @@ import { BackendMenuItem, SidebarItem } from './sidebar.config';
 export class SidebarComponent implements OnInit {
   menu: SidebarItem[] = [];
 
-  constructor(private permissionService: PermissionService, private authService: AuthService) { } // Inject services
+  constructor(private permissionService: PermissionService, private authService: AuthService) { }
 
   ngOnInit(): void {
     this.permissionService.userProfile$.subscribe(userProfile => {
@@ -37,14 +37,20 @@ export class SidebarComponent implements OnInit {
   }
 
   private transformMenu(backendMenu: BackendMenuItem[]): SidebarItem[] {
+    // Sort the main menu items by their 'id' property
+    backendMenu.sort((a, b) => a.id - b.id);
+
     const sidebarItems: SidebarItem[] = [];
     backendMenu.forEach(menuItem => {
       const children: SidebarItem[] = [];
+      // Sort the forms (sub-menu items) within each main menu item by their 'id' property
+      menuItem.forms.sort((a, b) => a.id - b.id);
+
       menuItem.forms.forEach(form => {
         children.push({
           label: form.name,
           icon: '',
-          route: `/admin/${form.route}` // Prefix with /Admin/
+          route: `/admin/${form.route}`
         });
       });
 

@@ -1,4 +1,4 @@
-export interface RolUserListDto {
+export interface RolUserSelectModel {
   id: number;
   userId: number;
   userEmail: string;
@@ -7,13 +7,13 @@ export interface RolUserListDto {
   active: boolean;
 }
 
-export interface RolUserCreateDto {
+export interface RolUserCreateModel {
   userId: number;
   rolId: number;
   active: boolean;
 }
 
-export interface RolUserUpdatePayload {
+export interface RolUserUpdateModel {
   userId: number;
   rolId: number;
   active: boolean;

@@ -1,0 +1,44 @@
+<div class="container">
+
+
+
+  <h2 mat-dialog-title>Detalles del Establecimiento</h2>
+
+  <div mat-dialog-content>
+    <div class="establishment-info">
+      <div class="info-card">
+        <p><strong>Nombre:</strong> {{ data.name }}</p>
+      </div>
+
+      <div class="info-card">
+        <p><strong>Dirección:</strong> {{ data.address }}</p>
+      </div>
+
+      <div class="info-card">
+        <p><strong>Descripción:</strong> {{ data.description }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="data.images && data.images.length > 0">
+      <h3>📸 Galería de Imágenes</h3>
+      <div class="image-gallery">
+        <div class="image-container" *ngFor="let image of data.images" (click)="viewImage(image.filePath)" tabindex="0"
+          (keydown.enter)="viewImage(image.filePath)" role="button" [attr.aria-label]="'Ver imagen de ' + data.name">
+          <img [src]="image.filePath" [alt]="'Imagen de ' + data.name" loading="lazy">
+          <div class="image-overlay"></div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!data.images || data.images.length === 0" class="no-images-message">
+      <p>No hay imágenes disponibles para este establecimiento</p>
+    </div>
+  </div>
+
+  <div mat-dialog-actions>
+    <button mat-button (click)="onClose()">
+      Cerrar
+    </button>
+  </div>
+
+</div>

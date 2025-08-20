@@ -8,6 +8,6 @@
         Task<TDtoGet> UpdateAsync(TDtoUpdate dto);
         Task<bool> DeleteAsync(int id);
         Task<bool> DeleteLogicAsync(int id);
-
+        Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active);
     }
 }

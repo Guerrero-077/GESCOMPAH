@@ -18,8 +18,9 @@ export class AuthService {
   private urlBase = environment.apiURL + '/auth/';
 
   Register(obj: RegisterModel): Observable<any> {
-    return this.http.post<any>(this.urlBase + 'login', obj, { withCredentials: true });
+    return this.http.post<any>(this.urlBase + 'register', obj, { withCredentials: true });
   }
+
 
   // Login -> luego /me para poblar el perfil
   Login(obj: LoginModel): Observable<User> {

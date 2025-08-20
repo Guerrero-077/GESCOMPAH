@@ -1,225 +1,81 @@
-﻿using Entity.DTOs.Base;
+﻿using Business.Interfaces.IBusiness;
+using Entity.DTOs.Base;
 using Microsoft.AspNetCore.Mvc;
-using Utilities.Exceptions;
 
 namespace WebGESCOMPAH.Controllers.Base
 {
     [ApiController]
     [Route("api/[controller]")]
-    public abstract class BaseController<TDtoGet, TDtoCreate, TDtoUpdate, TService> : ControllerBase
-          where TDtoGet : class
-          where TService : class
+    [Produces("application/json")]
+    public abstract class BaseController<TGet, TCreate, TUpdate> : ControllerBase
+        where TGet : class
     {
-        protected readonly TService _service;
-        protected readonly ILogger _logger;
+        protected readonly IBusiness<TGet, TCreate, TUpdate> Service;
+        protected readonly ILogger Logger;
 
-        protected BaseController(TService service, ILogger logger)
+        protected BaseController(IBusiness<TGet, TCreate, TUpdate> service, ILogger logger)
         {
-            _service = service;
-            _logger = logger;
+            Service = service;
+            Logger = logger;
         }
 
         [HttpGet]
-        //[ProducesResponseType(typeof(IEnumerable<TDto>), 200)]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(500)]
-        public virtual async Task<IActionResult> Get()
-        {
-            try
-            {
-                var result = await GetAllAsync();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error obteniendo datos");
-                return StatusCode(500, new { message = "Error interno del servidor." });
-            }
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<IEnumerable<TGet>>> Get()
+            => Ok(await Service.GetAllAsync());
 
-            //var result = await DeleteAsync(id, deleteType);
-
-            //if (!result)
-            //    return NotFound(new { message = "No se pudo eliminar el recurso." });
-
-            //return Ok(new { message = $"Eliminación {deleteType} realizada correctamente." });
-        }
-
-        [HttpGet("{id}")]
-        //[ProducesResponseType(typeof(TDto), 200)]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public virtual async Task<IActionResult> GetById(int id)
-        {
-            try
-            {
-                var result = await GetByIdAsync(id);
-                if (result == null)
-                    return NotFound(new { message = $"No se encontró el elemento con ID {id}" });
-
-                return Ok(result);
-            }
-            catch (ValidationException ex)
-            {
-                _logger.LogWarning(ex, "Validación fallida con ID: {Id}", id);
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener el ID {Id}", id);
-                return StatusCode(500, new { message = "Error interno del servidor." });
-            }
-        }
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public virtual async Task<ActionResult<TGet>> GetById(int id)
+            => (await Service.GetByIdAsync(id)) is { } dto ? Ok(dto) : NotFound();
 
         [HttpPost]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public virtual async Task<IActionResult> Post([FromBody] TDtoCreate dto)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public virtual async Task<ActionResult<TGet>> Post([FromBody] TCreate dto)
         {
-            try
-            {
-                await AddAsync(dto);
-                return Ok(new { message = "Elemento agregado exitosamente" });
-            }
-            catch (ValidationException ex)
-            {
-                _logger.LogWarning(ex, "Validación fallida al agregar");
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al agregar elemento");
-                return StatusCode(500, new { message = "Error interno del servidor." });
-            }
+            var created = await Service.CreateAsync(dto);
+            if (created is BaseDto withId)
+                return CreatedAtAction(nameof(GetById), new { id = withId.Id }, created);
+
+            return StatusCode(StatusCodes.Status201Created, created);
+        }
+
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public virtual async Task<ActionResult<TGet>> Put(int id, [FromBody] TUpdate dto)
+        {
+            if (dto is BaseDto withId) withId.Id = id;
+            var updated = await Service.UpdateAsync(dto);
+            return updated is null ? NotFound() : Ok(updated);
+        }
+
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public virtual async Task<IActionResult> Delete(int id)
+            => await Service.DeleteAsync(id) ? NoContent() : NotFound();
+
+        [HttpPatch("{id:int}/soft-delete")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public virtual async Task<IActionResult> DeleteLogic(int id)
+            => await Service.DeleteLogicAsync(id) ? NoContent() : NotFound();
+
+        public record ChangeActiveStatusDto(bool Active);
+
+        [HttpPatch("{id:int}/estado")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public virtual async Task<ActionResult<TGet>> ChangeActiveStatus(
+            int id, [FromBody] ChangeActiveStatusDto body)
+        {
+            var updated = await Service.UpdateActiveStatusAsync(id, body.Active );
+            return updated is null ? NotFound() : Ok(updated);
         }
 
 
-        [HttpPut("{id}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public virtual async Task<IActionResult> Put(int id, [FromBody] TDtoUpdate dto)
-        {
-            try
-            {
-                if (dto is null)
-                    return BadRequest(new { message = "El cuerpo de la solicitud es requerido." });
-
-                // Si el DTO de update tiene Id, lo sobreescribimos con el de la ruta (única fuente de verdad)
-                if (dto is BaseDto withId)
-                    withId.Id = id;
-
-                var updated = await UpdateAsync(id, dto);
-                if (updated == null)
-                    return NotFound(new { message = $"No se encontró el recurso con ID {id} para actualizar." });
-                return Ok(dto);
-
-                //return Ok(new { message = "Elemento actualizado exitosamente." });
-            }
-            catch (ValidationException ex)
-            {
-                _logger.LogWarning(ex, "Validación fallida al actualizar ID: {Id}", id);
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al actualizar ID: {Id}", id);
-                return StatusCode(500, new { message = "Error interno del servidor." });
-            }
-        }
-
-
-
-
-        [HttpDelete("{id}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                var result = await DeleteAsync(id);
-
-                if (!result)
-                    return NotFound(new { message = "No se pudo eliminar el recurso." });
-
-                return Ok(new { message = $"Eliminación realizada correctamente." });
-            }
-            catch (ValidationException ex)
-            {
-                _logger.LogWarning(ex, "Validación fallida al eliminar recurso con id: {ResourceId}", id);
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                _logger.LogInformation(ex, "Recurso no encontrado para eliminar con id: {ResourceId}", id);
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ExternalServiceException ex)
-            {
-                _logger.LogError(ex, "Error en servicio externo al eliminar recurso con id: {ResourceId}", id);
-                return StatusCode(500, new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error inesperado al eliminar recurso con id: {ResourceId}", id);
-                return StatusCode(500, new { message = "Error interno del servidor." });
-            }
-        }
-
-        [HttpPatch("{id}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteLogic(int id)
-        {
-            try
-            {
-                var result = await DeleteLogicAsync(id);
-
-                if (!result)
-                    return NotFound(new { message = "No se pudo eliminar el recurso." });
-
-                return Ok(new { message = $"Eliminación logica realizada correctamente." });
-            }
-            catch (ValidationException ex)
-            {
-                _logger.LogWarning(ex, "Validación fallida al eliminar recurso con id: {ResourceId}", id);
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                _logger.LogInformation(ex, "Recurso no encontrado para eliminar con id: {ResourceId}", id);
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ExternalServiceException ex)
-            {
-                _logger.LogError(ex, "Error en servicio externo al eliminar recurso con id: {ResourceId}", id);
-                return StatusCode(500, new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error inesperado al eliminar recurso con id: {ResourceId}", id);
-                return StatusCode(500, new { message = "Error interno del servidor." });
-            }
-        }
-
-
-        // Métodos que las subclases deben implementar
-        protected abstract Task<IEnumerable<TDtoGet>> GetAllAsync();
-        protected abstract Task<TDtoGet?> GetByIdAsync(int id);
-        protected abstract Task AddAsync(TDtoCreate dto);
-        protected abstract Task<TDtoGet> UpdateAsync(int id, TDtoUpdate dto);
-        protected abstract Task<bool> DeleteAsync(int id);
-        protected abstract Task<bool> DeleteLogicAsync(int id);
 
     }
-
-
 }

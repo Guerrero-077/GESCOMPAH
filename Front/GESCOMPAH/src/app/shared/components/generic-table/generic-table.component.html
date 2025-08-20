@@ -1,83 +1,131 @@
-<div class="table-wrapper">
+<div class="table-wrapper p-3">
 
-    <!-- 📌 Header -->
-    <div class="table-header d-flex justify-content-between align-items-center">
-        <mat-form-field appearance="outline">
-            <mat-label>Buscar</mat-label>
-            <input matInput [(ngModel)]="filterKey" (ngModelChange)="onFilterChange($event)" placeholder="Buscar...">
-        </mat-form-field>
+  <div class="header m-2">
+    <h3 class="m-0 p-0">{{ titulo }}</h3>
+    <span class="m-0 p-0">{{ subTitulo }}</span>
+  </div>
 
-        <button mat-button matButton="filled" class="boton" (click)="onCreate()">
-            {{ createButtonLabel }}
-        </button>
+  <!-- 📌 Header -->
+  <div class="table-header d-flex justify-content-between align-items-center">
+
+    <div class="d-flex align-items-center gap-2">
+      <!-- Botón de filtro (opcional) -->
+      <button *ngIf="showFilterButton" mat-icon-button [matTooltip]="filterTooltip" color="primary"
+        (click)="onFilterClick()">
+        <mat-icon>filter_list</mat-icon>
+      </button>
+
+      <!-- 🔍 Buscador -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar</mat-label>
+        <input matInput [(ngModel)]="filterKey" (ngModelChange)="onFilterChange($event)" placeholder="Buscar...">
+      </mat-form-field>
     </div>
 
-    <!-- 📌 Tabla si hay datos -->
-    <div class="table-body" *ngIf="hasData; else noDataTemplate">
-        <table mat-table [dataSource]="dataSource" matSort>
+    <!-- Botón crear (solo Admin con permiso CREAR) -->
+    <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
+      <button mat-button class="button-save" (click)="onCreate()">
+        {{ createButtonLabel }}
+      </button>
+    </ng-container>
+  </div>
 
-            <!-- Columnas dinámicas -->
-            <ng-container *ngFor="let col of columns" [matColumnDef]="col.key.toString()">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ col.header }}</th>
-                <td mat-cell *matCellDef="let row; let i = index">
-                    <ng-container *ngIf="col.type === 'index'">{{ i + 1 }}</ng-container>
+  <!-- 📌 Tabla si hay datos -->
+  <div class="table-body border" *ngIf="hasData; else noDataTemplate">
+    <table mat-table [dataSource]="dataSource" matSort>
 
-                    <ng-container *ngIf="!col.type || col.type !== 'index'">
-                        <ng-container *ngIf="!col.template">{{ row[col.key] }}</ng-container>
-                        <ng-container *ngIf="col.template" [ngTemplateOutlet]="col.template"
-                            [ngTemplateOutletContext]="{ $implicit: row }">
-                        </ng-container>
-                    </ng-container>
-                </td>
+      <!-- Columnas dinámicas -->
+      <ng-container *ngFor="let col of columns" [matColumnDef]="col.key.toString()">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ col.header }}
+        </th>
+
+        <td mat-cell *matCellDef="let row; let i = index">
+          <!-- 1) Índice -->
+          <ng-container *ngIf="col.type === 'index'">
+            {{ i + 1 }}
+          </ng-container>
+
+          <!-- 2) Resto: template → render → format → valor -->
+          <ng-container *ngIf="!col.type || col.type !== 'index'">
+            <!-- 2.1) Template externo -->
+            <ng-container *ngIf="col.template; else noTemplate" [ngTemplateOutlet]="col.template"
+              [ngTemplateOutletContext]="{ $implicit: row }">
             </ng-container>
 
-            <!-- Columna de acciones -->
-            <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>Detalles</th>
-                <td mat-cell *matCellDef="let row">
-                    <button mat-icon-button matTooltip="Ver" (click)="onView(row)">
-                        <mat-icon>visibility</mat-icon>
-                    </button>
+            <!-- 2.2) Sin template: probar render y format antes del valor plano -->
+            <ng-template #noTemplate>
+              <ng-container *ngIf="col.render; else maybeFormat">
+                {{ col.render(row) }}
+              </ng-container>
 
-                    <button mat-icon-button [matMenuTriggerFor]="menu">
-                        <mat-icon>more_vert</mat-icon>
-                    </button>
+              <ng-template #maybeFormat>
+                <ng-container *ngIf="col.format; else plainValue">
+                  {{ col.format(row[col.key], row) }}
+                </ng-container>
 
-                    <mat-menu #menu="matMenu">
-                        <button mat-menu-item (click)="onEdit(row)">
-                            <mat-icon>edit</mat-icon>
-                            Editar
-                        </button>
-                        <button mat-menu-item (click)="onDelete(row)">
-                            <mat-icon>delete</mat-icon>
-                            Eliminar
-                        </button>
-                    </mat-menu>
-                </td>
-            </ng-container>
+                <ng-template #plainValue>
+                  {{ row[col.key] }}
+                </ng-template>
+              </ng-template>
+            </ng-template>
+          </ng-container>
+        </td>
+      </ng-container>
 
-            <!-- Header y Rows -->
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row class="data-row" *matRowDef="let row; columns: displayedColumns;"></tr>
+      <!-- Columna de acciones -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Detalles</th>
+        <td mat-cell *matCellDef="let row">
+          <!-- Ver -->
+          <button mat-icon-button matTooltip="Ver" (click)="onView(row)">
+            <mat-icon>visibility</mat-icon>
+          </button>
 
-        </table>
+          <!-- Menú solo si tiene EDITAR o ELIMINAR -->
+          <ng-container *appHasRoleAndPermission="'Administrador'; perms: ['EDITAR','ELIMINAR']; mode: 'any'">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #menu="matMenu">
+              <!-- Editar -->
+              <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
+                <button mat-menu-item (click)="onEdit(row)">
+                  <mat-icon>edit</mat-icon> Editar
+                </button>
+              </ng-container>
+
+              <!-- Eliminar -->
+              <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'ELIMINAR'">
+                <button mat-menu-item (click)="onDelete(row)">
+                  <mat-icon>delete</mat-icon> Eliminar
+                </button>
+              </ng-container>
+            </mat-menu>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Header y Rows -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row class="data-row" *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+  </div>
+
+  <!-- 📌 Footer (solo si hay datos) -->
+  <div class="table-footer" *ngIf="hasData">
+    <mat-paginator class="custom-paginator" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons>
+    </mat-paginator>
+  </div>
+
+  <!-- 📌 Si no hay datos -->
+  <ng-template #noDataTemplate>
+    <div class="no-data-container">
+      <mat-icon class="no-data-icon">inventory_2</mat-icon>
+      <div class="no-data-text">No hay registros disponibles.</div>
     </div>
-
-    <!-- 📌 Footer (solo si hay datos) -->
-    <!-- Footer (solo si hay datos) -->
-    <div class="table-footer" *ngIf="hasData">
-        <mat-paginator class="custom-paginator" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons>
-        </mat-paginator>
-    </div>
-
-
-    <!-- 📌 Si no hay datos -->
-    <ng-template #noDataTemplate>
-        <div class="no-data-container">
-            <mat-icon class="no-data-icon">inventory_2</mat-icon>
-            <div class="no-data-text">No hay registros disponibles.</div>
-        </div>
-    </ng-template>
-
+  </ng-template>
 
 </div>

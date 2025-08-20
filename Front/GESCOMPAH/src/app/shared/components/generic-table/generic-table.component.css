@@ -1,52 +1,52 @@
 td button {
-    margin-right: 4px;
+  margin-right: 4px;
 }
 
 .table-wrapper {
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-header {
-    padding: 1rem;
-    border-bottom: 1px solid #ddd;
-    background-color: #F4F7FC;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+  background-color: #F4F7FC;
 }
 
 .table-body {
-    overflow-x: auto;
-    padding: 1rem;
+  overflow-x: auto;
+  padding: 1rem;
 }
 
 /* Estilo base */
 .data-row {
-    transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out;
 }
 
 /* Estilo al hacer hover */
 .data-row:hover {
-    background-color: #99A0A9;
-    cursor: pointer;
+  background-color: #99A0A9;
+  cursor: pointer;
 }
 
 
 .table-footer {
-    border-top: 1px solid #ddd;
-    padding: 0.5rem 1rem;
-    background-color: #F4F7FC;
+  border-top: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  background-color: #F4F7FC;
 }
 
 .custom-paginator {
-    flex-shrink: 0;
-    background-color: #F4F7FC;
-    border-top: 1px solid #ddd;
+  flex-shrink: 0;
+  background-color: #F4F7FC;
+  border-top: 1px solid #ddd;
 }
 
 .table-footer {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }

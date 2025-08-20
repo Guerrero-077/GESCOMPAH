@@ -1,5 +1,4 @@
-﻿using Business.Interfaces.IBusiness;
-using Business.Interfaces.Implements.SecrutityAuthentication;
+﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,43 +6,58 @@ using WebGESCOMPAH.Controllers.Base;
 
 namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 {
-    [Route("api/[controller]")]
     [Authorize]
     [ApiController]
-    public class RolFormPermissionController : BaseController<RolFormPermissionSelectDto, RolFormPermissionCreateDto, RolFormPermissionUpdateDto, IRolFormPermissionService>
+    [Route("api/[controller]")]
+    public class RolFormPermissionController
+        : BaseController<RolFormPermissionSelectDto, RolFormPermissionCreateDto, RolFormPermissionUpdateDto>
     {
-        public RolFormPermissionController(IRolFormPermissionService service, ILogger<RolFormPermissionController> logger) : base(service, logger)
+        private readonly IRolFormPermissionService _rolFormPermissionService;
+        private readonly ILogger<RolFormPermissionController> _logger;
+
+        public RolFormPermissionController(
+            IRolFormPermissionService service,
+            ILogger<RolFormPermissionController> logger
+        ) : base(service, logger)
         {
+            _rolFormPermissionService = service;
+            _logger = logger;
         }
 
-        protected override async Task AddAsync(RolFormPermissionCreateDto dto)
+        // GET: api/RolFormPermission/grouped
+        [HttpGet("grouped")]
+        public async Task<IActionResult> GetAllGrouped()
         {
-            await _service.CreateAsync(dto);
+            try
+            {
+                var result = await _rolFormPermissionService.GetAllGroupedAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener los permisos de rol-formulario agrupados.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocurrió un error interno en el servidor.");
+            }
         }
 
-        protected override async Task<bool> DeleteAsync(int id)
+        // DELETE: api/RolFormPermission/group/{rolId}/{formId}
+        [HttpDelete("group/{rolId:int}/{formId:int}")]
+        public async Task<IActionResult> DeleteByGroup([FromRoute] int rolId, [FromRoute] int formId)
         {
-            return await _service.DeleteAsync(id);
-        }
-
-        protected override async Task<bool> DeleteLogicAsync(int id)
-        {
-            return await _service.DeleteLogicAsync(id);
-        }
-
-        protected override async Task<IEnumerable<RolFormPermissionSelectDto>> GetAllAsync()
-        {
-            return await _service.GetAllAsync();
-        }
-
-        protected override async Task<RolFormPermissionSelectDto?> GetByIdAsync(int id)
-        {
-            return await _service.GetByIdAsync(id);
-        }
-
-        protected override async Task<RolFormPermissionSelectDto> UpdateAsync(int id, RolFormPermissionUpdateDto dto)
-        {
-            return await _service.UpdateAsync(dto);
+            try
+            {
+                var result = await _rolFormPermissionService.DeleteByGroupAsync(rolId, formId);
+                if (!result)
+                {
+                    return NotFound("No se encontró el grupo de permisos especificado.");
+                }
+                return NoContent(); // estándar para eliminación exitosa
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar el grupo de permisos para rol {RolId} y formulario {FormId}.", rolId, formId);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocurrió un error interno en el servidor.");
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Business.CustomJWT;
 using Business.Interfaces;
-using Business.Interfaces.IBusiness;
 using Business.Interfaces.Implements.AdministrationSystem;
 using Business.Interfaces.Implements.Business;
 using Business.Interfaces.Implements.Location;
@@ -8,7 +7,6 @@ using Business.Interfaces.Implements.Persons;
 using Business.Interfaces.Implements.SecrutityAuthentication;
 using Business.Interfaces.Implements.Utilities;
 using Business.Mapping;
-using Business.Repository;
 using Business.Services.AdministrationSystem;
 using Business.Services.Business;
 using Business.Services.Location;
@@ -29,11 +27,6 @@ using Data.Services.Location;
 using Data.Services.Persons;
 using Data.Services.SecurityAuthentication;
 using Data.Services.Utilities;
-using Entity.Domain.Models.Implements.AdministrationSystem;
-using Entity.Domain.Models.Implements.SecurityAuthentication;
-using Entity.DTOs.Implements.AdministrationSystem.Form;
-using Entity.DTOs.Implements.AdministrationSystem.Module;
-using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
 using Mapster;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
@@ -58,11 +51,9 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IPasswordResetCodeRepository, PasswordResetCodeRepository>();
             //services.AddScoped<EncriptePassword>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUserContextService, UserContextService>();
 
             //Services
-            
-
-
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRolService, RolService>();
@@ -76,6 +67,8 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IRolUserService, RolUserService>();
             services.AddScoped<IFormService, FormService>();
             services.AddScoped<IPermissionService, PermissionService>();
+
+
             //Mapping
             services.AddMapster();
             MapsterConfig.Register();
@@ -84,7 +77,6 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped(typeof(IDataGeneric<>), typeof(DataGeneric<>));
 
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IRolUserRepository, RolUserRepository>();
             services.AddScoped<IRolFormPermissionRepository, RolFormPermissionRepository>();
 
 
@@ -111,14 +103,21 @@ namespace WebGESCOMPAH.Extensions
 
 
             //Validaciones
-            services.AddScoped<ExceptionMiddleware>();
 
-            services.AddScoped<IExceptionHandler, ValidationExceptionHandler>();
-            services.AddScoped<IExceptionHandler, BusinessExceptionHandler>();
-            services.AddScoped<IExceptionHandler, EntityNotFoundExceptionHandler>();
-            services.AddScoped<IExceptionHandler, ExternalServiceExceptionHandler>();
-            services.AddScoped<IExceptionHandler, UnauthorizedAccessHandler>();
+            services.AddTransient<ExceptionMiddleware>();
 
+
+            // Handlers (elige Singleton/Scoped; Singleton suele bastar)
+            services.AddSingleton<IExceptionHandler, ValidationExceptionHandler>();
+            services.AddSingleton<IExceptionHandler, BusinessExceptionHandler>();
+            services.AddSingleton<IExceptionHandler, EntityNotFoundExceptionHandler>();
+            services.AddSingleton<IExceptionHandler, ForbiddenExceptionHandler>(); 
+            services.AddSingleton<IExceptionHandler, UnauthorizedAccessHandler>();
+            services.AddSingleton<IExceptionHandler, DbConcurrencyExceptionHandler>();
+            services.AddSingleton<IExceptionHandler, DbUpdateExceptionHandler>();     
+            services.AddSingleton<IExceptionHandler, HttpRequestExceptionHandler>();  
+            services.AddSingleton<IExceptionHandler, ExternalServiceExceptionHandler>();
+            services.AddSingleton<IExceptionHandler, DefaultExceptionHandler>();      
 
             return services;
         }

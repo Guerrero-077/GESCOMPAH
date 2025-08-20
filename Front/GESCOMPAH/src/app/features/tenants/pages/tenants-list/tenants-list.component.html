@@ -1,8 +1,24 @@
-<app-generic-table [data]="tenants" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
-    (view)="onView($event)">
+<app-generic-table [data]="tenants" [columns]="columns" [titulo]="'Gestión de Usuario'"
+  [subTitulo]="'Gesione los usuarios del sistema'" [createButtonLabel]="'Crear Usuario'" (create)="onCreate()"
+  (edit)="onEdit($event)" (delete)="onDelete($event)" (view)="onView($event)">
+
 </app-generic-table>
 
+<ng-template #userTemplate let-row>
+  <div>{{ row.personName }}</div>
+  <small>{{ row.email }}</small>
+</ng-template>
 
 <ng-template #estadoTemplate let-row>
-    <span class="badge badge-success">Activo</span>
+  <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
+    <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+      {{ row.active ? 'Activo' : 'Inactivo' }}
+    </span>
+
+    <app-toggle-button-component class="align-middle" [checked]="row.active"
+      (changed)="onToggleActive(row, { checked: $event })" [size]="20" [onColor]="'#16a34a'" [offColor]="'#ef4444'"
+      [thumb]="'#ffffff'">
+    </app-toggle-button-component>
+
+  </div>
 </ng-template>

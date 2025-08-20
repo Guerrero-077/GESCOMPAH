@@ -1,10 +1,19 @@
 <div class="row d-flex justify-content-center">
-  <app-generic-table [data]="items" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
+  <app-generic-table [data]="items$ | async" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
     (view)="onView($event)" (create)="onCreateNew()">
   </app-generic-table>
 
+  <!-- Template para mostrar la lista de permisos -->
+  <ng-template #permissionsTemplate let-row>
+    <span *ngFor="let p of row.permissions" class="badge texto mr-1 ">
+      {{ p.permissionName }}
+    </span>
+  </ng-template>
 
+  <!-- Template para mostrar el estado (Activo/Inactivo) -->
   <ng-template #estadoTemplate let-row>
-    <span class="badge badge-success">Activo</span>
+    <span class="badge" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+      {{ row.active ? 'Activo' : 'Inactivo' }}
+    </span>
   </ng-template>
 </div>

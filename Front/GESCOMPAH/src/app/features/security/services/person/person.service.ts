@@ -1,30 +1,16 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from '../../../../../environments/environment';
-import { Person, PersonCreate, PersonUpdate } from '../../models/person.models';
+import { GenericService } from '../../../../core/service/generic/generic.service';
+import { PersonSelectModel, PersonCreateModel, PersonUpdateModel } from '../../models/person.models';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PersonService {
-  private readonly apiUrl = `${environment.apiURL}/person`;
+export class PersonService extends GenericService<PersonSelectModel, PersonCreateModel, PersonUpdateModel> {
+  protected resource = 'person';
 
-  constructor(private http: HttpClient) { }
-
-  getPersons(): Observable<Person[]> {
-    return this.http.get<Person[]>(this.apiUrl);
-  }
-
-  createPerson(payload: PersonCreate): Observable<Person> {
-    return this.http.post<Person>(this.apiUrl, payload);
-  }
-
-  updatePerson(id: number, payload: PersonUpdate): Observable<Person> {
-    return this.http.put<Person>(`${this.apiUrl}/${id}`, payload);
-  }
-
-  deletePerson(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
+  // You can add any additional methods specific to person service here
+  // For example, if you need to fetch persons by a specific criteria
+  // getPersonsByCriteria(criteria: any): Observable<PersonSelectModel[]> {
+  //   return this.http.get<PersonSelectModel[]>(`${this.baseUrl}/${this.resource}/criteria`, { params: criteria });
+  // }
 }

@@ -14,23 +14,6 @@ namespace Business.Services.Business
         {
             _data = data;
         }
-     
-        public async Task<PlazaSelectDto> UpdateActiveStatusAsync(int id, bool active)
-        {
-            var entity = await _data.GetByIdAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException($"No se encontró la plaza con ID {id}");
-
-            if (entity.Active != active)
-            {
-                entity.Active = active;
-                await _data.UpdateAsync(entity);
-            }
-
-            return _mapper.Map<PlazaSelectDto>(entity);
-        }
-
-
 
     }
 }

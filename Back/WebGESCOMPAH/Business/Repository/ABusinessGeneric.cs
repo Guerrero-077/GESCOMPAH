@@ -11,5 +11,6 @@ namespace Business.Repository
         public abstract Task<TDtoGet> UpdateAsync(TDtoUpdate dto);
         public abstract Task<bool> DeleteAsync(int id);
         public abstract Task<bool> DeleteLogicAsync(int id);
+        public abstract Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active);
     }
 }

@@ -1,5 +1,5 @@
 
-export interface UserListDto {
+export interface UserSelectModel {
   id: number;
   personName: string;
   email: string;
@@ -7,14 +7,14 @@ export interface UserListDto {
 }
 
 // Crear
-export interface UserCreateDto {
+export interface UserCreateModel {
   email: string;
   password: string;
   personId: number;
 }
 
 // Actualizar (sin id en el body)
-export interface UserUpdatePayload {
+export interface UserUpdateModel {
   email: string;
   password?: string;
 }

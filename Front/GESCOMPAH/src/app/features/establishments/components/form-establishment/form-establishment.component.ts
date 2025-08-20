@@ -9,11 +9,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { EstablishmentCreate, EstablishmentSelect, EstablishmentUpdate, ImageSelectDto } from '../../models/establishment.models';
-import { SquareModel } from '../../models/squares.models';
 import { EstablishmentStore } from '../../services/establishment/establishment.store';
 import { ImageService } from '../../services/image/image.service';
 import { SquareService } from '../../services/square/square.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
+import { SquareSelectModel } from '../../models/squares.models';
 
 @Component({
   selector: 'app-form-establishment',
@@ -54,7 +54,7 @@ export class FormEstablishmentComponent {
   existingImagesToDelete: string[] = [];
 
   // Datos de soporte
-  Squares: SquareModel[] = [];
+  Squares: SquareSelectModel[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -78,7 +78,7 @@ export class FormEstablishmentComponent {
 
   private loadPlazas(): void {
     this.plazasSrv
-      .getAll('Plaza')
+      .getAll()
       .subscribe({ next: (plazas) => (this.Squares = plazas) });
   }
 
@@ -86,8 +86,8 @@ export class FormEstablishmentComponent {
     this.generalGroup = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.maxLength(500)]],
-      rentValueBase: [0, [Validators.required, Validators.min(0)]],
-      areaM2: [0, [Validators.required, Validators.min(0)]],
+      rentValueBase: [0, [Validators.required, Validators.min(1)]],
+      areaM2: [0, [Validators.required, Validators.min(1)]],
     });
 
     this.ubicacionGroup = this.fb.group({
