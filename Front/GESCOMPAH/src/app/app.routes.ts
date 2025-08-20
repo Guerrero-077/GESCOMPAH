@@ -20,7 +20,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: LayoutComponent,
-    canMatch: [authGuard], // evita cargar cualquier child si no hay sesión
+    // canMatch: [authGuard], // evita cargar cualquier child si no hay sesión
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
