@@ -43,12 +43,40 @@ export class FormComponent implements OnInit {
       {
         key: 'active',
         header: 'Estado',
-        type: 'custom',           // tu GenericTable debe renderizar template cuando type === 'custom'
+        type: 'custom',
         template: this.estadoTemplate
       }
     ];
   }
 
+  onCreateNew() {
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      width: '600px',
+      data: { entity: {}, formType: 'Form' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) return;
+
+      this.formStore.create(result).pipe(take(1)).subscribe({
+        next: () => {
+          this.sweetAlertService.showNotification(
+            'Creación Exitosa',
+            'Formulario creado exitosamente.',
+            'success'
+          );
+        },
+        error: (err) => {
+          console.error('Error creando el formulario:', err);
+          this.sweetAlertService.showNotification(
+            'Error',
+            'No se pudo crear el formulario.',
+            'error'
+          );
+        }
+      });
+    });
+  }
   onEdit(row: FormUpdateModel) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -110,34 +138,6 @@ export class FormComponent implements OnInit {
     console.log('Ver:', row);
   }
 
-  onCreateNew() {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: {}, formType: 'Form' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) return;
-
-      this.formStore.create(result).pipe(take(1)).subscribe({
-        next: () => {
-          this.sweetAlertService.showNotification(
-            'Creación Exitosa',
-            'Formulario creado exitosamente.',
-            'success'
-          );
-        },
-        error: (err) => {
-          console.error('Error creando el formulario:', err);
-          this.sweetAlertService.showNotification(
-            'Error',
-            'No se pudo crear el formulario.',
-            'error'
-          );
-        }
-      });
-    });
-  }
 
 
   // ----- Toggle estado (activo/inactivo) -----

@@ -84,16 +84,29 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
 
             await _repo.UpdateAsync(entity);
 
-            if (dto.ImagesToDelete?.Any() == true)
-                await DeleteImagesAsync(dto.ImagesToDelete);
+            // Conteo actual antes de modificaciones
+            var currentImages = await _imagesRepo.GetByEstablishmentIdAsync(dto.Id);
+            var currentCount = currentImages.Count;
 
-            if (dto.Images?.Any() == true)
+            // Calcular eliminadas
+            var toDelete = dto.ImagesToDelete?.Count ?? 0;
+
+            // Calcular nuevas válidas
+            var validFiles = dto.Images?.Where(f => f?.Length > 0).ToList() ?? new List<IFormFile>();
+            var toAdd = validFiles.Count;
+
+            // Conteo final esperado
+            var finalCount = currentCount - toDelete + toAdd;
+
+            ValidateMaxImages(finalCount);
+
+            // Procesar eliminaciones
+            if (toDelete > 0)
+                await DeleteImagesAsync(dto.ImagesToDelete!);
+
+            // Procesar nuevas
+            if (toAdd > 0)
             {
-                var validFiles = dto.Images.Where(f => f?.Length > 0).ToList();
-
-                var currentCount = (await _imagesRepo.GetByEstablishmentIdAsync(dto.Id)).Count;
-                ValidateMaxImages(validFiles.Count + currentCount, currentCount);
-
                 var newImages = await UploadAndMapImagesAsync(validFiles, entity.Id);
                 await _imagesRepo.AddAsync(newImages);
             }
@@ -110,6 +123,7 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
             throw;
         }
     }
+
 
     public override async Task<bool> DeleteAsync(int id)
     {
@@ -145,11 +159,12 @@ public class EstablishmentService : BusinessGeneric<EstablishmentSelectDto, Esta
 
     #region Helpers
 
-    private void ValidateMaxImages(int totalImages, int currentCount = 0)
+    private void ValidateMaxImages(int finalCount)
     {
-        if (totalImages > MaxImages || totalImages > (MaxImages - currentCount))
-            throw new BusinessException($"Solo se permiten hasta {MaxImages} imágenes por establecimiento. Actualmente: {currentCount}.");
+        if (finalCount > MaxImages)
+            throw new BusinessException($"Solo se permiten hasta {MaxImages} imágenes por establecimiento. Actualmente: {finalCount}.");
     }
+
 
     private async Task DeleteImagesAsync(IEnumerable<string> publicIds)
     {

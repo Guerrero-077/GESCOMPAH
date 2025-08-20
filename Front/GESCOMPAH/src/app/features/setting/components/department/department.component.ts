@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,7 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { DepartmentStore } from '../../services/department/department.store';
 import { DepartmentSelectModel } from '../../models/department.models';
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 
 
 @Component({
@@ -20,6 +21,7 @@ import { DepartmentSelectModel } from '../../models/department.models';
     GenericTableComponent,
     MatButtonModule,
     MatIconModule,
+    ToggleButtonComponent
   ],
   templateUrl: './department.component.html',
   styleUrls: ['./department.component.css'],
@@ -27,10 +29,12 @@ import { DepartmentSelectModel } from '../../models/department.models';
 })
 export class DepartmentComponent implements OnInit {
   departments$: Observable<DepartmentSelectModel[]>;
+
+  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
+
   columns: TableColumn<DepartmentSelectModel>[] = [
     { key: 'id', header: 'ID' },
-    { key: 'name', header: 'Nombre' },
-    { key: 'active', header: 'Activo', type: 'boolean' }
+    { key: 'name', header: 'Nombre' }
   ];
 
   constructor(
@@ -42,7 +46,15 @@ export class DepartmentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Columns are initialized directly now
+    this.columns = [
+      ...this.columns,
+      {
+        key: 'active',
+        header: 'Estado',
+        type: 'custom',
+        template: this.estadoTemplate
+      }
+    ];
   }
 
   openCreateDialog(): void {
@@ -97,5 +109,31 @@ export class DepartmentComponent implements OnInit {
         }
       });
     }
+  }
+
+  // ----- Toggle estado (activo/inactivo) -----
+  onToggleActive(row: DepartmentSelectModel, e: { checked: boolean }) {
+    const previous = row.active;
+    row.active = e.checked;
+    this.store.changeActiveStatus(row.id, e.checked).subscribe({
+      next: (updated) => {
+        // sincronizar con lo que devuelve el backend
+        row.active = updated.active ?? row.active;
+        this.sweetAlert.showNotification(
+          'Éxito',
+          `Departamento ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        // revertir si falla
+        row.active = previous;
+        this.sweetAlert.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
+    });
   }
 }

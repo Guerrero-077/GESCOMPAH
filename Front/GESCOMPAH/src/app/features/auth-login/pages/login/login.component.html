@@ -1,70 +1,78 @@
 <div class="container-fluid d-flex justify-content-center py-5 h-100">
-    <div class="row d-flex justify-content-center align-items-center ">
-        <!-- Logo -->
-        <div class="col-4 text-center mb-4">
-            <div class="mb-2">
-                <img src="../../../../../..//public/Escudo-palermo.png" alt="Logo" class="imagen-logo">
-            </div>
-            <div class="row d-flex justify-content-center">
-                <h2 class="text-green fw-bolder">GESCOMPAH</h2>
-                <p class="text-marmol fs-5 fw-semibold myn-1">Sistema de Gestión Comercial</p>
-                <p class="text-marmol fs-6 myn-1">Alcaldía de Palermo, Huila</p>
-            </div>
+  <div class="row d-flex justify-content-center align-items-center ">
+    <!-- Logo -->
+    <div class="col-4 text-center mb-4">
+      <div class="mb-2">
+        <img src="../../../../../..//public/Escudo-palermo.png" alt="Logo" class="imagen-logo">
+      </div>
+      <div class="row d-flex justify-content-center">
+        <h2 class="text-green fw-bolder">GESCOMPAH</h2>
+        <p class="text-marmol fs-5 fw-semibold myn-1">Sistema de Gestión Comercial</p>
+        <p class="text-marmol fs-6 myn-1">Alcaldía de Palermo, Huila</p>
+      </div>
+    </div>
+
+    <div class="col form p-4 border-green">
+      <!-- Encabezado -->
+      <div class="text-start mb-4 ">
+        <h4 class="text-green fw-medium">Iniciar Sesión</h4>
+        <p class="text-marmol">Ingrese sus credenciales para acceder al sistema</p>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="formLogin" (ngSubmit)="login()">
+
+        <div class="mb-3">
+          <label for="email" class="form-label texto fw-medium text-green">Correo Electrónico</label>
+          <input type="email" id="email" class="form-control border-green" formControlName="email"
+            placeholder="Correo Electrónico"
+            [class.is-invalid]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched">
+
+          <div *ngIf="formLogin.get('email')?.invalid && formLogin.get('email')?.touched" class="invalid-feedback">
+            El correo es requerido y debe ser válido.
+          </div>
         </div>
 
-        <div class="col form p-4 border-green">
-            <!-- Encabezado -->
-            <div class="text-start mb-4 ">
-                <h4 class="text-green fw-medium">Iniciar Sesión</h4>
-                <p class="text-marmol">Ingrese sus credenciales para acceder al sistema</p>
-            </div>
+        <div class="mb-3">
+          <label for="password" class="form-label texto fw-medium text-green">Contraseña</label>
+          <input type="password" id="password" class="form-control border-green" formControlName="password"
+            placeholder="Contraseña"
+            [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched">
 
-            <!-- Formulario -->
-            <form [formGroup]="formLogin" (ngSubmit)="login()">
+          <div *ngIf="formLogin.get('password')?.invalid && formLogin.get('password')?.touched"
+            class="invalid-feedback">
+            La contraseña es obligatoria.
+          </div>
+        </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label texto fw-medium text-green">Correo Electrónico</label>
-                    <input type="email" id="email" class="form-control border-green" formControlName="email"
-                        placeholder="Correo Electrónico"
-                        [class.is-invalid]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched">
+        <div class="mb-3 text-end">
+          <a [routerLink]="['../password_reset']" class="small link-secondary">¿Olvidaste tu contraseña?</a>
+        </div>
 
-                    <div *ngIf="formLogin.get('email')?.invalid && formLogin.get('email')?.touched"
-                        class="invalid-feedback">
-                        El correo es requerido y debe ser válido.
-                    </div>
-                </div>
+        <button type="submit" class="btn btn-green w-100" [disabled]="formLogin.invalid">
+          Iniciar Sesión
+        </button>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label texto fw-medium text-green">Contraseña</label>
-                    <input type="password" id="password" class="form-control border-green" formControlName="password"
-                        placeholder="Contraseña"
-                        [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched">
+        <div class="header text-end">
 
-                    <div *ngIf="formLogin.get('password')?.invalid && formLogin.get('password')?.touched"
-                        class="invalid-feedback">
-                        La contraseña es obligatoria.
-                    </div>
-                </div>
+          <p class="mb-0">
+            ¿No tienes cuenta?
+            <a routerLink="../register" class="link-primary">Regístrate</a>
+          </p>
+        </div>
 
-                <div class="mb-3 text-end">
-                    <a [routerLink]="['../password_reset']" class="small link-secondary">¿Olvidaste tu contraseña?</a>
-                </div>
-
-                <button type="submit" class="btn btn-green w-100" [disabled]="formLogin.invalid">
-                    Iniciar Sesión
-                </button>
-            </form>
-            <!-- <div class="header text-end">
+      </form>
+      <!-- <div class="header text-end">
 
                 <p class="mb-0">
                     ¿No tienes cuenta?
                     <a href="#" class="link-primary">Regístrate</a>
                 </p>
             </div> -->
-        </div>
-        <p class="lincese">
-            © 2024 Alcaldía de Palermo, Huila. Todos los derechos reservados.
-        </p>
     </div>
+    <p class="lincese">
+      © 2024 Alcaldía de Palermo, Huila. Todos los derechos reservados.
+    </p>
+  </div>
 
 </div>

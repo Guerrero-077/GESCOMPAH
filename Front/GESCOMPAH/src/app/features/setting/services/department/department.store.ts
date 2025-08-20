@@ -56,4 +56,13 @@ export class DepartmentStore {
       })
     );
   }
+
+
+  changeActiveStatus(id: number, active: boolean): Observable<DepartmentSelectModel> {
+    return this.departmentService.changeActiveStatus(id, active).pipe(
+      tap(() => {
+        this.loadAll();
+      })
+    );
+  }
 }

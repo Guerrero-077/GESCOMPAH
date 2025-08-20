@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { CityStore } from '../../services/city/city.store';
@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
 import { CitySelectModel } from '../../models/city.models';
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 
 
 @Component({
@@ -20,6 +21,7 @@ import { CitySelectModel } from '../../models/city.models';
     GenericTableComponent,
     MatButtonModule,
     MatIconModule,
+    ToggleButtonComponent
   ],
   templateUrl: './city.component.html',
   styleUrls: ['./city.component.css'],
@@ -27,11 +29,13 @@ import { CitySelectModel } from '../../models/city.models';
 })
 export class CityComponent implements OnInit {
   cities$: Observable<CitySelectModel[]>;
+
+  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
+
   columns: TableColumn<CitySelectModel>[] = [
     { key: 'id', header: 'ID' },
     { key: 'name', header: 'Nombre' },
-    { key: 'departmentName', header: 'Departamento' },
-    { key: 'active', header: 'Activo', type: 'boolean' }
+    { key: 'departmentName', header: 'Departamento' }
   ];
 
   constructor(
@@ -43,7 +47,15 @@ export class CityComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Columns are initialized directly now
+    this.columns = [
+      ...this.columns,
+      {
+        key: 'active',
+        header: 'Estado',
+        type: 'custom',
+        template: this.estadoTemplate
+      }
+    ];
   }
 
   openCreateDialog(): void {
@@ -98,5 +110,32 @@ export class CityComponent implements OnInit {
         }
       });
     }
+  }
+
+
+  // ----- Toggle estado (activo/inactivo) -----
+  onToggleActive(row: CitySelectModel, e: { checked: boolean }) {
+    const previous = row.active;
+    row.active = e.checked;
+    this.store.changeActiveStatus(row.id, e.checked).subscribe({
+      next: (updated) => {
+        // sincronizar con lo que devuelve el backend
+        row.active = updated.active ?? row.active;
+        this.sweetAlert.showNotification(
+          'Éxito',
+          `Ciudad ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        // revertir si falla
+        row.active = previous;
+        this.sweetAlert.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
+    });
   }
 }

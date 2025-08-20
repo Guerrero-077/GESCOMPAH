@@ -65,4 +65,12 @@ export class CityStore {
       })
     );
   }
+
+  changeActiveStatus(id: number, active: boolean): Observable<CitySelectModel> {
+    return this.cityService.changeActiveStatus(id, active).pipe(
+      tap(() => {
+        this.loadAll();
+      })
+    );
+  }
 }
