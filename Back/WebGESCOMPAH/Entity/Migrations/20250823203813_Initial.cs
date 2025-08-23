@@ -155,6 +155,25 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "systemParameters",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Key = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EffectiveFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EffectiveTo = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_systemParameters", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Cities",
                 columns: table => new
                 {
@@ -801,6 +820,9 @@ namespace Entity.Migrations
 
             migrationBuilder.DropTable(
                 name: "RolUsers");
+
+            migrationBuilder.DropTable(
+                name: "systemParameters");
 
             migrationBuilder.DropTable(
                 name: "Modules");

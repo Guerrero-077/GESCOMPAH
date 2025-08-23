@@ -26,5 +26,12 @@ namespace Data.Services.Persons
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<bool> ExistsByDocumentAsync(string document)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .AnyAsync(p => p.Document == document && !p.IsDeleted);
+        }
+
     }
 }

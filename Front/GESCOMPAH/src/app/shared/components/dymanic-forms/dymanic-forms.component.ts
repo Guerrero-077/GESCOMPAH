@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import {
   AbstractControl,
-  FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -53,10 +52,21 @@ export class DymanicFormsComponent implements OnInit {
   constructor(private fb: FormBuilder) { }
 
   ngOnInit() {
-    // 1) Clona schema
+    // 1) Clonar esquema
     this.fields = formSchemas[this.formType].map(f => ({ ...f }));
 
-    // reglas por tipo
+    // 2) Formatear campos tipo date antes de inicializar el formulario
+    this.fields.forEach(field => {
+      if (field.type === 'date') {
+        const rawDate = this.initialData?.[field.name];
+        if (rawDate) {
+          const dateOnly = new Date(rawDate).toISOString().split('T')[0];
+          this.initialData[field.name] = dateOnly;
+        }
+      }
+    });
+
+    // 3) Reglas especiales por tipo
     const isUser = this.formType === 'User';
     const isUserEdit = isUser && !!this.initialData?.id;
 
@@ -65,25 +75,25 @@ export class DymanicFormsComponent implements OnInit {
       if (personField) personField.type = 'hidden';
     }
 
-    // 2) Cargar opciones de selects/checkbox-list
+    // 4) Cargar opciones dinámicas (selects, checkbox-list)
     this.fields.forEach(field => {
       if (field.name === 'departmentId' && this.formType === 'City') {
         this.departmentService.getAll().pipe(
-          map(depts => depts.map((d: any) => ({ value: d.id, label: d.name } as Option)))
+          map(depts => depts.map((d: any) => ({ value: d.id, label: d.name })))
         ).subscribe(options => this.setOptionsForField(field.name, options));
       } else if ((field.type === 'select' || field.type === 'checkbox-list') && this.selectOptions[field.name]) {
         this.setOptionsForField(field.name, this.selectOptions[field.name]);
       }
     });
 
-    // 3) Construcción inicial de controles
+    // 5) Construir controles del formulario
     const controls: Record<string, any> = {};
+
     this.fields.forEach(field => {
       const init = this.initialData?.[field.name];
 
       switch (field.type) {
         case 'checkbox-list': {
-          // Creamos un FormGroup vacío; luego se reconcilia cuando tengamos options
           const fg = new FormGroup({});
           if (field.required) fg.addValidators(atLeastOneTrueInGroupValidator);
           controls[field.name] = fg;
@@ -98,7 +108,6 @@ export class DymanicFormsComponent implements OnInit {
           }
           const validators = [];
           if (field.required && field.type !== 'hidden') {
-            // Para checkbox simple, usa requiredTrue (consentimiento/flags)
             validators.push(field.type === 'checkbox' ? Validators.requiredTrue : Validators.required);
           }
           controls[field.name] = [value, validators];
@@ -109,7 +118,7 @@ export class DymanicFormsComponent implements OnInit {
 
     this.form = this.fb.group(controls);
 
-    // 4) Ajustes post-creación
+    // 6) Ajustes finales
     if (isUserEdit) {
       this.form.get('password')?.clearValidators();
       this.form.get('password')?.updateValueAndValidity();
@@ -122,12 +131,12 @@ export class DymanicFormsComponent implements OnInit {
       this.form.get('departmentId')?.setValue(this.initialData.departmentId);
     }
 
-    if ((this.formType === 'Department' || this.formType === 'City')
-      && typeof this.initialData?.active === 'boolean') {
+    if ((this.formType === 'Department' || this.formType === 'City') &&
+      typeof this.initialData?.active === 'boolean') {
       this.form.get('active')?.setValue(this.initialData.active);
     }
 
-    // Reconciliar checkbox-list para campos que ya tenían options antes de construir
+    // Reconciliar checkbox-list
     this.fields.filter(f => f.type === 'checkbox-list').forEach(f => {
       this.reconcileCheckboxListGroup(f.name);
     });
@@ -143,7 +152,6 @@ export class DymanicFormsComponent implements OnInit {
     return this.fields.find(f => f.name === name);
   }
 
-  /** Fija options (ordenadas) y reconcilia el FormGroup del checkbox-list */
   private setOptionsForField(fieldName: string, options: Option[]) {
     const field = this.getField(fieldName);
     if (!field) return;
@@ -153,7 +161,6 @@ export class DymanicFormsComponent implements OnInit {
     }
   }
 
-  /** Crea/actualiza el FormGroup (clave = id) preservando checks por ID */
   private reconcileCheckboxListGroup(fieldName: string) {
     const field = this.getField(fieldName);
     if (!field || field.type !== 'checkbox-list') return;
@@ -162,14 +169,12 @@ export class DymanicFormsComponent implements OnInit {
     const group = this.form.get(fieldName) as FormGroup;
     if (!group) return;
 
-    // set de seleccionados desde initialData (para primera carga)
     const selectedFromInit = new Set(
       Array.isArray(this.initialData?.[fieldName])
-        ? (this.initialData[fieldName] as (string | number)[]).map(String)
+        ? this.initialData[fieldName].map(String)
         : []
     );
 
-    // Crear controles faltantes / preservar existentes
     for (const opt of options) {
       const key = String(opt.value);
       if (!group.contains(key)) {
@@ -178,7 +183,6 @@ export class DymanicFormsComponent implements OnInit {
       }
     }
 
-    // Quitar controles que ya no existen en options
     Object.keys(group.controls).forEach(ctrlKey => {
       const stillExists = options.some(o => String(o.value) === ctrlKey);
       if (!stillExists) group.removeControl(ctrlKey);

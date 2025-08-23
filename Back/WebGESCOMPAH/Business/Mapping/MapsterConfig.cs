@@ -7,6 +7,7 @@ using Entity.Domain.Models.Implements.Utilities;
 using Entity.DTOs.Implements.AdministrationSystem.Form;
 using Entity.DTOs.Implements.AdministrationSystem.FormModule;
 using Entity.DTOs.Implements.AdministrationSystem.Module;
+using Entity.DTOs.Implements.AdministrationSystem.SystemParameter;
 using Entity.DTOs.Implements.Business.Appointment;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Entity.DTOs.Implements.Business.Plaza;
@@ -42,7 +43,8 @@ namespace Business.Mapping
             config.NewConfig<Form, FormSelectDto>();
             config.NewConfig<FormModule, FormModuleSelectDto>();
             config.NewConfig<Module, ModuleSelectDto>();
-
+            config.NewConfig<SystemParameter, SystemParameterDto>();
+            config.NewConfig<SystemParameter, SystemParameterUpdateDto>();
 
             // ============================================
             // Business

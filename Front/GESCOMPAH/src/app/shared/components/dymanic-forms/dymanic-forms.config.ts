@@ -9,7 +9,7 @@ export interface DynamicFormField {
 
 export type FormType =
   | 'Form' | 'Module' | 'FormModule' | 'Appointment' | 'City' | 'Department'
-  | 'Person' | 'Permission' | 'Rol' | 'RolFormPermission' | 'RolUser' | 'User' | 'Plaza';
+  | 'Person' | 'Permission' | 'Rol' | 'RolFormPermission' | 'RolUser' | 'User' | 'Plaza' | 'Finance';
 
 export const formSchemas: Record<FormType, DynamicFormField[]> = {
   'Form': [
@@ -90,5 +90,13 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
     { name: 'name', type: 'text', required: true, label: 'Nombre' },
     { name: 'description', type: 'text', required: true, label: 'Descripcion' },
     { name: 'location', type: 'text', required: true, label: 'Location' }
+  ],
+  'Finance': [
+    { name: 'id', type: 'hidden', required: false, label: 'Id' },
+    { name: 'key', type: 'text', required: true, label: 'Nombre' },
+    { name: 'value', type: 'text', required: true, label: 'Valor' },
+    { name: 'effectiveFrom', type: 'date', required: true, label: 'VIgente desde: ' },
+    { name: 'effectiveTo', type: 'date', required: true, label: 'Vigente hasta: ' },
+
   ]
 };

@@ -208,12 +208,10 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ContractNumber" Type="String" Nullable="false" />
           <Property Name="StartDate" Type="DateTime" Nullable="false" />
           <Property Name="EndDate" Type="DateTime" Nullable="false" />
           <Property Name="Status" Type="String" Nullable="false" />
           <Property Name="Destination" Type="String" Nullable="false" />
-          <Property Name="PDFPath" Type="String" Nullable="false" />
           <NavigationProperty Name="ContractTerms" Relationship="Model1.ContractTermsContract" FromRole="Contract" ToRole="ContractTerms" />
           <NavigationProperty Name="ObligationMonths" Relationship="Model1.ContractObligationMonths" FromRole="Contract" ToRole="ObligationMonths" />
           <NavigationProperty Name="PremisesLeased" Relationship="Model1.ContractPremisesLeased" FromRole="Contract" ToRole="PremisesLeased" />

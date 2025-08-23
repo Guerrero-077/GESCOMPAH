@@ -67,6 +67,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IRolUserService, RolUserService>();
             services.AddScoped<IFormService, FormService>();
             services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<ISystemParameterService, SystemParameterService>();
 
 
             //Mapping

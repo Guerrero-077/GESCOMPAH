@@ -5,14 +5,14 @@ namespace Entity.Domain.Models.Implements.Business
 {
     public class ContractTerms : BaseModel
     {
-        public Double ValueWeights { get; set; }
-        public Double ValueUVT { get; set; }
-        public enum Frequency
-        {
-            Monthly,
-            Quarterly,
-            SemiAnnually,
-            Annually
-        }
+        public int ContractId { get; set; }
+        public Contract Contract { get; set; } = null!;
+
+        public decimal UvtQty { get; set; }
+
+        public bool UseSystemParameters { get; set; } = true;
+
+        public string CalculationKey { get; set; }
+
     }
 }

@@ -10,18 +10,18 @@ using WebGESCOMPAH.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --------------------------
+// CONFIGURACIÓN Y SERVICIOS
+// --------------------------
 
-// Controladores
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); // Swagger siempre disponible
 
 // CORS, JWT, DB, Servicios personalizados
 builder.Services.AddCustomCors(builder.Configuration);
-
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<CookieSettings>(builder.Configuration.GetSection("Cookie"));
-
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
@@ -32,7 +32,9 @@ builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 
-// Cloudinary
+// --------------------------
+// CLOUDINARY CONFIG
+// --------------------------
 var cloudinaryConfig = builder.Configuration.GetSection("Cloudinary");
 var cloudinary = new Cloudinary(new Account(
     cloudinaryConfig["CloudName"],
@@ -44,36 +46,37 @@ builder.Services.AddSingleton(cloudinary);
 builder.Services.AddScoped<CloudinaryUtility>();
 
 
-
 var app = builder.Build();
 
 // --------------------------
-// MANEJO DE EXCEPCIONES
+// MIDDLEWARE GLOBAL
 // --------------------------
 
-// Registro de Handlers personalizados
-
-// Registro del middleware como scoped
-
-// ✅ Middleware de excepciones (desde el contenedor de DI para evitar problemas de scope)
+// Manejo de errores
 app.UseMiddleware<ExceptionMiddleware>();
 
-// --------------------------
-// APP Y PIPELINE HTTP
-// --------------------------
-// Swagger solo en desarrollo
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Archivos estáticos
+app.UseStaticFiles();
 
+// Swagger
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GESCOMPAH API v1");
+    c.RoutePrefix = "swagger";
+});
+
+// ✅ AQUI DEBE IR CORS: antes de Auth
+app.UseCors();
+
+// HTTPS
 app.UseHttpsRedirection();
 
+// 🔐 Seguridad
 app.UseAuthentication();
-app.UseCors();
 app.UseAuthorization();
 
+// Ruteo
 app.MapControllers();
 
 app.Run();

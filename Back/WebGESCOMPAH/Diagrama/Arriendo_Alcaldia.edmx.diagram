@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="9801f22eec2e4da2bebb24b5f99286af" Name="Diagram1" ZoomLevel="55" >
+      <Diagram DiagramId="9801f22eec2e4da2bebb24b5f99286af" Name="Diagram1" ZoomLevel="72" >
         <EntityTypeShape EntityType="Model1.Rol" Width="1.5" PointX="3" PointY="8" FillColor="Green" />
         <EntityTypeShape EntityType="Model1.User" Width="1.5" PointX="5.375" PointY="5.75" FillColor="Green" />
         <EntityTypeShape EntityType="Model1.Permission" Width="1.5" PointX="0.5" PointY="11.25" FillColor="Green" />
@@ -15,7 +15,7 @@
         <EntityTypeShape EntityType="Model1.Contract" Width="1.5" PointX="9.5" PointY="0.625" />
         <EntityTypeShape EntityType="Model1.RolFormPermission" Width="1.5" PointX="0.5" PointY="7.875" FillColor="Green" />
         <EntityTypeShape EntityType="Model1.RolUser" Width="1.5" PointX="5.375" PointY="9" FillColor="Green" />
-        <EntityTypeShape EntityType="Model1.Calculation" Width="1.5" PointX="19.75" PointY="0.5" />
+        <EntityTypeShape EntityType="Model1.Calculation" Width="1.5" PointX="13.375" PointY="3" />
         <EntityTypeShape EntityType="Model1.Person" Width="1.5" PointX="3" PointY="4.125" FillColor="ForestGreen" />
         <EntityTypeShape EntityType="Model1.Company" Width="1.5" PointX="0.5" PointY="0.5" FillColor="128, 128, 255" />
         <EntityTypeShape EntityType="Model1.Notification" Width="1.5" PointX="7.875" PointY="5.625" FillColor="128, 128, 255" />
@@ -24,7 +24,7 @@
         <EntityTypeShape EntityType="Model1.City" Width="1.5" PointX="3" PointY="0.5" FillColor="128, 255, 128" />
         <EntityTypeShape EntityType="Model1.Appointment" Width="1.5" PointX="14.75" PointY="5.375" />
         <EntityTypeShape EntityType="Model1.Image" Width="1.5" PointX="17.625" PointY="3.875" />
-        <EntityTypeShape EntityType="Model1.Establishment" Width="1.5" PointX="15" PointY="1" />
+        <EntityTypeShape EntityType="Model1.Establishment" Width="1.5" PointX="15.375" PointY="1" />
         <EntityTypeShape EntityType="Model1.Plaza" Width="1.5" PointX="17.625" PointY="0.75" />
         <AssociationConnector Association="Model1.RolRolUser" />
         <AssociationConnector Association="Model1.RolRolFormPermission" />
@@ -39,7 +39,7 @@
         <AssociationConnector Association="Model1.CityPerson" />
         <AssociationConnector Association="Model1.PlazaEstablishment" ManuallyRouted="false" >
         </AssociationConnector>
-        <EntityTypeShape EntityType="Model1.ContractTerms" Width="1.5" PointX="11.625" PointY="3.125" />
+        <EntityTypeShape EntityType="Model1.ContractTerms" Width="1.5" PointX="11.5" PointY="3.25" />
         <EntityTypeShape EntityType="Model1.ObligationMonths" Width="1.5" PointX="7.125" PointY="0.5" />
         <AssociationConnector Association="Model1.ContractTermsContract" />
         <AssociationConnector Association="Model1.ContractObligationMonths" />

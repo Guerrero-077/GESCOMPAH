@@ -69,5 +69,7 @@ namespace Entity.Infrastructure.Context
         public DbSet<Images> Images { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+
+        public DbSet<SystemParameter> systemParameters { get; set; }
     }
 }
