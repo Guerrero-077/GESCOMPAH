@@ -1,7 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, DestroyRef, inject, Inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors,
+  FormGroupDirective, NgForm
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,7 +19,7 @@ import { CitySelectModel } from '../../../setting/models/city.models';
 import { CityService } from '../../../setting/services/city/city.service';
 import { DepartmentStore } from '../../../setting/services/department/department.store';
 import { TenantFormData } from '../../models/tenants.models';
-
+import { ErrorStateMatcher } from '@angular/material/core';
 
 @Component({
   selector: 'app-tenants-form-dialog',
@@ -61,6 +64,7 @@ export class TenantsFormDialogComponent implements OnInit {
 
   compareById = (a: any, b: any) => Number(a) === Number(b);
 
+  // ====== Form ======
   form: FormGroup = this.fb.group({
     // Ubicación
     location: this.fb.group({
@@ -72,9 +76,9 @@ export class TenantsFormDialogComponent implements OnInit {
     person: this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
-      document: ['', Validators.required],
-      phone: ['', Validators.required],
-      address: ['', Validators.required],
+      document: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(20)]],
+      phone: ['', [Validators.required, Validators.pattern(/^\d{7,15}$/)]],
+      address: ['', [Validators.required, Validators.maxLength(100)]],
     }),
 
     // Cuenta
@@ -95,12 +99,15 @@ export class TenantsFormDialogComponent implements OnInit {
   get personGroup(): FormGroup { return this.form.get('person') as FormGroup; }
   get accountGroup(): FormGroup { return this.form.get('account') as FormGroup; }
 
+  // ====== Error matcher para errores del grupo (passwordsMismatch) en confirmPassword ======
+  confirmMatcher = new ConfirmMatcher();
+
   ngOnInit(): void {
     const deptCtrl = this.locationGroup.get('departmentId')!;
     const cityCtrl = this.locationGroup.get('cityId')!;
 
     if (this.isCreate()) {
-      // Password requerido solo en creación
+      // Password requerido solo en creación + reglas fuertes
       this.accountGroup.get('password')?.addValidators([
         Validators.required, Validators.minLength(8), hasUpper(), hasLower(), hasDigit(), hasSymbol()
       ]);
@@ -140,7 +147,7 @@ export class TenantsFormDialogComponent implements OnInit {
 
       const presetCity = Number(this.data?.tenant?.cityId ?? 0) || null;
 
-      // Cargar TODAS las ciudades (como en PersonComponent)
+      // Cargar TODAS las ciudades
       this.loadingCities.set(true);
       this.cityService.getAll().pipe(
         map(toCityList),
@@ -233,6 +240,7 @@ export class TenantsFormDialogComponent implements OnInit {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      Object.values(this.form.controls).forEach(c => c.updateValueAndValidity());
       return;
     }
 
@@ -279,6 +287,43 @@ export class TenantsFormDialogComponent implements OnInit {
 
   cancel(): void {
     this.dialogRef.close(null);
+  }
+
+  // ===== Utilidades =====
+  markGroupAsTouched(group: FormGroup) {
+    group.markAllAsTouched();
+    Object.values(group.controls).forEach(c => c.updateValueAndValidity());
+  }
+
+  private errorMessages: Record<string, string> = {
+    required: 'Requerido',
+    email: 'Correo inválido',
+    minlength: 'Mín. 8 caracteres',
+    maxlength: 'Máx. 50 caracteres',
+    pattern: 'Formato inválido',
+    upper: 'Debe contener mayúscula',
+    lower: 'Debe contener minúscula',
+    digit: 'Debe contener un número',
+    symbol: 'Debe contener un símbolo',
+    min: 'Valor inválido',
+  };
+
+  getFirstError(control: AbstractControl | null, order: string[]): string | null {
+    if (!control || !control.errors) return null;
+    for (const key of order) {
+      if (control.hasError(key)) return this.errorMessages[key] ?? key;
+    }
+    const firstKey = Object.keys(control.errors)[0];
+    return firstKey ? (this.errorMessages[firstKey] ?? firstKey) : null;
+  }
+}
+
+/* ====== ErrorStateMatcher para errores del grupo (confirmación de password) ====== */
+export class ConfirmMatcher implements ErrorStateMatcher {
+  isErrorState(control: AbstractControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const invalidCtrl = !!(control && control.invalid && (control.dirty || control.touched));
+    const invalidParent = !!(control && control.parent && control.parent.hasError('passwordsMismatch') && (control.dirty || control.touched));
+    return invalidCtrl || invalidParent;
   }
 }
 

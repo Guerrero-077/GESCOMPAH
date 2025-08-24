@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -22,7 +22,7 @@ export class SidebarComponent {
   @Output() closeSidebar = new EventEmitter<void>();
 
   readonly menu = computed(() => {
-    const backendMenu = this.permissionService.getMenu();
+    const backendMenu = this.permissionService.menu();
     return this.transformMenu(backendMenu);
   });
 
@@ -30,15 +30,16 @@ export class SidebarComponent {
     this.authService.logout().subscribe();
   }
 
-  private transformMenu(backendMenu: BackendMenuItem[] | null): SidebarItem[] {
+  private transformMenu(backendMenu: readonly BackendMenuItem[] | null): SidebarItem[] {
     if (!backendMenu) return [];
 
-    backendMenu.sort((a, b) => a.id - b.id);
+    // Create copies before sorting to avoid mutating the original array from the signal
+    const sortedMenu = [...backendMenu].sort((a, b) => a.id - b.id);
 
-    return backendMenu.map(menuItem => ({
+    return sortedMenu.map(menuItem => ({
       label: menuItem.name,
       icon: menuItem.icon,
-      children: (menuItem.forms ?? [])
+      children: (menuItem.forms ? [...menuItem.forms] : [])
         .sort((a, b) => a.id - b.id)
         .map(form => ({
           label: form.name,

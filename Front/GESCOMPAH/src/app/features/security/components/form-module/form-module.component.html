@@ -1,6 +1,14 @@
 <div class="row d-flex justify-content-center">
-    <app-generic-table [data]="(formModules$ | async) || []" [columns]="columns" (edit)="onEdit($event)" (delete)="onDelete($event)"
-        (view)="onView($event)" (create)="onCreateNew()">
+    <app-generic-table
+      [data]="(formModules$ | async) || []"
+      [columns]="columns"
+      [titulo]="'Formularios y modulos'"
+      [subTitulo]="'Gesiones los formularios y modulos del sistema'"
+      [createButtonLabel]="'Nuevo Formualio y Modulo'"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+      (view)="onView($event)"
+      (create)="onCreateNew()">
     </app-generic-table>
 
 

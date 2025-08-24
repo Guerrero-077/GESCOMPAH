@@ -1,0 +1,299 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Estilos para el stepper */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.p-4 {
+  padding: 1.5rem !important;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.m-3 {
+  margin: 1rem;
+}
+
+/* Estructura de grid para formularios */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Estilos para campos de formulario */
+.mat-form-field {
+  display: inline-block;
+  position: relative;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.mat-form-field-outline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.mat-form-field-label {
+  position: absolute;
+  left: 12px;
+  top: 18px;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.54);
+  transition: all 0.2s;
+  pointer-events: none;
+}
+
+.mat-form-field-input {
+  width: 100%;
+  padding: 20px 12px 6px;
+  border: none;
+  background: none;
+  font-size: 16px;
+}
+
+.mat-form-field-input:focus {
+  outline: none;
+}
+
+.mat-form-field-input:focus+.mat-form-field-outline {
+  border-color: var(--primary-color);
+  border-width: 2px;
+}
+
+.mat-form-field-input:focus~.mat-form-field-label,
+.mat-form-field-input:not(:placeholder-shown)~.mat-form-field-label {
+  top: 6px;
+  font-size: 12px;
+  color: var(--primary-color);
+}
+
+.mat-form-field-suffix {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.mat-select {
+  display: block;
+  width: 100%;
+  padding: 20px 12px 6px;
+  position: relative;
+  cursor: pointer;
+}
+
+.mat-select-value {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.mat-error {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Estilos para el stepper */
+.mat-horizontal-stepper {
+  display: block;
+  background: white;
+  border-radius: 12px;
+}
+
+.mat-horizontal-stepper-header-container {
+  display: flex;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 16px;
+}
+
+.mat-step-header {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  flex: 1;
+}
+
+.mat-step-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.mat-step-icon {
+  margin-right: 8px;
+  background-color: rgba(0, 0, 0, 0.38);
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mat-step-header .mat-step-label-active {
+  color: var(--primary-color);
+}
+
+.mat-step-header .mat-step-icon-selected {
+  background-color: var(--primary-color);
+}
+
+/* Botones de acción */
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.step-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0.25rem 0;
+  min-width: 120px;
+  justify-content: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.step-actions button[color="primary"] {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 2px 4px rgba(63, 81, 181, 0.3);
+}
+
+.step-actions button[color="primary"]:hover {
+  background-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(63, 181, 110, 0.4);
+}
+
+.step-actions button:not([color]) {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.step-actions button:not([color]):hover {
+  background-color: #e0e0e0;
+}
+
+/* Mensajes de error */
+.text-danger {
+  color: #f44336;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: #ffebee;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Animación de carga */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+
+  .form-row-2,
+  .form-row-3 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .mat-horizontal-stepper-header-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mat-step-header {
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .step-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .step-actions button {
+    width: 100%;
+  }
+
+  .mat-step-label {
+    max-width: 90px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .mat-step-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+}

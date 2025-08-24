@@ -1,5 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../service/auth/auth.service';
@@ -14,6 +15,7 @@ function getCookie(name: string): string | null {
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const userStore = inject(UserStore);
+  const router = inject(Router);
 
   const isApiRequest = req.url.startsWith(environment.apiURL);
   const isRefreshEndpoint = /\/auth\/refresh$/i.test(req.url);
@@ -33,7 +35,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return authService.RefreshToken().pipe(
           switchMap(() => next(req)),
           catchError((refreshError) => {
-            userStore.clear(); // ✅ Actualizado
+            userStore.clear();
+            router.navigate(['/']);
             return throwError(() => refreshError);
           })
         );

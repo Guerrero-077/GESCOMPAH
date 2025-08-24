@@ -7,12 +7,12 @@ import { LandingComponent } from './features/public/pages/landing/landing.compon
 
 export const routes: Routes = [
   // Landing pública: si el usuario ya está autenticado, publicGuard puede redirigirlo al dashboard
-  { path: '', pathMatch: 'full', component: LandingComponent, canMatch: [publicGuard], title: 'Inicio' },
+  { path: '', pathMatch: 'full', component: LandingComponent, canActivate: [publicGuard], title: 'Inicio' },
 
   // Área de autenticación (login/registro/recuperación, etc.)
   {
     path: 'auth',
-    canMatch: [publicGuard], // evita cargar el bundle de auth si ya está logueado
+    canActivate: [publicGuard],
     loadChildren: () => import('./features/auth-login/auth.routes').then(m => m.AUTH_ROUTES),
   },
 
@@ -20,7 +20,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: LayoutComponent,
-    // canMatch: [authGuard], // evita cargar cualquier child si no hay sesión
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 

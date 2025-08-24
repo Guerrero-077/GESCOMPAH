@@ -4,6 +4,7 @@ import { AuthService } from '../service/auth/auth.service';
 import { PermissionService } from '../service/permission/permission.service';
 import { map, of, catchError } from 'rxjs';
 import { UserStore } from '../service/permission/User.Store';
+import { User } from '../../shared/models/user.model';
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
@@ -14,26 +15,22 @@ export const authGuard: CanActivateFn = (
   const userStore = inject(UserStore);
   const router = inject(Router);
 
-  const check = () => {
-    const profile = userStore.snapshot;
-
-    if (!profile || !profile.roles) {
+  const check = (profile: User) => {
+    if (!profile.roles) {
       router.navigate(['/auth/login']);
       return false;
     }
 
-    if (!route || !route.data) {
-      console.warn('AuthGuard: Route or route.data is missing. Allowing access by default, but this is unexpected.');
-      return true;
+    if (!route.data) {
+      return true; // No requirements, allow access
     }
 
     // --- Role Check ---
     const requiredRoles = route.data['roles'] as string[] | undefined;
     if (requiredRoles?.length) {
-      const userRoles = profile.roles;
-      const hasRole = requiredRoles.some(requiredRole => userRoles.includes(requiredRole));
+      const hasRole = requiredRoles.some(role => permissionService.userHasRole(profile, role));
       if (!hasRole) {
-        router.navigate(['/admin/dashboard']);
+        router.navigate(['/admin/dashboard']); // Or a dedicated 'unauthorized' page
         return false;
       }
     }
@@ -42,10 +39,10 @@ export const authGuard: CanActivateFn = (
     const requiredPermissions = route.data['permissions'] as string[] | undefined;
     if (requiredPermissions?.length) {
       const hasPermission = requiredPermissions.every(p =>
-        permissionService.hasPermissionForRoute(p, state.url)
+        permissionService.userHasPermissionForRoute(profile, p, state.url)
       );
       if (!hasPermission) {
-        router.navigate(['/admin/dashboard']);
+        router.navigate(['/admin/dashboard']); // Or a dedicated 'unauthorized' page
         return false;
       }
     }
@@ -53,15 +50,16 @@ export const authGuard: CanActivateFn = (
     return true;
   };
 
-  if (userStore.snapshot) {
-    return check();
+  const currentUser = userStore.snapshot;
+  if (currentUser) {
+    return check(currentUser);
   }
 
   return authService.GetMe().pipe(
     map(user => {
       if (user) {
         userStore.set(user);
-        return check();
+        return check(user);
       }
       router.navigate(['/auth/login']);
       return false;

@@ -1,172 +1,214 @@
-<mat-horizontal-stepper class="card shadow p-4" [linear]="true">
+<div class="container">
+  <mat-horizontal-stepper class="card shadow p-4" [linear]="true">
 
-  <!-- PASO 1: Ubicación -->
-  <mat-step [stepControl]="locationGroup">
-    <form [formGroup]="form">
-      <ng-template matStepLabel>Ubicación</ng-template>
+    <!-- PASO 1: Ubicación -->
+    <mat-step [stepControl]="locationGroup">
+      <form [formGroup]="form" class="m-3">
+        <ng-template matStepLabel>Ubicación</ng-template>
 
-      <div formGroupName="location">
-        <!-- Departamento SOLO en creación -->
-        <mat-form-field appearance="outline" class="w-full" [hidden]="!isCreate()">
-          <mat-label>Departamento</mat-label>
-          <mat-select formControlName="departmentId" required [compareWith]="compareById">
-            <mat-option *ngFor="let d of (departments$ | async) ?? []" [value]="d.id">
-              {{ d.name }}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="locationGroup.get('departmentId')?.hasError('required')">
-            Selecciona un departamento
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Ciudad SIEMPRE visible -->
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Ciudad</mat-label>
-          <mat-select formControlName="cityId" required [compareWith]="compareById">
-            <mat-option [value]="null" disabled>Selecciona una ciudad…</mat-option>
-
-            <mat-option *ngIf="!loadingCities() && (((cities$ | async)?.length ?? 0) === 0)" [disabled]="true">
-              No hay ciudades disponibles
-            </mat-option>
-
-            <mat-option *ngFor="let c of (cities$ | async) ?? []" [value]="c.id">
-              {{ c.name }}
-            </mat-option>
-          </mat-select>
-
-          <mat-icon *ngIf="loadingCities()" matSuffix class="spin">autorenew</mat-icon>
-
-          <mat-error *ngIf="locationGroup.get('cityId')?.hasError('required')">
-            Selecciona una ciudad
-          </mat-error>
-          <mat-error *ngIf="locationGroup.get('cityId')?.hasError('min')">
-            Selecciona una ciudad válida
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="step-actions">
-        <button mat-raised-button color="primary" matStepperNext [disabled]="isCreate() ? locationGroup.invalid
-                                  : (locationGroup.get('cityId')?.invalid || loadingCities())">
-          Siguiente
-        </button>
-      </div>
-    </form>
-  </mat-step>
-
-  <!-- PASO 2: Datos personales -->
-  <mat-step [stepControl]="personGroup">
-    <form [formGroup]="form">
-      <ng-template matStepLabel>Datos personales</ng-template>
-
-      <div formGroupName="person">
-        <div class="grid">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Nombres</mat-label>
-            <input matInput formControlName="firstName" required />
-            <mat-error *ngIf="personGroup.get('firstName')?.hasError('required')">Requerido</mat-error>
+        <div formGroupName="location">
+          <!-- Departamento SOLO en creación -->
+          <mat-form-field appearance="outline" class="w-full" [hidden]="!isCreate()">
+            <mat-label>Departamento</mat-label>
+            <mat-select formControlName="departmentId" required [compareWith]="compareById">
+              <mat-option *ngFor="let d of (departments$ | async) ?? []" [value]="d.id">
+                {{ d.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="locationGroup.get('departmentId')?.touched && locationGroup.get('departmentId')?.invalid">
+              {{ getFirstError(locationGroup.get('departmentId'), ['required']) }}
+            </mat-error>
           </mat-form-field>
 
+          <!-- Ciudad SIEMPRE visible -->
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Apellidos</mat-label>
-            <input matInput formControlName="lastName" required />
-            <mat-error *ngIf="personGroup.get('lastName')?.hasError('required')">Requerido</mat-error>
+            <mat-label>Ciudad</mat-label>
+            <mat-select formControlName="cityId" required [compareWith]="compareById">
+              <mat-option [value]="null" disabled>Selecciona una ciudad…</mat-option>
+
+              <mat-option *ngIf="!loadingCities() && (((cities$ | async)?.length ?? 0) === 0)" [disabled]="true">
+                No hay ciudades disponibles
+              </mat-option>
+
+              <mat-option *ngFor="let c of (cities$ | async) ?? []" [value]="c.id">
+                {{ c.name }}
+              </mat-option>
+            </mat-select>
+
+            <mat-icon *ngIf="loadingCities()" matSuffix class="spin">autorenew</mat-icon>
+
+            <mat-error *ngIf="locationGroup.get('cityId')?.touched && locationGroup.get('cityId')?.invalid">
+              {{ getFirstError(locationGroup.get('cityId'), ['required','min']) }}
+            </mat-error>
           </mat-form-field>
         </div>
 
-        <div class="grid">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Documento</mat-label>
-            <input matInput formControlName="document" required />
-            <mat-error *ngIf="personGroup.get('document')?.hasError('required')">Requerido</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="phone" required />
-            <mat-error *ngIf="personGroup.get('phone')?.hasError('required')">Requerido</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Dirección</mat-label>
-            <input matInput formControlName="address" required />
-            <mat-error *ngIf="personGroup.get('address')?.hasError('required')">Requerido</mat-error>
-          </mat-form-field>
+        <div class="step-actions">
+          <button mat-raised-button color="primary" (click)="markGroupAsTouched(locationGroup)" matStepperNext
+            [disabled]="isCreate() ? locationGroup.invalid : (locationGroup.get('cityId')?.invalid || loadingCities())">
+            Siguiente
+          </button>
         </div>
-      </div>
+      </form>
+    </mat-step>
 
-      <div class="step-actions">
-        <button mat-button matStepperPrevious>Volver</button>
-        <button mat-raised-button color="primary" matStepperNext [disabled]="personGroup.invalid">
-          Siguiente
-        </button>
-      </div>
-    </form>
-  </mat-step>
+    <!-- PASO 2: Datos personales -->
+    <mat-step [stepControl]="personGroup">
+      <form [formGroup]="form" class="m-3">
+        <ng-template matStepLabel>Datos personales</ng-template>
 
-  <!-- PASO 3: Cuenta y Rol -->
-  <mat-step [stepControl]="accountGroup">
-    <form [formGroup]="form">
-      <ng-template matStepLabel>Cuenta y Rol</ng-template>
-
-      <div formGroupName="account">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Correo</mat-label>
-          <input matInput type="email" formControlName="email" required />
-          <mat-error *ngIf="accountGroup.get('email')?.hasError('required')">Requerido</mat-error>
-          <mat-error *ngIf="accountGroup.get('email')?.hasError('email')">Correo inválido</mat-error>
-        </mat-form-field>
-
-        <!-- Password solo requerido en creación -->
-        <div class="grid" *ngIf="isCreate(); else optionalPassword">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Contraseña</mat-label>
-            <input matInput type="password" formControlName="password" required />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Confirmar contraseña</mat-label>
-            <input matInput type="password" formControlName="confirmPassword" required />
-            <mat-error *ngIf="accountGroup.hasError('passwordsMismatch')">Las contraseñas no coinciden</mat-error>
-          </mat-form-field>
-        </div>
-
-        <ng-template #optionalPassword>
-          <div class="grid">
+        <div formGroupName="person">
+          <div class="form-row-2">
             <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Nueva contraseña (opcional)</mat-label>
-              <input matInput type="password" formControlName="password" />
+              <mat-label>Nombres</mat-label>
+              <input matInput formControlName="firstName" required />
+              <mat-error *ngIf="personGroup.get('firstName')?.touched && personGroup.get('firstName')?.invalid">
+                {{ getFirstError(personGroup.get('firstName'), ['required','maxlength']) }}
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Confirmar nueva contraseña</mat-label>
-              <input matInput type="password" formControlName="confirmPassword" />
+              <mat-label>Apellidos</mat-label>
+              <input matInput formControlName="lastName" required />
+              <mat-error *ngIf="personGroup.get('lastName')?.touched && personGroup.get('lastName')?.invalid">
+                {{ getFirstError(personGroup.get('lastName'), ['required','maxlength']) }}
+              </mat-error>
             </mat-form-field>
           </div>
-        </ng-template>
-      </div>
 
-      <!-- Rol (roleId en el form raíz) -->
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Rol</mat-label>
-        <mat-select formControlName="roleId" required>
-          <mat-option [value]="null" disabled>Selecciona un rol…</mat-option>
-          <mat-option *ngFor="let r of (roles$ | async) ?? []" [value]="r.id">
-            {{ r.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+          <div class="form-row-3">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Documento</mat-label>
+              <input matInput formControlName="document" required />
+              <mat-error *ngIf="personGroup.get('document')?.touched && personGroup.get('document')?.invalid">
+                {{ getFirstError(personGroup.get('document'), ['required','minlength','maxlength']) }}
+              </mat-error>
+            </mat-form-field>
 
-      <div class="text-danger" *ngIf="submitError()">{{ submitError() }}</div>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Teléfono</mat-label>
+              <input matInput formControlName="phone" required />
+              <mat-error *ngIf="personGroup.get('phone')?.touched && personGroup.get('phone')?.invalid">
+                {{ getFirstError(personGroup.get('phone'), ['required','pattern']) }}
+              </mat-error>
+            </mat-form-field>
 
-      <div class="step-actions">
-        <button mat-button matStepperPrevious>Volver</button>
-        <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || submitting()">
-          {{ submitting() ? 'Guardando...' : (isCreate() ? 'Crear' : 'Guardar cambios') }}
-        </button>
-        <button mat-button (click)="cancel()">Cancelar</button>
-      </div>
-    </form>
-  </mat-step>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Dirección</mat-label>
+              <input matInput formControlName="address" required />
+              <mat-error *ngIf="personGroup.get('address')?.touched && personGroup.get('address')?.invalid">
+                {{ getFirstError(personGroup.get('address'), ['required','maxlength']) }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
 
-</mat-horizontal-stepper>
+        <div class="step-actions">
+          <button mat-button matStepperPrevious>Volver</button>
+          <button mat-raised-button color="primary" (click)="markGroupAsTouched(personGroup)" matStepperNext
+            [disabled]="personGroup.invalid">
+            Siguiente
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- PASO 3: Cuenta y Rol -->
+    <mat-step [stepControl]="accountGroup">
+      <form [formGroup]="form" class="m-3">
+        <ng-template matStepLabel>Cuenta y Rol</ng-template>
+
+        <div formGroupName="account">
+          <div class="form-row-2">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Correo</mat-label>
+              <input matInput type="email" formControlName="email" required />
+              <mat-error *ngIf="accountGroup.get('email')?.touched && accountGroup.get('email')?.invalid">
+                {{ getFirstError(accountGroup.get('email'), ['required','email']) }}
+              </mat-error>
+            </mat-form-field>
+
+            <!-- separador para mantener 2 columnas -->
+            <div></div>
+          </div>
+
+          <!-- Password en creación -->
+          <div class="form-row-2" *ngIf="isCreate(); else optionalPassword">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Contraseña</mat-label>
+              <input matInput type="password" formControlName="password" required />
+              <mat-error *ngIf="accountGroup.get('password')?.touched && accountGroup.get('password')?.invalid">
+                {{ getFirstError(accountGroup.get('password'),
+                ['required','minlength','upper','lower','digit','symbol']) }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Confirmar contraseña</mat-label>
+              <input matInput type="password" formControlName="confirmPassword" required
+                [errorStateMatcher]="confirmMatcher" />
+              <mat-error
+                *ngIf="accountGroup.get('confirmPassword')?.touched && accountGroup.get('confirmPassword')?.invalid">
+                {{ getFirstError(accountGroup.get('confirmPassword'), ['required']) }}
+              </mat-error>
+              <mat-error *ngIf="accountGroup.touched && accountGroup.hasError('passwordsMismatch')">
+                Las contraseñas no coinciden
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <ng-template #optionalPassword>
+            <div class="form-row-2">
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Nueva contraseña (opcional)</mat-label>
+                <input matInput type="password" formControlName="password" />
+                <mat-error *ngIf="accountGroup.get('password')?.touched && accountGroup.get('password')?.invalid">
+                  {{ getFirstError(accountGroup.get('password'), ['minlength','upper','lower','digit','symbol']) }}
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Confirmar nueva contraseña</mat-label>
+                <input matInput type="password" formControlName="confirmPassword"
+                  [errorStateMatcher]="confirmMatcher" />
+                <mat-error *ngIf="accountGroup.touched && accountGroup.hasError('passwordsMismatch')">
+                  Las contraseñas no coinciden
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Rol (en el ROOT del form, fuera de account) -->
+        <div class="form-row-2">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Rol</mat-label>
+            <mat-select formControlName="roleId" required>
+              <mat-option [value]="null" disabled>Selecciona un rol…</mat-option>
+              <mat-option *ngFor="let r of (roles$ | async) ?? []" [value]="r.id">
+                {{ r.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('roleId')?.touched && form.get('roleId')?.invalid">
+              {{ getFirstError(form.get('roleId'), ['required','min']) }}
+            </mat-error>
+          </mat-form-field>
+
+          <div></div>
+        </div>
+
+        <div class="text-danger" *ngIf="submitError()">{{ submitError() }}</div>
+
+        <div class="step-actions">
+          <button mat-button matStepperPrevious>Volver</button>
+          <button mat-raised-button color="primary" (click)="markGroupAsTouched(accountGroup); submit()"
+            [disabled]="form.invalid || submitting()">
+            {{ submitting() ? 'Guardando...' : (isCreate() ? 'Crear' : 'Guardar cambios') }}
+          </button>
+          <button mat-button (click)="cancel()">Cancelar</button>
+        </div>
+      </form>
+    </mat-step>
+
+  </mat-horizontal-stepper>
+</div>
