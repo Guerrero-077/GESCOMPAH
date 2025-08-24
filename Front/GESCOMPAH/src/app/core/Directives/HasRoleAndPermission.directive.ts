@@ -1,7 +1,11 @@
-import { Directive, inject, Input, TemplateRef, ViewContainerRef } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  Directive, inject, Input,
+  TemplateRef, ViewContainerRef
+} from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { PermissionService } from '../service/permission/permission.service';
+import { UserStore } from '../service/permission/User.Store';
 
 type Mode = 'any' | 'all';
 
@@ -13,6 +17,7 @@ export class HasRoleAndPermissionDirective {
   private tpl = inject(TemplateRef<any>);
   private vcr = inject(ViewContainerRef);
   private permissionsSvc = inject(PermissionService);
+  private userStore = inject(UserStore);
 
   private roles$ = new BehaviorSubject<string[] | null>(null);
   private perms$ = new BehaviorSubject<string[] | null>(null);
@@ -20,21 +25,23 @@ export class HasRoleAndPermissionDirective {
   private route$ = new BehaviorSubject<string | null>(null);
   private shown = false;
 
-  // Alias largos para [] y nombres cortos para microsintaxis:
-  // *appHasRoleAndPermission="'Admin'; perms: 'EDITAR'; mode: 'any'"
   @Input('appHasRoleAndPermission') set roles(v: string | string[]) {
     this.roles$.next(Array.isArray(v) ? v : [v]);
   }
   @Input('appHasRoleAndPermissionPerms') set perms(v: string | string[]) {
     this.perms$.next(Array.isArray(v) ? v : [v]);
   }
-  @Input('appHasRoleAndPermissionMode') set mode(v: Mode) { this.mode$.next(v ?? 'any'); }
-  @Input('appHasRoleAndPermissionForRoute') set forRoute(r: string) { this.route$.next(r ?? null); }
+  @Input('appHasRoleAndPermissionMode') set mode(v: Mode) {
+    this.mode$.next(v ?? 'any');
+  }
+  @Input('appHasRoleAndPermissionForRoute') set forRoute(r: string) {
+    this.route$.next(r ?? null);
+  }
 
   constructor() {
     combineLatest([
-      this.permissionsSvc.userProfile$,
-      this.roles$, this.perms$, this.mode$, this.route$,
+      toObservable(this.userStore.user),
+      this.roles$, this.perms$, this.mode$, this.route$
     ])
       .pipe(
         map(([user, roles, perms, mode, route]) => {
@@ -44,8 +51,14 @@ export class HasRoleAndPermissionDirective {
         takeUntilDestroyed()
       )
       .subscribe(ok => {
-        if (ok && !this.shown) { this.vcr.clear(); this.vcr.createEmbeddedView(this.tpl); this.shown = true; }
-        else if (!ok && this.shown) { this.vcr.clear(); this.shown = false; }
+        if (ok && !this.shown) {
+          this.vcr.clear();
+          this.vcr.createEmbeddedView(this.tpl);
+          this.shown = true;
+        } else if (!ok && this.shown) {
+          this.vcr.clear();
+          this.shown = false;
+        }
       });
   }
 

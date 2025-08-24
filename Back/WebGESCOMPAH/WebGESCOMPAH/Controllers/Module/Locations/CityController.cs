@@ -8,7 +8,7 @@ using WebGESCOMPAH.Controllers.Base;
 namespace WebGESCOMPAH.Controllers.Module.Locations
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class CityController : BaseController<CitySelectDto, CityCreateDto, CityUpdateDto>
     {

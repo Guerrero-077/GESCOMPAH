@@ -1,10 +1,15 @@
-<div class="container-d">
-    <app-sidebar></app-sidebar>
-    <div class="content">
-        <app-header></app-header>
-        <div class="main-content" style="height: calc(100vh - 80px); overflow-y: auto;">
-            <!-- Ajusta '80px' según el tamaño de tu header -->
-            <router-outlet></router-outlet>
-        </div>
+<mat-drawer-container class="layout-container" autosize>
+  <!-- SIDEBAR -->
+  <mat-drawer #drawer class="layout-sidebar" mode="side" [opened]="true">
+    <app-sidebar (closeSidebar)="drawer.toggle()"></app-sidebar>
+  </mat-drawer>
+
+  <!-- MAIN CONTENT -->
+  <mat-drawer-content>
+    <app-header [toggleDrawer]="toggleSidebar"></app-header>
+
+    <div class="layout-content">
+      <router-outlet></router-outlet>
     </div>
-</div>
+  </mat-drawer-content>
+</mat-drawer-container>

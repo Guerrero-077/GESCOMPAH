@@ -1,18 +1,17 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { PermissionService } from '../service/permission/permission.service';
-import { map, of } from 'rxjs';
+import { UserStore } from '../service/permission/User.Store';
 
 export const publicGuard: CanActivateFn = (route, state) => {
-  const permissionService = inject(PermissionService);
+  const userStore = inject(UserStore);
   const router = inject(Router);
 
-  // Si ya hay perfil en memoria, redirigimos al dashboard
-  if (permissionService.currentUserProfile) {
+  // Si ya hay usuario en memoria, redirige al dashboard
+  if (userStore.snapshot) {
     router.navigate(['/admin/dashboard'], { replaceUrl: true });
     return false;
   }
 
-  // Si no hay perfil, permitimos el acceso a rutas públicas
+  // Si no hay usuario, puede acceder a ruta pública (ej: login, register)
   return true;
 };

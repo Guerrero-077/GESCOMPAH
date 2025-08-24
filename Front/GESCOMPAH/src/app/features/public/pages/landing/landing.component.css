@@ -4,7 +4,7 @@
   width: 100vw;
   /* background: linear-gradient(-45deg, #0f2715, #204323, #5c642c); */
   /* background-color: #2E7D32; */
-  color: white;
+  color: #fff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-x: hidden;
 }
@@ -16,7 +16,7 @@
   height: 100%;
   text-align: center;
   padding: 2rem;
-  
+
 }
 
 .content-wrapper {
@@ -64,7 +64,7 @@
   transform: translateY(-3px);
 }
 
-.imagen-local{
+.imagen-local {
   width: 90%;
   height: 100%;
   /* border: 1px #000 solid; */
@@ -72,3 +72,7 @@
   display: block;
 }
 
+.text-green {
+  color: #2E7D32;
+
+}

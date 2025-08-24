@@ -1,26 +1,27 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { PermissionService } from '../service/permission/permission.service';
 import { AuthService } from '../service/auth/auth.service';
+import { PermissionService } from '../service/permission/permission.service';
 import { map, of, catchError } from 'rxjs';
+import { UserStore } from '../service/permission/User.Store';
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-  const permissionService = inject(PermissionService);
   const authService = inject(AuthService);
+  const permissionService = inject(PermissionService);
+  const userStore = inject(UserStore);
   const router = inject(Router);
 
   const check = () => {
-    const profile = permissionService.currentUserProfile;
+    const profile = userStore.snapshot;
 
     if (!profile || !profile.roles) {
       router.navigate(['/auth/login']);
       return false;
     }
 
-    // --- Defensive check for route.data ---
     if (!route || !route.data) {
       console.warn('AuthGuard: Route or route.data is missing. Allowing access by default, but this is unexpected.');
       return true;
@@ -28,7 +29,7 @@ export const authGuard: CanActivateFn = (
 
     // --- Role Check ---
     const requiredRoles = route.data['roles'] as string[] | undefined;
-    if (requiredRoles && requiredRoles.length > 0) {
+    if (requiredRoles?.length) {
       const userRoles = profile.roles;
       const hasRole = requiredRoles.some(requiredRole => userRoles.includes(requiredRole));
       if (!hasRole) {
@@ -39,7 +40,7 @@ export const authGuard: CanActivateFn = (
 
     // --- Permission Check ---
     const requiredPermissions = route.data['permissions'] as string[] | undefined;
-    if (requiredPermissions && requiredPermissions.length > 0) {
+    if (requiredPermissions?.length) {
       const hasPermission = requiredPermissions.every(p =>
         permissionService.hasPermissionForRoute(p, state.url)
       );
@@ -52,14 +53,14 @@ export const authGuard: CanActivateFn = (
     return true;
   };
 
-  if (permissionService.currentUserProfile) {
+  if (userStore.snapshot) {
     return check();
   }
 
   return authService.GetMe().pipe(
     map(user => {
       if (user) {
-        permissionService.setUserProfile(user);
+        userStore.set(user);
         return check();
       }
       router.navigate(['/auth/login']);
@@ -71,4 +72,3 @@ export const authGuard: CanActivateFn = (
     })
   );
 };
-
