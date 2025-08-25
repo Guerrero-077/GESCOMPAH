@@ -22,7 +22,12 @@ export class SweetAlertService {
     });
   }
 
-  public showConfirm(title: string, text: string): Promise<any> {
+  public showConfirm(
+    title: string,
+    text: string,
+    confirmButtonText = 'Aceptar',
+    cancelButtonText = 'Cancelar'
+  ): Promise<any> {
     return Swal.fire({
       title,
       text,
@@ -30,7 +35,25 @@ export class SweetAlertService {
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonText,
+      cancelButtonText,
     });
+  }
+
+  public showLoading(title: string, text: string): void {
+    Swal.fire({
+      title,
+      text,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      allowEnterKey: false
+    });
+  }
+
+  public hideLoading(): void {
+    Swal.close();
   }
 }

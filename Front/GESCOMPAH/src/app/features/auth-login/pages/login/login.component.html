@@ -45,10 +45,15 @@
         <!-- Password -->
         <div class="mb-3">
           <label for="password" class="form-label texto fw-medium text-green">Contraseña</label>
-          <input type="password" id="password" class="form-control border-green" formControlName="password"
-            placeholder="Contraseña"
-            [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched"
-            [attr.aria-invalid]="formLogin.get('password')?.invalid ? 'true' : null" autocomplete="current-password" />
+          <div class="input-group">
+            <input [type]="passwordVisible ? 'text' : 'password'" id="password" class="form-control border-green"
+              formControlName="password" placeholder="Contraseña"
+              [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched"
+              [attr.aria-invalid]="formLogin.get('password')?.invalid ? 'true' : null" autocomplete="current-password" />
+            <button class="btn btn-outline-secondary" type="button" (click)="togglePasswordVisibility()">
+              <i class="fa-regular" [class.fa-eye-slash]="!passwordVisible" [class.fa-eye]="passwordVisible"></i>
+            </button>
+          </div>
 
           <!-- Mensajes específicos -->
           <div class="invalid-feedback d-block"

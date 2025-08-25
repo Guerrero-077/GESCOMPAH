@@ -15,6 +15,7 @@ import { EstablishmentStore } from '../../services/establishment/establishment.s
 import { FormEstablishmentComponent } from '../form-establishment/form-establishment.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
 import { EstablishmentDetailDialogComponent } from '../establishment-detail-dialog/establishment-detail-dialog.component';
+import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
 
 
 @Component({
@@ -42,11 +43,15 @@ export class EstablishmentsListComponent {
   constructor(
     private dialog: MatDialog,
     private store: EstablishmentStore,
-    private sweetAlert: SweetAlertService
+    private sweetAlert: SweetAlertService,
+    private sharedEvents: SharedEventsServiceService
   ) {
     this.establishments$ = this.store.establishments$.pipe(
       tap(establishments => this.establishments = establishments)
     );
+    this.sharedEvents.plazaStateChanged$.subscribe(() => {
+      this.store.loadAll(); // recarga establecimientos filtrados
+    });
   }
 
   openCreateDialog(): void {

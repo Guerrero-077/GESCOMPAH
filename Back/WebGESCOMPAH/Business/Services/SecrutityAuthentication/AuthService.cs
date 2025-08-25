@@ -1,4 +1,5 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
+using Data.Interfaz.IDataImplemenent.Persons;
 using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -25,7 +26,8 @@ namespace Business.Services.SecrutityAuthentication
         ISendCode emailService,
         IPasswordResetCodeRepository passwordResetRepo,
         IValidatorService validator,
-        IUserContextService userContextService
+        IUserContextService userContextService,
+        IPersonRepository personRepository
     ) : IAuthService
     {
         private readonly IUserRepository _userRepository = userData;
@@ -36,6 +38,7 @@ namespace Business.Services.SecrutityAuthentication
         private readonly IPasswordResetCodeRepository _passwordResetRepo = passwordResetRepo;
         private readonly IValidatorService _validator = validator;
         private readonly IUserContextService _userContext = userContextService;
+        private readonly IPersonRepository _personRepository = personRepository;
 
         public async Task<UserDto> RegisterAsync(RegisterDto dto)
         {
@@ -45,6 +48,9 @@ namespace Business.Services.SecrutityAuthentication
 
                 if (await _userRepository.ExistsByEmailAsync(dto.Email))
                     throw new BusinessException("El correo ya está registrado.");
+
+                if (await _personRepository.ExistsByDocumentAsync(dto.Document))
+                    throw new BusinessException("Ya existe una persona con este número de documento.");
 
                 var person = _mapper.Map<Person>(dto);
                 var user = _mapper.Map<User>(dto);

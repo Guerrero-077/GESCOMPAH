@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Business.Repository;
+using Data.Interfaz.IDataImplemenent.Persons;
 using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -16,14 +17,16 @@ namespace Business.Services.SecrutityAuthentication
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IUserRepository _userRepository; 
         private readonly IRolUserRepository _rolUserRepository;
+        private readonly IPersonRepository _personRepository;
         private readonly ApplicationDbContext _context;
 
-        public UserService(IUserRepository data, IMapper mapper, IPasswordHasher<User> passwordHasher, IRolUserRepository rolUserRepository, ApplicationDbContext contex)
+        public UserService(IUserRepository data, IMapper mapper, IPasswordHasher<User> passwordHasher, IRolUserRepository rolUserRepository, IPersonRepository personRepository, ApplicationDbContext contex)
             : base(data, mapper)
         {
             _passwordHasher = passwordHasher;
             _userRepository = data;
-            _rolUserRepository = rolUserRepository;
+            _rolUserRepository = rolUserRepository; 
+            _personRepository = personRepository;
             _context = contex;
         }
 
@@ -66,6 +69,9 @@ namespace Business.Services.SecrutityAuthentication
 
                 if (await _userRepository.ExistsByEmailAsync(dto.Email))
                     throw new BusinessException("El correo ya está registrado.");
+
+                if (await _personRepository.ExistsByDocumentAsync(dto.Document))
+                    throw new BusinessException("Ya existe una persona con este número de documento.");
 
                 await using var tx = await _context.Database.BeginTransactionAsync();
 
@@ -121,6 +127,11 @@ namespace Business.Services.SecrutityAuthentication
                 var emailExists = await _userRepository.ExistsByEmailAsync(dto.Email);
                 if (emailExists && !string.Equals(user.Email, dto.Email, StringComparison.OrdinalIgnoreCase))
                     throw new BusinessException("El correo ya está registrado.");
+
+
+                if (await _personRepository.ExistsByDocumentAsync(dto.Document))
+                    throw new BusinessException("Ya existe una persona con este número de documento.");
+
 
                 await using var tx = await _context.Database.BeginTransactionAsync();
 

@@ -24,6 +24,19 @@ namespace Entity.Infrastructure.DataInit.Persons
                     IsDeleted = false,
                     Active = true,
                     CreatedAt = seedDate
+                },
+                new Person
+                {
+                    Id = 2,
+                    FirstName = "Usuario",
+                    LastName = "General",
+                    Document = "1000000000",
+                    Address = "Calle Principal 123",
+                    Phone = "3000000000",
+                    CityId = 1,
+                    IsDeleted = false,
+                    Active = true,
+                    CreatedAt = seedDate
                 }
                 
             );

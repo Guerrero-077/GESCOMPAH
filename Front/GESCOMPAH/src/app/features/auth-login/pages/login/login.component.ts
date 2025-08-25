@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../../../core/service/auth/auth.service';
 import { CommonModule } from '@angular/common';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 function notOnlySpaces(): (control: AbstractControl) => ValidationErrors | null {
   return (control: AbstractControl) => {
@@ -55,6 +56,9 @@ export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private sweetAlertService = inject(SweetAlertService);
+
+  passwordVisible = false;
 
   readonly errorMessages = {
     email: {
@@ -116,6 +120,10 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void { }
 
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
   me() {
     this.auth.GetMe().subscribe({
       next: () => { },
@@ -157,14 +165,20 @@ export class LoginComponent implements OnInit {
 
     const password = this.passwordCtrl.value ?? '';
 
+    this.sweetAlertService.showLoading('Iniciando sesión', 'Por favor, espere...');
+
     this.auth.Login({ email, password }).subscribe({
-      next: () => this.router.navigate(['/admin/dashboard']),
+      next: () => {
+        this.sweetAlertService.hideLoading();
+        this.router.navigate(['/admin/dashboard']);
+      },
       error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: err?.error?.message ?? 'Credenciales inválidas'
-        });
+        this.sweetAlertService.hideLoading();
+        this.sweetAlertService.showNotification(
+          'Oops...',
+          err?.error?.message ?? 'Credenciales inválidas',
+          'error'
+        );
       }
     });
   }
