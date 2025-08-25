@@ -6,6 +6,7 @@ import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,8 +17,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { map } from 'rxjs/operators';
 
-import { FormType, formSchemas, DynamicFormField } from './dymanic-forms.config';
 import { DepartmentService } from '../../../features/setting/services/department/department.service';
+import { DynamicFormField } from '../Models/Form/form.models';
+import { FormType, formSchemas } from './dymanic-forms.config';
 
 type Option = { value: string | number; label: string };
 
@@ -41,21 +43,19 @@ export class DymanicFormsComponent implements OnInit {
   @Input() formType!: FormType;
   @Input() initialData: any = {};
   @Input() selectOptions: Record<string, Option[]> = {};
-
   @Output() formSubmit = new EventEmitter<any>();
 
   form!: FormGroup;
   fields: DynamicFormField[] = [];
 
   private departmentService = inject(DepartmentService);
-
   constructor(private fb: FormBuilder) { }
 
   ngOnInit() {
     // 1) Clonar esquema
     this.fields = formSchemas[this.formType].map(f => ({ ...f }));
 
-    // 2) Formatear campos tipo date antes de inicializar el formulario
+    // 2) Normaliza fechas a YYYY-MM-DD
     this.fields.forEach(field => {
       if (field.type === 'date') {
         const rawDate = this.initialData?.[field.name];
@@ -66,63 +66,58 @@ export class DymanicFormsComponent implements OnInit {
       }
     });
 
-    // 3) Reglas especiales por tipo
+    // 3) Reglas especiales por tipo (ej. User edit)
     const isUser = this.formType === 'User';
     const isUserEdit = isUser && !!this.initialData?.id;
-
     if (isUserEdit) {
       const personField = this.fields.find(f => f.name === 'personId');
       if (personField) personField.type = 'hidden';
     }
 
-    // 4) Cargar opciones dinámicas (selects, checkbox-list)
+    // 4) Cargar opciones dinámicas
     this.fields.forEach(field => {
       if (field.name === 'departmentId' && this.formType === 'City') {
         this.departmentService.getAll().pipe(
           map(depts => depts.map((d: any) => ({ value: d.id, label: d.name })))
         ).subscribe(options => this.setOptionsForField(field.name, options));
-      } else if ((field.type === 'select' || field.type === 'checkbox-list') && this.selectOptions[field.name]) {
+      } else if ((field.type === 'select' || (field as any).type === 'checkbox-list') && this.selectOptions[field.name]) {
         this.setOptionsForField(field.name, this.selectOptions[field.name]);
       }
     });
 
-    // 5) Construir controles del formulario
-    const controls: Record<string, any> = {};
+    // 5) Construir controles con VALIDADORES desde el schema
+    const controls: Record<string, FormControl | FormGroup> = {};
 
     this.fields.forEach(field => {
       const init = this.initialData?.[field.name];
+      const validators = this.mapValidators(field);
 
       switch (field.type) {
         case 'checkbox-list': {
           const fg = new FormGroup({});
-          if (field.required) fg.addValidators(atLeastOneTrueInGroupValidator);
+          if (field.required || field.validations?.atLeastOne) fg.addValidators(atLeastOneTrueInGroupValidator);
           controls[field.name] = fg;
           break;
         }
-        default: {
-          let value = init;
-          if (value === undefined) {
-            if (field.type === 'select' && field.multiple) value = [];
-            else if (field.type === 'checkbox') value = false;
-            else value = null;
-          }
-          const validators = [];
-          if (field.required && field.type !== 'hidden') {
-            validators.push(field.type === 'checkbox' ? Validators.requiredTrue : Validators.required);
-          }
-          controls[field.name] = [value, validators];
+        case 'checkbox': {
+          const value = init ?? false;
+          controls[field.name] = new FormControl<boolean>(!!value, { validators, updateOn: 'blur' });
           break;
+        }
+        default: {
+          let value = init ?? null;
+          if (field.type === 'select' && (field as any).multiple && value === null) value = [];
+          controls[field.name] = new FormControl(value, { validators, updateOn: 'blur' });
         }
       }
     });
 
-    this.form = this.fb.group(controls);
+    this.form = new FormGroup(controls);
 
     // 6) Ajustes finales
     if (isUserEdit) {
       this.form.get('password')?.clearValidators();
       this.form.get('password')?.updateValueAndValidity();
-
       this.form.get('personId')?.clearValidators();
       this.form.get('personId')?.updateValueAndValidity();
     }
@@ -132,37 +127,68 @@ export class DymanicFormsComponent implements OnInit {
     }
 
     if ((this.formType === 'Department' || this.formType === 'City') &&
-      typeof this.initialData?.active === 'boolean') {
+        typeof this.initialData?.active === 'boolean') {
       this.form.get('active')?.setValue(this.initialData.active);
     }
 
     // Reconciliar checkbox-list
-    this.fields.filter(f => f.type === 'checkbox-list').forEach(f => {
+    this.fields.filter(f => (f as any).type === 'checkbox-list').forEach(f => {
       this.reconcileCheckboxListGroup(f.name);
     });
   }
 
-  // ===== Helpers de opciones/checkbox-list =====
+  // ====== Mapeo de validadores ======
+  private mapValidators(field: DynamicFormField): ValidatorFn[] {
+    const v = field.validations ?? {};
+    const out: ValidatorFn[] = [];
 
+    // required
+    if (field.required && field.type !== 'hidden') {
+      if (field.type === 'checkbox') out.push(Validators.requiredTrue);
+      else out.push(Validators.required);
+    }
+
+    // min/max length
+    if (v.minLength) out.push(Validators.minLength(v.minLength));
+    if (v.maxLength) out.push(Validators.maxLength(v.maxLength));
+
+    // email
+    if (field.type === 'email' || (v as any).email) out.push(Validators.email);
+
+    // pattern (compilado con 'u')
+    if (v.pattern) out.push(Validators.pattern(new RegExp(v.pattern, 'u')));
+
+    // numérico con min/max (soporta coma)
+    if (field.type === 'number' && (v.min !== undefined || v.max !== undefined)) {
+      out.push(numberRange(v.min, v.max));
+    }
+
+    // onlySpaces para campos textuales
+    const isTextual = ['text', 'textarea', 'email', 'password'].includes(field.type as any);
+    if (v.onlySpaces || (field.required && isTextual)) {
+      out.push((c: AbstractControl) => {
+        const val = (c.value ?? '') as string;
+        return typeof val === 'string' && val.trim().length === 0 ? { onlySpaces: true } : null;
+      });
+    }
+
+    return out;
+  }
+
+  // ===== Helpers de opciones/checkbox-list =====
   private sortOptionsById(opts: Option[]) {
     return [...(opts ?? [])].sort((a, b) => Number(a.value) - Number(b.value));
   }
-
-  private getField(name: string) {
-    return this.fields.find(f => f.name === name);
-  }
-
+  private getField(name: string) { return this.fields.find(f => f.name === name); }
   private setOptionsForField(fieldName: string, options: Option[]) {
     const field = this.getField(fieldName);
     if (!field) return;
-    field.options = this.sortOptionsById(options ?? []);
-    if (field.type === 'checkbox-list' && this.form) {
-      this.reconcileCheckboxListGroup(fieldName);
-    }
+    (field as any).options = this.sortOptionsById(options ?? []);
+    if ((field as any).type === 'checkbox-list' && this.form) this.reconcileCheckboxListGroup(fieldName);
   }
 
   private reconcileCheckboxListGroup(fieldName: string) {
-    const field = this.getField(fieldName);
+    const field = this.getField(fieldName) as any;
     if (!field || field.type !== 'checkbox-list') return;
 
     const options = field.options ?? [];
@@ -184,7 +210,7 @@ export class DymanicFormsComponent implements OnInit {
     }
 
     Object.keys(group.controls).forEach(ctrlKey => {
-      const stillExists = options.some(o => String(o.value) === ctrlKey);
+      const stillExists = options.some((o: any) => String(o.value) === ctrlKey);
       if (!stillExists) group.removeControl(ctrlKey);
     });
 
@@ -193,13 +219,46 @@ export class DymanicFormsComponent implements OnInit {
 
   trackByOption = (_: number, opt: Option) => String(opt.value);
 
-  // ===== Utils =====
-
+  // ===== UX helpers =====
   compareById(o1: any, o2: any): boolean {
     if (o1 == null || o2 == null) return false;
     return String(o1) === String(o2);
   }
 
+  onTrim(name: string) {
+    const c = this.form.get(name);
+    if (!c) return;
+    const v = c.value;
+    if (typeof v === 'string') {
+      const t = v.trim().replace(/\s+/g, ' ');
+      if (t !== v) c.setValue(t);
+    }
+  }
+
+  blockNegative(e: KeyboardEvent) {
+    if (e.key === '-' || e.key === 'Minus') e.preventDefault();
+  }
+
+  getError(name: string): string | null {
+    const c = this.form.get(name);
+    if (!c || !c.touched || !c.errors) return null;
+
+    const f = this.getField(name);
+    const label = f?.label ?? name;
+
+    if (c.errors['required'])   return `${label} es obligatorio.`;
+    if (c.errors['minlength'])  return `${label} requiere al menos ${c.errors['minlength'].requiredLength} caracteres.`;
+    if (c.errors['maxlength'])  return `${label} no puede superar ${c.errors['maxlength'].requiredLength} caracteres.`;
+    if (c.errors['email'])      return `Ingresa un correo válido (ej. usuario@dominio.com).`;
+    if (c.errors['pattern'])    return `${label} tiene un formato inválido.`;
+    if (c.errors['NaN'])        return `${label} debe ser numérico.`;
+    if (c.errors['min'])        return `${label} no puede ser menor que ${c.errors['min'].min}.`;
+    if (c.errors['max'])        return `${label} no puede ser mayor que ${c.errors['max'].max}.`;
+    if (c.errors['onlySpaces']) return `${label} no puede ser solo espacios.`;
+    return 'Valor inválido.';
+  }
+
+  // ===== Submit =====
   onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -209,20 +268,43 @@ export class DymanicFormsComponent implements OnInit {
     const raw = this.form.getRawValue();
     const result: any = { ...raw };
 
-    // Normaliza checkbox-list: FormGroup { [id]: boolean } -> number[]
-    for (const field of this.fields) {
+    for (const field of this.fields as any[]) {
       if (field.type === 'checkbox-list') {
+        // Normaliza checkbox-list: FormGroup { [id]: boolean } -> number[] | string[]
         const fg = this.form.get(field.name) as FormGroup;
         const opts = field.options ?? [];
         const ids = opts
-          .filter(o => (fg.get(String(o.value)) as FormControl<boolean>)?.value === true)
-          .map(o => (typeof o.value === 'string' && !isNaN(+o.value) ? +o.value : o.value));
+          .filter((o: any) => (fg.get(String(o.value)) as FormControl<boolean>)?.value === true)
+          .map((o: any) => (typeof o.value === 'string' && !isNaN(+o.value) ? +o.value : o.value));
         result[field.name] = ids;
+
+      } else if (field.type === 'number') {
+        // convierte "100,50" => 100.5 / "" => null
+        const v = result[field.name];
+        result[field.name] = (v === null || v === '')
+          ? null
+          : Number(String(v).replace(',', '.'));
+
+      } else if (typeof result[field.name] === 'string') {
+        result[field.name] = result[field.name].trim().replace(/\s+/g, ' ');
       }
     }
 
     this.formSubmit.emit(result);
   }
+}
+
+/** Valida números (soporta coma) y chequea min/max si se proveen */
+function numberRange(min?: number, max?: number) {
+  return (c: AbstractControl) => {
+    const raw = c.value;
+    if (raw === null || raw === undefined || raw === '') return null;
+    const n = Number(String(raw).replace(',', '.'));
+    if (Number.isNaN(n)) return { NaN: true };
+    if (min !== undefined && n < min) return { min: { min, actual: n } };
+    if (max !== undefined && n > max) return { max: { max, actual: n } };
+    return null;
+  };
 }
 
 /** Validador: al menos un true dentro de un FormGroup<boolean> */

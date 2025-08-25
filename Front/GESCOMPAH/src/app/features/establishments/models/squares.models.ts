@@ -1,19 +1,11 @@
-export interface SquareSelectModel {
-  id: number;
-  name: string;
-  description: string;
-  location: string;
-  active: boolean;
-}
 export interface SquareCreateModel {
-  id: number
   name: string;
   description: string;
   location: string;
 }
-export interface SquareUpdateModel {
+export interface SquareUpdateModel extends SquareCreateModel {
   id: number;
-  name: string;
-  description: string;
-  location: string;
+}
+export interface SquareSelectModel extends SquareUpdateModel {
+  active: boolean;
 }

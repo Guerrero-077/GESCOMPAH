@@ -1,60 +1,100 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="dynamic-form-container">
   <div *ngFor="let field of fields" class="form-field-wrapper">
-    <ng-container *ngIf="field.type !== 'hidden'">
+    <!-- Hidden -->
+    <input *ngIf="field.type === 'hidden'" type="hidden" [formControlName]="field.name" />
 
-      <!-- Campos que NO son checkbox/checkbox-list, dentro de mat-form-field -->
-      <mat-form-field *ngIf="field.type !== 'checkbox' && field.type !== 'checkbox-list'" appearance="outline"
-        class="full-width">
-        <mat-label>{{ field.label ?? (field.name | titlecase) }}</mat-label>
+    <!-- Todos los que no son checkbox / checkbox-list -->
+    <mat-form-field *ngIf="field.type !== 'hidden' && field.type !== 'checkbox' && field.type !== 'checkbox-list'"
+                    appearance="outline" class="full-width">
+      <mat-label>{{ field.label ?? (field.name | titlecase) }}</mat-label>
 
-        <ng-container [ngSwitch]="field.type">
-          <input matInput *ngSwitchCase="'text'" [formControlName]="field.name"
-            [type]="field.name === 'password' ? 'password' : 'text'" />
+      <ng-container [ngSwitch]="field.type">
 
-          <input matInput *ngSwitchCase="'date'" [formControlName]="field.name" type="date" />
+        <!-- Text -->
+        <input matInput *ngSwitchCase="'text'"
+               [formControlName]="field.name"
+               [placeholder]="field.placeholder ?? ''"
+               (blur)="onTrim(field.name)" />
 
-          <mat-select *ngSwitchCase="'select'" [formControlName]="field.name" [multiple]="field.multiple"
-            [compareWith]="compareById">
-            <mat-option *ngFor="let opt of field.options" [value]="opt.value">
-              {{ opt.label }}
-            </mat-option>
-          </mat-select>
+        <!-- Number (ÚNICO) -->
+        <input matInput *ngSwitchCase="'number'"
+               type="number"
+               inputmode="decimal"
+               [attr.step]="'1'"
+               [attr.min]="(field.validations?.min ?? null)"
+               [attr.max]="(field.validations?.max ?? null)"
+               [formControlName]="field.name"
+               [placeholder]="field.placeholder ?? ''"
+               (keydown)="blockNegative($event)" />
 
-          <textarea matInput cdkTextareaAutosize [cdkAutosizeMinRows]="3" [cdkAutosizeMaxRows]="8"
-            *ngSwitchCase="'textarea'" [formControlName]="field.name"></textarea>
-        </ng-container>
+        <!-- Email -->
+        <input matInput *ngSwitchCase="'email'"
+               type="email"
+               [formControlName]="field.name"
+               [placeholder]="field.placeholder ?? ''"
+               (blur)="onTrim(field.name)" />
 
-        <mat-error *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched">
-          {{ field.label ?? (field.name | titlecase) }} es requerido.
-        </mat-error>
-      </mat-form-field>
+        <!-- Password -->
+        <input matInput *ngSwitchCase="'password'"
+               type="password"
+               [formControlName]="field.name"
+               [placeholder]="field.placeholder ?? ''"
+               (blur)="onTrim(field.name)" />
 
-      <!-- Checkbox BOOLEANO simple -->
-      <mat-checkbox *ngIf="field.type === 'checkbox'" [formControlName]="field.name" color="primary">
+        <!-- Date -->
+        <input matInput *ngSwitchCase="'date'"
+               type="date"
+               [formControlName]="field.name"
+               [placeholder]="field.placeholder ?? ''" />
+
+        <!-- Select -->
+        <mat-select *ngSwitchCase="'select'"
+                    [formControlName]="field.name"
+                    [multiple]="!!field.multiple"
+                    [compareWith]="compareById">
+          <mat-option *ngFor="let opt of (field.options ?? []); trackBy: trackByOption"
+                      [value]="opt.value">
+            {{ opt.label }}
+          </mat-option>
+        </mat-select>
+
+        <!-- Textarea -->
+        <textarea matInput *ngSwitchCase="'textarea'"
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder ?? ''"
+                  cdkTextareaAutosize
+                  [cdkAutosizeMinRows]="3"
+                  [cdkAutosizeMaxRows]="8"
+                  (blur)="onTrim(field.name)"></textarea>
+      </ng-container>
+
+      <mat-error *ngIf="form.get(field.name)?.touched && form.get(field.name)?.invalid">
+        {{ getError(field.name) }}
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Checkbox -->
+    <div *ngIf="field.type === 'checkbox'">
+      <mat-checkbox [formControlName]="field.name" color="primary">
         {{ field.label ?? (field.name | titlecase) }}
       </mat-checkbox>
-      <mat-error *ngIf="field.type === 'checkbox' &&
-                        form.get(field.name)?.invalid &&
-                        form.get(field.name)?.touched">
-        {{ field.label ?? (field.name | titlecase) }} es requerido.
+      <mat-error *ngIf="form.get(field.name)?.touched && form.get(field.name)?.invalid">
+        {{ getError(field.name) }}
       </mat-error>
+    </div>
 
-      <!-- Checkbox LIST (FormGroup con claves = ids) -->
-      <div *ngIf="field.type === 'checkbox-list'" class="checkbox-list-block">
-        <label class="mat-body-1">{{ field.label ?? (field.name | titlecase) }}</label>
-
-        <div [formGroupName]="field.name" class="checkbox-list">
-          <mat-checkbox *ngFor="let opt of field.options; trackBy: trackByOption" [formControlName]="opt.value">
-            {{ opt.label }}
-          </mat-checkbox>
-        </div>
-
-        <mat-error *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched">
-          Selecciona al menos una opción.
-        </mat-error>
+    <!-- Checkbox-list -->
+    <div *ngIf="field.type === 'checkbox-list'" class="checkbox-list-block">
+      <label class="mat-body-1">{{ field.label ?? (field.name | titlecase) }}</label>
+      <div [formGroupName]="field.name" class="checkbox-list">
+        <mat-checkbox *ngFor="let opt of (field.options ?? []); trackBy: trackByOption"
+                      [formControlName]="opt.value">
+          {{ opt.label }}
+        </mat-checkbox>
       </div>
-
-    </ng-container>
+      <mat-error *ngIf="form.get(field.name)?.touched && form.get(field.name)?.invalid">
+        {{ getError(field.name) }}
+      </mat-error>
+    </div>
   </div>
-
 </form>

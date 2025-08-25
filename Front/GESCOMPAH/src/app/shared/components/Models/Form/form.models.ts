@@ -1,83 +1,59 @@
-
-
-// export type FormFieldType =
-//     | 'text'
-//     | 'number'
-//     | 'select'
-//     | 'textarea'
-//     | 'checkbox'
-//     | 'radio'
-//     | 'date'
-//     | 'email'
-//     | 'password'
-//     | 'hidden';
-
-import { Type } from "@angular/core";
-
-// export interface DynamicFormField {
-//     name: string;
-//     label: string;
-//     type: FormFieldType;    
-//     value?: any;
-//     placeholder?: string;
-//     options?: { label: string; value: any }[]; // para select y radio
-//     validations?: {
-//         required?: boolean;
-//         minLength?: number;
-//         maxLength?: number;
-//         pattern?: string;
-//     };
-// }
-
-// export interface DynamicFormConfig {
-//     fields: DynamicFormField[];
-//     submitButtonLabel?: string;
-// }
-
-// form.types.ts
+import { Type } from '@angular/core';
 
 export type FormType = 'create' | 'edit' | 'view';
 
 export type FormFieldType =
-    | 'text'
-    | 'number'
-    | 'select'
-    | 'textarea'
-    | 'checkbox'
-    | 'radio'
-    | 'date'
-    | 'email'
-    | 'password'
-    | 'hidden';
+  | 'text'
+  | 'number'
+  | 'select'
+  | 'textarea'
+  | 'checkbox'
+  | 'radio'
+  | 'date'
+  | 'email'
+  | 'password'
+  | 'hidden'
+  | 'checkbox-list';
 
 export interface FormFieldOption {
-    label: string;
-    value: any;
+  label: string;
+  value: any;
 }
 
 export interface DynamicFormField {
-    name: string;
-    label: string;
-    type: FormFieldType;
-    placeholder?: string;
-    required?: boolean;
-    disabled?: boolean;
-    options?: FormFieldOption[]; // solo para select o radio
-    validations?: {
-        minLength?: number;
-        maxLength?: number;
-        pattern?: string;
-    };
+  name: string;
+  /** Puede faltar o venir vacío => usamos fallback en el template */
+  label?: string | null;
+  type: FormFieldType;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  options?: FormFieldOption[];
+  multiple?: boolean;
+  validations?: {
+    // texto
+    minLength?: number;
+    maxLength?: number;
+    pattern?: string;
+    onlySpaces?: boolean;
+    email?: boolean;
+    atLeastOne?: boolean;
+
+    // numéricos
+    min?: number;
+    max?: number;
+  };
 }
 
 export type FormSchema = Record<FormType, DynamicFormField[]>;
 export type EntityFormSchemas = Record<string, FormSchema>;
 
 export interface FormDialogData<T = any> {
-    title?: string;
-    component: Type<any>; // componente que será renderizado dinámicamente
-    formType: FormType;
-    entity?: Partial<T>;
-    schema: FormSchema;
-    selectOptions?: Record<string, any[]>;
+  title?: string;
+  component: Type<any>;
+  formType: FormType;
+  entity?: Partial<T>;
+  schema: FormSchema;
+  /** catálogos para selects: clave = nombre del campo */
+  selectOptions?: Record<string, any[]>;
 }

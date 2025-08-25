@@ -1,0 +1,22 @@
+<div class="preview-wrapper" (click)="close()">
+  <div class="toolbar" (click)="$event.stopPropagation()">
+    <span class="title">{{ (data.title?.trim()?.length ? data.title : null) ?? 'Vista previa' }}</span>
+
+    <span class="counter">{{ currentIndex() + 1 }} / {{ sources.length }}</span>
+    <button mat-icon-button aria-label="Cerrar" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <button class="nav left" type="button" aria-label="Anterior" (click)="prev($event)">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <div class="img-stage" (click)="$event.stopPropagation()">
+    <img [src]="sources[currentIndex()]" alt="Imagen" draggable="false" (dragstart)="$event.preventDefault()" />
+  </div>
+
+  <button class="nav right" type="button" aria-label="Siguiente" (click)="next($event)">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>
