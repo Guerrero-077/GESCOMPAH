@@ -1,21 +1,25 @@
-<div class="row d-flex justify-content-center">
-    <div class="row d-flex-justify-content-center">
-        <div class="row d-flex justify-content-start">
-            <div class="col-1">
-                <i class="fa fa-bell" aria-hidden="true"></i>
-            </div>
-            <div class="col-11">
-                <h4>Alerta del Sistema</h4>
-            </div>
-        </div>
-        <div class="row d-flex justify-content-center gap-2">
-            <div class="alert alert-danger" role="alert">
-                A simple danger alert—check it out!
-            </div>
-            <div class="alert alert-warning" role="alert">
-                A simple warning alert—check it out!
-            </div>
-        </div>
-    </div>
-</div>
+<div class="container p-3 border rounded shadow-sm bg-white height-300">
+    <h5 class="text-success mb-3 d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <!-- Bootstrap Icons -->
+        Alertas del Sistema
+    </h5>
 
+    <!-- 🔹 Cuando recibas el objeto por Input
+  <app-alerta-card
+    [titulo]="alerta.titulo"
+    [descripcion]="alerta.descripcion"
+    [tipo]="alerta.tipo"
+    [accionTexto]="alerta.accionTexto">
+  </app-alerta-card>
+  -->
+
+    <!-- 🔹 Mientras tanto con datos quemados -->
+    <app-alert-card 
+        *ngFor="let alerta of alertas" 
+        class="mb-2"
+        [title]="alerta.title" 
+        [description]="alerta.description"
+        [type]="alerta.type" [text]="alerta.text"
+    >
+    </app-alert-card>
+</div>

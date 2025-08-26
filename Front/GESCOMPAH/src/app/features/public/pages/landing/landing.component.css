@@ -4,7 +4,6 @@
   width: 100vw;
   /* background: linear-gradient(-45deg, #0f2715, #204323, #5c642c); */
   /* background-color: #2E7D32; */
-  color: #fff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow-x: hidden;
 }
@@ -24,7 +23,7 @@
 }
 
 .title {
-  font-size: 3.5rem;
+  font-size: 3.3rem;
   font-weight: 700;
   margin-bottom: 1rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -38,29 +37,50 @@
 }
 
 .description {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   line-height: 1.6;
   margin-bottom: 3rem;
 }
 
 .login-button {
   display: inline-block;
-  width: 45%;
+  width: auto;
+  max-height: 55px;
   text-align: center;
   padding: 15px 35px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
   background-color: #18812e;
-  border: none;
-  border-radius: 50px;
+  border: 1px solid #befdbe;
+  border-radius: 12px;
   text-decoration: none;
   transition: transform 0.2s ease-in-out, background-color 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 255, 13, 0.4);
 }
 
 .login-button:hover {
-  background-color: #0056b3;
+  background-color: #00b35a;
+  transform: translateY(-3px);
+}
+
+.premises-button{
+  display: flex;
+  width: auto;
+  max-height: 55px;
+  text-align: center;
+  padding: 15px 35px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #eab308;
+  border: 1px solid #befdbe;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+}
+
+.premises-button:hover {
+  background-color: #fbbf24;
   transform: translateY(-3px);
 }
 
@@ -76,8 +96,55 @@
   color: #2E7D32;
 
 }
+.header {
+  color: #fff;
+}
 
 .footer{
-  color: #fff;
   background-color: #146530;
+}
+
+.footer h5{
+  color: #fff;
+}
+
+.logo{
+  min-width: 45px;
+  max-width: 60px;
+  min-height: 45px;
+  max-height: 60px;
+}
+
+.text-gold{
+  color: #eab308 !important;
+}
+
+.footer p,
+.footer a,
+.footer span,
+.footer i
+{
+  font-size: 1rem;        
+  font-weight: 500;       
+  color: #c1e9d2;         
+  opacity: 1;            
+}
+
+.footer a,
+.footer i { 
+  text-decoration: none;
+}
+
+
+.footer h5{
+  margin-bottom: -2px;
+}
+
+.footer ul {
+  padding-left: 0;
+}
+
+.footer .e ul li:hover a,
+.footer .e ul li:hover i {
+  color: #eab308 ;
 }

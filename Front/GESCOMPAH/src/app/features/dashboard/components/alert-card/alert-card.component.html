@@ -1,0 +1,20 @@
+<div class="alerta-card card mb-3 border-0 shadow-sm" 
+    [ngClass]="{'bg-warning-subtle border-warning': type === 'warning',
+    'bg-primary-subtle border-primary': type === 'info'}"
+>
+
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h6 class="mb-1 fw-bold" [ngClass]="{'text-warning': type === 'warning', 'text-primary': type === 'info'}">
+                {{ title }}
+            </h6>
+            <p class="mb-0 small" [ngClass]="{'text-warning': type === 'warning', 'text-primary': type === 'info'}">
+                {{ description }}
+            </p>
+        </div>
+        <button class="btn btn-sm mt-2 mt-md-0"
+            [ngClass]="{'btn-outline-warning': type === 'warning', 'btn-outline-primary': type === 'info'}">
+            {{ text }}
+        </button>
+    </div>
+</div>

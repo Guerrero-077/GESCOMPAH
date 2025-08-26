@@ -1,37 +1,36 @@
 <div class="container-fluid">
 
-  <div class="row d-flex justify-content-center h-50 content-wrapper py-5">
-
+  <div class="row d-flex justify-content-center h-50 content-wrapper py-5 header">
     <div class="row justify-content-center">
-      <h1 class="title text-center">Bienvenido a GESCOMPAH</h1>
+      <h1 class="title text-center">Bienvenido a <strong class="text-gold">GESCOMPAH</strong></h1>
     </div>
-
     <div class="row justify-content-center">
-      <p class="subtitle text-center fw-bold ">Gestión de Comprobantes de Pago y Horarios</p>
+      <p class="subtitle text-center fw-semibold ">Gestión de Comprobantes de Pago y Horarios</p>
     </div>
-
     <div class="row justify-content-center">
-      <p class="description text-center fw-medium ">
+      <p class="description text-center">
         Optimiza la administración de tu negocio con nuestra plataforma centralizada.
       </p>
     </div>
-
-    <div class="row justify-content-center">
-      <div class="col-md-6 row justify-content-between">
+    <div class="row d-flex justify-content-center gap-4">
+      <div class="col-sm-12 col-md-2 col-lg-4 d-flex justify-content-center">
+        <a routerLink="/auth/login" class="premises-button col-md-5">Ver locales disponibles</a>
+      </div>
+      <div class="col-sm-12 col-md-2 d-flex justify-content-center">
         <a routerLink="/auth/login" class="login-button col-md-5">Iniciar Sesión</a>
-        <a routerLink="/auth/login" class="login-button col-md-5">Ver locales disponibles</a>
       </div>
     </div>
   </div>
 
-  <div class="row d-flex justify-content-center py-5 gap-4">
+  <div class="row d-flex justify-content-center py-5">
     <div class="row justify-content-center">
       <h2 class="text-center text-green fw-bolder">Palermo, Huila</h2>
-      <p class="text-center text-marmol fs-5 text-marmol">Tierra de tradición cafetera, cultura vibrante y oportunidades comerciales
+      <p class="text-center text-marmol fs-5 text-marmol">Tierra de tradición cafetera, cultura vibrante y oportunidades
+        comerciales
       </p>
     </div>
     <div class="row d-flex justify-content-center">
-      <div class="col row d-flex justify-content-start py-4 align-items-center">
+      <div class="col row d-flex justify-content-start py-3 align-items-center">
         <h2 class="text-green fw-bolder py-2">Nuestra Historia</h2>
         <p class="text-marmol fs-5 text-marmol">
           <strong>Palermo</strong> es un municipio del departamento del Huila, Colombia,
@@ -89,19 +88,103 @@
 
   </div>
 
-  <div class="footer row d-flex justify-content-between gap py-3 px-1">
-    <div class="col-sm-12 col-md-3">
-      <img src="" alt="">
-      <h5>GESCOMPAH</h5>
+  <div class="footer row d-flex justify-content-start gap py-3 px-1">
+    <div class="row col-sm-12 col-md-3 gap-2">
+      <div class="row">
+        <div class="col-3 col-md-3">
+          <img class="logo" src="../../../../../..//public/Escudo-palermo.png" alt="">
+        </div>
+        <div class="col-7 col-md-8">
+          <h5>GESCOMPAH</h5>
+          <p>sistema Oficial</p>
+        </div>
+      </div>
+      <div class="row d-flex justify-content-start">
+        <p>
+          Sistema de Gestión Comercial de la Alcaldía de Palermo, Huila.
+          Promoviendo el desarrollo económico local a través de la gestión transparente de espacios comerciales
+          públicos.
+        </p>
+      </div>
     </div>
-    <div class="col-sm-12 col-md-3">
-      <h5>Enlaces Rápidos</h5>
+    <div class="col-sm-12 col-md-3 e">
+      <h5 class="fw-bold text-white pb-3">Enlaces Rápidos</h5>
+
+      <ul class="list-unstyled mt-3">
+        <li class="d-flex align-items-center py-2">
+          <i class="fa fa-building me-2"></i>
+          <a routerLink="/locales" class="text-decoration-none">Locales Disponibles</a>
+        </li>
+        <li class="d-flex align-items-center py-2">
+          <i class="fa fa-calendar me-2"></i>
+          <a routerLink="/citas" class="text-decoration-none">Solicitar Cita</a>
+        </li>
+        <li class="d-flex align-items-center py-2">
+          <i class="fa fa-file-alt me-2"></i>
+          <a routerLink="/portal" class="text-decoration-none">Portal Arrendatario</a>
+        </li>
+        <li class="d-flex align-items-center py-2">
+          <i class="fa fa-user me-2"></i>
+          <a routerLink="/informacion" class="text-decoration-none">Información</a>
+        </li>
+      </ul>
     </div>
+
     <div class="col-sm-12 col-md-3">
-      <h5>Servicios</h5>
+      <h5 class="fw-bold text-white pb-3">Servicios</h5>
+
+      <ul class="list-unstyled mt-3">
+        <li class="d-flex align-items-center py-2">
+          <i class="fa fa-building me-2 "></i>
+          <span>Arriendo de Locales Comerciales</span>
+        </li>
+        <li class="d-flex align-items-center py-2">
+          <i class="fa fa-file-alt me-2 "></i>
+          <span>Gestión de Contratos</span>
+        </li>
+        <li class="d-flex align-items-center py-2">
+          <i class="fa fa-calendar me-2 "></i>
+          <span>Calendario de Pagos</span>
+        </li>
+        <li class="d-flex align-items-center py-2">
+          <i class="fa fa-user me-2 "></i>
+          <span>Soporte Técnico</span>
+        </li>
+      </ul>
+
     </div>
     <div class="col-sm-12 col-md-3">
       <h5>Contacto Directo</h5>
+
+      <ul class="list-unstyled mt-3">
+        <!-- Teléfono -->
+        <li class="d-flex align-items-start py-2 c">
+          <i class="fa-solid fa-phone me-3 text-gold"></i>
+          <div>
+            <p class="m-0 fw-bold text-white">(608) 837-5000</p>
+            <span class="text-white-50">Ext. 101 - 102</span>
+          </div>
+        </li>
+
+        <!-- Correo -->
+        <li class="d-flex align-items-start py-2">
+          <i class="fa fa-envelope me-3 text-gold"></i>
+          <div>
+            <p class="m-0 fw-bold text-white">gescompahpalermo-huila.gov.co</p>
+            <span class="text-white-50">Respuesta en 24-48 horas</span>
+          </div>
+        </li>
+
+        <!-- Dirección -->
+        <li class="d-flex align-items-start py-2">
+          <i class="fa-solid fa-map-marker-alt me-3 text-gold"></i>
+          <div>
+            <p class="m-0 fw-bold text-white">Carrera 5 # 4-30</p>
+            <span class="text-white-50">Centro, Palermo - Huila</span>
+          </div>
+        </li>
+      </ul>
+
     </div>
   </div>
 </div>
