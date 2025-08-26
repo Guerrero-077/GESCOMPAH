@@ -3,8 +3,9 @@
     border-radius: 8px;
     padding: 1.5rem;
     text-align: center;
-    max-width: 400px;
-    max-height: 225px;
+    max-width: 675px;
+    max-height: 300px;
+    min-height: 275px;
     background-color: white;
     transition: 100ms;
 }
