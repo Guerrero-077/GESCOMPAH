@@ -72,8 +72,8 @@ namespace Utilities.Messaging.Implements
         // 🧩 Plantilla base HTML (brand + layout)
         private string WrapEmail(string title, string contentHtml)
         {
-            var appUrl = _config["APP:FRONTEND_URL"] ?? "https://app.gescomph.com";
-            var logoUrl = _config["APP:LOGO_URL"]; // opcional
+            //var appUrl = _config["APP:FRONTEND_URL"] ?? "https://app.gescomph.com";
+            var logoUrl = _config["APP:LOGO_URL"];
 
             var logoHtml = !string.IsNullOrWhiteSpace(logoUrl)
                 ? $"<img src='{logoUrl}' alt='{BrandName}' style='height:40px; display:block;'/>"
@@ -103,9 +103,6 @@ namespace Utilities.Messaging.Implements
 
                           <p style='margin:0; color:{BrandMuted}; font-size:12px;'>
                             Este mensaje fue enviado por {BrandName}. Si no reconoces esta solicitud, ignora este correo.
-                          </p>
-                          <p style='margin:8px 0 0 0; color:{BrandMuted}; font-size:12px;'>
-                            <a href='{appUrl}' style='color:{BrandPrimary}; text-decoration:none;' target='_blank' rel='noopener'>{appUrl}</a>
                           </p>
                         </div>
                       </div>
@@ -142,12 +139,7 @@ namespace Utilities.Messaging.Implements
                             {tempPassword}
                         </div>
 
-                        <p style='margin-top:16px;'>Por seguridad, deberás cambiarla en tu <strong>primer ingreso</strong> al sistema.</p>
-
-                        <a href='{appUrl}/login' target='_blank' rel='noopener'
-                            style='display:inline-block; margin-top:12px; padding:12px 18px; background:{BrandPrimary}; color:white; text-decoration:none; border-radius:10px; font-weight:600;'>
-                            Acceder a GESCOMPAH
-                        </a>";
+                        <p style='margin-top:16px;'>Por seguridad, deberás cambiarla en tu <strong>primer ingreso</strong> al sistema.</p>";
 
             var html = WrapEmail("Tu cuenta fue creada", content);
             await SendEmailAsync(email, "GESCOMPAH – Tu cuenta fue creada", html);

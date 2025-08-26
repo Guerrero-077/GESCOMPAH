@@ -56,4 +56,12 @@ export class SweetAlertService {
   public hideLoading(): void {
     Swal.close();
   }
+
+  public success(message: string, title: string = 'Éxito'): void {
+    this.showNotification(title, message, 'success');
+  }
+
+  public error(message: string, title: string = 'Error'): void {
+    this.showNotification(title, message, 'error');
+  }
 }

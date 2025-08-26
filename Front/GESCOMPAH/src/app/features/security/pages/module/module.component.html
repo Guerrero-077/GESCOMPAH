@@ -1,7 +1,14 @@
 <div class="row d-flex justify-content-center">
-  <app-generic-table [data]="(modules$ | async) || []" [columns]="columns" [titulo]="'Gestión de Módulos'"
-    [subTitulo]="'Administra los módulos del sistema'" [createButtonLabel]="'Nuevo Módulo'" (edit)="onEdit($event)"
-    (delete)="onDelete($event)" (view)="onView($event)" (create)="onCreateNew()">
+  <app-generic-table
+    [data]="(modules$ | async) || []"
+    [columns]="columns"
+    [titulo]="'Gestión de Módulos'"
+    [subTitulo]="'Administra los módulos del sistema'"
+    [createButtonLabel]="'Nuevo Módulo'"
+    [showViewButton]="false"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (create)="onCreateNew()">
   </app-generic-table>
 
 

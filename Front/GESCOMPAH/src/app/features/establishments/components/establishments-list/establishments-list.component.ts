@@ -84,8 +84,8 @@ export class EstablishmentsListComponent {
     const row = this.establishments.find(e => e.id === id);
     if (row) { // Asegurarse de que el establecimiento fue encontrado
       this.dialog.open(EstablishmentDetailDialogComponent, {
-        width: '900px', // Puedes ajustar el ancho según tus necesidades
-        data: row // Pasa el objeto completo del establecimiento al modal
+        width: '900px',
+        data: row
       });
     } else {
       console.warn(`Establecimiento con ID ${id} no encontrado.`);

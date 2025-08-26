@@ -1,182 +1,169 @@
 <div class="container">
   <mat-horizontal-stepper class="card shadow p-4" [linear]="true">
-
-    <!-- PASO 1: Ubicación -->
+    <!-- PASO 1: UBICACIÓN -->
     <mat-step [stepControl]="locationGroup">
-      <form [formGroup]="form" class="m-3">
+      <form [formGroup]="locationGroup">
         <ng-template matStepLabel>Ubicación</ng-template>
 
-        <div formGroupName="location">
-          <!-- Departamento SOLO en creación -->
-          <mat-form-field appearance="outline" class="w-full" [hidden]="!isCreate()">
-            <mat-label>Departamento</mat-label>
-            <mat-select formControlName="departmentId" required [compareWith]="compareById">
-              <mat-option *ngFor="let d of (departments$ | async) ?? []" [value]="d.id">
-                {{ d.name }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="locationGroup.get('departmentId')?.touched && locationGroup.get('departmentId')?.invalid">
-              {{ getFirstError(locationGroup.get('departmentId'), ['required']) }}
-            </mat-error>
-          </mat-form-field>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Departamento</mat-label>
+          <mat-select formControlName="departmentId" required [compareWith]="compareById">
+            <mat-option *ngFor="let d of (departments$ | async) ?? []" [value]="d.id">
+              {{ d.name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="locationGroup.get('departmentId')?.hasError('required')">
+            Selecciona un departamento
+          </mat-error>
+        </mat-form-field>
 
-          <!-- Ciudad SIEMPRE visible -->
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Ciudad</mat-label>
-            <mat-select formControlName="cityId" required [compareWith]="compareById">
-              <mat-option [value]="null" disabled>Selecciona una ciudad…</mat-option>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Ciudad</mat-label>
+          <mat-select formControlName="cityId" required [compareWith]="compareById">
+            <mat-option [value]="null" disabled>Selecciona una ciudad…</mat-option>
 
-              <mat-option *ngIf="!loadingCities() && (((cities$ | async)?.length ?? 0) === 0)" [disabled]="true">
-                No hay ciudades disponibles
-              </mat-option>
+            <mat-option *ngIf="locationGroup.get('departmentId')?.value && !loadingCities() && (((cities$ | async)?.length ?? 0) === 0)" [disabled]="true">
+              No hay ciudades disponibles para este departamento
+            </mat-option>
 
-              <mat-option *ngFor="let c of (cities$ | async) ?? []" [value]="c.id">
-                {{ c.name }}
-              </mat-option>
-            </mat-select>
+            <mat-option *ngFor="let c of (cities$ | async) ?? []" [value]="c.id">
+              {{ c.name }}
+            </mat-option>
+          </mat-select>
 
-            <mat-icon *ngIf="loadingCities()" matSuffix class="spin">autorenew</mat-icon>
+          <mat-icon *ngIf="loadingCities()" matSuffix class="spin">autorenew</mat-icon>
 
-            <mat-error *ngIf="locationGroup.get('cityId')?.touched && locationGroup.get('cityId')?.invalid">
-              {{ getFirstError(locationGroup.get('cityId'), ['required','min']) }}
-            </mat-error>
-          </mat-form-field>
-        </div>
+          <mat-error *ngIf="locationGroup.get('cityId')?.errors as errs">
+            {{
+              getFirstError(locationGroup.get('cityId'), ['required','min'])
+              || 'Selecciona una ciudad válida'
+            }}
+          </mat-error>
+        </mat-form-field>
 
         <div class="step-actions">
-          <button mat-raised-button color="primary" (click)="markGroupAsTouched(locationGroup)" matStepperNext
-            [disabled]="isCreate() ? locationGroup.invalid : (locationGroup.get('cityId')?.invalid || loadingCities())">
+          <button mat-raised-button color="primary" matStepperNext [disabled]="locationGroup.invalid">
             Siguiente
           </button>
         </div>
       </form>
     </mat-step>
 
-    <!-- PASO 2: Datos personales -->
+    <!-- PASO 2: PERSONA -->
     <mat-step [stepControl]="personGroup">
-      <form [formGroup]="form" class="m-3">
+      <form [formGroup]="personGroup">
         <ng-template matStepLabel>Datos personales</ng-template>
 
-        <div formGroupName="person">
-          <div class="form-row-2">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Nombres</mat-label>
-              <input matInput type="text" formControlName="firstName" required />
-              <mat-error *ngIf="personGroup.get('firstName')?.hasError('required')">
-                El nombre es requerido.
-              </mat-error>
-              <mat-error *ngIf="personGroup.get('firstName')?.hasError('maxlength')">
-                El nombre no puede tener más de 50 caracteres.
-              </mat-error>
-              <mat-error *ngIf="personGroup.get('firstName')?.hasError('pattern')">
-                El nombre solo puede contener letras y espacios.
-              </mat-error>
-            </mat-form-field>
+        <div class="grid">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Nombres</mat-label>
+            <input matInput formControlName="firstName" required (blur)="personGroup.get('firstName')?.updateValueAndValidity()" />
+            <mat-error *ngIf="personGroup.get('firstName')?.errors as errs">
+              {{
+                getFirstError(personGroup.get('firstName'), ['required','onlySpaces','alphaHuman','maxlength'])
+              }}
+            </mat-error>
+          </mat-form-field>
 
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Apellidos</mat-label>
-              <input matInput formControlName="lastName" required />
-              <mat-error *ngIf="personGroup.get('lastName')?.hasError('required')">
-                El apellido es requerido.
-              </mat-error>
-              <mat-error *ngIf="personGroup.get('lastName')?.hasError('maxlength')">
-                El apellido no puede tener más de 50 caracteres.
-              </mat-error>
-              <mat-error *ngIf="personGroup.get('lastName')?.hasError('pattern')">
-                El apellido solo puede contener letras y espacios.
-              </mat-error>
-            </mat-form-field>
-          </div>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Apellidos</mat-label>
+            <input matInput formControlName="lastName" required (blur)="personGroup.get('lastName')?.updateValueAndValidity()" />
+            <mat-error *ngIf="personGroup.get('lastName')?.errors as errs">
+              {{
+                getFirstError(personGroup.get('lastName'), ['required','onlySpaces','alphaHuman','maxlength'])
+              }}
+            </mat-error>
+          </mat-form-field>
+        </div>
 
-          <div class="form-row-3">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Documento</mat-label>
-              <input matInput type="number" formControlName="document" required min="0" />
-              <mat-error *ngIf="personGroup.get('document')?.hasError('required')">
-                El documento es requerido.
-              </mat-error>
-              <mat-error
-                *ngIf="personGroup.get('document')?.hasError('min') || personGroup.get('document')?.hasError('max')">
-                El documento debe tener entre 7 y 10 dígitos.
-              </mat-error>
-            </mat-form-field>
+        <div class="grid">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Documento</mat-label>
+            <input matInput formControlName="document" required />
+            <mat-hint>Solo dígitos (5–20)</mat-hint>
+            <mat-error *ngIf="personGroup.get('document')?.errors as errs">
+              {{
+                getFirstError(personGroup.get('document'), ['required','numericString'])
+              }}
+            </mat-error>
+          </mat-form-field>
 
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Teléfono</mat-label>
-              <input matInput type="number" formControlName="phone" required min="0" />
-              <mat-error *ngIf="personGroup.get('phone')?.hasError('required')">
-                El teléfono es requerido.
-              </mat-error>
-              <mat-error *ngIf="personGroup.get('phone')?.hasError('min') || personGroup.get('phone')?.hasError('max')">
-                El teléfono debe tener 10 dígitos.
-              </mat-error>
-            </mat-form-field>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="phone" required />
+            <mat-hint>7–15 dígitos, opcional prefijo “+”</mat-hint>
+            <mat-error *ngIf="personGroup.get('phone')?.errors as errs">
+              {{
+                getFirstError(personGroup.get('phone'), ['required','phone'])
+              }}
+            </mat-error>
+          </mat-form-field>
 
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Dirección</mat-label>
-              <input matInput formControlName="address" required />
-              <mat-error *ngIf="personGroup.get('address')?.hasError('required')">
-                La dirección es requerida.
-              </mat-error>
-              <mat-error *ngIf="personGroup.get('address')?.hasError('maxlength')">
-                La dirección no puede tener más de 100 caracteres.
-              </mat-error>
-            </mat-form-field>
-          </div>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="address" required (blur)="personGroup.get('address')?.updateValueAndValidity()" />
+            <mat-error *ngIf="personGroup.get('address')?.errors as errs">
+              {{
+                getFirstError(personGroup.get('address'), ['required','onlySpaces','maxlength'])
+              }}
+            </mat-error>
+          </mat-form-field>
         </div>
 
         <div class="step-actions">
           <button mat-button matStepperPrevious>Volver</button>
-          <button mat-raised-button color="primary" (click)="markGroupAsTouched(personGroup)" matStepperNext
-            [disabled]="personGroup.invalid">
+          <button mat-raised-button color="primary" matStepperNext [disabled]="personGroup.invalid">
             Siguiente
           </button>
         </div>
       </form>
     </mat-step>
 
-    <!-- PASO 3: Cuenta y Rol -->
+    <!-- PASO 3: CUENTA y ROL -->
     <mat-step [stepControl]="accountGroup">
-      <form [formGroup]="form" class="m-3">
-        <ng-template matStepLabel>Cuenta y Rol</ng-template>
+      <form [formGroup]="accountGroup">
+        <ng-template matStepLabel>Cuenta</ng-template>
 
-        <div class="form-row-2">
-          <div formGroupName="account">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Correo</mat-label>
-              <input matInput type="email" formControlName="email" required />
-              <mat-error *ngIf="accountGroup.get('email')?.touched && accountGroup.get('email')?.invalid">
-                {{ getFirstError(accountGroup.get('email'), ['required','email']) }}
-              </mat-error>
-            </mat-form-field>
-          </div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Correo</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            required
+            (blur)="fixEmail()"
+          />
+          <mat-error *ngIf="accountGroup.get('email')?.errors as errs">
+            {{
+              getFirstError(accountGroup.get('email'),
+                ['required','email','domainMissing','tldMissing','tldInvalid','domainInvalid']
+              )
+            }}
+          </mat-error>
+        </mat-form-field>
 
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Rol</mat-label>
-            <mat-select formControlName="roleId" required>
-              <mat-option [value]="null" disabled>Selecciona un rol…</mat-option>
-              <mat-option *ngFor="let r of (roles$ | async) ?? []" [value]="r.id">
-                {{ r.name }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="form.get('roleId')?.touched && form.get('roleId')?.invalid">
-              {{ getFirstError(form.get('roleId'), ['required','min']) }}
-            </mat-error>
-          </mat-form-field>
-        </div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Rol</mat-label>
+          <mat-select [formControl]="roleIdCtrl" required [compareWith]="compareById">
+            <mat-option [value]="null" disabled>Selecciona un rol…</mat-option>
+            <mat-option *ngFor="let r of (roles$ | async) ?? []" [value]="r.id">
+              {{ r.name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="roleIdCtrl.errors as errs">
+            {{ getFirstError(roleIdCtrl, ['required','min']) || 'Selecciona un rol' }}
+          </mat-error>
+        </mat-form-field>
 
         <div class="text-danger" *ngIf="submitError()">{{ submitError() }}</div>
 
         <div class="step-actions">
           <button mat-button matStepperPrevious>Volver</button>
-          <button mat-raised-button color="primary" (click)="markGroupAsTouched(accountGroup); submit()"
-            [disabled]="form.invalid || submitting()">
-            {{ submitting() ? 'Guardando...' : (isCreate() ? 'Crear' : 'Guardar cambios') }}
+          <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || submitting()">
+            {{ submitting() ? 'Guardando...' : (isCreate() ? 'Crear' : 'Actualizar') }}
           </button>
-          <button mat-button (click)="cancel()">Cancelar</button>
         </div>
       </form>
     </mat-step>
-
   </mat-horizontal-stepper>
 </div>

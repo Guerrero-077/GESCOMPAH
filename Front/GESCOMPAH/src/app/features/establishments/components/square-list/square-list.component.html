@@ -1,6 +1,14 @@
-<app-generic-table [data]="squares$ | async" [columns]="columns" [titulo]="'Gestión de plazas comerciales'"
-  [subTitulo]="'Administra las plazas comerciales del sistema'" [createButtonLabel]="'Nueva Plaza'"
-  (view)="onView($event)" (create)="onCreate()" (edit)="onEdit($event)" (delete)="onDelete($event)">
+<app-generic-table
+  [data]="squares$ | async"
+  [columns]="columns"
+  [titulo]="'Gestión de plazas comerciales'"
+  [subTitulo]="'Administra las plazas comerciales del sistema'"
+  [showViewButton]="false"
+  [createButtonLabel]="'Nueva Plaza'"
+  (view)="onView($event)"
+  (create)="onCreate()"
+  (edit)="onEdit($event)"
+  (delete)="onDelete($event)">
 </app-generic-table>
 
 

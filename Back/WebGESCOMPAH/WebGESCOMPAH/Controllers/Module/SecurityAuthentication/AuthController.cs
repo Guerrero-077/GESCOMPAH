@@ -1,8 +1,10 @@
 ﻿using Business.Interfaces;
 using Business.Interfaces.Implements.SecrutityAuthentication;
+using Business.Services.SecrutityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
+using Entity.DTOs.Implements.SecurityAuthentication.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -211,5 +213,15 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
             await _authService.ResetPasswordAsync(dto);
             return Ok(new { isSuccess = true, message = "Contraseña actualizada" });
         }
+
+
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            await _authService.ChangePasswordAsync(dto);
+            return Ok(new { message = "Contraseña actualizada correctamente." });
+        }
     }
+
 }

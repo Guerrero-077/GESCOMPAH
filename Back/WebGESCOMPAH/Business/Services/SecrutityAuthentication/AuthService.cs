@@ -6,6 +6,7 @@ using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 using Entity.DTOs.Implements.SecurityAuthentication.Me;
+using Entity.DTOs.Implements.SecurityAuthentication.User;
 using Entity.DTOs.Interfaces;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
@@ -19,6 +20,7 @@ namespace Business.Services.SecrutityAuthentication
     /// Servicio de autenticación. El contexto de usuario (/me) lo construye UserContextService.
     /// </summary>
     public class AuthService(
+        IPasswordHasher<User> passwordHasher,
         IUserRepository userData,
         ILogger<AuthService> logger,
         IRolUserRepository rolUserData,
@@ -30,6 +32,7 @@ namespace Business.Services.SecrutityAuthentication
         IPersonRepository personRepository
     ) : IAuthService
     {
+        private readonly IPasswordHasher<User> _passwordHasher = passwordHasher;
         private readonly IUserRepository _userRepository = userData;
         private readonly IRolUserRepository _rolUserData = rolUserData;
         private readonly ILogger<AuthService> _logger = logger;
@@ -117,5 +120,22 @@ namespace Business.Services.SecrutityAuthentication
         // ✅ Ahora delega completamente en UserContextService:
         public Task<UserMeDto> BuildUserContextAsync(int userId)
             => _userContext.BuildUserContextAsync(userId);
+
+
+        public async Task ChangePasswordAsync(ChangePasswordDto dto)
+        {
+            var user = await _userRepository.GetByIdAsync(dto.UserId)
+                       ?? throw new BusinessException("Usuario no encontrado.");
+
+            // Validar contraseña actual
+            var result = _passwordHasher.VerifyHashedPassword(user, user.Password, dto.CurrentPassword);
+            if (result == PasswordVerificationResult.Failed)
+                throw new BusinessException("La contraseña actual es incorrecta.");
+
+            // Hashear nueva contraseña
+            user.Password = _passwordHasher.HashPassword(user, dto.NewPassword);
+
+            await _userRepository.UpdateAsync(user);
+        }
     }
 }

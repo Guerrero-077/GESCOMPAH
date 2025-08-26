@@ -8,6 +8,7 @@ import { RegisterModel } from '../../../features/auth-login/models/register.mode
 import { User } from '../../../shared/models/user.model';
 import { PermissionService } from '../permission/permission.service';
 import { UserStore } from '../permission/User.Store';
+import { ChangePasswordDto } from '../../models/ChangePassword.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -49,5 +50,9 @@ export class AuthService {
     return this.http.post<any>(this.urlBase + 'refresh', {}, { withCredentials: true }).pipe(
       switchMap(() => this.GetMe())
     );
+  }
+
+  ChangePassword(dto: ChangePasswordDto): Observable<any> {
+    return this.http.post(environment.apiURL + '/auth/change-password', dto, { withCredentials: true });
   }
 }

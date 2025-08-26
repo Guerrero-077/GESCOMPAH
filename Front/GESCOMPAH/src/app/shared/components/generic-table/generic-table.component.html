@@ -23,8 +23,8 @@
     </div>
 
     <!-- Botón crear (solo Admin con permiso CREAR) -->
-    <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
-      <button mat-button class="button-save" (click)="onCreate()">
+    <ng-container  *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'" >
+      <button mat-button class="button-save" (click)="onCreate()" *ngIf="showDetailButton">
         {{ createButtonLabel }}
       </button>
     </ng-container>
@@ -78,7 +78,7 @@
         <th mat-header-cell *matHeaderCellDef>Detalles</th>
         <td mat-cell *matCellDef="let row">
           <!-- Ver -->
-          <button mat-icon-button matTooltip="Ver" (click)="onView(row)">
+          <button *ngIf="showViewButton" mat-icon-button matTooltip="Ver" (click)="onView(row)">
             <mat-icon>visibility</mat-icon>
           </button>
 

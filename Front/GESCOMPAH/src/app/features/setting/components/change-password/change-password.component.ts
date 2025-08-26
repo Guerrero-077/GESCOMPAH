@@ -1,0 +1,104 @@
+import { Component } from '@angular/core';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import { AuthService } from '../../../../core/service/auth/auth.service';
+import { UserStore } from '../../../../core/service/permission/User.Store';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-change-password',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './change-password.component.html',
+  styleUrl: './change-password.component.css'
+})
+export class ChangePasswordComponent {
+  form: FormGroup;
+  passwordVisible: boolean = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private userStore: UserStore,
+    private sweetAlertService: SweetAlertService
+  ) {
+    this.form = this.fb.group({
+      currentPassword: ['', [Validators.required]],
+      newPassword: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        hasUpper(),
+        hasLower(),
+        hasDigit(),
+        hasSymbol()
+      ]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: matchPasswords('newPassword', 'confirmPassword') });
+  }
+
+  togglePasswordVisibility() {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  async onSubmit() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.sweetAlertService.showNotification('Advertencia', 'Por favor, completa todos los campos correctamente.', 'warning');
+      return;
+    }
+
+    const userId = this.userStore.snapshot?.id;
+
+    if (!userId) {
+      this.sweetAlertService.error('Usuario no identificado');
+      return;
+    }
+
+    this.sweetAlertService.showLoading('Cambiando Contraseña', 'Por favor, espera...');
+
+    const dto = {
+      userId,
+      currentPassword: this.form.value.currentPassword,
+      newPassword: this.form.value.newPassword
+    };
+
+    this.authService.ChangePassword(dto).subscribe({
+      next: () => {
+        this.sweetAlertService.hideLoading();
+        this.sweetAlertService.success('Contraseña actualizada correctamente');
+        this.form.reset();
+      },
+      error: (err) => {
+        this.sweetAlertService.hideLoading();
+
+        const errorMessage =
+          err?.error?.detail ??
+          err?.error?.message ??
+          err?.error?.title ??
+          'Error inesperado';
+
+        if (errorMessage === 'La contraseña actual es incorrecta.') {
+          this.form.get('currentPassword')?.setErrors({ incorrect: true });
+          this.form.get('currentPassword')?.markAsTouched();
+          this.form.get('currentPassword')?.updateValueAndValidity();
+        }
+
+        this.sweetAlertService.error(errorMessage);
+      }
+    });
+  }
+}
+
+// ===== Validadores reutilizables =====
+function matchPasswords(passKey: string, confirmKey: string) {
+  return (group: AbstractControl): ValidationErrors | null => {
+    const pass = group.get(passKey)?.value;
+    const conf = group.get(confirmKey)?.value;
+    return pass && conf && pass !== conf ? { notMatching: true } : null;
+  };
+}
+
+function hasUpper() { return (c: AbstractControl) => /[A-Z]/.test(c.value || '') ? null : { upper: true }; }
+function hasLower() { return (c: AbstractControl) => /[a-z]/.test(c.value || '') ? null : { lower: true }; }
+function hasDigit() { return (c: AbstractControl) => /\d/.test(c.value || '') ? null : { digit: true }; }
+function hasSymbol() { return (c: AbstractControl) => /[\W_]/.test(c.value || '') ? null : { symbol: true }; }

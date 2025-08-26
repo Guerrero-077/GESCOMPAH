@@ -1,6 +1,12 @@
 <div class="row d-flex justify-content-center">
-  <app-generic-table [data]="appointments$ | async" [columns]="columns" [titulo]="'Gestión de Citas'"
-    [subTitulo]="'Administra los citas del sistema'">
+  <app-generic-table
+    [data]="appointments$ | async"
+    [columns]="columns"
+    [titulo]="'Gestión de Citas'"
+    [showActionsColumn]="false"
+    [subTitulo]="'Administra los citas del sistema'"
+    [showDetailButton]="false"
+    >
   </app-generic-table>
 
   <ng-template #userTemplate let-row>

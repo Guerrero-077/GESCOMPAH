@@ -40,12 +40,12 @@ export const routes: Routes = [
         loadChildren: () => import('./features/tenants/tenants.routes').then(m => m.TENANTS_ROUTES),
         title: 'Arrendatarios',
       },
+      // {
+      //   path: 'contracts',
+      //   loadChildren: () => import('./features/contracts/contracts.routes').then(m => m.CONTRACTS_ROUTES),
+      //   title: 'Contratos',
+      // },
       {
-        path: 'contracts',
-        loadChildren: () => import('./features/contracts/contracts.routes').then(m => m.CONTRACTS_ROUTES),
-        title: 'Contratos',
-      },
-            {
         path: 'appointment',
         loadChildren: () => import('./features/appointment/appointment.routes').then(m => m.APPOINTMENT_ROUTES),
         title: 'Citas',

@@ -168,5 +168,6 @@ namespace Business.Services.SecrutityAuthentication
                 throw new BusinessException($"Error al actualizar el usuario: {ex.Message}", ex);
             }
         }
+    
     }
 }

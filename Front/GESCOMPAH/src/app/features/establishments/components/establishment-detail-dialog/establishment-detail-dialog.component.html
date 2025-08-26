@@ -1,44 +1,69 @@
-<div class="container">
-
-
-
-  <h2 mat-dialog-title>Detalles del Establecimiento</h2>
-
+<div class="container-fluid p-4">
   <div mat-dialog-content>
     <div class="establishment-info">
-      <div class="info-card">
-        <p><strong>Nombre:</strong> {{ data.name }}</p>
+      <div class="mb-4 text-center">
+        <h2>{{ data.name }}</h2>
       </div>
 
-      <div class="info-card">
-        <p><strong>Dirección:</strong> {{ data.address }}</p>
-      </div>
+      <div class="row gx-4">
 
-      <div class="info-card">
-        <p><strong>Descripción:</strong> {{ data.description }}</p>
-      </div>
-    </div>
+        <!-- Carrusel de Imágenes -->
+        <div class="col-lg-6 col-md-12 mb-4">
+          <div *ngIf="data.images?.length > 0" class="carousel-container">
+            <div class="carousel-wrapper">
+              <img [src]="data.images[currentImageIndex]?.filePath" [alt]="'Imagen de ' + data.name"
+                class="carousel-image" (click)="viewImage(data.images[currentImageIndex].filePath)" tabindex="0"
+                (keydown.enter)="viewImage(data.images[currentImageIndex].filePath)" role="button"
+                [attr.aria-label]="'Ver imagen de ' + data.name" />
 
-    <div *ngIf="data.images && data.images.length > 0">
-      <h3>📸 Galería de Imágenes</h3>
-      <div class="image-gallery">
-        <div class="image-container" *ngFor="let image of data.images" (click)="viewImage(image.filePath)" tabindex="0"
-          (keydown.enter)="viewImage(image.filePath)" role="button" [attr.aria-label]="'Ver imagen de ' + data.name">
-          <img [src]="image.filePath" [alt]="'Imagen de ' + data.name" loading="lazy">
-          <div class="image-overlay"></div>
+              <!-- Flechas dentro del .carousel-wrapper -->
+              <button class="carousel-arrow left" (click)="prevImage()" aria-label="Imagen anterior">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+
+              <button class="carousel-arrow right" (click)="nextImage()" aria-label="Imagen siguiente">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+
+            </div>
+
+            <div class="carousel-dots">
+              <span *ngFor="let image of data.images; let idx = index" class="dot"
+                [class.active]="idx === currentImageIndex" (click)="goToImage(idx)">
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información del Establecimiento -->
+        <div class="col-lg-6 col-md-12">
+          <div class="info mb-3"><span>Información del establecimiento</span></div>
+
+          <div class="info-card">
+            <p><strong>Dirección:</strong> {{ data.address }}</p>
+          </div>
+          <div class="info-card mt-2">
+            <p><strong>Área m²:</strong> {{ data.areaM2 }}</p>
+          </div>
+
+          <div class="title m-3"><span>Información Financiera</span></div>
+          <div class="info-card">
+            <p><strong>Renta base:</strong> {{ data.rentValueBase }}</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div *ngIf="!data.images || data.images.length === 0" class="no-images-message">
-      <p>No hay imágenes disponibles para este establecimiento</p>
+      <div class="info-card mt-3">
+        <p><strong>Descripción:</strong> {{ data.description }}</p>
+      </div>
+
+      <div *ngIf="!data.images?.length" class="no-images-message mt-4">
+        <p>No hay imágenes disponibles para este establecimiento</p>
+      </div>
     </div>
   </div>
 
-  <div mat-dialog-actions>
-    <button mat-button (click)="onClose()">
-      Cerrar
-    </button>
+  <div mat-dialog-actions class="text-end">
+    <button mat-button (click)="onClose()">Cerrar</button>
   </div>
-
 </div>
