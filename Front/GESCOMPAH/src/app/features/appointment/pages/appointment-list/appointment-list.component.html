@@ -1,0 +1,53 @@
+<div class="row d-flex justify-content-center">
+  <app-generic-table
+    [data]="appointments$ | async"
+    [columns]="columns"
+    [titulo]="'Gestión de Citas'"
+    [showActionsColumn]="false"
+    [subTitulo]="'Administra los citas del sistema'"
+    [showDetailButton]="false"
+    >
+  </app-generic-table>
+
+  <ng-template #userTemplate let-row>
+    <div>{{ row.fullName }}</div>
+    <small>{{ row.email }}</small>
+  </ng-template>
+
+
+  <ng-template #estadoTemplate let-row>
+    <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
+
+      <div class="d-inline-flex align-items-center gap-2">
+        <!-- Activar -->
+        <button mat-icon-button matTooltip="Activar" aria-label="Activar" class="text-white"
+          class="badge-success"
+          [disabled]="row.active || pendingId === row.id"
+          (click)="confirmState(row, true)">
+
+          <mat-icon *ngIf="!(pendingId === row.id && desiredState === true)">check</mat-icon>
+          <mat-progress-spinner
+            *ngIf="pendingId === row.id && desiredState === true" diameter="20"
+            mode="indeterminate">
+          </mat-progress-spinner>
+
+        </button>
+
+        <!-- Desactivar -->
+        <button mat-icon-button matTooltip="Desactivar" aria-label="Desactivar" class="text-white badge-secondary"
+
+          [disabled]="!row.active || pendingId === row.id" (click)="confirmState(row, false)">
+
+          <mat-icon *ngIf="!(pendingId === row.id && desiredState === false)">close</mat-icon>
+
+          <mat-progress-spinner *ngIf="pendingId === row.id && desiredState === false"
+            diameter="20"
+            mode="indeterminate">
+          </mat-progress-spinner>
+        </button>
+      </div>
+    </div>
+  </ng-template>
+
+
+</div>

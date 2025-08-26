@@ -11,6 +11,7 @@ import { catchError, EMPTY, filter, map, switchMap, take, tap } from 'rxjs';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { CommonModule } from '@angular/common';
 import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
+import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
 
 @Component({
   selector: 'app-square-list',
@@ -24,6 +25,8 @@ export class SquareListComponent implements OnInit {
   private readonly squaresStore = inject(SquareStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
+  private sharedEvents = inject(SharedEventsServiceService);
+
 
 
   // Variables
@@ -163,6 +166,7 @@ export class SquareListComponent implements OnInit {
       next: (updated) => {
         // sincronizar con lo que devuelve el backend
         row.active = updated.active ?? row.active;
+        this.sharedEvents.notifyPlazaStateChanged(row.id);
         this.sweetAlertService.showNotification(
           'Éxito',
           `Plaza ${row.active ? 'activado' : 'desactivado'} correctamente.`,

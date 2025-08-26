@@ -5,7 +5,9 @@
 .layout-sidebar {
   width: 250px;
   background-color: #fff;
-  border-right: 1px solid #ddd;
+  /* border-right: 1px solid #ddd; */
+  border-radius: 0;
+  border-right-width: 0;
 }
 
 .layout-content {

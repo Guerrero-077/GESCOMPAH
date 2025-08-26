@@ -2,10 +2,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #2E7D32;
-  color: white;
+  background-color: #fff;
+  color: black;
   padding: 12px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0;
 }
 
 .left-content {
@@ -15,7 +16,7 @@
 }
 
 .menu-button {
-  color: white;
+  color: black;
   background: transparent;
   border: none;
   border-radius: 8px;
@@ -44,7 +45,7 @@
 
 .description {
   font-size: 0.85rem;
-  color: #c8e6c9;
+  color: green;
 }
 
 .right-content {

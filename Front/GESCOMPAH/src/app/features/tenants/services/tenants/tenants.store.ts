@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
-import { TenantFormData, TenantsCreateModel, TenantsSelectModel, TenantsUpdateModel } from "../../models/tenants.models";
+import { TenantsCreateModel, TenantsSelectModel, TenantsUpdateModel } from "../../models/tenants.models";
 import { TenantsService } from './tenants.service';
 
 @Injectable({

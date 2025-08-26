@@ -10,7 +10,6 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
         {
             var seedDate = new DateTime(2025, 01, 01);
 
-
             builder.HasData(
                 // Panel Principal
                 new FormModule { Id = 1, FormId = 1, ModuleId = 1, IsDeleted = false, Active = true, CreatedAt = seedDate },
@@ -21,20 +20,22 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
                 // Arrendatarios
                 new FormModule { Id = 3, FormId = 3, ModuleId = 3, IsDeleted = false, Active = true, CreatedAt = seedDate },
 
-                // Gestión de Citas
+                // Contratos
                 new FormModule { Id = 4, FormId = 4, ModuleId = 4, IsDeleted = false, Active = true, CreatedAt = seedDate },
 
+                // Gestión de Citas
+                new FormModule { Id = 5, FormId = 5, ModuleId = 5, IsDeleted = false, Active = true, CreatedAt = seedDate },
+
                 // Seguridad
-                new FormModule { Id = 5, FormId = 5, ModuleId = 5, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Modelos de Seguridad
-                new FormModule { Id = 6, FormId = 6, ModuleId = 5, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Roles
-                new FormModule { Id = 7, FormId = 7, ModuleId = 5, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Formularios
-                new FormModule { Id = 8, FormId = 8, ModuleId = 5, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Módulos
-                new FormModule { Id = 9, FormId = 9, ModuleId = 5, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Permisos
+                new FormModule { Id = 6, FormId = 6, ModuleId = 6, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Modelos de Seguridad
+                new FormModule { Id = 7, FormId = 7, ModuleId = 6, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Roles
+                new FormModule { Id = 8, FormId = 8, ModuleId = 6, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Formularios
+                new FormModule { Id = 9, FormId = 9, ModuleId = 6, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Módulos
+                new FormModule { Id = 10, FormId = 10, ModuleId = 6, IsDeleted = false, Active = true, CreatedAt = seedDate }, // Permisos
 
                 // Configuración
-                new FormModule { Id = 10, FormId = 10, ModuleId = 6, IsDeleted = false, Active = true, CreatedAt = seedDate }
+                new FormModule { Id = 11, FormId = 11, ModuleId = 7, IsDeleted = false, Active = true, CreatedAt = seedDate }
             );
-
         }
     }
 }

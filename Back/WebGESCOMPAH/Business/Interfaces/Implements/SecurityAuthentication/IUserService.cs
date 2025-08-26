@@ -9,5 +9,6 @@ namespace Business.Interfaces.Implements.SecrutityAuthentication
         //Task<UserCreateDto> CreateUserAsync(UserCreateDto dto);
         Task<UserSelectDto> CreateWithPersonAndRolesAsync(UserCreateDto dto);
         Task<UserSelectDto> UpdateWithPersonAndRolesAsync(UserUpdateDto dto);
+
     }
 }

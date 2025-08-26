@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Business.Repository;
+using Data.Interfaz.IDataImplemenent.Persons;
 using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -8,6 +9,9 @@ using Entity.Infrastructure.Context;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Utilities.Exceptions;
+using Utilities.Helpers.GeneratePassword;
+using Utilities.Messaging.Implements;
+using Utilities.Messaging.Interfaces;
 
 namespace Business.Services.SecrutityAuthentication
 {
@@ -16,15 +20,19 @@ namespace Business.Services.SecrutityAuthentication
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IUserRepository _userRepository; 
         private readonly IRolUserRepository _rolUserRepository;
+        private readonly IPersonRepository _personRepository;
         private readonly ApplicationDbContext _context;
+        private readonly ISendCode _emailService;
 
-        public UserService(IUserRepository data, IMapper mapper, IPasswordHasher<User> passwordHasher, IRolUserRepository rolUserRepository, ApplicationDbContext contex)
+        public UserService(IUserRepository data, IMapper mapper, IPasswordHasher<User> passwordHasher, IRolUserRepository rolUserRepository, IPersonRepository personRepository, ISendCode emailService, ApplicationDbContext contex)
             : base(data, mapper)
         {
             _passwordHasher = passwordHasher;
             _userRepository = data;
-            _rolUserRepository = rolUserRepository;
+            _rolUserRepository = rolUserRepository; 
+            _personRepository = personRepository;
             _context = contex;
+            _emailService = emailService;
         }
 
 
@@ -53,46 +61,48 @@ namespace Business.Services.SecrutityAuthentication
 
         public async Task<UserSelectDto> CreateWithPersonAndRolesAsync(UserCreateDto dto)
         {
-
-            try{
-
-                // 1) Validación de unicidad de email
+            try
+            {
+                // 1) Validación de datos mínimos
                 if (string.IsNullOrWhiteSpace(dto.Email))
                     throw new BusinessException("El correo es requerido.");
-
-                if (dto is UserCreateDto && string.IsNullOrWhiteSpace(dto.Password))
-                    throw new BusinessException("La contraseña es requerida.");
-
 
                 if (await _userRepository.ExistsByEmailAsync(dto.Email))
                     throw new BusinessException("El correo ya está registrado.");
 
+                if (await _personRepository.ExistsByDocumentAsync(dto.Document))
+                    throw new BusinessException("Ya existe una persona con este número de documento.");
+
                 await using var tx = await _context.Database.BeginTransactionAsync();
 
-                // 2) Mapear User + Person (NO setear PersonId manualmente)
+                // 2) Mapear entidades
                 var person = _mapper.Map<Person>(dto);
                 var user = _mapper.Map<User>(dto);
-
-                // 3) Hash de password
-                var hasher = new PasswordHasher<User>();
-                user.Password = _passwordHasher.HashPassword(user, dto.Password);
                 user.Person = person;
 
+                // 3) Generar contraseña aleatoria
+                var tempPassword = PasswordGenerator.Generate(12); // Asegúrate de tener esta clase
 
-                // 4) Persistir (EF inserta Person y luego User)
+                // 4) Hashear y marcar cambio obligatorio
+                user.Password = _passwordHasher.HashPassword(user, tempPassword);
+
+                // 5) Guardar usuario
                 await _userRepository.AddAsync(user);
 
-                // 5) Roles: por defecto o explícitos
+                // 6) Asignar roles
                 var roleIds = (dto.RoleIds ?? Array.Empty<int>()).Where(x => x > 0).Distinct().ToList();
                 await _rolUserRepository.ReplaceUserRolesAsync(user.Id, roleIds);
 
                 await tx.CommitAsync();
 
-                // 6) Volver a leer el usuario con includes para mapear seguro
+                // 7) Enviar correo con contraseña temporal
+                var fullName = $"{person.FirstName} {person.LastName}";
+                await _emailService.SendTemporaryPasswordAsync(user.Email, fullName, tempPassword);
+
+                // 8) Obtener resultado final
                 var created = await _userRepository.GetByIdAsync(user.Id)
                               ?? throw new BusinessException("Error interno: no se pudo recuperar el usuario tras registrarlo.");
 
-                // 7) Construir DTO de salida
                 var result = _mapper.Map<UserSelectDto>(created);
                 result.Roles = (await _rolUserRepository.GetRoleNamesByUserIdAsync(created.Id)).ToList();
                 return result;
@@ -101,8 +111,8 @@ namespace Business.Services.SecrutityAuthentication
             {
                 throw new BusinessException($"Error en el registro del usuario: {ex.Message}", ex);
             }
-         
         }
+
 
 
         public async Task<UserSelectDto> UpdateWithPersonAndRolesAsync(UserUpdateDto dto)
@@ -121,6 +131,11 @@ namespace Business.Services.SecrutityAuthentication
                 var emailExists = await _userRepository.ExistsByEmailAsync(dto.Email);
                 if (emailExists && !string.Equals(user.Email, dto.Email, StringComparison.OrdinalIgnoreCase))
                     throw new BusinessException("El correo ya está registrado.");
+
+
+                if (await _personRepository.ExistsByDocumentAsync(dto.Document))
+                    throw new BusinessException("Ya existe una persona con este número de documento.");
+
 
                 await using var tx = await _context.Database.BeginTransactionAsync();
 
@@ -153,43 +168,6 @@ namespace Business.Services.SecrutityAuthentication
                 throw new BusinessException($"Error al actualizar el usuario: {ex.Message}", ex);
             }
         }
-
-
-
-        //// CREATE: siempre hashear antes de guardar
-        //public async Task<UserCreateDto> CreateUserAsync(UserCreateDto dto)
-        //{
-        //    BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
-
-        //    var entity = _mapper.Map<User>(dto);
-        //    entity.InitializeLogicalState();
-
-        //    entity.Password = _passwordHasher.HashPassword(entity, dto.Password); // <-- hash
-
-        //    var created = await Data.AddAsync(entity);
-        //    return _mapper.Map<UserCreateDto>(created);
-        //}
-
-        //// UPDATE: hashear sólo si viene una nueva contraseña
-        //public override async Task<UserSelectDto> UpdateAsync(UserUpdateDto dto)
-        //{
-        //    BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
-        //    BusinessValidationHelper.ThrowIfZeroOrLess(dto.Id, "El ID debe ser mayor que cero.");
-
-        //    // Carga actual (tracking la maneja Data.UpdateAsync via Find + SetValues)
-        //    var existing = await Data.GetByIdAsync(dto.Id)
-        //                   ?? throw new BusinessException($"Usuario {dto.Id} no encontrado.");
-
-        //    existing.Email = dto.Email;
-
-        //    if (!string.IsNullOrWhiteSpace(dto.Password))
-        //    {
-        //        // Hash NUEVA contraseña
-        //        existing.Password = _passwordHasher.HashPassword(existing, dto.Password);
-        //    }
-
-        //    var updated = await Data.UpdateAsync(existing);
-        //    return _mapper.Map<UserSelectDto>(updated);
-        //}
+    
     }
 }

@@ -1,6 +1,14 @@
-<app-generic-table [data]="tenants" [columns]="columns" [titulo]="'Gestión de Usuario'"
-  [subTitulo]="'Gesione los usuarios del sistema'" [createButtonLabel]="'Crear Usuario'" (create)="onCreate()"
-  (edit)="onEdit($event)" (delete)="onDelete($event)" (view)="onView($event)">
+<app-generic-table
+  [data]="tenants"
+  [columns]="columns"
+  [titulo]="'Gestión de Usuario'"
+  [subTitulo]="'Gesione los usuarios del sistema'"
+  [createButtonLabel]="'Crear Usuario'"
+  [showViewButton]="false"
+  (create)="onCreate()"
+  (edit)="onEdit($event)"
+  (delete)="onDelete($event)"
+  (view)="onView($event)">
 
 </app-generic-table>
 

@@ -21,6 +21,17 @@ namespace Entity.Infrastructure.DataInit.SecurityAuthentication
                     Active = true,
                     CreatedAt = seedDate,
                     PersonId = 1
+                },
+                new User
+                {
+                    Id = 2,
+                    Email = "usuario@gescomph.com",
+                    // Usuario1.
+                    Password = "AQAAAAIAAYagAAAAEGNtpwDVV/mpIlUqi5xrPjpvzCejMXq142erkCJONaKJSiXb73eZm1tPxzj+2RvBXw==",
+                    IsDeleted = false,
+                    Active = true,
+                    CreatedAt = seedDate,
+                    PersonId = 2
                 }
             );
         }

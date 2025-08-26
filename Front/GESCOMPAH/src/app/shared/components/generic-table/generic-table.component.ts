@@ -1,5 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,11 +49,15 @@ import { HasRoleAndPermissionDirective } from '../../../core/Directives/HasRoleA
 export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() data: T[] | null = null;
   @Input() columns: TableColumn<T>[] = [];
+
   @Input() createButtonLabel = '+ Crear';
   @Input() titulo = 'Tabla Genérica';
   @Input() subTitulo = 'Subtítulo de la tabla';
 
-  /** 👉 Botón de filtros (opcional y configurable) */
+  @Input() showViewButton = true;
+  @Input() showDetailButton = true;
+  @Input() showActionsColumn = true; 
+
   @Input() showFilterButton = true;
   @Input() filterParams: any = {};
   @Input() filterTooltip: string = 'Filtros';
@@ -72,25 +88,25 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     this.connectSort();
   }
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.displayedColumns = this.columns.map(col => col.key.toString()).concat('actions');
+    this.updateDisplayedColumns();
     this.dataSource.data = this.data || [];
 
-    this.filterSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntil(this.destroy$)
-    ).subscribe(value => {
-      this.dataSource.filter = value.trim().toLowerCase();
-      if (this._paginator) { this._paginator.firstPage(); }
-    });
+    this.filterSubject
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(value => {
+        this.dataSource.filter = value.trim().toLowerCase();
+        if (this._paginator) {
+          this._paginator.firstPage();
+        }
+      });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['columns']) {
-      this.displayedColumns = this.columns.map(col => col.key.toString()).concat('actions');
+    if (changes['columns'] || changes['showActionsColumn']) {
+      this.updateDisplayedColumns();
     }
 
     if (changes['data']) {
@@ -108,7 +124,9 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
       this.connectSort();
       this.connectPaginator();
 
-      try { (this.dataSource as any)._updateChangeSubscription(); } catch { }
+      try {
+        (this.dataSource as any)._updateChangeSubscription();
+      } catch {}
 
       this.cdr.detectChanges();
     }
@@ -117,6 +135,13 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   ngAfterViewInit() {
     this.connectSort();
     this.connectPaginator();
+  }
+
+  private updateDisplayedColumns(): void {
+    this.displayedColumns = this.columns.map(col => col.key.toString());
+    if (this.showActionsColumn) {
+      this.displayedColumns.push('actions');
+    }
   }
 
   private connectPaginator() {
@@ -147,11 +172,18 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   onEdit(row: T) {
     this.edit.emit(row);
   }
+
   onDelete(row: T) {
     this.delete.emit(row);
   }
-  onView(row: T) { this.view.emit(row); }
-  onCreate() { this.create.emit(); }
+
+  onView(row: T) {
+    this.view.emit(row);
+  }
+
+  onCreate() {
+    this.create.emit();
+  }
 
   ngOnDestroy() {
     this.destroy$.next();

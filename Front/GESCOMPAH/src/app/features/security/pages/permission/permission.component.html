@@ -1,7 +1,14 @@
 <div class="row d-flex justify-content-center">
-  <app-generic-table [data]="permissions$ | async" [columns]="columns" [titulo]="'Gestión de Permisos'"
-    [subTitulo]="'Administra los permisos del sistema'" [createButtonLabel]="'Nuevo Permiso'" (edit)="onEdit($event)"
-    (delete)="onDelete($event)" (view)="onView($event)" (create)="onCreateNew()">
+  <app-generic-table
+    [data]="permissions$ | async"
+    [columns]="columns"
+    [titulo]="'Gestión de Permisos'"
+    [subTitulo]="'Administra los permisos del sistema'"
+    [createButtonLabel]="'Nuevo Permiso'"
+    [showViewButton]="false"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (create)="onCreateNew()">
   </app-generic-table>
 
 

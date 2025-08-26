@@ -1,7 +1,14 @@
 <div class="row d-flex justify-content-center">
-  <app-generic-table [data]="roles$ | async" [columns]="columns" [titulo]="'Gestión de Roles'"
-    [subTitulo]="'Administra los roles del sistema'" [createButtonLabel]="'Nuevo Rol'" (edit)="onEdit($event)"
-    (delete)="onDelete($event)" (view)="onView($event)" (create)="onCreateNew()">
+  <app-generic-table
+    [data]="roles$ | async"
+    [columns]="columns"
+    [titulo]="'Gestión de Roles'"
+    [subTitulo]="'Administra los roles del sistema'"
+    [createButtonLabel]="'Nuevo Rol'"
+    [showViewButton]="false"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (create)="onCreateNew()">
   </app-generic-table>
 
 
