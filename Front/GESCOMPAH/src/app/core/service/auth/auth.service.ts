@@ -3,9 +3,9 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, switchMap, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { User } from '../../../shared/models/user.model';
 import { LoginModel } from '../../../features/auth-login/models/login.models';
 import { RegisterModel } from '../../../features/auth-login/models/register.models';
+import { User } from '../../../shared/models/user.model';
 import { PermissionService } from '../permission/permission.service';
 import { UserStore } from '../permission/User.Store';
 

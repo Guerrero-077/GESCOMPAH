@@ -148,7 +148,7 @@ namespace Entity.Migrations
                             Description = "Gestión de Citas",
                             IsDeleted = false,
                             Name = "Citas",
-                            Route = "quotes"
+                            Route = "appointment"
                         },
                         new
                         {

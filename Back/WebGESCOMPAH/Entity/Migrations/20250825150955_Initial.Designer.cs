@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250825144248_Initial")]
+    [Migration("20250825150955_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -151,7 +151,7 @@ namespace Entity.Migrations
                             Description = "Gestión de Citas",
                             IsDeleted = false,
                             Name = "Citas",
-                            Route = "quotes"
+                            Route = "appointment"
                         },
                         new
                         {

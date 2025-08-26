@@ -1,8 +1,8 @@
 export interface SidebarItem {
   label: string;
   icon: string;
-  route?: string; // Make route optional
-  children?: SidebarItem[]; // Add children property for nesting
+  route?: string;
+  children?: SidebarItem[];
 }
 
 export interface BackendSubMenuItem {

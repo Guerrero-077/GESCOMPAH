@@ -469,7 +469,7 @@ namespace Entity.Migrations
                     { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Ver y gestionar establecimientos", false, "Establecimientos", "establishments/main" },
                     { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de arrendatarios", false, "Arrendatarios", "tenants" },
                     { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de contratos", false, "Contratos", "contracts" },
-                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de Citas", false, "Citas", "quotes" },
+                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de Citas", false, "Citas", "appointment" },
                     { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Configuración de modelos de seguridad", false, "Modelos de Seguridad", "security/main" },
                     { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de roles", false, "Roles", "security/roles" },
                     { 8, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de Formularios", false, "Formularios", "security/forms" },

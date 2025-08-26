@@ -18,7 +18,7 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
                
                 new Form { Id = 4, Name = "Contratos", Description = "Gestión de contratos", Route = "contracts", IsDeleted = false, Active = true, CreatedAt = seedDate },
 
-                new Form { Id = 5, Name = "Citas", Description = "Gestión de Citas", Route = "quotes", IsDeleted = false, Active = true, CreatedAt = seedDate },
+                new Form { Id = 5, Name = "Citas", Description = "Gestión de Citas", Route = "appointment", IsDeleted = false, Active = true, CreatedAt = seedDate },
 
                 new Form { Id = 6, Name = "Modelos de Seguridad", Description = "Configuración de modelos de seguridad", Route = "security/main", IsDeleted = false, Active = true, CreatedAt = seedDate }
                 ,

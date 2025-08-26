@@ -1,10 +1,8 @@
+// ...imports iguales...
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, inject, Inject, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, Inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors,
-  FormGroupDirective, NgForm
-} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,8 +16,7 @@ import { RoleService } from '../../../security/services/role/role.service';
 import { CitySelectModel } from '../../../setting/models/city.models';
 import { CityService } from '../../../setting/services/city/city.service';
 import { DepartmentStore } from '../../../setting/services/department/department.store';
-import { TenantFormData } from '../../models/tenants.models';
-import { ErrorStateMatcher } from '@angular/material/core';
+import { TenantsCreateModel, TenantsSelectModel, TenantFormData } from '../../models/tenants.models';
 
 @Component({
   selector: 'app-tenants-form-dialog',
@@ -39,7 +36,6 @@ import { ErrorStateMatcher } from '@angular/material/core';
   styleUrls: ['./tenants-form-dialog.component.css'],
 })
 export class TenantsFormDialogComponent implements OnInit {
-
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly deptStore = inject(DepartmentStore);
@@ -66,13 +62,10 @@ export class TenantsFormDialogComponent implements OnInit {
 
   // ====== Form ======
   form: FormGroup = this.fb.group({
-    // Ubicación
     location: this.fb.group({
-      departmentId: [null, Validators.required], // se deshabilita/limpia en edición
+      departmentId: [null, Validators.required],
       cityId: [{ value: null, disabled: true }, [Validators.required, Validators.min(1)]],
     }),
-
-    // Persona
     person: this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
@@ -80,18 +73,10 @@ export class TenantsFormDialogComponent implements OnInit {
       phone: ['', [Validators.required, Validators.pattern(/^\d{7,15}$/)]],
       address: ['', [Validators.required, Validators.maxLength(100)]],
     }),
-
-    // Cuenta
     account: this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: [''],
-      confirmPassword: ['']
-    }, { validators: passwordsMatch('password', 'confirmPassword') }),
-
-    // Rol en el form raíz
+    }),
     roleId: [null, [Validators.required, Validators.min(1)]],
-
-    // Estado
     active: [true]
   });
 
@@ -99,26 +84,17 @@ export class TenantsFormDialogComponent implements OnInit {
   get personGroup(): FormGroup { return this.form.get('person') as FormGroup; }
   get accountGroup(): FormGroup { return this.form.get('account') as FormGroup; }
 
-  // ====== Error matcher para errores del grupo (passwordsMismatch) en confirmPassword ======
-  confirmMatcher = new ConfirmMatcher();
-
   ngOnInit(): void {
     const deptCtrl = this.locationGroup.get('departmentId')!;
     const cityCtrl = this.locationGroup.get('cityId')!;
 
     if (this.isCreate()) {
-      // Password requerido solo en creación + reglas fuertes
-      this.accountGroup.get('password')?.addValidators([
-        Validators.required, Validators.minLength(8), hasUpper(), hasLower(), hasDigit(), hasSymbol()
-      ]);
-
-      // Cadena Departamento → Ciudades (CREACIÓN)
       deptCtrl.valueChanges.pipe(
         takeUntilDestroyed(this.destroyRef),
         distinctUntilChanged(),
         tap((deptId) => {
           cityCtrl.reset({ value: null, disabled: !deptId }, { emitEvent: false });
-          if (deptId) cityCtrl.enable({ emitEvent: false }); else cityCtrl.disable({ emitEvent: false });
+          deptId ? cityCtrl.enable({ emitEvent: false }) : cityCtrl.disable({ emitEvent: false });
           this._cities.next([]);
           this.loadingCities.set(!!deptId);
         }),
@@ -135,19 +111,14 @@ export class TenantsFormDialogComponent implements OnInit {
         })
       ).subscribe((list: CitySelectModel[]) => this._cities.next(list));
     } else {
-      // ======= EDICIÓN =======
-      // Departamento NO participa en validación ni UI
       deptCtrl.clearValidators();
       deptCtrl.setErrors(null);
       deptCtrl.setValue(null, { emitEvent: false });
       deptCtrl.disable({ emitEvent: false });
 
-      // La ciudad siempre habilitada en edición
       cityCtrl.enable({ emitEvent: false });
 
       const presetCity = Number(this.data?.tenant?.cityId ?? 0) || null;
-
-      // Cargar TODAS las ciudades
       this.loadingCities.set(true);
       this.cityService.getAll().pipe(
         map(toCityList),
@@ -161,13 +132,9 @@ export class TenantsFormDialogComponent implements OnInit {
       });
     }
 
-    // Cargar roles y preseleccionar
     this.loadRoles();
-
-    // Patch inicial
     this.patchInitialData();
 
-    // Si en creación ya venía departamento, dispara la cadena
     const presetDept = this.locationGroup.get('departmentId')?.value;
     if (this.isCreate() && presetDept) deptCtrl.updateValueAndValidity({ emitEvent: true });
   }
@@ -185,58 +152,46 @@ export class TenantsFormDialogComponent implements OnInit {
       .subscribe((roles: RoleSelectModel[]) => {
         this.roles$.next(roles);
 
-        const roleName = this.data?.tenant?.roleName ?? null;
-        if (roleName) {
-          const match = roles.find(r => r.name?.toLowerCase().trim() === roleName.toLowerCase().trim());
+        if (this.data?.tenant?.roles?.length) {
+          const match = roles.find(r => this.data.tenant!.roles.includes(r.name ?? ''));
           if (match) this.form.get('roleId')?.setValue(match.id, { emitEvent: false });
-        }
-
-        if (this.data?.tenant?.roleIds?.length) {
-          this.form.get('roleId')?.setValue(this.data.tenant.roleIds[0], { emitEvent: false });
         }
       });
   }
 
   private patchInitialData(): void {
-    const t = this.data?.tenant ?? {};
+    const t = this.data?.tenant as TenantsSelectModel;
 
     // Ubicación
     this.locationGroup.patchValue({
-      departmentId: this.isCreate() ? (t.departmentId ?? null) : null,
-      cityId: t.cityId ?? null
+      departmentId: this.isCreate() ? null : null,
+      cityId: t?.cityId ?? null
     }, { emitEvent: false });
 
     // Persona
     this.personGroup.patchValue({
-      firstName: t.firstName ?? '',
-      lastName: t.lastName ?? '',
-      document: t.document ?? '',
-      phone: String(t.phone ?? '').trim(),
-      address: t.address ?? ''
+      firstName: t?.personName?.split(' ')[0] ?? '',
+      lastName: t?.personName?.split(' ')[1] ?? '',
+      document: t?.personDocument ?? '',
+      phone: t?.personPhone ?? '',
+      address: t?.personAddress ?? ''
     }, { emitEvent: false });
 
     // Cuenta
     this.accountGroup.patchValue({
-      email: String(t.email ?? '').trim().toLowerCase(),
-      password: '',
-      confirmPassword: ''
+      email: t?.email?.toLowerCase() ?? ''
     }, { emitEvent: false });
 
     // Estado
-    this.form.get('active')?.setValue(t.active ?? true, { emitEvent: false });
+    this.form.get('active')?.setValue(t?.active ?? true, { emitEvent: false });
   }
+
 
   submit(): void {
     this.submitError.set(null);
 
-    // Normaliza email
     const emailCtrl = this.accountGroup.get('email')!;
     emailCtrl.setValue(String(emailCtrl.value ?? '').trim().toLowerCase(), { emitEvent: false });
-
-    // En edición, si password vacío, quitar error de confirmación
-    if (!this.isCreate() && !this.accountGroup.get('password')?.value) {
-      this.accountGroup.setErrors(null);
-    }
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -252,34 +207,29 @@ export class TenantsFormDialogComponent implements OnInit {
     const roleId = this.form.get('roleId')?.value as number | null;
     const active = !!this.form.get('active')?.value;
 
-    const base = {
-      firstName: p.firstName,
-      lastName: p.lastName,
-      document: p.document,
-      phone: p.phone,
-      address: p.address,
-      departmentId: Number(loc.departmentId ?? 0) || null, // solo para creación
-      cityId: Number(loc.cityId ?? 0) || null,
-      email: acc.email,
-      roleIds: roleId ? [roleId] : [],
-      active
-    };
-
-    const payload = this.isCreate()
-      ? { ...base, password: acc.password }
-      : ({
-        // CONTRATO UserUpdateDto
-        personId: this.data?.tenant?.personId,
-        firstName: base.firstName,
-        lastName: base.lastName,
-        document: base.document,
-        phone: base.phone,
-        address: base.address,
-        cityId: base.cityId,
-        email: base.email,
-        password: acc.password || null,
-        roleIds: base.roleIds
-      });
+    const payload: TenantsCreateModel | Partial<TenantsSelectModel> = this.isCreate()
+      ? {
+        firstName: p.firstName,
+        lastName: p.lastName,
+        document: String(p.document), // Forzar a string
+        phone: String(p.phone),
+        address: p.address,
+        cityId: Number(loc.cityId),
+        email: acc.email,
+        roleIds: roleId ? [roleId] : []
+      }
+      : {
+        id: this.data?.tenant?.id!,
+        personId: this.data?.tenant?.personId!,
+        personName: `${p.firstName} ${p.lastName}`,
+        personDocument: p.document,
+        personPhone: p.phone,
+        personAddress: p.address,
+        email: acc.email,
+        cityId: Number(loc.cityId),
+        active,
+        roles: []
+      };
 
     this.dialogRef.close(payload);
     this.submitting.set(false);
@@ -289,7 +239,6 @@ export class TenantsFormDialogComponent implements OnInit {
     this.dialogRef.close(null);
   }
 
-  // ===== Utilidades =====
   markGroupAsTouched(group: FormGroup) {
     group.markAllAsTouched();
     Object.values(group.controls).forEach(c => c.updateValueAndValidity());
@@ -301,10 +250,6 @@ export class TenantsFormDialogComponent implements OnInit {
     minlength: 'Mín. 8 caracteres',
     maxlength: 'Máx. 50 caracteres',
     pattern: 'Formato inválido',
-    upper: 'Debe contener mayúscula',
-    lower: 'Debe contener minúscula',
-    digit: 'Debe contener un número',
-    symbol: 'Debe contener un símbolo',
     min: 'Valor inválido',
   };
 
@@ -318,16 +263,7 @@ export class TenantsFormDialogComponent implements OnInit {
   }
 }
 
-/* ====== ErrorStateMatcher para errores del grupo (confirmación de password) ====== */
-export class ConfirmMatcher implements ErrorStateMatcher {
-  isErrorState(control: AbstractControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const invalidCtrl = !!(control && control.invalid && (control.dirty || control.touched));
-    const invalidParent = !!(control && control.parent && control.parent.hasError('passwordsMismatch') && (control.dirty || control.touched));
-    return invalidCtrl || invalidParent;
-  }
-}
-
-/* ====== utils ====== */
+// ========== UTILS ==========
 const toCityList = (res: any): CitySelectModel[] => {
   const raw = Array.isArray(res) ? res
     : Array.isArray(res?.data) ? res.data
@@ -339,16 +275,3 @@ const toCityList = (res: any): CitySelectModel[] => {
     name: String(c.name ?? c.cityName ?? c.label ?? '').trim(),
   })).filter((c: any) => !!c.id && !!c.name);
 };
-
-/* ========= VALIDADORES ========= */
-function passwordsMatch(passwordKey: string, confirmKey: string) {
-  return (group: AbstractControl): ValidationErrors | null => {
-    const pass = group.get(passwordKey)?.value ?? '';
-    const confirm = group.get(confirmKey)?.value ?? '';
-    return pass && confirm && pass !== confirm ? { passwordsMismatch: true } : null;
-  };
-}
-function hasUpper() { return (c: AbstractControl) => /[A-Z]/.test(String(c.value ?? '')) ? null : { upper: true }; }
-function hasLower() { return (c: AbstractControl) => /[a-z]/.test(String(c.value ?? '')) ? null : { lower: true }; }
-function hasDigit() { return (c: AbstractControl) => /\d/.test(String(c.value ?? '')) ? null : { digit: true }; }
-function hasSymbol() { return (c: AbstractControl) => /[^A-Za-z0-9]/.test(String(c.value ?? '')) ? null : { symbol: true }; }

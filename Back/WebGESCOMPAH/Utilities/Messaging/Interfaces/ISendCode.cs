@@ -9,5 +9,7 @@ namespace Utilities.Messaging.Interfaces
     public interface ISendCode
     {
         Task SendRecoveryCodeEmail(string emailReceptor, string recoveryCode);
+        Task SendTemporaryPasswordAsync(string email, string fullName, string tempPassword);
+
     }
 }
