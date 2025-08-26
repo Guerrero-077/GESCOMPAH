@@ -1,12 +1,6 @@
 /* =========================
    Estilos originales
 ========================= */
-.form {
-  width: 85%;
-  max-width: 450px;
-  border-radius: 15px;
-  box-shadow: 0px 6px 3px #0000004b;
-}
 
 .imagen-logo {
   height: 8rem;
@@ -95,4 +89,77 @@
   to {
     transform: scale(1);
   }
+}
+
+
+/* Asegurar que el contenedor principal ocupe toda la altura */
+.container-fluid {
+  min-height: 100vh;
+}
+
+/* Ajustes para el formulario */
+.form {
+  border-radius: 12px;
+  background: #ffffff;
+  max-width: 100%;
+}
+
+/* Ajustes para la imagen del logo */
+.imagen-logo {
+  max-width: 120px;
+  height: auto;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 575.98px) {
+  .form {
+    margin: 0 15px;
+    padding: 20px !important;
+  }
+  
+  .imagen-logo {
+    max-width: 100px;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  .fs-5 {
+    font-size: 1rem !important;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .form {
+    margin: 0 20px;
+  }
+  
+  .imagen-logo {
+    max-width: 110px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .form {
+    margin: 0 30px;
+  }
+}
+
+@media (min-width: 992px) {
+  .row {
+    min-height: 80vh;
+  }
+}
+
+/* Espaciado vertical mejorado */
+@media (max-width: 991.98px) {
+  .mb-4.mb-lg-0 {
+    margin-bottom: 2rem !important;
+  }
+}
+
+/* Centrado perfecto en todos los tamaños */
+.container-xl {
+  max-width: 1200px;
 }
