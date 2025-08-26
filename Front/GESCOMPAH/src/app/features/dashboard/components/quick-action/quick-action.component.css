@@ -1,0 +1,14 @@
+.quick-actions {
+    border: 1px solid #d4edda;
+    border-radius: 8px;
+
+    h5 {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+}

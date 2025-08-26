@@ -10,8 +10,6 @@ import { Component, Input } from '@angular/core';
 export class QuickActionComponent {
   @Input() actions = [
     { label: 'Nuevo Contrato', style: 'btn-success' },
-    { label: 'Registrar Pago', style: 'btn-outline-success' },
     { label: 'Nuevo Usuario', style: 'btn-outline-success' },
-    { label: 'Generar Reporte', style: 'btn-outline-success' },
   ];
 }

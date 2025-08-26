@@ -1,10 +1,10 @@
-<div class="quick-actions card p-3 border-success-subtle shadow-sm height-300">
-    <h6 class="fw-bold text-success mb-3">
+<div class="quick-actions card p-3 border-success-subtle shadow-sm">
+    <h5 class="fw-bold text-success mb-3">
         <i class="bi bi-plus-circle me-2"></i>
         Acciones Rápidas
-    </h6>
+    </h5>
 
-    <div class="d-flex flex-column gap-2">
+    <div class="row d-flex flex-column gap-3 mx-1">
         <button *ngFor="let action of actions" class="btn w-100" [ngClass]="action.style">
             {{ action.label }}
         </button>
