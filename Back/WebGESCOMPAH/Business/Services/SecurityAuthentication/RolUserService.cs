@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements.SecrutityAuthentication;
+﻿using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Repository;
 using Data.Interfaz.DataBasic;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
@@ -6,7 +6,7 @@ using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.RolUser;
 using MapsterMapper;
 
-namespace Business.Services.SecrutityAuthentication
+namespace Business.Services.SecurityAuthentication
 {
     public class RolUserService : BusinessGeneric<RolUserSelectDto, RolUserCreateDto, RolUserUpdateDto, RolUser>, IRolUserService
     {

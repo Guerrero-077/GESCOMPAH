@@ -14,7 +14,7 @@ using Utilities.Exceptions;
 using Utilities.Helpers.GeneratePassword;
 using Utilities.Messaging.Interfaces;
 
-namespace Business.Services.Contracts
+namespace Business.Services.Business
 {
     public class ContractService : BusinessGeneric<ContractSelectDto, ContractCreateDto, ContractUpdateDto, Contract>, IContractService
     {

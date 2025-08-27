@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements.SecrutityAuthentication;
+﻿using Business.Interfaces.Implements.SecurityAuthentication;
 using Data.Interfaz.IDataImplement.Persons;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Persons;
@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using Utilities.Exceptions;
 using Utilities.Messaging.Interfaces;
 
-namespace Business.Services.SecrutityAuthentication
+namespace Business.Services.SecurityAuthentication
 {
     /// <summary>
     /// Servicio de autenticación. El contexto de usuario (/me) lo construye UserContextService.

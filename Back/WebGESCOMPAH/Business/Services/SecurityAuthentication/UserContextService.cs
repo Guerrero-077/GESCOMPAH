@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements.SecrutityAuthentication;
+﻿using Business.Interfaces.Implements.SecurityAuthentication;
 using Data.Interfaz.Security;
 using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -8,7 +8,7 @@ using MapsterMapper;
 using Microsoft.Extensions.Caching.Memory;
 using Utilities.Exceptions;
 
-namespace Business.Services.SecrutityAuthentication
+namespace Business.Services.SecurityAuthentication
 {
     public class UserContextService : IUserContextService
     {

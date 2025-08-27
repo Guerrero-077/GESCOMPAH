@@ -1,11 +1,11 @@
-﻿using Business.Interfaces.Implements.SecrutityAuthentication;
+﻿using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Repository;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
 using MapsterMapper;
 
-namespace Business.Services.SecrutityAuthentication
+namespace Business.Services.SecurityAuthentication
 {
     public class RolFormPermissionService
         : BusinessGeneric<RolFormPermissionSelectDto, RolFormPermissionCreateDto, RolFormPermissionUpdateDto, RolFormPermission>,

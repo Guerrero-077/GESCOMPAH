@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements.SecrutityAuthentication;
+﻿using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Repository;
 using Data.Interfaz.IDataImplement.Persons;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
@@ -13,7 +13,7 @@ using Utilities.Helpers.GeneratePassword;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
 
-namespace Business.Services.SecrutityAuthentication
+namespace Business.Services.SecurityAuthentication
 {
     public class UserService : BusinessGeneric<UserSelectDto, UserCreateDto, UserUpdateDto, User>, IUserService
     {

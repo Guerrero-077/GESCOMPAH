@@ -1,6 +1,5 @@
 ﻿using Business.Interfaces;
-using Business.Interfaces.Implements.SecrutityAuthentication;
-using Business.Services.SecrutityAuthentication;
+using Business.Interfaces.Implements.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;

@@ -1,5 +1,5 @@
 ﻿using Business.Interfaces.Implements.AdministrationSystem;
-using Business.Interfaces.Implements.SecrutityAuthentication;
+using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Repository;
 using Data.Interfaz.IDataImplement.AdministrationSystem;
 using Entity.Domain.Models.Implements.AdministrationSystem;

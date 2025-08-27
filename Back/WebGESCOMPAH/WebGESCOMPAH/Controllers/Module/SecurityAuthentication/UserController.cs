@@ -1,5 +1,5 @@
 ﻿using Business.Interfaces.IBusiness;
-using Business.Interfaces.Implements.SecrutityAuthentication;
+using Business.Interfaces.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
