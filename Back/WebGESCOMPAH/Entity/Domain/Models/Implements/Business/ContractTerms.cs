@@ -12,7 +12,7 @@ namespace Entity.Domain.Models.Implements.Business
 
         public bool UseSystemParameters { get; set; } = true;
 
-        public string CalculationKey { get; set; }
+        //public string CalculationKey { get; set; }
 
     }
 }

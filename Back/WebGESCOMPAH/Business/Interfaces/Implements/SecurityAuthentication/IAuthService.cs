@@ -7,7 +7,8 @@ namespace Business.Interfaces.Implements.SecrutityAuthentication
 {
     public interface IAuthService
     {
-        Task<UserDto> RegisterAsync(RegisterDto dto);
+
+        //Task<UserDto> RegisterAsync(RegisterDto dto);
         Task RequestPasswordResetAsync(string email);   
         Task ResetPasswordAsync(ConfirmResetDto dto);
         Task<UserMeDto> BuildUserContextAsync(int userId);

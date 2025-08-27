@@ -1,6 +1,6 @@
 ﻿using Business.Interfaces.Implements.Utilities;
 using Business.Repository;
-using Data.Interfaz.IDataImplemenent.Utilities;
+using Data.Interfaz.IDataImplement.Utilities;
 using Data.Services.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Utilities;
 using Entity.DTOs.Implements.Utilities.Images;

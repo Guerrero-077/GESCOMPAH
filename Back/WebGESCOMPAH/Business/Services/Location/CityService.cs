@@ -1,7 +1,7 @@
 ﻿using Business.Interfaces.Implements.Location;
 using Business.Repository;
 using Data.Interfaz.DataBasic;
-using Data.Interfaz.IDataImplemenent.Location;
+using Data.Interfaz.IDataImplement.Location;
 using Entity.Domain.Models.Implements.Location;
 using Entity.DTOs.Implements.Location.City;
 using MapsterMapper;

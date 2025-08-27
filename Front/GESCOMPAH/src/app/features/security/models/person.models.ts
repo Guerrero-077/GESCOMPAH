@@ -7,6 +7,7 @@ export interface PersonSelectModel {
   address?: string;
   phone?: string;
   cityName: string;   // viene desde SelectDto
+  email?: string;
 }
 
 export interface PersonCreateModel {

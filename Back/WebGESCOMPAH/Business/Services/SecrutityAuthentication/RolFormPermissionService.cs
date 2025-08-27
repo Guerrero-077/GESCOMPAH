@@ -1,6 +1,6 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Business.Repository;
-using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
+using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
 using MapsterMapper;
@@ -54,7 +54,7 @@ namespace Business.Services.SecrutityAuthentication
             var entityToReturn = await _repo.GetByIdAsync(lastEntity.Id);
             return _mapper.Map<RolFormPermissionSelectDto>(entityToReturn);
         }
-        public async Task<IEnumerable<RolFormPermissionGroupedDto>> GetAllGroupedAsync()
+        public async Task<IEnumerable<RolFormPermissionSelectDto>> GetAllGroupedAsync()
         {
             var allPermissions = await _repo.GetAllAsync();
 
@@ -63,8 +63,7 @@ namespace Business.Services.SecrutityAuthentication
                 .Select(g =>
                 {
                     var first = g.First();
-                    return new RolFormPermissionGroupedDto
-                    {
+                    return new RolFormPermissionSelectDto                    {
                         RolId = g.Key.RolId,
                         RolName = first.Rol.Name,
                         FormId = g.Key.FormId,

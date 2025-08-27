@@ -1,7 +1,7 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
 using Business.Repository;
 using Data.Interfaz.DataBasic;
-using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
+using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.RolUser;
 using MapsterMapper;

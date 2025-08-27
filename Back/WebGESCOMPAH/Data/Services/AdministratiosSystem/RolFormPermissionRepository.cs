@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
+﻿using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Data.Repository;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Infrastructure.Context;

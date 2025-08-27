@@ -9,11 +9,13 @@ using Entity.DTOs.Implements.AdministrationSystem.FormModule;
 using Entity.DTOs.Implements.AdministrationSystem.Module;
 using Entity.DTOs.Implements.AdministrationSystem.SystemParameter;
 using Entity.DTOs.Implements.Business.Appointment;
+using Entity.DTOs.Implements.Business.Contract;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Entity.DTOs.Implements.Business.Plaza;
+using Entity.DTOs.Implements.Business.PremisesLeased;
 using Entity.DTOs.Implements.Location.City;
 using Entity.DTOs.Implements.Location.Department;
-using Entity.DTOs.Implements.Persons.Peron;
+using Entity.DTOs.Implements.Persons.Person;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Me;
 using Entity.DTOs.Implements.SecurityAuthentication.Permission;
@@ -75,6 +77,57 @@ namespace Business.Mapping
 
             config.NewConfig<Plaza, PlazaSelectDto>();
 
+
+
+
+
+
+            TypeAdapterConfig<ContractCreateDto, Person>.NewConfig()
+                .Map(dest => dest.FirstName, src => src.FirstName)
+                .Map(dest => dest.LastName, src => src.LastName)
+                .Map(dest => dest.Document, src => src.Document)
+                .Map(dest => dest.Phone, src => src.Phone)
+                .Map(dest => dest.Address, src => src.Address)
+                .Map(dest => dest.CityId, src => src.CityId);
+
+            TypeAdapterConfig<ContractCreateDto, Contract>.NewConfig()
+                .Map(dest => dest.StartDate, src => src.StartDate)
+                .Map(dest => dest.EndDate, src => src.EndDate);
+
+            TypeAdapterConfig<ContractCreateDto, ContractTerms>.NewConfig()
+                .Map(dest => dest.UvtQty, src => src.UvtQty)
+                .Map(dest => dest.UseSystemParameters, src => src.UseSystemParameters);
+
+
+            TypeAdapterConfig<Contract, ContractSelectDto>.NewConfig()
+                .Map(dest => dest.FullName, src => src.Person.FirstName + " " + src.Person.LastName)
+                .Map(dest => dest.Document, src => src.Person.Document)
+                .Map(dest => dest.Phone, src => src.Person.Phone)
+                .Map(dest => dest.PremisesLeased, src => src.PremisesLeased)
+                .Map(dest => dest.Email, src => src.Person.User != null ? src.Person.User.Email : string.Empty)
+
+                .Map(dest => dest.Terms, src => src.ContractTerms.FirstOrDefault());
+
+
+
+
+            config.NewConfig<PremisesLeased, PremisesLeasedSelectDto>()
+                .Map(dest => dest.EstablishmentId, src => src.Establishment.Id)
+                .Map(dest => dest.EstablishmentName, src => src.Establishment.Name)
+                .Map(dest => dest.Description, src => src.Establishment.Description)
+                .Map(dest => dest.AreaM2, src => src.Establishment.AreaM2)
+                .Map(dest => dest.RentValueBase, src => src.Establishment.RentValueBase)
+                .Map(dest => dest.Address, src => src.Establishment.Address)
+                .Map(dest => dest.PlazaName, src => src.Establishment.Plaza.Name)
+                .Map(dest => dest.Images, src => src.Establishment.Images);
+
+
+
+
+
+
+
+
             // ============================================
             // Location
             // ============================================
@@ -88,8 +141,14 @@ namespace Business.Mapping
             // Persons
             // ============================================
             // Entidad -> DTO de selección (maneja City nullable)
+
+            //config.NewConfig<Person, PersonSelectDto>()
+            //    .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty);
+
             config.NewConfig<Person, PersonSelectDto>()
-                .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty);
+    .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty)
+    .Map(dest => dest.Email, src => src.User != null ? src.User.Email : null);
+
 
             // DTO de creación -> Entidad  (NO toca navegaciones)
             config.NewConfig<PersonDto, Person>()

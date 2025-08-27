@@ -1,5 +1,5 @@
 ﻿using Business.Interfaces;
-using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
+using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Data.Interfaz.Security;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;

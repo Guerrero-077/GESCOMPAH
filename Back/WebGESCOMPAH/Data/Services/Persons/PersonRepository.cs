@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplemenent.Persons;
+﻿using Data.Interfaz.IDataImplement.Persons;
 using Data.Repository;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Infrastructure.Context;
@@ -31,6 +31,21 @@ namespace Data.Services.Persons
             return await _dbSet
                 .AsNoTracking()
                 .AnyAsync(p => p.Document == document && !p.IsDeleted);
+        }
+
+        //public async Task<Person?> GetByDocumentAsync(string document)
+        //{
+        //    return await _dbSet
+        //        .Include(p => p.City)
+        //        .FirstOrDefaultAsync(p => p.Document == document && !p.IsDeleted);
+        //}
+
+        public async Task<Person?> GetByDocumentAsync(string document)
+        {
+            return await _dbSet
+                .Include(p => p.City)
+                .Include(p => p.User) // ← Agregado para obtener el Email
+                .FirstOrDefaultAsync(p => p.Document == document && !p.IsDeleted);
         }
 
     }

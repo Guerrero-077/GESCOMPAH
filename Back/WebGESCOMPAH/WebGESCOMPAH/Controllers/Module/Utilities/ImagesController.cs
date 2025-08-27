@@ -58,19 +58,6 @@ public class ImagesController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>
-    /// Eliminar múltiples imágenes por sus PublicIds
-    /// </summary>
-    [HttpDelete("multiple")]
-    public async Task<IActionResult> DeleteMultipleImages([FromBody] List<string> publicIds)
-    {
-        if (publicIds == null || !publicIds.Any())
-            return BadRequest("Debe proporcionar al menos un PublicId.");
-
-        await _imagesService.DeleteImagesByPublicIdsAsync(publicIds);
-        return NoContent();
-    }
-
     [HttpPatch("logical-delete")]
     public async Task<IActionResult> LogicalDelete([FromQuery] string publicId)
     {

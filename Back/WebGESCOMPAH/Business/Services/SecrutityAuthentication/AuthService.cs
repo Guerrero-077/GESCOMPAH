@@ -1,13 +1,12 @@
 ﻿using Business.Interfaces.Implements.SecrutityAuthentication;
-using Data.Interfaz.IDataImplemenent.Persons;
-using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
+using Data.Interfaz.IDataImplement.Persons;
+using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
 using Entity.DTOs.Implements.SecurityAuthentication.Me;
 using Entity.DTOs.Implements.SecurityAuthentication.User;
-using Entity.DTOs.Interfaces;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -27,7 +26,7 @@ namespace Business.Services.SecrutityAuthentication
         IMapper mapper,
         ISendCode emailService,
         IPasswordResetCodeRepository passwordResetRepo,
-        IValidatorService validator,
+        //IValidatorService validator,
         IUserContextService userContextService,
         IPersonRepository personRepository
     ) : IAuthService
@@ -39,45 +38,9 @@ namespace Business.Services.SecrutityAuthentication
         private readonly IMapper _mapper = mapper;
         private readonly ISendCode _emailService = emailService;
         private readonly IPasswordResetCodeRepository _passwordResetRepo = passwordResetRepo;
-        private readonly IValidatorService _validator = validator;
+        //private readonly IValidatorService _validator = validator;
         private readonly IUserContextService _userContext = userContextService;
         private readonly IPersonRepository _personRepository = personRepository;
-
-        public async Task<UserDto> RegisterAsync(RegisterDto dto)
-        {
-            try
-            {
-                await _validator.ValidateAsync(dto);
-
-                if (await _userRepository.ExistsByEmailAsync(dto.Email))
-                    throw new BusinessException("El correo ya está registrado.");
-
-                if (await _personRepository.ExistsByDocumentAsync(dto.Document))
-                    throw new BusinessException("Ya existe una persona con este número de documento.");
-
-                var person = _mapper.Map<Person>(dto);
-                var user = _mapper.Map<User>(dto);
-
-                var hasher = new PasswordHasher<User>();
-                user.Password = hasher.HashPassword(user, dto.Password);
-                user.Person = person;
-
-                await _userRepository.AddAsync(user);
-                await _rolUserData.AsignateRolDefault(user);
-
-                var createdUser = await _userRepository.GetByIdAsync(user.Id)
-                    ?? throw new BusinessException("Error interno: no se pudo recuperar el usuario tras registrarlo.");
-
-                // ⚠️ Importante: invalidar cache del contexto
-                _userContext.InvalidateCache(user.Id);
-
-                return _mapper.Map<UserDto>(createdUser);
-            }
-            catch (Exception ex)
-            {
-                throw new BusinessException($"Error en el registro del usuario: {ex.Message}", ex);
-            }
-        }
 
         public async Task RequestPasswordResetAsync(string email)
         {
@@ -117,10 +80,6 @@ namespace Business.Services.SecrutityAuthentication
             _userContext.InvalidateCache(user.Id);
         }
 
-        // ✅ Ahora delega completamente en UserContextService:
-        public Task<UserMeDto> BuildUserContextAsync(int userId)
-            => _userContext.BuildUserContextAsync(userId);
-
 
         public async Task ChangePasswordAsync(ChangePasswordDto dto)
         {
@@ -137,5 +96,49 @@ namespace Business.Services.SecrutityAuthentication
 
             await _userRepository.UpdateAsync(user);
         }
+
+        // ✅ Ahora delega completamente en UserContextService:
+        public Task<UserMeDto> BuildUserContextAsync(int userId)
+            => _userContext.BuildUserContextAsync(userId);
+
+
+        //public async Task<UserDto> RegisterAsync(RegisterDto dto)
+        //{
+        //    try
+        //    {
+        //        //await _validator.ValidateAsync(dto);
+
+        //        if (await _userRepository.ExistsByEmailAsync(dto.Email))
+        //            throw new BusinessException("El correo ya está registrado.");
+
+        //        if (await _personRepository.ExistsByDocumentAsync(dto.Document))
+        //            throw new BusinessException("Ya existe una persona con este número de documento.");
+
+        //        var person = _mapper.Map<Person>(dto);
+        //        var user = _mapper.Map<User>(dto);
+
+        //        var hasher = new PasswordHasher<User>();
+        //        user.Password = hasher.HashPassword(user, dto.Password);
+        //        user.Person = person;
+
+        //        await _userRepository.AddAsync(user);
+        //        await _rolUserData.AsignateRolDefault(user);
+
+        //        var createdUser = await _userRepository.GetByIdAsync(user.Id)
+        //            ?? throw new BusinessException("Error interno: no se pudo recuperar el usuario tras registrarlo.");
+
+        //        // ⚠️ Importante: invalidar cache del contexto
+        //        _userContext.InvalidateCache(user.Id);
+
+        //        return _mapper.Map<UserDto>(createdUser);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new BusinessException($"Error en el registro del usuario: {ex.Message}", ex);
+        //    }
+        //}
+
+
+
     }
 }

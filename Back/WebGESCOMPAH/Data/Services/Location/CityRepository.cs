@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplemenent.Location;
+﻿using Data.Interfaz.IDataImplement.Location;
 using Data.Repository;
 using Entity.Domain.Models.Implements.Location;
 using Entity.Infrastructure.Context;

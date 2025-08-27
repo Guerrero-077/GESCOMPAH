@@ -4,7 +4,6 @@ namespace Entity.Domain.Models.Implements.Business
 {
     public class ObligationMonth : BaseModel
     {
-        public int Id { get; set; }
 
         public int ContractId { get; set; }
         public Contract Contract { get; set; } = null!;
