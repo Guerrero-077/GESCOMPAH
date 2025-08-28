@@ -1,4 +1,4 @@
-﻿using Entity.DTOs.Implements.Persons.Peron;
+﻿using Entity.DTOs.Implements.Persons.Person;
 
 namespace Entity.DTOs.Implements.SecurityAuthentication.Me
 {

@@ -597,6 +597,137 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Clause", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("clauses");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Contract", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("BusinessPurpose")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("contracts");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.ContractClause", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ClauseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClauseId");
+
+                    b.HasIndex("ContractId");
+
+                    b.ToTable("contractClauses");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.ContractTerms", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("UseSystemParameters")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("UvtQty")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractId");
+
+                    b.ToTable("ContractTerms");
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
                 {
                     b.Property<int>("Id")
@@ -683,6 +814,81 @@ namespace Entity.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.ObligationMonth", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("BaseAmount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DaysLate")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("LateAmount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<bool>("Locked")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("UvtQtyApplied")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("UvtValueApplied")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("VatAmount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("VatRateApplied")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractId");
+
+                    b.ToTable("ObligationMonths", (string)null);
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Plaza", b =>
                 {
                     b.Property<int>("Id")
@@ -737,6 +943,38 @@ namespace Entity.Migrations
                             Location = "Zona Norte",
                             Name = "Plaza Norte"
                         });
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.PremisesLeased", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EstablishmentId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractId");
+
+                    b.HasIndex("EstablishmentId");
+
+                    b.ToTable("premisesLeaseds");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>
@@ -1589,7 +1827,7 @@ namespace Entity.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.SecurityAuthentication.Rol", b =>
@@ -2310,24 +2548,27 @@ namespace Entity.Migrations
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("FilePath")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("PublicId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EstablishmentId");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", (string)null);
 
                     b.HasData(
                         new
@@ -2428,6 +2669,47 @@ namespace Entity.Migrations
                     b.Navigation("Establishment");
                 });
 
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Contract", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Persons.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.ContractClause", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Clause", "Clause")
+                        .WithMany("ContractUsages")
+                        .HasForeignKey("ClauseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Contract", "Contract")
+                        .WithMany("ContractClauses")
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Clause");
+
+                    b.Navigation("Contract");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.ContractTerms", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Contract", "Contract")
+                        .WithMany("ContractTerms")
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
+                });
+
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
                 {
                     b.HasOne("Entity.Domain.Models.Implements.Business.Plaza", "Plaza")
@@ -2437,6 +2719,36 @@ namespace Entity.Migrations
                         .IsRequired();
 
                     b.Navigation("Plaza");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.ObligationMonth", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Contract", "Contract")
+                        .WithMany("ObligationMonths")
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.PremisesLeased", b =>
+                {
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Contract", "Contract")
+                        .WithMany("PremisesLeased")
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entity.Domain.Models.Implements.Business.Establishment", "Establishment")
+                        .WithMany()
+                        .HasForeignKey("EstablishmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
+
+                    b.Navigation("Establishment");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Location.City", b =>
@@ -2539,6 +2851,22 @@ namespace Entity.Migrations
             modelBuilder.Entity("Entity.Domain.Models.Implements.AdministrationSystem.Module", b =>
                 {
                     b.Navigation("FormModules");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Clause", b =>
+                {
+                    b.Navigation("ContractUsages");
+                });
+
+            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Contract", b =>
+                {
+                    b.Navigation("ContractClauses");
+
+                    b.Navigation("ContractTerms");
+
+                    b.Navigation("ObligationMonths");
+
+                    b.Navigation("PremisesLeased");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>

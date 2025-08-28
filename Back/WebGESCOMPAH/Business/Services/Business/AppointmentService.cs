@@ -1,6 +1,6 @@
 ﻿using Business.Interfaces.Implements.Business;
 using Business.Repository;
-using Data.Interfaz.IDataImplemenent.Business;
+using Data.Interfaz.IDataImplement.Business;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.Appointment;
 using MapsterMapper;

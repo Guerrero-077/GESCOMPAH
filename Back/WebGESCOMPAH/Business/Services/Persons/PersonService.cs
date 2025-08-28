@@ -1,8 +1,8 @@
 ﻿using Business.Interfaces.Implements.Persons;
 using Business.Repository;
-using Data.Interfaz.IDataImplemenent.Persons;
+using Data.Interfaz.IDataImplement.Persons;
 using Entity.Domain.Models.Implements.Persons;
-using Entity.DTOs.Implements.Persons.Peron;
+using Entity.DTOs.Implements.Persons.Person;
 using MapsterMapper;
 using Utilities.Exceptions;
 
@@ -62,4 +62,12 @@ public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonU
 
         return _mapper.Map<PersonSelectDto>(reloaded);
     }
+
+
+    public async Task<PersonSelectDto?> GetByDocumentAsync(string document)
+    {
+        var person = await _personRepository.GetByDocumentAsync(document);
+        return person is null ? null : _mapper.Map<PersonSelectDto>(person);
+    }
+
 }

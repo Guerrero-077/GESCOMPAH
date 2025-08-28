@@ -1,10 +1,10 @@
-﻿using FluentValidation.AspNetCore;
+﻿using Business.Interfaces.PDF;
+using Business.Services.Utilities.PDF;
 using CloudinaryDotNet;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
-using Entity.DTOs.Interfaces;
-using Entity.DTOs.Services;
 using Entity.DTOs.Validations.SecurityAuthentication.Auth;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Utilities.Helpers.CloudinaryHelper;
 using WebGESCOMPAH.Extensions;
 
@@ -14,17 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 // CONFIGURACIÓN Y SERVICIOS
 // --------------------------
 
-builder.Services.AddControllers()
-.AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-});
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.UseInlineDefinitionsForEnums(); // 👈 Swagger mostrará el dropdown con los nombres
-}); 
+builder.Services.AddScoped<IContractPdfGeneratorService, ContractPdfService>();
 
+
+
+
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(); // Swagger siempre disponible
 
@@ -38,7 +34,7 @@ builder.Services.AddApplicationServices();
 builder.Services.AddDatabase(builder.Configuration);
 
 // Validaciones y CQRS
-builder.Services.AddScoped<IValidatorService, ValidatorService>();
+//builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 

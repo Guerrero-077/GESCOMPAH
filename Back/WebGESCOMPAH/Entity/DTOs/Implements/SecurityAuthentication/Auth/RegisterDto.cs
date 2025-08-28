@@ -1,6 +1,4 @@
-﻿using Entity.Enum;
-
-namespace Entity.DTOs.Implements.SecurityAuthentication.Auth
+﻿namespace Entity.DTOs.Implements.SecurityAuthentication.Auth
 {
     public class RegisterDto
     {
