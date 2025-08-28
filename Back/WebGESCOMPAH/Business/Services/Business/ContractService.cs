@@ -23,7 +23,7 @@ namespace Business.Services.Business
         private readonly IRolUserRepository _rolUserRepository;
         private readonly IContractRepository _contractRepository;
         private readonly IPremisesLeasedRepository _premisesLeasedRepository;
-        private readonly IContractTermsRepository _contractTermsRepository;
+        //private readonly IContractTermsRepository _contractTermsRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ISendCode _emailService;
         private readonly ApplicationDbContext _context;
@@ -35,7 +35,7 @@ namespace Business.Services.Business
             IUserRepository userRepository,
             IRolUserRepository rolUserRepository,
             IPremisesLeasedRepository premisesLeasedRepository,
-            IContractTermsRepository contractTermsRepository,
+            //IContractTermsRepository contractTermsRepository,
             IMapper mapper,
             IPasswordHasher<User> passwordHasher,
             ISendCode emailService,
@@ -48,7 +48,7 @@ namespace Business.Services.Business
             _rolUserRepository = rolUserRepository;
             _contractRepository = data;
             _premisesLeasedRepository = premisesLeasedRepository;
-            _contractTermsRepository = contractTermsRepository;
+            //_contractTermsRepository = contractTermsRepository;
             _passwordHasher = passwordHasher;
             _emailService = emailService;
             _context = context;
@@ -111,10 +111,10 @@ namespace Business.Services.Business
             await _premisesLeasedRepository.AddRangeAsync(premises);
 
             // 6. Registrar términos del contrato
-            var terms = _mapper.Map<ContractTerms>(dto);
-            terms.ContractId = contract.Id;
+            //var terms = _mapper.Map<ContractTerms>(dto);
+            //terms.ContractId = contract.Id;
 
-            await _contractTermsRepository.AddAsync(terms);
+            //await _contractTermsRepository.AddAsync(terms);
 
             await tx.CommitAsync();
 

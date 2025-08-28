@@ -31,7 +31,7 @@ namespace Data.Services.Business
                     .Include(c => c.PremisesLeased)
                         .ThenInclude(pl => pl.Establishment)
                             .ThenInclude(e => e.Plaza)
-                    .Include(c => c.ContractTerms)
+                    //.Include(c => c.ContractTerms)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -61,7 +61,7 @@ namespace Data.Services.Business
                         .Include(c => c.PremisesLeased)
                             .ThenInclude(pl => pl.Establishment)
                                 .ThenInclude(e => e.Plaza) // 🟢 Incluye la plaza asociada al local
-                        .Include(c => c.ContractTerms)
+                        //.Include(c => c.ContractTerms)
                         .AsNoTracking()
                         .FirstOrDefaultAsync(c => c.Id == id);
             }

@@ -73,16 +73,6 @@
     <mat-datepicker #pickerEnd></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Tipo de Cálculo</mat-label>
-    <mat-select formControlName="calculationKey" required>
-      <mat-option value="AREA">Por Área</mat-option>
-      <mat-option value="FIXED">Valor Fijo</mat-option>
-      <mat-option value="PERCENTAGE">Porcentaje sobre ventas</mat-option>
-      <!-- Ajusta los valores según las claves esperadas en el backend -->
-    </mat-select>
-  </mat-form-field>
-
 
   <button mat-raised-button color="primary" [disabled]="form.invalid">
     Crear Contrato

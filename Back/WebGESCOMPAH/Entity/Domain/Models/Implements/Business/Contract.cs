@@ -13,7 +13,7 @@ namespace Entity.Domain.Models.Implements.Business
         public int PersonId { get; set; }
         public Person Person { get; set; } = null!;
 
-        public ICollection<ContractTerms> ContractTerms { get; set; } = new List<ContractTerms>();
+        //public ICollection<ContractTerms> ContractTerms { get; set; } = new List<ContractTerms>();
         public ICollection<PremisesLeased> PremisesLeased { get; set; } = new List<PremisesLeased>();
         public ICollection<ObligationMonth> ObligationMonths { get; set; } = new List<ObligationMonth>();
 

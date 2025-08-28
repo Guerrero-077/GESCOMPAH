@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250827020421_Initial")]
+    [Migration("20250828031933_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -692,39 +692,6 @@ namespace Entity.Migrations
                     b.ToTable("contractClauses");
                 });
 
-            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.ContractTerms", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ContractId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("UseSystemParameters")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("UvtQty")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ContractId");
-
-                    b.ToTable("ContractTerms");
-                });
-
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
                 {
                     b.Property<int>("Id")
@@ -763,6 +730,9 @@ namespace Entity.Migrations
                     b.Property<double>("RentValueBase")
                         .HasColumnType("float");
 
+                    b.Property<decimal>("UvtQty")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PlazaId");
@@ -781,7 +751,8 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             Name = "Centro Comercial Primavera",
                             PlazaId = 1,
-                            RentValueBase = 2500.0
+                            RentValueBase = 2500.0,
+                            UvtQty = 0m
                         },
                         new
                         {
@@ -794,7 +765,8 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             Name = "Oficina Torre Norte",
                             PlazaId = 2,
-                            RentValueBase = 1500.0
+                            RentValueBase = 1500.0,
+                            UvtQty = 0m
                         },
                         new
                         {
@@ -807,7 +779,8 @@ namespace Entity.Migrations
                             IsDeleted = false,
                             Name = "Bodega Industrial Sur",
                             PlazaId = 1,
-                            RentValueBase = 3000.0
+                            RentValueBase = 3000.0,
+                            UvtQty = 0m
                         });
                 });
 
@@ -2696,17 +2669,6 @@ namespace Entity.Migrations
                     b.Navigation("Contract");
                 });
 
-            modelBuilder.Entity("Entity.Domain.Models.Implements.Business.ContractTerms", b =>
-                {
-                    b.HasOne("Entity.Domain.Models.Implements.Business.Contract", "Contract")
-                        .WithMany("ContractTerms")
-                        .HasForeignKey("ContractId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Contract");
-                });
-
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Establishment", b =>
                 {
                     b.HasOne("Entity.Domain.Models.Implements.Business.Plaza", "Plaza")
@@ -2858,8 +2820,6 @@ namespace Entity.Migrations
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Contract", b =>
                 {
                     b.Navigation("ContractClauses");
-
-                    b.Navigation("ContractTerms");
 
                     b.Navigation("ObligationMonths");
 

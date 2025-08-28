@@ -31,6 +31,7 @@ using Data.Services.SecurityAuthentication;
 using Data.Services.Utilities;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.Clause;
+using Entity.Infrastructure.Binder;
 using Mapster;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
@@ -102,7 +103,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IRolUserRepository,  RolUserRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IContractRepository, ContractRepository>();
-            services.AddScoped<IContractTermsRepository, ContractTermsRepository>();
+            //services.AddScoped<IContractTermsRepository, ContractTermsRepository>();
             services.AddScoped<IPremisesLeasedRepository, PremisesLeasedRepository>();
 
 
@@ -134,7 +135,21 @@ namespace WebGESCOMPAH.Extensions
             services.AddSingleton<IExceptionHandler, DbUpdateExceptionHandler>();     
             services.AddSingleton<IExceptionHandler, HttpRequestExceptionHandler>();  
             services.AddSingleton<IExceptionHandler, ExternalServiceExceptionHandler>();
-            services.AddSingleton<IExceptionHandler, DefaultExceptionHandler>();      
+            services.AddSingleton<IExceptionHandler, DefaultExceptionHandler>();
+
+
+            services
+            .AddControllers(options =>
+            {
+                options.ModelBinderProviders.Insert(0, new FlexibleDecimalModelBinderProvider());
+            })
+            .AddJsonOptions(o =>
+            {
+                // por si llega JSON con números como string
+                o.JsonSerializerOptions.NumberHandling =
+                    System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
+            });
+
 
             return services;
         }

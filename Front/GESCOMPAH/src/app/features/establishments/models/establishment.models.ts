@@ -5,6 +5,7 @@ export interface EstablishmentSelect {
   description: string;
   areaM2: number;
   rentValueBase: number;
+  uvtQty: number;
   address: string;
   plazaId: number;
   plazaName: string;
@@ -17,6 +18,7 @@ export interface EstablishmentCreate {
   description: string;
   areaM2: number;
   rentValueBase: number;
+  uvtQty: number;
   plazaId: number;
   address?: string;
   files?: File[];          // <-- la colección de archivos nuevos (máx 5)
@@ -33,6 +35,7 @@ export interface EstablishmentUpdate {
   description?: string;
   areaM2?: number;
   rentValueBase?: number;
+  uvtQty?: number;
   plazaId?: number;
   address?: string;
 

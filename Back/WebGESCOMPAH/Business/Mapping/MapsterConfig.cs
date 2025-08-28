@@ -94,9 +94,9 @@ namespace Business.Mapping
                 .Map(dest => dest.StartDate, src => src.StartDate)
                 .Map(dest => dest.EndDate, src => src.EndDate);
 
-            TypeAdapterConfig<ContractCreateDto, ContractTerms>.NewConfig()
-                .Map(dest => dest.UvtQty, src => src.UvtQty)
-                .Map(dest => dest.UseSystemParameters, src => src.UseSystemParameters);
+            //TypeAdapterConfig<ContractCreateDto, ContractTerms>.NewConfig()
+            //    .Map(dest => dest.UvtQty, src => src.UvtQty)
+            //    .Map(dest => dest.UseSystemParameters, src => src.UseSystemParameters);
 
 
             TypeAdapterConfig<Contract, ContractSelectDto>.NewConfig()
@@ -104,9 +104,9 @@ namespace Business.Mapping
                 .Map(dest => dest.Document, src => src.Person.Document)
                 .Map(dest => dest.Phone, src => src.Person.Phone)
                 .Map(dest => dest.PremisesLeased, src => src.PremisesLeased)
-                .Map(dest => dest.Email, src => src.Person.User != null ? src.Person.User.Email : string.Empty)
+                .Map(dest => dest.Email, src => src.Person.User != null ? src.Person.User.Email : string.Empty);
 
-                .Map(dest => dest.Terms, src => src.ContractTerms.FirstOrDefault());
+                //.Map(dest => dest.Terms, src => src.ContractTerms.FirstOrDefault());
 
 
 
