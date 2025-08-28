@@ -1,12 +1,12 @@
-﻿    using Data.Interfaz.IDataImplemenent.Business;
-    using Data.Interfaz.IDataImplemenent.Utilities;
-    using Data.Repository;
-    using Entity.Domain.Models.Implements.Business;
-    using Entity.Domain.Models.Implements.Utilities;
-    using Entity.Infrastructure.Context;
-    using Microsoft.EntityFrameworkCore;
+﻿using Data.Interfaz.IDataImplement.Business;
+using Data.Interfaz.IDataImplement.Utilities;
+using Data.Repository;
+using Entity.Domain.Models.Implements.Business;
+using Entity.Domain.Models.Implements.Utilities;
+using Entity.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
-    namespace Data.Services.Business
+namespace Data.Services.Business
     {
         public class EstablishmentsRepository : DataGeneric<Establishment>, IEstablishmentsRepository
         {

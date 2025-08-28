@@ -64,32 +64,34 @@ export class EstablishmentService {
   private buildFormData(dto: EstablishmentCreate | EstablishmentUpdate): FormData {
     const data = new FormData();
 
-    /* ---------------------------------  Campos básicos  -------------------------------- */
+    // -------- Campos básicos --------
     if (dto.name) data.append('name', dto.name);
     if (dto.description) data.append('description', dto.description);
+
     if (dto.areaM2 !== undefined) data.append('areaM2', dto.areaM2.toString());
+    if (dto.uvtQty !== undefined) data.append('uvtQty', dto.uvtQty.toString());          // <-- FALTABA
     if (dto.rentValueBase !== undefined) data.append('rentValueBase', dto.rentValueBase.toString());
+
     if (dto.plazaId !== undefined) data.append('plazaId', dto.plazaId.toString());
     if (dto.address !== null && dto.address !== undefined) data.append('address', dto.address);
 
-    /* ---------------------------------  Campos de actualización (opcional)  -------------------------------- */
+    // -------- Update opcional --------
     if ('id' in dto) data.append('id', dto.id.toString());
 
-    /* ---------------------------------  Imágenes  -------------------------------- */
-    // 4️⃣  Nuevas imágenes (Crear y Update comparten la misma lógica)
+    // -------- Imágenes --------
     if ('files' in dto && dto.files?.length) {
-      // Create – propiedad Files
-      dto.files.forEach(file => data.append('files', file, file.name));
+      dto.files.forEach(f => data.append('files', f, f.name));
     } else if ('images' in dto && dto.images?.length) {
-      // Update – propiedad Images
-      dto.images.forEach(file => data.append('images', file, file.name));
+      dto.images.forEach(f => data.append('images', f, f.name));
     }
 
-    // 5️⃣  Lista de publicId a borrar (solo en Update)
     if ('imagesToDelete' in dto && dto.imagesToDelete?.length) {
+      // Si tu backend NO espera JSON, envíalas una por una:
+      // dto.imagesToDelete.forEach(x => data.append('imagesToDelete', x));
       data.append('imagesToDelete', JSON.stringify(dto.imagesToDelete));
     }
 
     return data;
   }
+
 }

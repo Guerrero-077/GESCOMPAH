@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplemenent.AdministrationSystem;
+﻿using Data.Interfaz.IDataImplement.AdministrationSystem;
 using Data.Repository;
 using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.SecurityAuthentication;

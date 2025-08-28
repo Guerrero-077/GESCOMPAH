@@ -82,44 +82,32 @@ export class TenantsListComponent implements OnInit {
   }
 
   onEdit(row: TenantsSelectModel) {
-    this.tenantsService.getById(row.id).subscribe({
-      next: (detail: TenantsSelectModel) => {
-        const data: TenantFormData = {
-          mode: 'edit',
-          tenant: detail
-        };
+    const data: TenantFormData = {
+      mode: 'edit',
+      tenant: row
+    };
 
-        const ref = this.dialog.open(TenantsFormDialogComponent, { width: '720px', data });
-        ref.afterClosed().subscribe(payload => {
-          if (!payload) return;
-          this.tenantsService.update(row.id, payload).subscribe({
-            next: () => {
-              this.load();
-              this.sweetAlertService.showNotification(
-                'Éxito',
-                'Usuario actualizado exitosamente.',
-                'success'
-              );
-            },
-            error: err => {
-              console.error('Error al actualizar:', err);
-              this.sweetAlertService.showNotification(
-                'Error',
-                'No se pudo actualizar el usuario.',
-                'error'
-              );
-            }
-          });
-        });
-      },
-      error: err => {
-        console.error('No se pudo cargar el detalle del usuario:', err);
-        this.sweetAlertService.showNotification(
-          'Error',
-          'No se pudo cargar el detalle del usuario.',
-          'error'
-        );
-      }
+    const ref = this.dialog.open(TenantsFormDialogComponent, { width: '720px', data });
+    ref.afterClosed().subscribe(payload => {
+      if (!payload) return;
+      this.tenantsService.update(row.id, payload).subscribe({
+        next: () => {
+          this.load();
+          this.sweetAlertService.showNotification(
+            'Éxito',
+            'Usuario actualizado exitosamente.',
+            'success'
+          );
+        },
+        error: err => {
+          console.error('Error al actualizar:', err);
+          this.sweetAlertService.showNotification(
+            'Error',
+            'No se pudo actualizar el usuario.',
+            'error'
+          );
+        }
+      });
     });
   }
 

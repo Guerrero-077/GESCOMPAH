@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements.SecrutityAuthentication;
+﻿using Business.Interfaces.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.RolUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

@@ -1,4 +1,5 @@
 ﻿using Entity.Domain.Models.Implements.Business;
+using Entity.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -6,6 +7,7 @@ namespace Entity.Infrastructure.DataInit.Business
 {
     public class AppointmentSeeder : IEntityTypeConfiguration<Appointment>
     {
+
         public void Configure(EntityTypeBuilder<Appointment> builder)
         {
             var seedDate = new DateTime(2025, 01, 01);
@@ -21,6 +23,7 @@ namespace Entity.Infrastructure.DataInit.Business
                     RequestDate = seedDate,
                     DateTimeAssigned = seedDate.AddDays(3).AddHours(10),
                     EstablishmentId = 1,
+                    Status = 1,
                     CreatedAt = seedDate,
                     Active = true,
                     IsDeleted = false
@@ -35,6 +38,7 @@ namespace Entity.Infrastructure.DataInit.Business
                     RequestDate = seedDate.AddDays(1),
                     DateTimeAssigned = seedDate.AddDays(4).AddHours(11),
                     EstablishmentId = 2,
+                    Status = 1,
                     CreatedAt = seedDate.AddDays(1),
                     Active = true,
                     IsDeleted = false
@@ -49,6 +53,7 @@ namespace Entity.Infrastructure.DataInit.Business
                     RequestDate = seedDate.AddDays(2),
                     DateTimeAssigned = seedDate.AddDays(5).AddHours(9),
                     EstablishmentId = 3,
+                    Status = 1,
                     CreatedAt = seedDate.AddDays(2),
                     Active = true,
                     IsDeleted = false

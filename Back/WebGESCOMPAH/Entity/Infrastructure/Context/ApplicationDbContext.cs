@@ -17,30 +17,6 @@ namespace Entity.Infrastructure.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            modelBuilder.Entity<User>()
-             .HasOne(u => u.Person)
-             .WithOne(p => p.User)
-             .HasForeignKey<User>(u => u.PersonId)
-             .OnDelete(DeleteBehavior.Cascade); // o Restrict si no quieres borrado en cascada
-
-            modelBuilder.Entity<Images>(e =>
-            {
-                e.HasOne(i => i.Establishment)
-                 .WithMany(e => e.Images)
-                 .HasForeignKey(i => i.EstablishmentId)
-                 .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            modelBuilder.Entity<RefreshToken>(ent =>
-            {
-                ent.HasKey(e => e.Id);
-                ent.HasIndex(e => e.TokenHash).IsUnique(false);
-                ent.HasIndex(e => e.UserId);
-                ent.Property(e => e.TokenHash).IsRequired().HasMaxLength(128);
-            });
-
-            //Data init
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Images>().HasQueryFilter(img => !img.IsDeleted);
             //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
@@ -48,7 +24,23 @@ namespace Entity.Infrastructure.Context
 
             // Apply configurations from the assembly where UserConfiguration is defined
             //modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+
+
+            /// <summary>
+            /// Aplica automáticamente todas las configuraciones de entidades que implementan
+            /// <c>IEntityTypeConfiguration&lt;TEntity&gt;</c> desde el ensamblado donde se encuentra <see cref="UserConfiguration" />.
+            /// </summary>
+            /// <remarks>
+            /// Este método escanea el ensamblado especificado y registra todas las clases que implementan
+            /// <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{TEntity}" />.
+            /// 
+            /// ✅ Beneficios:
+            /// - Evita registrar cada configuración manualmente (como <c>modelBuilder.ApplyConfiguration(new XConfiguration())</c>).
+            /// - Escalable: al agregar nuevas entidades/configuraciones, se aplican automáticamente.
+            /// - Limpieza y mantenibilidad en <see cref="DbContext" 
+            /// </remarks>
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+
 
         }
 
@@ -71,5 +63,11 @@ namespace Entity.Infrastructure.Context
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
         public DbSet<SystemParameter> systemParameters { get; set; }
+
+        public DbSet<Contract> contracts { get; set; }
+        //public DbSet<ContractTerms> ContractTerms { get; set; }
+        public DbSet<PremisesLeased> premisesLeaseds { get; set; }
+        public DbSet<Clause> clauses { get; set; }  
+        public DbSet<ContractClause> contractClauses { get; set; }   
     }
 }

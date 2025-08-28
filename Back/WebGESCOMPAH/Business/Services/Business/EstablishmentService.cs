@@ -1,7 +1,7 @@
 ﻿using Business.Interfaces.Implements.Business;
 using Business.Repository;
-using Data.Interfaz.IDataImplemenent.Business;
-using Data.Interfaz.IDataImplemenent.Utilities;
+using Data.Interfaz.IDataImplement.Business;
+using Data.Interfaz.IDataImplement.Utilities;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Utilities;
 using Entity.DTOs.Implements.Business.EstablishmentDto;

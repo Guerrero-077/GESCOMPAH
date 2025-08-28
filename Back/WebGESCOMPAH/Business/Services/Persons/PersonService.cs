@@ -1,8 +1,8 @@
 ﻿using Business.Interfaces.Implements.Persons;
 using Business.Repository;
-using Data.Interfaz.IDataImplemenent.Persons;
+using Data.Interfaz.IDataImplement.Persons;
 using Entity.Domain.Models.Implements.Persons;
-using Entity.DTOs.Implements.Persons.Peron;
+using Entity.DTOs.Implements.Persons.Person;
 using MapsterMapper;
 using Utilities.Exceptions;
 
@@ -32,7 +32,7 @@ public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonU
         var created = await Data.AddAsync(entity);
 
         // Recargar con navegación (City, si aplica)
-        var reloaded = await _personRepository.GetByIdWithCityAsync(created.Id) ?? created;
+        var reloaded = await _personRepository.GetByIdAsync(created.Id) ?? created;
 
         // Mapear Entidad -> SelectDto
         return _mapper.Map<PersonSelectDto>(reloaded);
@@ -46,20 +46,21 @@ public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonU
         var existing = await Data.GetByIdAsync(dto.Id)
             ?? throw new BusinessException("Persona no encontrada.");
 
-        // Si cambia el documento, validar que el nuevo no esté duplicado
-        if (!string.Equals(existing.Document, dto.Document, StringComparison.OrdinalIgnoreCase)
-            && await _personRepository.ExistsByDocumentAsync(dto.Document))
-        {
-            throw new BusinessException("Ya existe otra persona con ese número de documento.");
-        }
-
         // Mapear los nuevos valores al entity existente
         _mapper.Map(dto, existing); // Respeta IgnoreNullValues si lo configuraste en Mapster
 
         await Data.UpdateAsync(existing);
 
-        var reloaded = await _personRepository.GetByIdWithCityAsync(existing.Id) ?? existing;
+        var reloaded = await _personRepository.GetByIdAsync(existing.Id) ?? existing;
 
         return _mapper.Map<PersonSelectDto>(reloaded);
     }
+
+
+    public async Task<PersonSelectDto?> GetByDocumentAsync(string document)
+    {
+        var person = await _personRepository.GetByDocumentAsync(document);
+        return person is null ? null : _mapper.Map<PersonSelectDto>(person);
+    }
+
 }

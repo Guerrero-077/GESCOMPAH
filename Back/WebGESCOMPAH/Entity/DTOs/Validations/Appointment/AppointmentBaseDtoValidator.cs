@@ -17,7 +17,7 @@ namespace Entity.DTOs.Validations.Appointment
 
             RuleFor(x => x.Phone)
                 .NotEmpty().WithMessage("El teléfono es obligatorio.")
-                .Matches("^\\+\\d{7,15}$").WithMessage("Formato de teléfono inválido.");
+                .Matches("^\\+?\\d{7,15}$").WithMessage("Formato de teléfono inválido.");
 
             RuleFor(x => x.Description)
                 .NotEmpty().WithMessage("La descripción es obligatoria.")

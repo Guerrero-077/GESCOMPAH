@@ -1,20 +1,30 @@
-using FluentValidation;
 using Entity.DTOs.Implements.Location.City;
+using Entity.DTOs.Implements.Location.Department;
+using FluentValidation;
+using System.Text.RegularExpressions;
 
 namespace Entity.DTOs.Validations.City
 {
-    public class CityUpdateDtoValidator : CityDtoBaseValidator<CityUpdateDto>
+    public class DepartmentUpdateDtoValidator : AbstractValidator<DepartmentUpdateDto>
     {
-        public CityUpdateDtoValidator()
+        public DepartmentUpdateDtoValidator()
         {
-            // Asumiendo que BaseDto expone la propiedad Id
             RuleFor(x => x.Id)
-                .GreaterThan(0)
-                .WithMessage("El identificador de la ciudad es inválido.");
+                .GreaterThan(0).WithMessage("El identificador del departamento es invï¿½lido.");
 
-            RuleFor(x => x.DepartmentId)
-                .GreaterThan(0)
-                .WithMessage("El departamento es obligatorio.");
+            RuleFor(x => x.Name)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty().WithMessage("El nombre es obligatorio.")
+                .Must(v => !string.IsNullOrWhiteSpace(v))
+                    .WithMessage("El nombre no puede estar en blanco.")
+                .Must(v => v == v.Trim())
+                    .WithMessage("El nombre no debe iniciar ni terminar con espacios.")
+                .Length(2, 80)
+                    .WithMessage("El nombre debe tener entre 2 y 80 caracteres.")
+                .Matches(@"^[A-Za-zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'\.\- ]+$")
+                    .WithMessage("El nombre solo puede contener letras, espacios, apï¿½strofes, puntos y guiones.")
+                .Must(v => !Regex.IsMatch(v, @"\s{2,}"))
+                    .WithMessage("El nombre no debe contener espacios consecutivos.");
         }
     }
 }

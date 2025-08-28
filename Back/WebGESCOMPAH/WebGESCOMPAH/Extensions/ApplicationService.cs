@@ -1,24 +1,26 @@
 ﻿using Business.CustomJWT;
 using Business.Interfaces;
+using Business.Interfaces.IBusiness;
 using Business.Interfaces.Implements.AdministrationSystem;
 using Business.Interfaces.Implements.Business;
 using Business.Interfaces.Implements.Location;
 using Business.Interfaces.Implements.Persons;
-using Business.Interfaces.Implements.SecrutityAuthentication;
+using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Interfaces.Implements.Utilities;
 using Business.Mapping;
+using Business.Repository;
 using Business.Services.AdministrationSystem;
 using Business.Services.Business;
 using Business.Services.Location;
-using Business.Services.SecrutityAuthentication;
+using Business.Services.SecurityAuthentication;
 using Business.Services.Utilities;
 using Data.Interfaz.DataBasic;
-using Data.Interfaz.IDataImplemenent.AdministrationSystem;
-using Data.Interfaz.IDataImplemenent.Business;
-using Data.Interfaz.IDataImplemenent.Location;
-using Data.Interfaz.IDataImplemenent.Persons;
-using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
-using Data.Interfaz.IDataImplemenent.Utilities;
+using Data.Interfaz.IDataImplement.AdministrationSystem;
+using Data.Interfaz.IDataImplement.Business;
+using Data.Interfaz.IDataImplement.Location;
+using Data.Interfaz.IDataImplement.Persons;
+using Data.Interfaz.IDataImplement.SecurityAuthentication;
+using Data.Interfaz.IDataImplement.Utilities;
 using Data.Interfaz.Security;
 using Data.Repository;
 using Data.Services.AdministratiosSystem;
@@ -27,6 +29,9 @@ using Data.Services.Location;
 using Data.Services.Persons;
 using Data.Services.SecurityAuthentication;
 using Data.Services.Utilities;
+using Entity.Domain.Models.Implements.Business;
+using Entity.DTOs.Implements.Business.Clause;
+using Entity.Infrastructure.Binder;
 using Mapster;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
@@ -69,6 +74,13 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<ISystemParameterService, SystemParameterService>();
 
+            services.AddScoped<IContractService, ContractService>(); 
+
+            services.AddScoped<IClauseService, ClauseService>();
+            services.AddScoped<IContractClauseService, ContractClauseService>();
+
+
+
 
             //Mapping
             services.AddMapster();
@@ -90,6 +102,11 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IFormModuleRepository, FormModuleRepository>();
             services.AddScoped<IRolUserRepository,  RolUserRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IContractRepository, ContractRepository>();
+            //services.AddScoped<IContractTermsRepository, ContractTermsRepository>();
+            services.AddScoped<IPremisesLeasedRepository, PremisesLeasedRepository>();
+
+
 
 
 
@@ -118,7 +135,21 @@ namespace WebGESCOMPAH.Extensions
             services.AddSingleton<IExceptionHandler, DbUpdateExceptionHandler>();     
             services.AddSingleton<IExceptionHandler, HttpRequestExceptionHandler>();  
             services.AddSingleton<IExceptionHandler, ExternalServiceExceptionHandler>();
-            services.AddSingleton<IExceptionHandler, DefaultExceptionHandler>();      
+            services.AddSingleton<IExceptionHandler, DefaultExceptionHandler>();
+
+
+            services
+            .AddControllers(options =>
+            {
+                options.ModelBinderProviders.Insert(0, new FlexibleDecimalModelBinderProvider());
+            })
+            .AddJsonOptions(o =>
+            {
+                // por si llega JSON con números como string
+                o.JsonSerializerOptions.NumberHandling =
+                    System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
+            });
+
 
             return services;
         }

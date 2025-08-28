@@ -12,38 +12,52 @@ import { EstablishmentCreate, EstablishmentSelect, EstablishmentUpdate, ImageSel
 import { EstablishmentStore } from '../../services/establishment/establishment.store';
 import { ImageService } from '../../services/image/image.service';
 import { SquareService } from '../../services/square/square.service';
-import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { SquareSelectModel } from '../../models/squares.models';
 import { ImagePreviewDialogComponent } from '../image-preview-dialog-component/image-preview-dialog-component.component';
 
+// ========================
+// Validadores
+// ========================
 function notOnlySpaces() {
   return (c: AbstractControl): ValidationErrors | null => {
-    const v = (c.value ?? '') as string;
-    if (v == null) return null;
-    return v.trim().length === 0 ? { onlySpaces: true } : null;
-  };
-}
-function decimalScale(maxDecimals = 2) {
-  const regex = new RegExp(`^\\d+(?:\\.\\d{1,${maxDecimals}})?$`);
-  return (c: AbstractControl): ValidationErrors | null => {
     const v = c.value;
+    // si está vacío, deja el "required" como único error
     if (v === null || v === undefined || v === '') return null;
-    return regex.test(String(v)) ? null : { decimalScale: { max: maxDecimals } };
+    return String(v).trim().length === 0 ? { onlySpaces: true } : null;
   };
 }
+
+// Acepta "23.5" o "23,5" y limita a N decimales
+function twoDecimals(max = 2) {
+  return (c: AbstractControl): ValidationErrors | null => {
+    const raw = c.value;
+    if (raw === null || raw === undefined || raw === '') return null;
+
+    const s = String(raw).trim().replace(',', '.'); // normaliza coma→punto
+    // Debe lucir como número decimal básico
+    if (!/^\d+(\.\d+)?$/.test(s)) return { NaN: true };
+
+    const [, decimals] = s.split('.');
+    if (decimals && decimals.length > max) return { decimalScale: { max } };
+    return null;
+  };
+}
+
 function numberRange(min?: number, max?: number) {
   return (c: AbstractControl): ValidationErrors | null => {
     const raw = c.value;
     if (raw === null || raw === undefined || raw === '') return null;
-    const n = Number(raw);
+    const n = Number(String(raw).replace(',', '.')); // soporta coma
     if (Number.isNaN(n)) return { NaN: true };
     if (min !== undefined && n < min) return { min: { min, actual: n } };
     if (max !== undefined && n > max) return { max: { max, actual: n } };
     return null;
   };
 }
+
 function addressPattern() {
-  const regex = /^[\p{L}\d\s#\-,\.]+$/u;
+  const regex = /^[\p{L}\d\s#\-,.]+$/u;
   return (c: AbstractControl): ValidationErrors | null => {
     const v = (c.value ?? '') as string;
     if (!v) return null;
@@ -82,7 +96,7 @@ export class FormEstablishmentComponent {
   readonly MAX_FILE_SIZE_BYTES = this.MAX_FILE_SIZE_MB * 1024 * 1024;
 
   selectedFiles: File[] = [];
-  imagesPreview: string[] = [];           // nuevas (dataURL)
+  imagesPreview: string[] = [];              // nuevas (dataURL)
   existingImagesFull: ImageSelectDto[] = []; // existentes
   existingImagesToDelete: string[] = [];
 
@@ -92,6 +106,7 @@ export class FormEstablishmentComponent {
     name: { required: 'El nombre es obligatorio.', maxlength: 'El nombre no puede superar 100 caracteres.', onlySpaces: 'El nombre no puede ser solo espacios.' },
     description: { required: 'La descripción es obligatoria.', maxlength: 'La descripción no puede superar 500 caracteres.', onlySpaces: 'La descripción no puede ser solo espacios.' },
     rentValueBase: { required: 'El valor base es obligatorio.', NaN: 'Ingresa un número válido.', min: 'El valor base no puede ser menor que 1.', max: 'El valor base es demasiado alto.', decimalScale: 'Máximo 2 decimales permitidos.' },
+    uvtQty: { required: 'La cantidad de UVT es obligatoria.', NaN: 'Ingresa un número válido.', min: 'La cantidad UVT no puede ser menor que 1.', max: 'La cantidad UVT es demasiado alta.', decimalScale: 'Máximo 2 decimales permitidos.' },
     areaM2: { required: 'El área es obligatoria.', NaN: 'Ingresa un número válido.', min: 'El área no puede ser menor que 1 m².', max: 'El área es demasiado alta.', decimalScale: 'Máximo 2 decimales permitidos.' },
     plazaId: { required: 'La plaza es obligatoria.' },
     address: { maxlength: 'La dirección no puede superar 150 caracteres.', addressInvalid: 'Usa solo letras, números, espacios y # - , .' }
@@ -104,7 +119,7 @@ export class FormEstablishmentComponent {
     private plazasSrv: SquareService,
     private dialogRef: MatDialogRef<FormEstablishmentComponent>,
     private sweetAlert: SweetAlertService,
-    private dialog: MatDialog, // <-- MatDialog para abrir preview
+    private dialog: MatDialog,
     @Optional() @Inject(MAT_DIALOG_DATA) public data?: EstablishmentSelect
   ) {
     this.isEdit = !!data?.id;
@@ -121,17 +136,24 @@ export class FormEstablishmentComponent {
   }
 
   private startForms(): void {
-    this.generalGroup = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(100), notOnlySpaces()]],
-      description: ['', [Validators.required, Validators.maxLength(500), notOnlySpaces()]],
-      rentValueBase: [null, [Validators.required, numberRange(1, 9_999_999.99), decimalScale(2)]],
-      areaM2: [null, [Validators.required, numberRange(1, 1_000_000), decimalScale(2)]],
-    });
+    this.generalGroup = this.fb.group(
+      {
+        name: ['', [Validators.required, Validators.maxLength(100), notOnlySpaces()]],
+        description: ['', [Validators.required, Validators.maxLength(500), notOnlySpaces()]],
+        rentValueBase: [null, [Validators.required, numberRange(1, 9_999_999.99), twoDecimals(2)]],
+        uvtQty: [null, [Validators.required, numberRange(1, 9999), twoDecimals(2)]],
+        areaM2: [null, [Validators.required, numberRange(1, 1_000_000), twoDecimals(2)]],
+      },
+      { updateOn: 'blur' } // valida al salir del campo
+    );
 
-    this.ubicacionGroup = this.fb.group({
-      plazaId: [null, Validators.required],
-      address: ['', [Validators.maxLength(150), addressPattern()]],
-    });
+    this.ubicacionGroup = this.fb.group(
+      {
+        plazaId: [null, Validators.required],
+        address: ['', [Validators.maxLength(150), addressPattern()]],
+      },
+      { updateOn: 'blur' }
+    );
   }
 
   private patchValues(): void {
@@ -141,6 +163,7 @@ export class FormEstablishmentComponent {
       description: this.data.description,
       areaM2: this.data.areaM2,
       rentValueBase: this.data.rentValueBase,
+      uvtQty: this.data.uvtQty,
     });
     this.ubicacionGroup.patchValue({
       plazaId: this.data.plazaId,
@@ -156,13 +179,17 @@ export class FormEstablishmentComponent {
     const trimmed = v.trim().replace(/\s+/g, ' ');
     if (trimmed !== v) control.setValue(trimmed);
   }
+
   onNumberBlur(control: AbstractControl | null) {
     if (!control) return;
     const v = control.value;
     if (v === null || v === undefined || v === '') return;
-    const n = Number(v);
-    if (!Number.isNaN(n)) control.setValue(n);
-    control.updateValueAndValidity();
+
+    // Normaliza coma → punto, castea a number y revalida
+    const s = String(v).replace(',', '.');
+    const n = Number(s);
+    if (!Number.isNaN(n)) control.setValue(n, { emitEvent: false });
+    control.updateValueAndValidity({ emitEvent: false });
   }
 
   // ========================
@@ -241,15 +268,11 @@ export class FormEstablishmentComponent {
   // ========================
   // PREVIEW EN DIALOG
   // ========================
-
-  /** Construye la galería combinada y devuelve el índice real */
   private getCombinedGallery(clickedIndex: number, isExisting: boolean){
     const existingSources = this.existingImagesFull.map(x => x.filePath);
     const newSources = this.imagesPreview;
     const sources = [...existingSources, ...newSources];
-
     const index = isExisting ? clickedIndex : existingSources.length + clickedIndex;
-
     return { sources, index };
   }
 
@@ -299,6 +322,7 @@ export class FormEstablishmentComponent {
           description: base.description,
           areaM2: base.areaM2,
           rentValueBase: base.rentValueBase,
+          uvtQty: base.uvtQty,
           plazaId: loc.plazaId,
           address: loc.address,
           images: this.selectedFiles.length ? this.selectedFiles : undefined,
@@ -309,6 +333,7 @@ export class FormEstablishmentComponent {
           description: base.description,
           areaM2: base.areaM2,
           rentValueBase: base.rentValueBase,
+          uvtQty: base.uvtQty,
           plazaId: loc.plazaId,
           address: loc.address,
           files: this.selectedFiles.length ? this.selectedFiles : undefined,

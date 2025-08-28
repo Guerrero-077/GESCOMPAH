@@ -1,6 +1,5 @@
 ﻿using Business.Interfaces;
-using Business.Interfaces.Implements.SecrutityAuthentication;
-using Business.Services.SecrutityAuthentication;
+using Business.Interfaces.Implements.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Auth.RestPasword;
@@ -42,16 +41,16 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
             _logger = logger;
         }
 
-        [HttpPost("register")]
-        [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Registrarse([FromBody] RegisterDto objeto)
-        {
-            await _authService.RegisterAsync(objeto);
-            return Ok(new { isSuccess = true });
-        }
+        //[HttpPost("register")]
+        //[AllowAnonymous]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //public async Task<IActionResult> Registrarse([FromBody] RegisterDto objeto)
+        //{
+        //    await _authService.RegisterAsync(objeto);
+        //    return Ok(new { isSuccess = true });
+        //}
 
         /// <summary>Login: genera access + refresh + csrf, guarda cookies HttpOnly.</summary>
         [HttpPost("login")]
@@ -172,23 +171,23 @@ namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
         }
 
         /// <summary>Revoca el refresh token actual (si existe) y elimina la cookie.</summary>
-        [HttpPost("revoke-token")]
-        [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RevokeToken()
-        {
-            var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenName];
-            if (string.IsNullOrWhiteSpace(refreshToken))
-                return BadRequest(new { message = "No hay refresh token" });
+        //[HttpPost("revoke-token")]
+        //[AllowAnonymous]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //public async Task<IActionResult> RevokeToken()
+        //{
+        //    var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenName];
+        //    if (string.IsNullOrWhiteSpace(refreshToken))
+        //        return BadRequest(new { message = "No hay refresh token" });
 
-            await _tokenService.RevokeRefreshTokenAsync(refreshToken);
+        //    await _tokenService.RevokeRefreshTokenAsync(refreshToken);
 
-            var now = DateTime.UtcNow;
-            Response.Cookies.Delete(_cookieSettings.RefreshTokenName, _cookieFactory.RefreshCookieOptions(now));
+        //    var now = DateTime.UtcNow;
+        //    Response.Cookies.Delete(_cookieSettings.RefreshTokenName, _cookieFactory.RefreshCookieOptions(now));
 
-            return Ok(new { message = "Refresh token revocado" });
-        }
+        //    return Ok(new { message = "Refresh token revocado" });
+        //}
 
         [HttpPost("recuperar/enviar-codigo")]
         [AllowAnonymous]

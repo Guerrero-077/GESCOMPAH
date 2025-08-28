@@ -1,4 +1,6 @@
-﻿namespace Entity.DTOs.Implements.Business.Appointment
+﻿using Entity.Enum;
+
+namespace Entity.DTOs.Implements.Business.Appointment
 {
     public class AppointmentCreateDto : IAppointmentDto
     {
@@ -9,5 +11,6 @@
         public string Description { get; set; } = null!;
         public DateTime RequestDate { get; set; }
         public DateTime DateTimeAssigned { get; set; }
+        public int status { get; set; }
     }
 }

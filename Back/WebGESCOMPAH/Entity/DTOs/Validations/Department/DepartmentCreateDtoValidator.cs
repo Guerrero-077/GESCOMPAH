@@ -1,13 +1,13 @@
-using FluentValidation;
 using Entity.DTOs.Implements.Location.Department;
 
 namespace Entity.DTOs.Validations.Department
 {
+    using FluentValidation;
     // Entity.DTOs.Validations/Location/Department/DepartmentCreateDtoValidator.cs
     using System.Text.RegularExpressions;
     using FluentValidation;
-    using Entity.DTOs.Implements.Location.City;
-    using Entity.DTOs.Implements.Location.Department;
+    //using Entity.DTOs.Implements.Location.City;
+    //using Entity.DTOs.Implements.Location.Department;
 
     namespace Entity.DTOs.Validations.Location.Department
     {
@@ -24,8 +24,8 @@ namespace Entity.DTOs.Validations.Department
                         .WithMessage("El nombre no debe iniciar ni terminar con espacios.")
                     .Length(2, 80)
                         .WithMessage("El nombre debe tener entre 2 y 80 caracteres.")
-                    .Matches(@"^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ'\.\- ]+$")
-                        .WithMessage("El nombre solo puede contener letras, espacios, apóstrofes, puntos y guiones.")
+                    .Matches(@"^[A-Za-zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'\.\- ]+$")
+                        .WithMessage("El nombre solo puede contener letras, espacios, apï¿½strofes, puntos y guiones.")
                     .Must(v => !Regex.IsMatch(v, @"\s{2,}"))
                         .WithMessage("El nombre no debe contener espacios consecutivos.");
 
@@ -43,8 +43,8 @@ namespace Entity.DTOs.Validations.Department
                             .WithMessage("El nombre de la ciudad no debe iniciar ni terminar con espacios.")
                         .Length(2, 80)
                             .WithMessage("El nombre de la ciudad debe tener entre 2 y 80 caracteres.")
-                        .Matches(@"^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ'\.\- ]+$")
-                            .WithMessage("El nombre de la ciudad solo puede contener letras, espacios, apóstrofes, puntos y guiones.")
+                        .Matches(@"^[A-Za-zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'\.\- ]+$")
+                            .WithMessage("El nombre de la ciudad solo puede contener letras, espacios, apï¿½strofes, puntos y guiones.")
                         .Must(v => !Regex.IsMatch(v, @"\s{2,}"))
                             .WithMessage("El nombre de la ciudad no debe contener espacios consecutivos.");
 

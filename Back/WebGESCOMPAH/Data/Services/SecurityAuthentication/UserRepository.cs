@@ -1,11 +1,11 @@
-﻿    using Data.Interfaz.IDataImplemenent.SecurityAuthentication;
-    using Data.Repository;
-    using Entity.Domain.Models.Implements.SecurityAuthentication;
-    using Entity.DTOs.Implements.SecurityAuthentication.Auth;
-    using Entity.Infrastructure.Context;
-    using Microsoft.EntityFrameworkCore;
+﻿using Data.Interfaz.IDataImplement.SecurityAuthentication;
+using Data.Repository;
+using Entity.Domain.Models.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.SecurityAuthentication.Auth;
+using Entity.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
-    namespace Data.Services.SecurityAuthentication
+namespace Data.Services.SecurityAuthentication
     {
         public class UserRepository : DataGeneric<User>, IUserRepository
         {
@@ -23,14 +23,14 @@
         }
 
         public override async Task<User?> GetByIdAsync(int id)
-            {
-                return await _dbSet
-                    .Include(u => u.Person)
-                        .ThenInclude(p => p.City)
-                    .Include(u => u.RolUsers)
-                        .ThenInclude(ru => ru.Rol)
-                    .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false);
-            }
+        {
+            return await _dbSet
+                .Include(u => u.Person)
+                    .ThenInclude(p => p.City)
+                .Include(u => u.RolUsers)
+                    .ThenInclude(ru => ru.Rol)
+                .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false);
+        }
 
             public async Task<User> LoginUser(LoginDto loginDto)
             {
@@ -75,5 +75,14 @@
                     .FirstOrDefaultAsync(u => u.Email == email && u.IsDeleted == false);
             }
 
+        public async Task<User?> GetByPersonIdAsync(int personId)
+        {
+            return await _dbSet
+                .Include(u => u.Person)
+                .Include(u => u.RolUsers)
+                    .ThenInclude(ru => ru.Rol)
+                .FirstOrDefaultAsync(u => u.PersonId == personId && !u.IsDeleted);
         }
+
     }
+}

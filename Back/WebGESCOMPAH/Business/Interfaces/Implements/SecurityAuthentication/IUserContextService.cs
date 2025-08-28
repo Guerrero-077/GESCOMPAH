@@ -1,6 +1,6 @@
 ﻿using Entity.DTOs.Implements.SecurityAuthentication.Me;
 
-namespace Business.Interfaces.Implements.SecrutityAuthentication
+namespace Business.Interfaces.Implements.SecurityAuthentication
 {
     public interface IUserContextService
     {
