@@ -10,10 +10,10 @@ namespace Business.Services.Business
 {
     public class AppointmentService(IAppointmentRepository data, IMapper mapper) : BusinessGeneric<AppointmentSelectDto, AppointmentCreateDto, AppointmentUpdateDto, Appointment>(data, mapper), IAppointmentService
     {
-        public async Task<bool> ChangesStatusAsync(int id, int status)
-        {
+        public async Task<bool> RejectedAppointment(int id)
+        { 
             BusinessValidationHelper.ThrowIfZeroOrLess(id, "El ID debe ser mayor que cero.");
-            return await data.ChangeStatusAsync(id, status);
+            return await data.RejectedAppointment(id);
         }
     }
 }

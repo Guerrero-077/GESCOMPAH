@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class initDataBase : Migration
+    public partial class DataBase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -251,6 +251,7 @@ namespace Entity.Migrations
                     AreaM2 = table.Column<double>(type: "float", nullable: false),
                     RentValueBase = table.Column<double>(type: "float", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UvtQty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PlazaId = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -458,30 +459,6 @@ namespace Entity.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_contractClauses_contracts_ContractId",
-                        column: x => x.ContractId,
-                        principalTable: "contracts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ContractTerms",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractId = table.Column<int>(type: "int", nullable: false),
-                    UvtQty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UseSystemParameters = table.Column<bool>(type: "bit", nullable: false),
-                    Active = table.Column<bool>(type: "bit", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ContractTerms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ContractTerms_contracts_ContractId",
                         column: x => x.ContractId,
                         principalTable: "contracts",
                         principalColumn: "Id",
@@ -727,12 +704,12 @@ namespace Entity.Migrations
 
             migrationBuilder.InsertData(
                 table: "Establishment",
-                columns: new[] { "Id", "Active", "Address", "AreaM2", "CreatedAt", "Description", "IsDeleted", "Name", "PlazaId", "RentValueBase" },
+                columns: new[] { "Id", "Active", "Address", "AreaM2", "CreatedAt", "Description", "IsDeleted", "Name", "PlazaId", "RentValueBase", "UvtQty" },
                 values: new object[,]
                 {
-                    { 1, true, "Cr 1 ", 500.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Establecimiento amplio con excelente ubicación.", false, "Centro Comercial Primavera", 1, 2500.0 },
-                    { 2, true, "Cr 1 ", 120.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Oficina moderna en zona empresarial.", false, "Oficina Torre Norte", 2, 1500.0 },
-                    { 3, true, "Cr 1 ", 1000.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Espacio para almacenamiento de gran capacidad.", false, "Bodega Industrial Sur", 1, 3000.0 }
+                    { 1, true, "Cr 1 ", 500.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Establecimiento amplio con excelente ubicación.", false, "Centro Comercial Primavera", 1, 2500.0, 0m },
+                    { 2, true, "Cr 1 ", 120.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Oficina moderna en zona empresarial.", false, "Oficina Torre Norte", 2, 1500.0, 0m },
+                    { 3, true, "Cr 1 ", 1000.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Espacio para almacenamiento de gran capacidad.", false, "Bodega Industrial Sur", 1, 3000.0, 0m }
                 });
 
             migrationBuilder.InsertData(
@@ -890,11 +867,6 @@ namespace Entity.Migrations
                 column: "PersonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ContractTerms_ContractId",
-                table: "ContractTerms",
-                column: "ContractId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Departments_Name",
                 table: "Departments",
                 column: "Name",
@@ -1030,9 +1002,6 @@ namespace Entity.Migrations
 
             migrationBuilder.DropTable(
                 name: "contractClauses");
-
-            migrationBuilder.DropTable(
-                name: "ContractTerms");
 
             migrationBuilder.DropTable(
                 name: "FormModules");
