@@ -12,8 +12,9 @@
       <div class="d-flex">
         <!-- Nombre -->
         <mat-form-field appearance="outline" class="w-100 me-3 mb-3">
-          <mat-label>Nombre</mat-label>
-          <input matInput formControlName="name" required (blur)="onTrim(generalGroup.get('name'))">
+          <mat-label>Nombre*</mat-label>
+          <input matInput formControlName="name" required
+                 (blur)="onTrim(generalGroup.get('name'))">
           <mat-error *ngIf="generalGroup.get('name')?.touched && generalGroup.get('name')?.errors as e">
             <ng-container *ngIf="e['required']">{{ errors.name.required }}</ng-container>
             <ng-container *ngIf="e['maxlength']">{{ errors.name.maxlength }}</ng-container>
@@ -22,10 +23,12 @@
         </mat-form-field>
 
         <!-- Área -->
-        <mat-form-field appearance="outline" class="w-100 mb-3">
-          <mat-label>Área (m²)</mat-label>
-          <input matInput type="number" formControlName="areaM2" required min="1"
-            (blur)="onNumberBlur(generalGroup.get('areaM2'))">
+        <mat-form-field appearance="outline" class="w-100 me-3 mb-3">
+          <mat-label>Área (m²)*</mat-label>
+          <input matInput type="number" inputmode="decimal" step="0.01" min="1"
+                 formControlName="areaM2" required
+                 (blur)="onNumberBlur(generalGroup.get('areaM2'))">
+          <mat-hint align="end">Máximo 2 decimales permitidos.</mat-hint>
           <mat-error *ngIf="generalGroup.get('areaM2')?.touched && generalGroup.get('areaM2')?.errors as e">
             <ng-container *ngIf="e['required']">{{ errors.areaM2.required }}</ng-container>
             <ng-container *ngIf="e['NaN']">{{ errors.areaM2.NaN }}</ng-container>
@@ -34,13 +37,31 @@
             <ng-container *ngIf="e['decimalScale']">{{ errors.areaM2.decimalScale }}</ng-container>
           </mat-error>
         </mat-form-field>
+
+        <!-- UVT -->
+        <mat-form-field appearance="outline" class="w-100 mb-3">
+          <mat-label>UVT*</mat-label>
+          <input matInput type="number" inputmode="decimal" step="0.01" min="1"
+                 formControlName="uvtQty" required
+                 (blur)="onNumberBlur(generalGroup.get('uvtQty'))">
+          <mat-hint align="end">Máximo 2 decimales permitidos.</mat-hint>
+          <mat-error *ngIf="generalGroup.get('uvtQty')?.touched && generalGroup.get('uvtQty')?.errors as e">
+            <ng-container *ngIf="e['required']">{{ errors.uvtQty.required }}</ng-container>
+            <ng-container *ngIf="e['NaN']">{{ errors.uvtQty.NaN }}</ng-container>
+            <ng-container *ngIf="e['min']">{{ errors.uvtQty.min }}</ng-container>
+            <ng-container *ngIf="e['max']">{{ errors.uvtQty.max }}</ng-container>
+            <ng-container *ngIf="e['decimalScale']">{{ errors.uvtQty.decimalScale }}</ng-container>
+          </mat-error>
+        </mat-form-field>
       </div>
 
       <!-- Valor base de arriendo -->
       <mat-form-field appearance="outline" class="w-100 mb-3">
-        <mat-label>Valor base de arriendo</mat-label>
-        <input matInput type="number" formControlName="rentValueBase" required min="1"
-          (blur)="onNumberBlur(generalGroup.get('rentValueBase'))">
+        <mat-label>Valor base de arriendo*</mat-label>
+        <input matInput type="number" inputmode="decimal" step="0.01" min="1"
+               formControlName="rentValueBase" required
+               (blur)="onNumberBlur(generalGroup.get('rentValueBase'))">
+        <mat-hint align="end">Máximo 2 decimales permitidos.</mat-hint>
         <mat-error *ngIf="generalGroup.get('rentValueBase')?.touched && generalGroup.get('rentValueBase')?.errors as e">
           <ng-container *ngIf="e['required']">{{ errors.rentValueBase.required }}</ng-container>
           <ng-container *ngIf="e['NaN']">{{ errors.rentValueBase.NaN }}</ng-container>
@@ -52,9 +73,9 @@
 
       <!-- Descripción -->
       <mat-form-field appearance="outline" class="w-100 mb-3">
-        <mat-label>Descripción</mat-label>
-        <textarea matInput formControlName="description" required rows="3"
-          (blur)="onTrim(generalGroup.get('description'))"></textarea>
+        <mat-label>Descripción*</mat-label>
+        <textarea matInput rows="3" formControlName="description" required
+                  (blur)="onTrim(generalGroup.get('description'))"></textarea>
         <mat-hint align="start">{{ generalGroup.get('description')?.value?.length || 0 }}/500</mat-hint>
         <mat-error *ngIf="generalGroup.get('description')?.touched && generalGroup.get('description')?.errors as e">
           <ng-container *ngIf="e['required']">{{ errors.description.required }}</ng-container>
@@ -81,7 +102,7 @@
 
       <!-- Plaza -->
       <mat-form-field appearance="outline" class="w-100 mb-3">
-        <mat-label>Plaza</mat-label>
+        <mat-label>Plaza*</mat-label>
         <mat-select formControlName="plazaId" required>
           <mat-option *ngFor="let plaza of Squares" [value]="plaza.id">
             {{ plaza.name }}
@@ -96,7 +117,7 @@
       <mat-form-field appearance="outline" class="w-100 mb-3">
         <mat-label>Dirección</mat-label>
         <input matInput formControlName="address" placeholder="Ej: Cra 10 # 12-34"
-          (blur)="onTrim(ubicacionGroup.get('address'))">
+               (blur)="onTrim(ubicacionGroup.get('address'))">
         <mat-error *ngIf="ubicacionGroup.get('address')?.touched && ubicacionGroup.get('address')?.errors as e">
           <ng-container *ngIf="e['maxlength']">{{ errors.address.maxlength }}</ng-container>
           <ng-container *ngIf="e['addressInvalid']">{{ errors.address.addressInvalid }}</ng-container>
@@ -120,9 +141,12 @@
     </div>
 
     <!-- Zona Drag & Drop -->
-    <div class="drop-zone" role="button" tabindex="0" (keydown.enter)="fileInput.click()"
-      (keydown.space)="fileInput.click()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
-      (drop)="onFileDropped($event)" [class.dragover]="isDragging" (click)="fileInput.click()">
+    <div class="drop-zone" role="button" tabindex="0"
+         (keydown.enter)="fileInput.click()"
+         (keydown.space)="fileInput.click()"
+         (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+         (drop)="onFileDropped($event)" [class.dragover]="isDragging"
+         (click)="fileInput.click()">
       <mat-icon>cloud_upload</mat-icon>
       <p>Arrastra imágenes aquí o haz clic para seleccionarlas</p>
       <small>Formatos soportados: JPG, PNG (Máx. 5 imágenes)</small>
@@ -138,12 +162,13 @@
     <div class="compact-image-grid">
       <!-- Imágenes existentes -->
       <div class="compact-image-container" *ngFor="let img of existingImagesFull; let i = index"
-        (dragstart)="$event.preventDefault()" (click)="openPreviewFromExisting(i)" role="button" tabindex="0"
-        (keydown.enter)="openPreviewFromExisting(i)" (keydown.space)="openPreviewFromExisting(i)">
+           (dragstart)="$event.preventDefault()" (click)="openPreviewFromExisting(i)"
+           role="button" tabindex="0"
+           (keydown.enter)="openPreviewFromExisting(i)" (keydown.space)="openPreviewFromExisting(i)">
         <img [src]="img.filePath" alt="Imagen existente" class="compact-image" draggable="false" />
         <div class="compact-image-actions">
           <button mat-icon-button color="warn" (click)="$event.stopPropagation(); removeImage(i, true)"
-            matTooltip="Eliminar">
+                  matTooltip="Eliminar">
             <mat-icon class="compact-icon">delete</mat-icon>
           </button>
         </div>
@@ -152,12 +177,13 @@
 
       <!-- Imágenes nuevas -->
       <div class="compact-image-container" *ngFor="let imgPath of imagesPreview; let i = index"
-        (dragstart)="$event.preventDefault()" (click)="openPreviewFromNew(i)" role="button" tabindex="0"
-        (keydown.enter)="openPreviewFromNew(i)" (keydown.space)="openPreviewFromNew(i)">
+           (dragstart)="$event.preventDefault()" (click)="openPreviewFromNew(i)"
+           role="button" tabindex="0"
+           (keydown.enter)="openPreviewFromNew(i)" (keydown.space)="openPreviewFromNew(i)">
         <img [src]="imgPath" alt="Vista previa" class="compact-image" draggable="false" />
         <div class="compact-image-actions">
           <button mat-icon-button color="warn" (click)="$event.stopPropagation(); removeImage(i, false)"
-            matTooltip="Eliminar">
+                  matTooltip="Eliminar">
             <mat-icon class="compact-icon">delete</mat-icon>
           </button>
         </div>
@@ -168,11 +194,10 @@
     <div class="d-flex justify-content-between mt-4">
       <button mat-button matStepperPrevious>Anterior</button>
       <button mat-raised-button color="primary" (click)="onSubmit()"
-        [disabled]="(selectedFiles.length + existingImagesFull.length) === 0 || isLoading">
+              [disabled]="(selectedFiles.length + existingImagesFull.length) === 0 || isLoading">
         <span *ngIf="!isLoading">{{ isEdit ? 'Actualizar' : 'Crear' }}</span>
         <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
       </button>
     </div>
   </mat-step>
 </mat-horizontal-stepper>
-```

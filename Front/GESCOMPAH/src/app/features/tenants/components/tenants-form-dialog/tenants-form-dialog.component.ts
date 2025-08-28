@@ -1,9 +1,8 @@
-// ...imports iguales...
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, DestroyRef, Inject, signal, computed } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
 import {
-  ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormControl
+  ReactiveFormsModule, FormBuilder, FormGroup, Validators,
+  AbstractControl, ValidationErrors, ValidatorFn, FormControl
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -12,13 +11,80 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
-import { BehaviorSubject, distinctUntilChanged, tap, switchMap, of, finalize, map, catchError } from 'rxjs';
+import { BehaviorSubject, catchError, distinctUntilChanged, finalize, map, of, switchMap, tap } from 'rxjs';
+
 import { RoleSelectModel } from '../../../security/models/role.models';
 import { RoleService } from '../../../security/services/role/role.service';
 import { CitySelectModel } from '../../../setting/models/city.models';
 import { CityService } from '../../../setting/services/city/city.service';
 import { DepartmentStore } from '../../../setting/services/department/department.store';
-import { TenantsCreateModel, TenantsSelectModel, TenantFormData } from '../../models/tenants.models';
+
+import { TenantFormData, TenantsCreateModel, TenantsSelectModel, TenantsUpdateModel } from '../../models/tenants.models';
+
+/* =======================
+   Validadores reutilizables (puros)
+   ======================= */
+function notOnlySpaces(): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null => {
+    const v = (c.value ?? '') as string;
+    if (v == null) return null;
+    return v.trim().length === 0 ? { onlySpaces: true } : null;
+  };
+}
+function alphaHumanName(): ValidatorFn {
+  const rx = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '’-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
+  return (c: AbstractControl): ValidationErrors | null => {
+    const v = String(c.value ?? '').trim();
+    if (!v) return null;
+    return rx.test(v) ? null : { alphaHuman: true };
+  };
+}
+function numericString(minLen: number, maxLen: number): ValidatorFn {
+  const rx = new RegExp(`^\d{${minLen},${maxLen}}$`);
+  return (c: AbstractControl): ValidationErrors | null => {
+    const v = String(c.value ?? '').trim();
+    if (!v) return null;
+    return rx.test(v) ? null : { numericString: true };
+  };
+}
+function phoneE164Like(): ValidatorFn {
+  const rx = /^\+?\d{7,15}$/;
+  return (c: AbstractControl): ValidationErrors | null => {
+    const v = String(c.value ?? '').trim();
+    if (!v) return null;
+    return rx.test(v) ? null : { phone: true };
+  };
+}
+function emailWithDotTld(): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null => {
+    const v = String(c.value ?? '').trim();
+    if (!v) return null;
+    const at = v.indexOf('@');
+    if (at < 0) return null; // deja que falle Validators.email primero
+    const domain = v.slice(at + 1);
+    if (!domain) return { domainMissing: true };
+    if (!/^[A-Za-z0-9.-]+$/.test(domain)) return { domainInvalid: true };
+    if (!domain.includes('.')) return { tldMissing: true };
+    const lastLabel = domain.split('.').pop() || '';
+    if (lastLabel.length < 2 || lastLabel.length > 24) return { tldInvalid: true };
+    return null;
+  };
+}
+
+/* =======================
+   Utils
+   ======================= */
+const toCityList = (res: any): CitySelectModel[] => {
+  const raw = Array.isArray(res) ? res
+    : Array.isArray(res?.data) ? res.data
+      : Array.isArray(res?.items) ? res.items
+        : Array.isArray(res?.result) ? res.result
+          : [];
+  return raw.map((c: any) => ({
+    id: Number(c.id ?? c.cityId ?? c.value),
+    name: String(c.name ?? c.cityName ?? c.label ?? '').trim(),
+  })).filter((c: any) => !!c.id && !!c.name);
+};
 
 @Component({
   selector: 'app-tenants-form-dialog',
@@ -37,145 +103,126 @@ import { TenantsCreateModel, TenantsSelectModel, TenantFormData } from '../../mo
   templateUrl: './tenants-form-dialog.component.html',
   styleUrls: ['./tenants-form-dialog.component.css'],
 })
-export class TenantsFormDialogComponent implements OnInit {
+export class TenantsFormDialogComponent {
+  // Inyección con inject()
   private readonly fb = inject(FormBuilder);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly deptStore = inject(DepartmentStore);
   private readonly cityService = inject(CityService);
   private readonly roleService = inject(RoleService);
+  private readonly dialogRef = inject(MatDialogRef<TenantsFormDialogComponent>);
+  readonly data = inject<TenantFormData>(MAT_DIALOG_DATA, { optional: true }) ?? { mode: 'create' };
 
-  constructor(
-    private readonly dialogRef: MatDialogRef<TenantsFormDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public readonly data: TenantFormData
-  ) { }
+  // Estado
+  isEdit = this.data?.mode === 'edit';
+  isLoading = false;
+  loadingCities = false;
+  loadingRoles = false;
 
-  submitting = signal(false);
-  submitError = signal<string | null>(null);
-  loadingCities = signal(false);
-  loadingRoles = signal(false);
-  isCreate = computed(() => this.data?.mode !== 'edit');
+  // Catálogos
+  readonly departments$ = this.deptStore.departments$;
+  private _cities$ = new BehaviorSubject<CitySelectModel[]>([]);
+  readonly cities$ = this._cities$.asObservable();
+  private _roles$ = new BehaviorSubject<RoleSelectModel[]>([]);
+  readonly roles$ = this._roles$.asObservable();
 
-  departments$ = this.deptStore.departments$;
-  private _cities = new BehaviorSubject<CitySelectModel[]>([]);
-  cities$ = this._cities.asObservable();
-  roles$ = new BehaviorSubject<RoleSelectModel[]>([]);
-
-  compareById = (a: any, b: any) => String(a ?? '') === String(b ?? '');
-
-  /* =======================
-     VALIDADORES REUTILIZABLES
-     ======================= */
-
-  private onlySpaces(): ValidatorFn {
-    return (c: AbstractControl): ValidationErrors | null =>
-      (c.value ?? '').toString().trim().length === 0 ? { onlySpaces: true } : null;
-  }
-
-  private alphaHumanName(): ValidatorFn {
-    const rx = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ '’-][A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/;
-    return (c: AbstractControl) => {
-      const v = (c.value ?? '').toString().trim();
-      return v && rx.test(v) ? null : { alphaHuman: true };
-    };
-  }
-
-  private numericString(minLen: number, maxLen: number): ValidatorFn {
-    const rx = new RegExp(`^\\d{${minLen},${maxLen}}$`);
-    return (c: AbstractControl) => {
-      const v = String(c.value ?? '').trim();
-      return v && rx.test(v) ? null : { numericString: true };
-    };
-  }
-
-  private phoneE164Like(): ValidatorFn {
-    const rx = /^\+?\d{7,15}$/;
-    return (c: AbstractControl) => {
-      const v = String(c.value ?? '').trim();
-      return v && rx.test(v) ? null : { phone: true };
-    };
-  }
-
-  /** Email debe tener dominio con punto (TLD). Ej: user@dominio.com */
-  private emailWithDotTld(): ValidatorFn {
-    return (c: AbstractControl): ValidationErrors | null => {
-      const v = String(c.value ?? '').trim();
-      if (!v) return null; // Otros validators (required) se encargan
-      const at = v.indexOf('@');
-      if (at < 0) return null; // si no hay @, que falle Validators.email primero
-      const domain = v.slice(at + 1);
-      if (!domain) return { domainMissing: true };
-      // Solo chars válidos de dominio
-      if (!/^[A-Za-z0-9.-]+$/.test(domain)) return { domainInvalid: true };
-      if (!domain.includes('.')) return { tldMissing: true };
-      const lastLabel = domain.split('.').pop() || '';
-      // TLD común de 2 a 24 caracteres
-      if (lastLabel.length < 2 || lastLabel.length > 24) return { tldInvalid: true };
-      return null;
-    };
-  }
-
-  /* =======================
-     FORM ROOT
-     ======================= */
+  // Form
   form: FormGroup = this.fb.group({
     location: this.fb.group({
       departmentId: [null, Validators.required],
       cityId: [{ value: null, disabled: true }, [Validators.required, Validators.min(1)]],
     }),
-
     person: this.fb.group({
-      firstName: ['', [Validators.required, Validators.maxLength(50), this.onlySpaces(), this.alphaHumanName()]],
-      lastName: ['', [Validators.required, Validators.maxLength(50), this.onlySpaces(), this.alphaHumanName()]],
-      document: ['', [Validators.required, this.numericString(5, 20)]],
-      phone: ['', [Validators.required, this.phoneE164Like()]],
-      address: ['', [Validators.required, Validators.maxLength(100), this.onlySpaces()]],
+      firstName: ['', [Validators.required, Validators.maxLength(50), notOnlySpaces(), alphaHumanName()]],
+      lastName: ['', [Validators.required, Validators.maxLength(50), notOnlySpaces(), alphaHumanName()]],
+      document: ['', [Validators.required, numericString(5, 20)]], // solo se usa en CREATE
+      phone: ['', [Validators.required, phoneE164Like()]],
+      address: ['', [Validators.required, Validators.maxLength(100), notOnlySpaces()]],
     }),
-
     account: this.fb.group({
-      email: ['', [Validators.required, Validators.email, this.emailWithDotTld()]],
+      email: ['', [Validators.required, Validators.email, emailWithDotTld()]],
     }),
-
     roleId: [null, [Validators.required, Validators.min(1)]],
-    active: [true]
+    active: [true], // solo UI (no viaja en update del back actual)
   });
 
-  // GETTERS rápidos
+  // Getters
   get locationGroup(): FormGroup { return this.form.get('location') as FormGroup; }
   get personGroup(): FormGroup { return this.form.get('person') as FormGroup; }
   get accountGroup(): FormGroup { return this.form.get('account') as FormGroup; }
+  get roleIdCtrl(): FormControl { return this.form.get('roleId') as FormControl; }
 
-  // ✅ Getter tipado para usar en [formControl]
-  get roleIdCtrl(): FormControl {
-    return this.form.get('roleId') as FormControl;
+  // Compare helper para mat-select
+  compareById = (a: any, b: any) => String(a ?? '') === String(b ?? '');
+
+  // Errores
+  private readonly errorMessages: Record<string, string> = {
+    required: 'Requerido',
+    email: 'Correo inválido',
+    domainMissing: 'Falta el dominio después de @',
+    domainInvalid: 'Dominio inválido',
+    tldMissing: 'Falta el TLD (por ej. .com)',
+    tldInvalid: 'TLD inválido',
+    minlength: 'Longitud mínima no válida',
+    maxlength: 'Longitud máxima excedida',
+    pattern: 'Formato inválido',
+    min: 'Selecciona un valor válido',
+    onlySpaces: 'No puede ser solo espacios',
+    alphaHuman: 'Solo letras y separadores válidos',
+    numericString: 'Solo dígitos (longitud permitida)',
+    phone: 'Teléfono inválido (7–15 dígitos, opcional +)',
+  };
+
+  // Init
+  ngOnInit(): void {
+    if (this.isEdit) {
+      console.log('Datos iniciales para editar:', this.data.tenant);
+    }
+    this.configureEditMode();
+    this.setupCityCascading();
+    this.loadRoles();
+    this.patchInitialData();
   }
 
-  ngOnInit(): void {
+  private configureEditMode(): void {
+    if (!this.isEdit) return;
+    const deptCtrl = this.locationGroup.get('departmentId')!;
+    const cityCtrl = this.locationGroup.get('cityId')!;
+    deptCtrl.clearValidators();
+    deptCtrl.setErrors(null);
+    deptCtrl.setValue(null, { emitEvent: false });
+    deptCtrl.disable({ emitEvent: false });
+    cityCtrl.enable({ emitEvent: false });
+
+    // Deshabilitar el campo 'document' en modo edición, ya que no se puede cambiar
+    this.personGroup.get('document')?.disable({ emitEvent: false });
+  }
+
+  private setupCityCascading(): void {
     const deptCtrl = this.locationGroup.get('departmentId')!;
     const cityCtrl = this.locationGroup.get('cityId')!;
 
-    if (this.isCreate()) {
+    if (!this.isEdit) {
       deptCtrl.valueChanges.pipe(
-        takeUntilDestroyed(this.destroyRef),
         distinctUntilChanged(),
         tap((deptId) => {
           cityCtrl.reset({ value: null, disabled: !deptId }, { emitEvent: false });
           if (deptId) cityCtrl.enable({ emitEvent: false }); else cityCtrl.disable({ emitEvent: false });
-          this._cities.next([]);
-          this.loadingCities.set(!!deptId);
+          this._cities$.next([]);
+          this.loadingCities = !!deptId;
         }),
         switchMap((deptId: number | string | null) => {
           const id = deptId == null ? null : Number(deptId);
           if (!id || Number.isNaN(id)) {
-            return of([]).pipe(finalize(() => this.loadingCities.set(false)));
+            return of([]).pipe(finalize(() => this.loadingCities = false));
           }
           return this.cityService.getCitiesByDepartment(id).pipe(
             map(toCityList),
             catchError(() => of([])),
-            finalize(() => this.loadingCities.set(false))
+            finalize(() => this.loadingCities = false)
           );
         })
       ).subscribe((list: CitySelectModel[]) => {
-        this._cities.next(list);
+        this._cities$.next(list);
 
         if (this.locationGroup.get('departmentId')?.value) {
           cityCtrl.enable({ emitEvent: false });
@@ -192,47 +239,41 @@ export class TenantsFormDialogComponent implements OnInit {
         }
       });
     } else {
-      deptCtrl.clearValidators();
-      deptCtrl.setErrors(null);
-      deptCtrl.setValue(null, { emitEvent: false });
-      deptCtrl.disable({ emitEvent: false });
-
-      cityCtrl.enable({ emitEvent: false });
-
+      // Edición: carga plana de ciudades y preselección
+      this.loadingCities = true;
       const presetCity = Number(this.data?.tenant?.cityId ?? 0) || null;
-      this.loadingCities.set(true);
       this.cityService.getAll().pipe(
         map(toCityList),
         catchError(() => of([])),
-        finalize(() => this.loadingCities.set(false))
+        finalize(() => this.loadingCities = false)
       ).subscribe(list => {
-        this._cities.next(list);
+        this._cities$.next(list);
         if (presetCity) cityCtrl.setValue(presetCity, { emitEvent: false });
       });
     }
-
-    this.loadRoles();
-    this.patchInitialData();
-
-    const presetDept = this.locationGroup.get('departmentId')?.value;
-    if (this.isCreate() && presetDept) deptCtrl.updateValueAndValidity({ emitEvent: true });
   }
 
   private loadRoles(): void {
-    this.loadingRoles.set(true);
+    this.loadingRoles = true;
     this.roleService.getAll()
       .pipe(
-        finalize(() => this.loadingRoles.set(false)),
+        finalize(() => this.loadingRoles = false),
         catchError(() => {
-          this.roles$.next([]);
+          this._roles$.next([]);
           return of([]);
         })
       )
       .subscribe((roles: RoleSelectModel[]) => {
-        this.roles$.next(roles);
-        if (this.data?.tenant?.roles?.length) {
-          const match = roles.find(r => this.data.tenant!.roles.includes(r.name ?? ''));
-          if (match) this.roleIdCtrl.setValue(match.id, { emitEvent: false });
+        this._roles$.next(roles);
+
+        // Preselección robusta en edición (por nombre, case-insensitive)
+        if (this.isEdit && this.data?.tenant?.roles?.length) {
+          const wanted = new Set(this.data.tenant.roles.map(r => String(r).trim().toLowerCase()));
+          const match = roles.find(r => wanted.has(String(r.name ?? '').trim().toLowerCase()));
+          if (match) {
+            this.roleIdCtrl.setValue(match.id, { emitEvent: false });
+            this.roleIdCtrl.updateValueAndValidity({ emitEvent: false });
+          }
         }
       });
   }
@@ -256,32 +297,35 @@ export class TenantsFormDialogComponent implements OnInit {
     }, { emitEvent: false });
 
     this.locationGroup.patchValue({
-      departmentId: this.isCreate() ? null : null,
+      departmentId: this.isEdit ? null : null,
       cityId: t?.cityId ?? null
     }, { emitEvent: false });
 
     this.form.get('active')?.setValue(t?.active ?? true, { emitEvent: false });
   }
 
-  /** Normaliza y auto-completa TLD si falta (agrega .com). */
-  fixEmail(): void {
+  // Normalizaciones
+  private onTrim(control: AbstractControl | null) {
+    if (!control) return;
+    const v = (control.value ?? '') as string;
+    const trimmed = v.trim().replace(/\s+/g, ' ');
+    if (trimmed !== v) control.setValue(trimmed);
+  }
+  public fixEmail(): void {
     const emailCtrl = this.accountGroup.get('email')!;
     let v = String(emailCtrl.value ?? '').trim().toLowerCase();
     if (!v) return;
     const at = v.indexOf('@');
     if (at < 0) {
-      // no tocamos nada: dejar que falle Validators.email / required
       emailCtrl.setValue(v, { emitEvent: false });
       return;
     }
     const local = v.slice(0, at);
     const domain = v.slice(at + 1);
     if (!domain) {
-      // dominio vacío -> inválido (validator lo marcará)
       emailCtrl.setValue(`${local}@`, { emitEvent: false });
       return;
     }
-    // si no hay punto en el dominio, agregar .com
     if (!domain.includes('.')) {
       v = `${local}@${domain}.com`;
       emailCtrl.setValue(v, { emitEvent: false });
@@ -290,40 +334,39 @@ export class TenantsFormDialogComponent implements OnInit {
     }
   }
 
+  // Submit (DTOs alineados con el back)
   submit(): void {
-    this.submitError.set(null);
-
-    // Normalizaciones previas
-    this.fixEmail(); // <-- asegura .com si falta
-    const emailCtrl = this.accountGroup.get('email')!;
-    emailCtrl.setValue(String(emailCtrl.value ?? '').trim().toLowerCase(), { emitEvent: false });
-
+    // Normalizaciones
+    this.fixEmail();
     const fn = this.personGroup.get('firstName')!;
     const ln = this.personGroup.get('lastName')!;
-    fn.setValue(String(fn.value ?? '').trim(), { emitEvent: false });
-    ln.setValue(String(ln.value ?? '').trim(), { emitEvent: false });
-
     const doc = this.personGroup.get('document')!;
     const phone = this.personGroup.get('phone')!;
-    doc.setValue(String(doc.value ?? '').trim(), { emitEvent: false });
-    phone.setValue(String(phone.value ?? '').trim(), { emitEvent: false });
+    const addr = this.personGroup.get('address')!;
+    const emailCtrl = this.accountGroup.get('email')!;
+    [fn, ln, doc, phone, addr, emailCtrl].forEach(c => {
+      c.setValue(String(c.value ?? '').trim(), { emitEvent: false });
+      this.onTrim(c);
+    });
 
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      Object.values((this.form.controls)).forEach(c => c.updateValueAndValidity());
+      this.markAllTouched();
       return;
     }
 
-    this.submitting.set(true);
+    this.isLoading = true;
 
     const loc = this.locationGroup.value;
     const p = this.personGroup.value;
     const acc = this.accountGroup.value;
-    const roleId = this.roleIdCtrl.value as number | null;
-    const active = !!this.form.get('active')?.value;
 
-    const payload: TenantsCreateModel | Partial<TenantsSelectModel> = this.isCreate()
-      ? {
+    // Resolver roleIds
+    const roleId = this.roleIdCtrl.value;
+    const roleIds = roleId ? [Number(roleId)] : [];
+
+    // CREATE → el back espera también 'document'
+    if (!this.isEdit) {
+      const payload: TenantsCreateModel = {
         firstName: p.firstName,
         lastName: p.lastName,
         document: String(p.document),
@@ -331,51 +374,42 @@ export class TenantsFormDialogComponent implements OnInit {
         address: p.address,
         cityId: Number(loc.cityId),
         email: acc.email,
-        roleIds: roleId ? [roleId] : []
-      }
-      : {
-        id: this.data?.tenant?.id!,
-        personId: this.data?.tenant?.personId!,
-        personName: `${p.firstName} ${p.lastName}`.trim(),
-        personDocument: String(p.document),
-        personPhone: String(p.phone),
-        personAddress: p.address,
-        email: acc.email,
-        cityId: Number(loc.cityId),
-        active,
-        roles: []
+        roleIds
       };
+      this.dialogRef.close(payload);
+      this.isLoading = false;
+      return;
+    }
+
+    // UPDATE → el back NO espera personId ni document
+    const t = this.data!.tenant!;
+    const payload: TenantsUpdateModel = {
+      id: t.id,
+      firstName: p.firstName,
+      lastName: p.lastName,
+      phone: String(p.phone),
+      address: p.address,
+      cityId: Number(loc.cityId),
+      email: acc.email,
+      roleIds
+    };
 
     this.dialogRef.close(payload);
-    this.submitting.set(false);
+    this.isLoading = false;
   }
 
   cancel(): void {
     this.dialogRef.close(null);
   }
 
-  markGroupAsTouched(group: FormGroup) {
-    group.markAllAsTouched();
-    Object.values(group.controls).forEach(c => c.updateValueAndValidity());
+  // Helpers UI
+  markAllTouched(): void {
+    this.form.markAllAsTouched();
+    Object.values(this.form.controls).forEach(c => c.updateValueAndValidity());
+    Object.values(this.locationGroup.controls).forEach(c => c.updateValueAndValidity());
+    Object.values(this.personGroup.controls).forEach(c => c.updateValueAndValidity());
+    Object.values(this.accountGroup.controls).forEach(c => c.updateValueAndValidity());
   }
-
-  /* ========== MENSAJES ========== */
-  private errorMessages: Record<string, string> = {
-    required: 'Requerido',
-    email: 'Correo inválido',
-    domainMissing: 'Falta el dominio después de @',
-    domainInvalid: 'Dominio inválido',
-    tldMissing: 'Falta el TLD (por ej. .com)',
-    tldInvalid: 'TLD inválido',
-    minlength: 'Longitud mínima no válida',
-    maxlength: 'Longitud máxima excedida',
-    pattern: 'Formato inválido',
-    min: 'Selecciona un valor válido',
-    onlySpaces: 'No puede ser solo espacios',
-    alphaHuman: 'Solo letras y separadores válidos',
-    numericString: 'Debe contener solo dígitos (longitud permitida)',
-    phone: 'Teléfono inválido (7–15 dígitos, opcional +)',
-  };
 
   getFirstError(control: AbstractControl | null, order: string[] = []): string | null {
     if (!control || !control.errors) return null;
@@ -387,16 +421,3 @@ export class TenantsFormDialogComponent implements OnInit {
     return firstKey ? (this.errorMessages[firstKey] ?? firstKey) : null;
   }
 }
-
-/* ========== UTILS ========== */
-const toCityList = (res: any): CitySelectModel[] => {
-  const raw = Array.isArray(res) ? res
-    : Array.isArray(res?.data) ? res.data
-      : Array.isArray(res?.items) ? res.items
-        : Array.isArray(res?.result) ? res.result
-          : [];
-  return raw.map((c: any) => ({
-    id: Number(c.id ?? c.cityId ?? c.value),
-    name: String(c.name ?? c.cityName ?? c.label ?? '').trim(),
-  })).filter((c: any) => !!c.id && !!c.name);
-};

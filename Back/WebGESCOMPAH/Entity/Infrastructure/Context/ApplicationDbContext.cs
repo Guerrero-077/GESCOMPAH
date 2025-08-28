@@ -65,7 +65,7 @@ namespace Entity.Infrastructure.Context
         public DbSet<SystemParameter> systemParameters { get; set; }
 
         public DbSet<Contract> contracts { get; set; }
-        public DbSet<ContractTerms> ContractTerms { get; set; }
+        //public DbSet<ContractTerms> ContractTerms { get; set; }
         public DbSet<PremisesLeased> premisesLeaseds { get; set; }
         public DbSet<Clause> clauses { get; set; }  
         public DbSet<ContractClause> contractClauses { get; set; }   

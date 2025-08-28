@@ -1,90 +1,30 @@
-<form [formGroup]="form" (ngSubmit)="submit()" class="p-4 space-y-4">
-
-  <!-- Documento + botón buscar -->
-  <div class="flex gap-2">
-    <mat-form-field appearance="fill" class="flex-1">
-      <mat-label>Documento</mat-label>
-      <input matInput formControlName="document" />
-    </mat-form-field>
-
-    <button mat-stroked-button type="button" (click)="buscarPersona()">
-      Buscar
-    </button>
-  </div>
-
-  <!-- Datos personales -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Nombres</mat-label>
-    <input matInput formControlName="firstName" [readonly]="personaEncontrada" />
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Apellidos</mat-label>
-    <input matInput formControlName="lastName" [readonly]="personaEncontrada" />
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Teléfono</mat-label>
-    <input matInput formControlName="phone" [readonly]="personaEncontrada" />
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Email</mat-label>
-    <input matInput formControlName="email" type="email" />
-    <mat-hint *ngIf="personaEncontrada && !form.value.email">
-      Si se proporciona un correo, se creará un usuario vinculado.
-    </mat-hint>
-  </mat-form-field>
-
-  <!-- Dirección -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Dirección</mat-label>
-    <input matInput formControlName="address" />
-  </mat-form-field>
-
-  <!-- Ciudad -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Ciudad</mat-label>
-    <mat-select formControlName="cityId">
-      <mat-option *ngFor="let c of ciudades" [value]="c.id">{{ c.name }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <!-- Locales -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Locales</mat-label>
-    <mat-select formControlName="establishmentIds" multiple>
-      <mat-option *ngFor="let e of establecimientos" [value]="e.id">{{ e.name }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <!-- Fechas -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Fecha de Inicio</mat-label>
-    <input matInput [matDatepicker]="pickerStart" formControlName="startDate" />
-    <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
-    <mat-datepicker #pickerStart></mat-datepicker>
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Fecha de Fin</mat-label>
-    <input matInput [matDatepicker]="pickerEnd" formControlName="endDate" />
-    <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-    <mat-datepicker #pickerEnd></mat-datepicker>
-  </mat-form-field>
-
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Tipo de Cálculo</mat-label>
-    <mat-select formControlName="calculationKey" required>
-      <mat-option value="AREA">Por Área</mat-option>
-      <mat-option value="FIXED">Valor Fijo</mat-option>
-      <mat-option value="PERCENTAGE">Porcentaje sobre ventas</mat-option>
-      <!-- Ajusta los valores según las claves esperadas en el backend -->
-    </mat-select>
-  </mat-form-field>
+<div class="row d-flex justify-content-center">
+  <app-generic-table
+    [data]="contracts$()"
+    [columns]="columns"
+    [titulo]="'Gestión de Contratos'"
+    [subTitulo]="'Administra los contratos del sistema'"
+    [createButtonLabel]="'Nuevo Contrato'"
+    [showViewButton]="true"
+    (view)="onView($event)"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (create)="onCreateNew()">
+  </app-generic-table>
 
 
-  <button mat-raised-button color="primary" [disabled]="form.invalid">
-    Crear Contrato
-  </button>
-</form>
+  <ng-template #estadoTemplate let-row>
+    <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
+      <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+        {{ row.active ? 'Activo' : 'Inactivo' }}
+      </span>
+
+      <app-toggle-button-component class="align-middle" [checked]="row.active"
+        (changed)="onToggleActive(row, { checked: $event })" [size]="20" [onColor]="'#16a34a'" [offColor]="'#ef4444'"
+        [thumb]="'#ffffff'">
+      </app-toggle-button-component>
+
+    </div>
+  </ng-template>
+
+</div>

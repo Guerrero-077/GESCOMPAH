@@ -16,12 +16,16 @@ namespace Data.Services.Persons
         {
             return  await _dbSet
                 .Include(e => e.City)
+                .Include(e => e.User)
                 .ToListAsync();
         }
-        public async Task<Person?> GetByIdWithCityAsync(int id)
+
+     
+        public override async Task<Person?> GetByIdAsync(int id)
         {
             return await _dbSet
                 .Include(p => p.City)
+                .Include(e => e.User)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -33,18 +37,11 @@ namespace Data.Services.Persons
                 .AnyAsync(p => p.Document == document && !p.IsDeleted);
         }
 
-        //public async Task<Person?> GetByDocumentAsync(string document)
-        //{
-        //    return await _dbSet
-        //        .Include(p => p.City)
-        //        .FirstOrDefaultAsync(p => p.Document == document && !p.IsDeleted);
-        //}
-
         public async Task<Person?> GetByDocumentAsync(string document)
         {
             return await _dbSet
                 .Include(p => p.City)
-                .Include(p => p.User) // ← Agregado para obtener el Email
+                .Include(p => p.User)
                 .FirstOrDefaultAsync(p => p.Document == document && !p.IsDeleted);
         }
 

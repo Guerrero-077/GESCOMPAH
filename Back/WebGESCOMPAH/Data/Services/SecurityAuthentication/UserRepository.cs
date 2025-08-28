@@ -23,14 +23,14 @@ namespace Data.Services.SecurityAuthentication
         }
 
         public override async Task<User?> GetByIdAsync(int id)
-            {
-                return await _dbSet
-                    .Include(u => u.Person)
-                        .ThenInclude(p => p.City)
-                    .Include(u => u.RolUsers)
-                        .ThenInclude(ru => ru.Rol)
-                    .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false);
-            }
+        {
+            return await _dbSet
+                .Include(u => u.Person)
+                    .ThenInclude(p => p.City)
+                .Include(u => u.RolUsers)
+                    .ThenInclude(ru => ru.Rol)
+                .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false);
+        }
 
             public async Task<User> LoginUser(LoginDto loginDto)
             {

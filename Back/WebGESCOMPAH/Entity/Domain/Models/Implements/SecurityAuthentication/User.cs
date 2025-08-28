@@ -10,7 +10,7 @@ namespace Entity.Domain.Models.Implements.SecurityAuthentication
 
         public int PersonId { get; set; }
         public Person Person { get; set; } = null!;
-        public ICollection<RolUser> RolUsers { get; set; } = new List<RolUser>(); // Relacion de muchos a muchos 
+        public ICollection<RolUser> RolUsers { get; set; } = new List<RolUser>();
     }
 
 }
