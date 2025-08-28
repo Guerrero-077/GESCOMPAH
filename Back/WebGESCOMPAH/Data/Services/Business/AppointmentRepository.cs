@@ -25,5 +25,18 @@ namespace Data.Services.Business
                 .FirstOrDefaultAsync();
 
         }
+
+        public async Task<bool> ChangeStatusAsync(int id, int status) 
+        { 
+            var appointment = await _dbSet.FindAsync(id); ;
+            if (appointment is null)
+                throw new Exception("La cita no existe");
+
+            appointment.Status = status;
+
+            await context.SaveChangesAsync();
+            return true;
+
+        }
     }
 }

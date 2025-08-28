@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initDataBase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -328,6 +328,7 @@ namespace Entity.Migrations
                     RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateTimeAssigned = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EstablishmentId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -650,12 +651,12 @@ namespace Entity.Migrations
 
             migrationBuilder.InsertData(
                 table: "Appointments",
-                columns: new[] { "Id", "Active", "CreatedAt", "DateTimeAssigned", "Description", "Email", "EstablishmentId", "FullName", "IsDeleted", "Phone", "RequestDate" },
+                columns: new[] { "Id", "Active", "CreatedAt", "DateTimeAssigned", "Description", "Email", "EstablishmentId", "FullName", "IsDeleted", "Phone", "RequestDate", "Status" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), "Solicitud para conocer el local", "juan.perez@example.com", 1, "Juan Pérez", false, "3001234567", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, true, new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 5, 11, 0, 0, 0, DateTimeKind.Unspecified), "Revisión de contrato anterior", "maria.gomez@example.com", 2, "María Gómez", false, "3019876543", new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, true, new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 6, 9, 0, 0, 0, DateTimeKind.Unspecified), "Consulta sobre requisitos para arriendo", "carlos.ramirez@example.com", 3, "Carlos Ramírez", false, "3021122334", new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), "Solicitud para conocer el local", "juan.perez@example.com", 1, "Juan Pérez", false, "3001234567", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
+                    { 2, true, new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 5, 11, 0, 0, 0, DateTimeKind.Unspecified), "Revisión de contrato anterior", "maria.gomez@example.com", 2, "María Gómez", false, "3019876543", new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
+                    { 3, true, new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 6, 9, 0, 0, 0, DateTimeKind.Unspecified), "Consulta sobre requisitos para arriendo", "carlos.ramirez@example.com", 3, "Carlos Ramírez", false, "3021122334", new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 }
                 });
 
             migrationBuilder.InsertData(

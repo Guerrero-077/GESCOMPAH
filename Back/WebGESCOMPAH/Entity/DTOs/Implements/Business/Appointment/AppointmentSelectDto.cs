@@ -1,5 +1,6 @@
 ﻿using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Base;
+using Entity.Enum;
 
 namespace Entity.DTOs.Implements.Business.Appointment
 {
@@ -16,5 +17,10 @@ namespace Entity.DTOs.Implements.Business.Appointment
         // Relación con Establecimiento
         public int EstablishmentId { get; set; }
         public string EstablishmentName { get; set; } = null!;
+
+        // Enum de estado
+        public int Status { get; set; }
+        public string StatusName => ((Status)Status).ToString();
+
     }
 }

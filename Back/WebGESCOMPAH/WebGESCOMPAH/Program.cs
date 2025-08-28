@@ -14,7 +14,17 @@ var builder = WebApplication.CreateBuilder(args);
 // CONFIGURACIÓN Y SERVICIOS
 // --------------------------
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.UseInlineDefinitionsForEnums(); // 👈 Swagger mostrará el dropdown con los nombres
+}); 
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(); // Swagger siempre disponible
 

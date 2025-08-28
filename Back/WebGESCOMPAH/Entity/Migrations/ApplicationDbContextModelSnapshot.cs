@@ -540,6 +540,9 @@ namespace Entity.Migrations
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EstablishmentId");
@@ -559,7 +562,8 @@ namespace Entity.Migrations
                             FullName = "Juan Pérez",
                             IsDeleted = false,
                             Phone = "3001234567",
-                            RequestDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            RequestDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 1
                         },
                         new
                         {
@@ -573,7 +577,8 @@ namespace Entity.Migrations
                             FullName = "María Gómez",
                             IsDeleted = false,
                             Phone = "3019876543",
-                            RequestDate = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            RequestDate = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 1
                         },
                         new
                         {
@@ -587,7 +592,8 @@ namespace Entity.Migrations
                             FullName = "Carlos Ramírez",
                             IsDeleted = false,
                             Phone = "3021122334",
-                            RequestDate = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            RequestDate = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 1
                         });
                 });
 

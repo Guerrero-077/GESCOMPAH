@@ -5,5 +5,6 @@ namespace Business.Interfaces.Implements.Business
 {
     public interface IAppointmentService : IBusiness<AppointmentSelectDto, AppointmentCreateDto, AppointmentUpdateDto>
     {
+        Task<bool> ChangesStatusAsync(int id, int status);
     }
 }

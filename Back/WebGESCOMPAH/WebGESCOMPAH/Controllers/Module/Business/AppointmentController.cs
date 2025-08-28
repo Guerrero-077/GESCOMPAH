@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.Appointment;
+using Entity.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,6 +54,21 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             var appointment = await _appointmentService.UpdateAsync(dto);
             return Ok(appointment);
         }
+
+        [HttpPut]
+        public async Task<ActionResult<bool>> ChangeStatu(int id, Status status)
+        {
+            if (id <= 0)
+                return BadRequest("ID no pueden ser menores o iguales a cero");
+
+            var appointment = await _appointmentService.ChangesStatusAsync(id, (int)status);
+
+            if (!appointment)
+                return NotFound("La cita no existe");
+
+            return Ok("Estado de la cita cambiado exitosamente");
+        }
+
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

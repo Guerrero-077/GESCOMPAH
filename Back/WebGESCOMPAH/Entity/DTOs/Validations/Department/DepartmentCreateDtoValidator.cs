@@ -6,8 +6,8 @@ namespace Entity.DTOs.Validations.Department
     // Entity.DTOs.Validations/Location/Department/DepartmentCreateDtoValidator.cs
     using System.Text.RegularExpressions;
     using FluentValidation;
-    using Entity.DTOs.Implements.Location.City;
-    using Entity.DTOs.Implements.Location.Department;
+    //using Entity.DTOs.Implements.Location.City;
+    //using Entity.DTOs.Implements.Location.Department;
 
     namespace Entity.DTOs.Validations.Location.Department
     {

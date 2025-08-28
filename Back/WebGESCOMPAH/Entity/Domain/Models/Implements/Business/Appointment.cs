@@ -1,4 +1,5 @@
 ﻿using Entity.Domain.Models.ModelBase;
+using Entity.Enum;
 
 namespace Entity.Domain.Models.Implements.Business
 {
@@ -11,6 +12,7 @@ namespace Entity.Domain.Models.Implements.Business
         public DateTime RequestDate { get; set; } 
         public DateTime DateTimeAssigned { get; set; }
         public int EstablishmentId { get; set; }
+        public int Status { get; set; }
         public  Establishment Establishment { get; set; }
 
     }
