@@ -146,8 +146,8 @@ namespace Business.Mapping
             //    .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty);
 
             config.NewConfig<Person, PersonSelectDto>()
-    .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty)
-    .Map(dest => dest.Email, src => src.User != null ? src.User.Email : null);
+                .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty)
+                .Map(dest => dest.Email, src => src.User != null ? src.User.Email : null);
 
 
             // DTO de creación -> Entidad  (NO toca navegaciones)
@@ -198,7 +198,6 @@ namespace Business.Mapping
                 .Ignore(dest => dest.Id) // No modificar la PK
                 .Map(dest => dest.FirstName, src => src.FirstName)
                 .Map(dest => dest.LastName, src => src.LastName)
-                .Map(dest => dest.Document, src => src.Document)
                 .Map(dest => dest.Phone, src => src.Phone)
                 .Map(dest => dest.Address, src => src.Address)
                 .Map(dest => dest.CityId, src => src.CityId);

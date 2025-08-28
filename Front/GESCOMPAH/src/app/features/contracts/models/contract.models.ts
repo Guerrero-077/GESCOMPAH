@@ -7,7 +7,7 @@ export interface ContractCreateModel {
   firstName?: string;
   lastName?: string;
   phone?: string;
-  email?: string;
+  userEmail?: string;
   establishmentIds: number[];
   calculationKey: string;
 }
@@ -29,6 +29,7 @@ export interface ContractSelectModel {
   fullName: string;
   document: string;
   phone: string;
-  email: string | null;
+  userEmail: string | null;
   premisesLeased: PremisesLeasedModel[];
+  active: boolean;
 }

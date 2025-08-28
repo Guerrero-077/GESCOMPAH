@@ -22,7 +22,9 @@
           <mat-select formControlName="cityId" required [compareWith]="compareById">
             <mat-option [value]="null" disabled>Selecciona una ciudad…</mat-option>
 
-            <mat-option *ngIf="locationGroup.get('departmentId')?.value && !loadingCities() && (((cities$ | async)?.length ?? 0) === 0)" [disabled]="true">
+            <mat-option
+              *ngIf="locationGroup.get('departmentId')?.value && !loadingCities && (((cities$ | async)?.length ?? 0) === 0)"
+              [disabled]="true">
               No hay ciudades disponibles para este departamento
             </mat-option>
 
@@ -31,7 +33,7 @@
             </mat-option>
           </mat-select>
 
-          <mat-icon *ngIf="loadingCities()" matSuffix class="spin">autorenew</mat-icon>
+          <mat-icon *ngIf="loadingCities" matSuffix class="spin">autorenew</mat-icon>
 
           <mat-error *ngIf="locationGroup.get('cityId')?.errors as errs">
             {{
@@ -57,7 +59,11 @@
         <div class="grid">
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Nombres</mat-label>
-            <input matInput formControlName="firstName" required (blur)="personGroup.get('firstName')?.updateValueAndValidity()" />
+            <input
+              matInput
+              formControlName="firstName"
+              required
+              (blur)="personGroup.get('firstName')?.updateValueAndValidity()" />
             <mat-error *ngIf="personGroup.get('firstName')?.errors as errs">
               {{
                 getFirstError(personGroup.get('firstName'), ['required','onlySpaces','alphaHuman','maxlength'])
@@ -67,7 +73,11 @@
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Apellidos</mat-label>
-            <input matInput formControlName="lastName" required (blur)="personGroup.get('lastName')?.updateValueAndValidity()" />
+            <input
+              matInput
+              formControlName="lastName"
+              required
+              (blur)="personGroup.get('lastName')?.updateValueAndValidity()" />
             <mat-error *ngIf="personGroup.get('lastName')?.errors as errs">
               {{
                 getFirstError(personGroup.get('lastName'), ['required','onlySpaces','alphaHuman','maxlength'])
@@ -77,17 +87,6 @@
         </div>
 
         <div class="grid">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Documento</mat-label>
-            <input matInput formControlName="document" required />
-            <mat-hint>Solo dígitos (5–20)</mat-hint>
-            <mat-error *ngIf="personGroup.get('document')?.errors as errs">
-              {{
-                getFirstError(personGroup.get('document'), ['required','numericString'])
-              }}
-            </mat-error>
-          </mat-form-field>
-
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Teléfono</mat-label>
             <input matInput formControlName="phone" required />
@@ -101,7 +100,11 @@
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Dirección</mat-label>
-            <input matInput formControlName="address" required (blur)="personGroup.get('address')?.updateValueAndValidity()" />
+            <input
+              matInput
+              formControlName="address"
+              required
+              (blur)="personGroup.get('address')?.updateValueAndValidity()" />
             <mat-error *ngIf="personGroup.get('address')?.errors as errs">
               {{
                 getFirstError(personGroup.get('address'), ['required','onlySpaces','maxlength'])
@@ -131,8 +134,7 @@
             type="email"
             formControlName="email"
             required
-            (blur)="fixEmail()"
-          />
+            (blur)="fixEmail()" />
           <mat-error *ngIf="accountGroup.get('email')?.errors as errs">
             {{
               getFirstError(accountGroup.get('email'),
@@ -155,12 +157,14 @@
           </mat-error>
         </mat-form-field>
 
-        <div class="text-danger" *ngIf="submitError()">{{ submitError() }}</div>
-
         <div class="step-actions">
           <button mat-button matStepperPrevious>Volver</button>
-          <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || submitting()">
-            {{ submitting() ? 'Guardando...' : (isCreate() ? 'Crear' : 'Actualizar') }}
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="submit()"
+            [disabled]="form.invalid || isLoading">
+            {{ isLoading ? 'Guardando...' : (isEdit ? 'Actualizar' : 'Crear') }}
           </button>
         </div>
       </form>

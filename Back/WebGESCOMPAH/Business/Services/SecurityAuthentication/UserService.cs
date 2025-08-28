@@ -133,10 +133,6 @@ namespace Business.Services.SecurityAuthentication
                     throw new BusinessException("El correo ya está registrado.");
 
 
-                if (await _personRepository.ExistsByDocumentAsync(dto.Document))
-                    throw new BusinessException("Ya existe una persona con este número de documento.");
-
-
                 await using var tx = await _context.Database.BeginTransactionAsync();
 
                 // 4) Mapear cambios (NO tocar PersonId)
