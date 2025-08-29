@@ -1,8 +1,10 @@
-﻿using Business.Interfaces.Implements.Business;
+﻿using Business.CustomJWT;
+using Business.Interfaces.Implements.Business;
 using Business.Repository;
 using Data.Interfaz.IDataImplement.Business;
 using Data.Interfaz.IDataImplement.Persons;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -11,10 +13,10 @@ using Entity.Infrastructure.Context;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using Utilities.Exceptions;
 using Utilities.Helpers.GeneratePassword;
 using Utilities.Messaging.Interfaces;
-using System.Linq;
 
 namespace Business.Services.Business
 {
@@ -24,16 +26,16 @@ namespace Business.Services.Business
     public class ContractService
         : BusinessGeneric<ContractSelectDto, ContractCreateDto, ContractUpdateDto, Contract>, IContractService
     {
+        private readonly IContractRepository _contractRepository;
         private readonly IPersonRepository _personRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRolUserRepository _rolUserRepository;
-        private readonly IContractRepository _contractRepository;
         private readonly IPremisesLeasedRepository _premisesLeasedRepository;
         private readonly IEstablishmentsRepository _establishmentsRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ISendCode _emailService;
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly ICurrentUser _user;
 
         public ContractService(
             IContractRepository data,
@@ -45,7 +47,8 @@ namespace Business.Services.Business
             IMapper mapper,
             IPasswordHasher<User> passwordHasher,
             ISendCode emailService,
-            ApplicationDbContext context
+            ApplicationDbContext context,
+             ICurrentUser user
         ) : base(data, mapper)
         {
             _personRepository = personRepository;
@@ -57,8 +60,26 @@ namespace Business.Services.Business
             _passwordHasher = passwordHasher;
             _emailService = emailService;
             _context = context;
-            _mapper = mapper;
+            _user = user;
         }
+
+
+        public async Task<IReadOnlyList<ContractCardDto>> GetMineAsync()
+        {
+            var list = _user.EsAdministrador
+                ? await _contractRepository.GetCardsAllAsync()
+                : await _contractRepository.GetCardsByPersonAsync(
+                      _user.PersonId ?? throw new BusinessException("Usuario sin persona asociada.")
+                  );
+
+            return list.Select(c => new ContractCardDto(
+                c.Id, c.PersonId,
+                c.StartDate.ToString("yyyy-MM-dd"),
+                c.EndDate.ToString("yyyy-MM-dd"),
+                c.TotalBase, c.TotalUvt, c.Active
+            )).ToList().AsReadOnly();
+        }
+
 
         // Proyección liviana -> suma totales sin materializar entidades completas.
         private async Task<(decimal totalBase, decimal totalUvt)> SumEstablishmentsAsync(IEnumerable<int> establishmentIds)

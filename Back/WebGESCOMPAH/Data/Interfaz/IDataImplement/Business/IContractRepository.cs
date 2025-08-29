@@ -3,7 +3,14 @@ using Entity.Domain.Models.Implements.Business;
 
 namespace Data.Interfaz.IDataImplement.Business
 {
+    public sealed record ContractCard(
+        int Id, int PersonId, DateOnly StartDate, DateOnly EndDate,
+        decimal TotalBase, decimal TotalUvt, bool Active);
+
     public interface IContractRepository : IDataGeneric<Contract>
     {
+        Task<IReadOnlyList<ContractCard>> GetCardsByPersonAsync(int personId);
+        Task<IReadOnlyList<ContractCard>> GetCardsAllAsync();
     }
+
 }

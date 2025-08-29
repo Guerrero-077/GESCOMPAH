@@ -3,6 +3,7 @@ using Data.Repository;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Data.Services.Business
 {
@@ -28,5 +29,25 @@ namespace Data.Services.Business
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
+
+        ///Metodos adicionales para optener los contratos por persona 
+
+
+        public async Task<IReadOnlyList<ContractCard>> GetCardsByPersonAsync(int personId) =>
+            await _dbSet.AsNoTracking()
+                .Where(c => !c.IsDeleted && c.PersonId == personId)
+                .Select(c => new ContractCard(
+                    c.Id, c.PersonId, c.StartDate, c.EndDate,
+                    c.TotalBaseRentAgreed, c.TotalUvtQtyAgreed, c.Active))
+                .ToListAsync();
+
+                public async Task<IReadOnlyList<ContractCard>> GetCardsAllAsync() =>
+                    await _dbSet.AsNoTracking()
+                        .Where(c => !c.IsDeleted)
+                        .Select(c => new ContractCard(
+                            c.Id, c.PersonId, c.StartDate, c.EndDate,
+                            c.TotalBaseRentAgreed, c.TotalUvtQtyAgreed, c.Active))
+                        .ToListAsync();
+
     }
 }

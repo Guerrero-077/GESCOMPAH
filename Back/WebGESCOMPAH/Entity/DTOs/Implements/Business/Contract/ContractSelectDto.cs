@@ -7,8 +7,8 @@ namespace Entity.DTOs.Implements.Business.Contract
 {
     public class ContractSelectDto : BaseDto
     {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
         public bool Active { get; set; }
 
         // Persona asociada

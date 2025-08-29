@@ -3,8 +3,8 @@
     public class ContractUpdateDto
     {
         public int Id { get; set; }
-        public DateTime StartDate { get; init; }
-        public DateTime EndDate { get; init; }
+        public DateOnly StartDate { get; init; }
+        public DateOnly EndDate { get; init; }
         public bool Active { get; init; }
 
         // Permite reconfigurar locales y recalcular totales

@@ -1,6 +1,6 @@
 export interface ContractCreateModel {
-  startDate: string
-  endDate: string;
+  startDate: string;  // "YYYY-MM-DD"
+  endDate:   string;  // "YYYY-MM-DD"
   address: string;
   cityId: number;
   document: string;
@@ -13,7 +13,7 @@ export interface ContractCreateModel {
   clauseIds?: number[];
 }
 
-// Para listar
+/** Detalle de locales asociados (para lista completa) */
 export interface PremisesLeasedModel {
   id: number;
   establishmentId: number;
@@ -22,10 +22,11 @@ export interface PremisesLeasedModel {
   address?: string;
 }
 
+/** Read-model COMPLETO (Admin) */
 export interface ContractSelectModel {
   id: number;
-  startDate: string;
-  endDate: string;
+  startDate: string; // "YYYY-MM-DD"
+  endDate:   string; // "YYYY-MM-DD"
   personId: number;
   fullName: string;
   document: string;
@@ -33,4 +34,15 @@ export interface ContractSelectModel {
   email: string | null;
   premisesLeased: PremisesLeasedModel[];
   active: boolean;
+}
+
+/** Read-model LIGERO (/contract/mine) */
+export interface ContractCard {
+  id: number;
+  personId: number;
+  startDate: string;  // "YYYY-MM-DD"
+  endDate:   string;  // "YYYY-MM-DD"
+  totalBase: number;
+  totalUvt:  number;
+  active:    boolean;
 }

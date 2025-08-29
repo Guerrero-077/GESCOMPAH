@@ -5,8 +5,8 @@ namespace Entity.Domain.Models.Implements.Business
 {
     public class Contract : BaseModel
     {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
 
         public string? BusinessPurpose { get; set; }
 
