@@ -3,7 +3,7 @@ import { ContractSelectModel } from '../../models/contract.models';
 
 @Injectable({ providedIn: 'root' })
 export class ContractStore {
-  
+
   private _contracts = signal<ContractSelectModel[]>([]);
 
   // Señal pública reactiva

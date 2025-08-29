@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { EstablishmentSelect, EstablishmentCreate, EstablishmentUpdate } from '../../models/establishment.models';
+import { EstablishmentSelect, EstablishmentCreate, EstablishmentUpdate, ImageSelectDto } from '../../models/establishment.models';
 import { EstablishmentService } from './establishment.service';
 
 @Injectable({
@@ -60,6 +60,17 @@ export class EstablishmentStore {
         this.establishments = this.establishments.filter(e => e.id !== id);
       })
     );
+  }
+
+
+
+  applyImages(establishmentId: number, images: ImageSelectDto[]): void {
+    const next = this.establishments.map(e =>
+      e.id === establishmentId
+        ? { ...e, images: [...(e.images ?? []), ...images] }
+        : e
+    );
+    this.establishments = next;
   }
 }
 

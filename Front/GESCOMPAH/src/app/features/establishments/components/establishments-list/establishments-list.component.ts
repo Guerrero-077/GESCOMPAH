@@ -55,16 +55,21 @@ export class EstablishmentsListComponent {
   }
 
   openCreateDialog(): void {
-    this.dialog.open(FormEstablishmentComponent, {
+    const ref = this.dialog.open(FormEstablishmentComponent, {
       width: '600px',
       data: null
     });
+    ref.afterClosed().subscribe(ok => {
+      if (ok) this.store.loadAll(); // ✅ recarga la lista
+    });
   }
-
   openEditDialog(est: EstablishmentSelect): void {
-    this.dialog.open(FormEstablishmentComponent, {
+    const ref = this.dialog.open(FormEstablishmentComponent, {
       width: '600px',
       data: est
+    });
+    ref.afterClosed().subscribe(ok => {
+      if (ok) this.store.loadAll(); // ✅ recarga la lista
     });
   }
 
@@ -79,6 +84,11 @@ export class EstablishmentsListComponent {
       }
     });
   }
+
+  onCardUpdated(): void {
+    this.store.loadAll();
+  }
+
 
   onView(id: number) {
     const row = this.establishments.find(e => e.id === id);

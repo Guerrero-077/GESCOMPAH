@@ -60,20 +60,35 @@ namespace Business.Mapping
             config.NewConfig<Establishment, EstablishmentSelectDto>()
                 .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageSelectDto>>());
 
-            // DTO de creación → Entidad
+            // EstablishmentCreateDto → Establishment (JSON puro; sin media)
             config.NewConfig<EstablishmentCreateDto, Establishment>()
-                .Ignore(dest => dest.Id)               // Se genera en DB
-                .Ignore(dest => dest.Images)           // Se manejan aparte
-                .Ignore(dest => dest.Active)           // Control de negocio
-                .IgnoreNullValues(true);
+                .Ignore(dest => dest.Id)                 // PK generada por DB
+                .Ignore(dest => dest.Images)             // media se gestiona aparte
+                .Ignore(dest => dest.Active)             // controlado por negocio
+                .IgnoreNullValues(true)
+                .Map(dest => dest.Name, src => src.Name.Trim())
+                .Map(dest => dest.Description, src => src.Description.Trim())
+                .Map(dest => dest.Address, src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address.Trim())
+                .Map(dest => dest.AreaM2, src => src.AreaM2)
+                .Map(dest => dest.RentValueBase, src => src.RentValueBase)
+                .Map(dest => dest.UvtQty, src => src.UvtQty)
+                // Si tu entidad usa PlazaId:
+                .Map(dest => dest.PlazaId, src => src.PlazaId);
 
-            // DTO de actualización → Entidad (ignorar nulos y valores por defecto)
+
             config.NewConfig<EstablishmentUpdateDto, Establishment>()
-                .Ignore(dest => dest.Images)   // Se manejan aparte
-                .Ignore(dest => dest.Active)   // No se actualiza desde DTO
-                .IgnoreNullValues(true);
-
-
+              .Ignore(dest => dest.Images)     // media va por ImagesController
+              .Ignore(dest => dest.Active)     // no se actualiza desde DTO
+              .IgnoreNullValues(true)          // si el src es null, no pisa el dest
+                                               // Strings: trim si vienen, y si vienen vacíos/whitespace -> null (no pisa)
+              .Map(dest => dest.Name, src => src.Name == null ? null : src.Name.Trim())
+              .Map(dest => dest.Description, src => src.Description == null ? null : src.Description.Trim())
+              .Map(dest => dest.Address, src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address.Trim())
+              // Numéricos y FK (se asignan directo)
+              .Map(dest => dest.AreaM2, src => src.AreaM2)
+              .Map(dest => dest.RentValueBase, src => src.RentValueBase)
+              .Map(dest => dest.UvtQty, src => src.UvtQty)
+              .Map(dest => dest.PlazaId, src => src.PlazaId);
 
             config.NewConfig<Plaza, PlazaSelectDto>();
 
@@ -224,15 +239,14 @@ namespace Business.Mapping
             // Entidad → DTO de creación (por si lo necesitás)
             config.NewConfig<Images, ImageCreateDto>();
 
-            // DTO de actualización → Entidad
+            // ImageUpdateDto → Images (patch-friendly)
             config.NewConfig<ImageUpdateDto, Images>()
-                .Ignore(dest => dest.Id)
-                .Ignore(dest => dest.FilePath)    // Solo cambia desde Cloudinary
-                .Ignore(dest => dest.FileName)    // No se modifica directamente
-                .Ignore(dest => dest.CreatedAt)
-                .Ignore(dest => dest.IsDeleted)   // Controlado por lógica
-                .IgnoreNullValues(true);          // Fundamental para evitar sobrescritura
-
+                  .Ignore(dest => dest.Id)
+                  .Ignore(dest => dest.FilePath)   // Se cambia solo desde Cloudinary
+                  .Ignore(dest => dest.FileName)
+                  .Ignore(dest => dest.CreatedAt)
+                  .Ignore(dest => dest.IsDeleted)
+                  .IgnoreNullValues(true);
 
 
             // ============================================
@@ -258,7 +272,12 @@ namespace Business.Mapping
                 .Map(dest => dest.FullName, src => $"{src.Person.FirstName} {src.Person.LastName}")
                 .Map(dest => dest.Email, src => src.Email);
 
-         
+
+
+            // =========================================================================================
+            // Menú
+            // =========================================================================================
+
             config.NewConfig<Module, MenuModuleDto>()
                 .Map(dest => dest.Forms, src => src.FormModules.Select(fm => fm.Form).Adapt<List<FormDto>>());
 

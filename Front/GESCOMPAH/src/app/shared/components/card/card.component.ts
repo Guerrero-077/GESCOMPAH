@@ -22,12 +22,18 @@ export class CardComponent {
 
   constructor(private dialog: MatDialog) { }
 
-  get primaryImage(): string {
-    const imageUrl = this.local?.images?.[0]?.filePath || 'assets/images/placeholder.jpg';
-    // console.log('Primary Image URL:', imageUrl);
-    // Append a timestamp to the URL to bypass browser caching
-    return imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+get primaryImage(): string {
+  const first: any = this.local?.images?.[0];
+  const url = first?.filePath ?? first?.FilePath;
+
+  if (typeof url === 'string' && url.startsWith('http')) {
+    return url; // Cloudinary: úsala tal cual
   }
+
+  // Fallback transparente (sin 404)
+  return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wwAAn8B9oZ1VwAAAABJRU5ErkJggg==';
+}
+
 
   get formattedRent(): string {
     return new Intl.NumberFormat('es-CO', {

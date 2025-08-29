@@ -40,8 +40,8 @@ namespace Business.Services.Utilities.PDF
             template = template.Replace("@Model.Document", c.Document);
             template = template.Replace("@Model.StartDate.ToString(\"dd/MM/yyyy\")", c.StartDate.ToString("dd/MM/yyyy"));
             template = template.Replace("@Model.EndDate.ToString(\"dd/MM/yyyy\")", c.EndDate.ToString("dd/MM/yyyy"));
-            template = template.Replace("@Model.Terms.UvtQty", c.Terms.UvtQty.ToString("0.##"));
-            template = template.Replace("@(Model.Terms.UseSystemParameters ? \"Sí\" : \"No\")", c.Terms.UseSystemParameters ? "Sí" : "No");
+            //template = template.Replace("@Model.Terms.UvtQty", c.Terms.UvtQty.ToString("0.##"));
+            //template = template.Replace("@(Model.Terms.UseSystemParameters ? \"Sí\" : \"No\")", c.Terms.UseSystemParameters ? "Sí" : "No");
 
             var p = c.PremisesLeased.FirstOrDefault();
             if (p != null)

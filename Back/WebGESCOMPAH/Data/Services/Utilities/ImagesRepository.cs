@@ -15,52 +15,67 @@ namespace Data.Services.Utilities
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        // Lectura estándar: solo activas y no borradas, sin tracking
         public override async Task<IEnumerable<Images>> GetAllAsync()
         {
             return await _dbSet
-                .Where(e => !e.IsDeleted)
+                .AsNoTracking()
+                .Where(i => i.Active && !i.IsDeleted)
                 .ToListAsync();
         }
 
         public async Task<List<Images>> GetByEstablishmentIdAsync(int establishmentId)
         {
             return await _dbSet
-                .Where(e => e.EstablishmentId == establishmentId && !e.IsDeleted)
+                .AsNoTracking()
+                .Where(i => i.EstablishmentId == establishmentId && i.Active && !i.IsDeleted)
+                .OrderByDescending(i => i.Id) // portada = la última subida (opcional)
                 .ToListAsync();
         }
 
-        public Task AddAsync(List<Images> images)
+        /// <summary>
+        /// Inserta en lote y confirma con UN solo SaveChangesAsync().
+        /// (No confundirse con AddAsync(T) del genérico.)
+        /// </summary>
+        public async Task AddRangeAsync(IEnumerable<Images> images)
         {
-            if (images == null || !images.Any())
-                return Task.CompletedTask;
+            if (images == null) throw new ArgumentNullException(nameof(images));
+            var list = images.Where(x => x != null).ToList();
+            if (list.Count == 0) return;
 
-            // No transacciones ni SaveChanges aquí
-            _dbSet.AddRange(images);
-            return Task.CompletedTask;
+            await _dbSet.AddRangeAsync(list);
+            await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Borrado físico por PublicId. El borrado en Cloudinary lo maneja la capa Business.
+        /// </summary>
         public async Task<bool> DeleteByPublicIdAsync(string publicId)
         {
-            var image = await _dbSet.FirstOrDefaultAsync(i => i.PublicId == publicId);
-            if (image == null) return false;
+            if (string.IsNullOrWhiteSpace(publicId)) return false;
 
-            _dbSet.Remove(image);
-            await _context.SaveChangesAsync();
-            return true;
+            var entity = await _dbSet.FirstOrDefaultAsync(i => i.PublicId == publicId && !i.IsDeleted);
+            if (entity == null) return false;
+
+            _dbSet.Remove(entity);
+            return await _context.SaveChangesAsync() > 0;
         }
 
-
+        /// <summary>
+        /// Borrado lógico por PublicId (Active=false, IsDeleted=true).
+        /// </summary>
         public async Task<bool> DeleteLogicalByPublicIdAsync(string publicId)
         {
-            var entity = await _context.Images.FirstOrDefaultAsync(i => i.PublicId == publicId);
+            if (string.IsNullOrWhiteSpace(publicId)) return false;
+
+            var entity = await _dbSet.FirstOrDefaultAsync(i => i.PublicId == publicId && !i.IsDeleted);
             if (entity == null) return false;
 
             entity.Active = false;
-            entity.IsDeleted = true; // o el nombre del flag soft delete
-            _context.Images.Update(entity);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+            entity.IsDeleted = true;
+            _dbSet.Update(entity);
 
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

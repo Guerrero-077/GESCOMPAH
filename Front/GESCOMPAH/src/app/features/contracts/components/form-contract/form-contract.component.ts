@@ -68,7 +68,6 @@ export class FormContractComponent implements OnInit {
       phone: [''],
       email: [''],
       establishmentIds: [[], Validators.required],
-      calculationKey: ['', Validators.required],
     });
   }
 
