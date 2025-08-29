@@ -4,18 +4,23 @@ using Entity.Domain.Models.Implements.Location;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Utilities;
+
 using Entity.DTOs.Implements.AdministrationSystem.Form;
 using Entity.DTOs.Implements.AdministrationSystem.FormModule;
 using Entity.DTOs.Implements.AdministrationSystem.Module;
 using Entity.DTOs.Implements.AdministrationSystem.SystemParameter;
+
 using Entity.DTOs.Implements.Business.Appointment;
 using Entity.DTOs.Implements.Business.Contract;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Entity.DTOs.Implements.Business.Plaza;
 using Entity.DTOs.Implements.Business.PremisesLeased;
+
 using Entity.DTOs.Implements.Location.City;
 using Entity.DTOs.Implements.Location.Department;
+
 using Entity.DTOs.Implements.Persons.Person;
+
 using Entity.DTOs.Implements.SecurityAuthentication.Auth;
 using Entity.DTOs.Implements.SecurityAuthentication.Me;
 using Entity.DTOs.Implements.SecurityAuthentication.Permission;
@@ -23,9 +28,11 @@ using Entity.DTOs.Implements.SecurityAuthentication.Rol;
 using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
 using Entity.DTOs.Implements.SecurityAuthentication.RolUser;
 using Entity.DTOs.Implements.SecurityAuthentication.User;
+
 using Entity.DTOs.Implements.Utilities.Images;
 
 using Mapster;
+using System.Linq;
 
 namespace Business.Mapping
 {
@@ -35,13 +42,9 @@ namespace Business.Mapping
         {
             var config = TypeAdapterConfig.GlobalSettings;
 
-
-
-
             // ============================================
             // AdministrationSystem
             // ============================================
-
             config.NewConfig<Form, FormSelectDto>();
             config.NewConfig<FormModule, FormModuleSelectDto>();
             config.NewConfig<Module, ModuleSelectDto>();
@@ -52,52 +55,53 @@ namespace Business.Mapping
             // Business
             // ============================================
 
+            // Appointment
             config.NewConfig<Appointment, AppointmentSelectDto>()
-                    .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
+                  .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
 
-
-            // Entidad → DTO de selección
+            // Establishment -> Select
             config.NewConfig<Establishment, EstablishmentSelectDto>()
-                .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageSelectDto>>());
+                  .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageSelectDto>>());
 
-            // EstablishmentCreateDto → Establishment (JSON puro; sin media)
+            // Establishment Create -> Entity
             config.NewConfig<EstablishmentCreateDto, Establishment>()
-                .Ignore(dest => dest.Id)                 // PK generada por DB
-                .Ignore(dest => dest.Images)             // media se gestiona aparte
-                .Ignore(dest => dest.Active)             // controlado por negocio
-                .IgnoreNullValues(true)
-                .Map(dest => dest.Name, src => src.Name.Trim())
-                .Map(dest => dest.Description, src => src.Description.Trim())
-                .Map(dest => dest.Address, src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address.Trim())
-                .Map(dest => dest.AreaM2, src => src.AreaM2)
-                .Map(dest => dest.RentValueBase, src => src.RentValueBase)
-                .Map(dest => dest.UvtQty, src => src.UvtQty)
-                // Si tu entidad usa PlazaId:
-                .Map(dest => dest.PlazaId, src => src.PlazaId);
+                  .Ignore(dest => dest.Id)
+                  .Ignore(dest => dest.Images)
+                  .Ignore(dest => dest.Active)
+                  .Ignore(dest => dest.IsDeleted)
+                  .Ignore(dest => dest.CreatedAt)
+                  .IgnoreNullValues(true)
+                  .Map(dest => dest.Name, src => src.Name.Trim())
+                  .Map(dest => dest.Description, src => src.Description.Trim())
+                  .Map(dest => dest.Address, src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address.Trim())
+                  .Map(dest => dest.AreaM2, src => src.AreaM2)
+                  .Map(dest => dest.RentValueBase, src => src.RentValueBase)
+                  .Map(dest => dest.UvtQty, src => src.UvtQty)
+                  .Map(dest => dest.PlazaId, src => src.PlazaId);
 
-
+            // Establishment Update -> Entity
             config.NewConfig<EstablishmentUpdateDto, Establishment>()
-              .Ignore(dest => dest.Images)     // media va por ImagesController
-              .Ignore(dest => dest.Active)     // no se actualiza desde DTO
-              .IgnoreNullValues(true)          // si el src es null, no pisa el dest
-                                               // Strings: trim si vienen, y si vienen vacíos/whitespace -> null (no pisa)
-              .Map(dest => dest.Name, src => src.Name == null ? null : src.Name.Trim())
-              .Map(dest => dest.Description, src => src.Description == null ? null : src.Description.Trim())
-              .Map(dest => dest.Address, src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address.Trim())
-              // Numéricos y FK (se asignan directo)
-              .Map(dest => dest.AreaM2, src => src.AreaM2)
-              .Map(dest => dest.RentValueBase, src => src.RentValueBase)
-              .Map(dest => dest.UvtQty, src => src.UvtQty)
-              .Map(dest => dest.PlazaId, src => src.PlazaId);
+                  .Ignore(dest => dest.Images)
+                  .Ignore(dest => dest.Active)
+                  .Ignore(dest => dest.IsDeleted)
+                  .Ignore(dest => dest.CreatedAt)
+                  .IgnoreNullValues(true)
+                  .Map(dest => dest.Name, src => src.Name == null ? null : src.Name.Trim())
+                  .Map(dest => dest.Description, src => src.Description == null ? null : src.Description.Trim())
+                  .Map(dest => dest.Address, src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address.Trim())
+                  .Map(dest => dest.AreaM2, src => src.AreaM2)
+                  .Map(dest => dest.RentValueBase, src => src.RentValueBase)
+                  .Map(dest => dest.UvtQty, src => src.UvtQty)
+                  .Map(dest => dest.PlazaId, src => src.PlazaId);
 
             config.NewConfig<Plaza, PlazaSelectDto>();
 
+            // -------- Contract mapeos críticos --------
 
-
-
-
-
+            // ContractCreateDto -> Person (ya lo tenías)
             TypeAdapterConfig<ContractCreateDto, Person>.NewConfig()
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.City) // navegación
                 .Map(dest => dest.FirstName, src => src.FirstName)
                 .Map(dest => dest.LastName, src => src.LastName)
                 .Map(dest => dest.Document, src => src.Document)
@@ -105,27 +109,34 @@ namespace Business.Mapping
                 .Map(dest => dest.Address, src => src.Address)
                 .Map(dest => dest.CityId, src => src.CityId);
 
+            // ContractCreateDto -> Contract
+            // ⚠️ Ignoramos totales y navegaciones para que NO se pisen en Business
             TypeAdapterConfig<ContractCreateDto, Contract>.NewConfig()
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.Person)            // se setea PersonId en Business
+                .Ignore(dest => dest.PersonId)
+                .Ignore(dest => dest.PremisesLeased)    // se crean luego de guardar contrato
+                .Ignore(dest => dest.ContractClauses)
+                .Ignore(dest => dest.TotalBaseRentAgreed) // calculado en Business
+                .Ignore(dest => dest.TotalUvtQtyAgreed)   // calculado en Business
+                .Ignore(dest => dest.Active)            // controlado por negocio
+                .Ignore(dest => dest.IsDeleted)
+                .Ignore(dest => dest.CreatedAt)
                 .Map(dest => dest.StartDate, src => src.StartDate)
                 .Map(dest => dest.EndDate, src => src.EndDate);
 
-            //TypeAdapterConfig<ContractCreateDto, ContractTerms>.NewConfig()
-            //    .Map(dest => dest.UvtQty, src => src.UvtQty)
-            //    .Map(dest => dest.UseSystemParameters, src => src.UseSystemParameters);
-
-
+            // Contract -> ContractSelectDto (exponer totales y datos útiles de persona/usuario)
             TypeAdapterConfig<Contract, ContractSelectDto>.NewConfig()
                 .Map(dest => dest.FullName, src => src.Person.FirstName + " " + src.Person.LastName)
                 .Map(dest => dest.Document, src => src.Person.Document)
                 .Map(dest => dest.Phone, src => src.Person.Phone)
-                .Map(dest => dest.PremisesLeased, src => src.PremisesLeased)
-                .Map(dest => dest.Email, src => src.Person.User != null ? src.Person.User.Email : string.Empty);
+                .Map(dest => dest.Email, src => src.Person.User != null ? src.Person.User.Email : string.Empty)
+                .Map(dest => dest.PremisesLeased, src => src.PremisesLeased.Adapt<List<PremisesLeasedSelectDto>>())
+                .Map(dest => dest.TotalBaseRentAgreed, src => src.TotalBaseRentAgreed)
+                .Map(dest => dest.TotalUvtQtyAgreed, src => src.TotalUvtQtyAgreed)
+                .Map(dest => dest.Active, src => !src.IsDeleted);
 
-                //.Map(dest => dest.Terms, src => src.ContractTerms.FirstOrDefault());
-
-
-
-
+            // PremisesLeased -> PremisesLeasedSelectDto (adaptar imágenes a DTO)
             config.NewConfig<PremisesLeased, PremisesLeasedSelectDto>()
                 .Map(dest => dest.EstablishmentId, src => src.Establishment.Id)
                 .Map(dest => dest.EstablishmentName, src => src.Establishment.Name)
@@ -134,59 +145,41 @@ namespace Business.Mapping
                 .Map(dest => dest.RentValueBase, src => src.Establishment.RentValueBase)
                 .Map(dest => dest.Address, src => src.Establishment.Address)
                 .Map(dest => dest.PlazaName, src => src.Establishment.Plaza.Name)
-                .Map(dest => dest.Images, src => src.Establishment.Images);
+                .Map(dest => dest.Images, src => src.Establishment.Images.Adapt<List<ImageSelectDto>>());
 
-
-
-
-
-
-
+            // (Si luego habilitas Terms:)
+            // TypeAdapterConfig<Contract, ContractSelectDto>.NewConfig()
+            //   .Map(dest => dest.Terms, src => src.ContractTerms.FirstOrDefault());
 
             // ============================================
             // Location
             // ============================================
-
             config.NewConfig<City, CitySelectDto>();
-
             config.NewConfig<Department, DepartmentSelectDto>();
-
 
             // ============================================
             // Persons
             // ============================================
-            // Entidad -> DTO de selección (maneja City nullable)
-
-            //config.NewConfig<Person, PersonSelectDto>()
-            //    .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty);
-
             config.NewConfig<Person, PersonSelectDto>()
                 .Map(dest => dest.CityName, src => src.City != null ? src.City.Name : string.Empty)
                 .Map(dest => dest.Email, src => src.User != null ? src.User.Email : null);
 
-
-            // DTO de creación -> Entidad  (NO toca navegaciones)
             config.NewConfig<PersonDto, Person>()
-                .Ignore(dest => dest.Id)    // lo genera DB
-                .Ignore(dest => dest.City)  // navegación
-                .IgnoreNullValues(false);   // para creación, aplica TODOS los campos
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.City)
+                .IgnoreNullValues(false);
 
-            // DTO de actualización -> Entidad (patch-friendly)
             config.NewConfig<PersonUpdateDto, Person>()
-                .Ignore(dest => dest.Id)  // Ignora el Id para evitar modificar la clave primaria
-                .Ignore(dest => dest.City)  // navegación
-                .IgnoreNullValues(true);    // no pises con nulls
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.City)
+                .IgnoreNullValues(true);
 
             // ============================================
             // SecurityAuthentication
             // ============================================
-
             config.NewConfig<Permission, PermissionSelectDto>();
-
             config.NewConfig<Rol, RolSelectDto>();
-
             config.NewConfig<RolFormPermission, RolFormPermissionSelectDto>();
-
             config.NewConfig<RolUser, RolUserSelectDto>();
 
             config.NewConfig<User, UserSelectDto>()
@@ -203,86 +196,65 @@ namespace Business.Mapping
             config.NewConfig<UserCreateDto, User>()
                 .Ignore(dest => dest.Id);
 
-
             config.NewConfig<UserCreateDto, Person>()
                 .Ignore(dest => dest.Id);
 
             config.NewConfig<UserUpdateDto, User>();
 
             config.NewConfig<UserUpdateDto, Person>()
-                .Ignore(dest => dest.Id) // No modificar la PK
+                .Ignore(dest => dest.Id)
                 .Map(dest => dest.FirstName, src => src.FirstName)
                 .Map(dest => dest.LastName, src => src.LastName)
                 .Map(dest => dest.Phone, src => src.Phone)
                 .Map(dest => dest.Address, src => src.Address)
                 .Map(dest => dest.CityId, src => src.CityId);
 
-
-
-
             // ============================================
-            // Utilities
+            // Utilities (Images)
             // ============================================
-
             config.NewConfig<Images, ImageSelectDto>();
 
-
-            //? Revisar
-
-            // DTO de creación → Entidad (nuevo mapeo agregado)
             config.NewConfig<ImageCreateDto, Images>()
                 .Ignore(dest => dest.Id)
-                .Ignore(dest => dest.Establishment) // Relación se setea manualmente
+                .Ignore(dest => dest.Establishment)
                 .Ignore(dest => dest.CreatedAt)
                 .Ignore(dest => dest.IsDeleted);
 
-            // Entidad → DTO de creación (por si lo necesitás)
             config.NewConfig<Images, ImageCreateDto>();
 
-            // ImageUpdateDto → Images (patch-friendly)
             config.NewConfig<ImageUpdateDto, Images>()
-                  .Ignore(dest => dest.Id)
-                  .Ignore(dest => dest.FilePath)   // Se cambia solo desde Cloudinary
-                  .Ignore(dest => dest.FileName)
-                  .Ignore(dest => dest.CreatedAt)
-                  .Ignore(dest => dest.IsDeleted)
-                  .IgnoreNullValues(true);
-
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.FilePath)
+                .Ignore(dest => dest.FileName)
+                .Ignore(dest => dest.CreatedAt)
+                .Ignore(dest => dest.IsDeleted)
+                .IgnoreNullValues(true);
 
             // ============================================
-            // USUARIOS / AUTENTICACIÓN
+            // Auth / Registro
             // ============================================
-
             config.NewConfig<RegisterDto, User>()
-                .Ignore(dest => dest.Id); 
-
-            
-            config.NewConfig<RegisterDto, Person>()
                 .Ignore(dest => dest.Id);
 
-
+            config.NewConfig<RegisterDto, Person>()
+                .Ignore(dest => dest.Id);
 
             config.NewConfig<User, UserDto>()
                 .Map(dest => dest.Person, src => src.Person)
                 .Map(dest => dest.Roles, src => src.RolUsers.Select(r => r.Rol.Name).ToList());
 
-            // User hacia DTO para "mi perfil"
             config.NewConfig<User, UserMeDto>()
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.FullName, src => $"{src.Person.FirstName} {src.Person.LastName}")
                 .Map(dest => dest.Email, src => src.Email);
 
-
-
-            // =========================================================================================
+            // ============================================
             // Menú
-            // =========================================================================================
-
+            // ============================================
             config.NewConfig<Module, MenuModuleDto>()
                 .Map(dest => dest.Forms, src => src.FormModules.Select(fm => fm.Form).Adapt<List<FormDto>>());
 
             config.NewConfig<Form, FormDto>();
-
 
             return config;
         }

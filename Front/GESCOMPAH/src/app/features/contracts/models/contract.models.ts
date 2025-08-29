@@ -1,17 +1,19 @@
 export interface ContractCreateModel {
-  startDate: string;
+  startDate: string
   endDate: string;
   address: string;
   cityId: number;
   document: string;
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  userEmail?: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string | null;
   establishmentIds: number[];
-  calculationKey: string;
+  useSystemParameters?: boolean;
+  clauseIds?: number[];
 }
 
+// Para listar
 export interface PremisesLeasedModel {
   id: number;
   establishmentId: number;
@@ -24,12 +26,11 @@ export interface ContractSelectModel {
   id: number;
   startDate: string;
   endDate: string;
-  status: string;
   personId: number;
   fullName: string;
   document: string;
   phone: string;
-  userEmail: string | null;
+  email: string | null;
   premisesLeased: PremisesLeasedModel[];
   active: boolean;
 }

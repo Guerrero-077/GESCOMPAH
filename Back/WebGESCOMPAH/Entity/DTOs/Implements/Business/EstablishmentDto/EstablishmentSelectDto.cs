@@ -14,8 +14,8 @@ namespace Entity.DTOs.Implements.Business.EstablishmentDto
         public string PlazaName { get; set; } = null!;
         public bool Active { get; set; }
 
-        /// <summary>Imágenes asociadas al establecimiento</summary>
+        public decimal UvtQty { get; set; }
+
         public List<ImageSelectDto> Images { get; set; } = [];
     }
-
 }
