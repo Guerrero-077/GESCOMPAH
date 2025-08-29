@@ -10,15 +10,16 @@ using Entity.DTOs.Implements.Business.Contract;
 using Entity.Infrastructure.Context;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Utilities.Exceptions;
 using Utilities.Helpers.GeneratePassword;
 using Utilities.Messaging.Interfaces;
+using System.Linq;
 
 namespace Business.Services.Business
 {
     /// <summary>
-    /// Crea contratos (persona/usuario opcional) y calcula totales desde establecimientos.
-    /// Alineado con IContractService: solo expone CreateContractWithPersonHandlingAsync.
+    /// Crea contratos (persona/usuario opcional), asocia locales y marca sus establecimientos como ocupados (Active = false).
     /// </summary>
     public class ContractService
         : BusinessGeneric<ContractSelectDto, ContractCreateDto, ContractUpdateDto, Contract>, IContractService
@@ -76,7 +77,18 @@ namespace Business.Services.Business
             if (dto.EstablishmentIds is null || dto.EstablishmentIds.Count == 0)
                 throw new BusinessException("Debe seleccionar al menos un establecimiento.");
 
+            var targetIds = dto.EstablishmentIds.Distinct().ToList();
+
             await using var tx = await _context.Database.BeginTransactionAsync();
+
+            // 0) Validación de disponibilidad: todos deben estar activos
+            var alreadyInactive = await _establishmentsRepository.GetInactiveIdsAsync(targetIds);
+            if (alreadyInactive.Count > 0)
+            {
+                throw new BusinessException(
+                    $"Los establecimientos {string.Join(", ", alreadyInactive)} no están disponibles (Active = false)."
+                );
+            }
 
             // 1) Persona (crear o reutilizar por documento)
             var person = await _personRepository.GetByDocumentAsync(dto.Document);
@@ -84,7 +96,7 @@ namespace Business.Services.Business
             {
                 person = _mapper.Map<Person>(dto);
                 await _personRepository.AddAsync(person);
-                await _context.SaveChangesAsync(); // asegura Person.Id
+                await _context.SaveChangesAsync();
             }
 
             // 2) Usuario opcional
@@ -114,7 +126,7 @@ namespace Business.Services.Business
             contract.PersonId = person.Id;
 
             // 4) Calcular totales por proyección
-            var (totalBase, totalUvt) = await SumEstablishmentsAsync(dto.EstablishmentIds);
+            var (totalBase, totalUvt) = await SumEstablishmentsAsync(targetIds);
             contract.TotalBaseRentAgreed = totalBase;
             contract.TotalUvtQtyAgreed = totalUvt;
 
@@ -122,13 +134,27 @@ namespace Business.Services.Business
             await _context.SaveChangesAsync(); // genera Contract.Id
 
             // 5) Asociar locales
-            var premises = dto.EstablishmentIds.Distinct().Select(id => new PremisesLeased
+            var premises = targetIds.Select(id => new PremisesLeased
             {
                 ContractId = contract.Id,
                 EstablishmentId = id
-            });
+            }).ToList();
+
             await _premisesLeasedRepository.AddRangeAsync(premises);
             await _context.SaveChangesAsync();
+
+            // 6) Marcar establecimientos como ocupados (Active = false) en BLOQUE
+            //    Filtro por Active != false para no tocar filas innecesarias.
+            var rows = await _establishmentsRepository.SetActiveByIdsAsync(targetIds, active: false);
+
+            if (rows != targetIds.Count)
+            {
+                // Concurrencia: alguien pudo cambiar estado entre validación y update.
+                throw new BusinessException(
+                    "Conflicto de concurrencia al actualizar estados de establecimientos. " +
+                    "Intente nuevamente; verifique disponibilidad actual."
+                );
+            }
 
             await tx.CommitAsync();
             return contract.Id;

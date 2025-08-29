@@ -1,153 +1,179 @@
 .local-card {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    width: 300px;
-    /* height: 350px; */ /* Removed fixed height */
-    display: flex;
-    flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 300px;
+  /* height: 350px; */
+  /* Removed fixed height */
+  display: flex;
+  flex-direction: column;
 }
 
 .local-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .image-container {
-    height: 150px;
-    overflow: hidden;
-    padding: 0.25rem; /* Reduced padding */
+  height: 150px;
+  overflow: hidden;
+  padding: 0.25rem;
+  /* Reduced padding */
 }
 
 .local-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-    transition: transform 0.3s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
 }
 
 .local-card:hover .local-image {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .availability-tag {
-    position: absolute;
-    top: 10px; /* Adjusted position */
-    right: 15px; /* Adjusted position */
-    background: #4CAF50;
-    color: white;
-    padding: 3px 8px; /* Reduced padding */
-    border-radius: 16px;
-    font-size: 10px; /* Reduced font size */
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  position: absolute;
+  top: 10px;
+  /* Adjusted position */
+  right: 15px;
+  /* Adjusted position */
+  background: #4CAF50;
+  color: white;
+  padding: 3px 8px;
+  /* Reduced padding */
+  border-radius: 16px;
+  font-size: 10px;
+  /* Reduced font size */
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.unavailable {
+  background-color: red;
 }
 
 .card-content {
-    padding: 0.75rem; /* Reduced padding */
+  padding: 0.75rem;
+  /* Reduced padding */
 }
 
 .local-name {
-    font-size: 1.15rem; /* Slightly reduced font size */
-    font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 0.25rem; /* Reduced margin */
-    line-height: 1.3;
+  font-size: 1.15rem;
+  /* Slightly reduced font size */
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+  /* Reduced margin */
+  line-height: 1.3;
 }
 
 .description {
-    font-size: 0.8rem; /* Slightly reduced font size */
-    color: #555;
-    margin-bottom: 0.75rem; /* Reduced margin */
-    line-height: 1.4;
-    height: 3em; /* Limit description to 2 lines */
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 0.8rem;
+  /* Slightly reduced font size */
+  color: #555;
+  margin-bottom: 0.75rem;
+  /* Reduced margin */
+  line-height: 1.4;
+  height: 3em;
+  /* Limit description to 2 lines */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem; /* Reduced gap */
-    margin-bottom: 0.75rem; /* Reduced margin */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  /* Reduced gap */
+  margin-bottom: 0.75rem;
+  /* Reduced margin */
 }
 
 .info-item {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .info-label {
-    font-size: 0.7rem; /* Slightly reduced font size */
-    color: #666;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.15rem; /* Reduced margin */
+  font-size: 0.7rem;
+  /* Slightly reduced font size */
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.15rem;
+  /* Reduced margin */
 }
 
 .info-value {
-    font-size: 0.85rem; /* Slightly reduced font size */
-    color: #1a1a1a;
-    font-weight: 500;
-    word-break: break-word;
+  font-size: 0.85rem;
+  /* Slightly reduced font size */
+  color: #1a1a1a;
+  font-weight: 500;
+  word-break: break-word;
 }
 
 .card-divider {
-    border: none;
-    height: 1px;
-    background-color: #eee;
-    margin: 0.75rem 0; /* Reduced margin */
+  border: none;
+  height: 1px;
+  background-color: #eee;
+  margin: 0.75rem 0;
+  /* Reduced margin */
 }
 
 .rent-section {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .rent-label {
-    font-size: 0.7rem; /* Slightly reduced font size */
-    color: #666;
-    font-weight: 500;
-    display: block;
-    margin-bottom: 0.15rem; /* Reduced margin */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-size: 0.7rem;
+  /* Slightly reduced font size */
+  color: #666;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.15rem;
+  /* Reduced margin */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .rent-price {
-    font-size: 1.2rem; /* Slightly reduced font size */
-    font-weight: 700;
-    color: #2E7D32;
-    line-height: 1.2;
+  font-size: 1.2rem;
+  /* Slightly reduced font size */
+  font-weight: 700;
+  color: #2E7D32;
+  line-height: 1.2;
 }
 
 .footer {
-    margin-top: 0.75rem; /* Reduced margin */
+  margin-top: 0.75rem;
+  /* Reduced margin */
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .local-card {
-        max-width: 100%;
-    }
+  .local-card {
+    max-width: 100%;
+  }
 
-    .card-content {
-        padding: 0.75rem;
-    }
+  .card-content {
+    padding: 0.75rem;
+  }
 
-    .local-name {
-        font-size: 1rem;
-    }
+  .local-name {
+    font-size: 1rem;
+  }
 
-    .rent-price {
-        font-size: 1.1rem;
-    }
+  .rent-price {
+    font-size: 1.1rem;
+  }
 }

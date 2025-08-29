@@ -153,14 +153,13 @@ export class FormContractComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadEstablecimientos(): void {
-    this.establishmentService.getAll()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: res => (this.establecimientos = res),
-        error: err => console.error('Error al cargar establecimientos', err)
-      });
-  }
+private loadEstablecimientos(): void {
+  this.establishmentService.getAllActive()
+    .subscribe({
+      next: (res) => this.establecimientos = res,
+      error: (err) => console.error('Error al cargar establecimientos', err)
+    });
+}
 
   // Búsqueda reactiva por documento
   private setupReactivePersonLookup(): void {

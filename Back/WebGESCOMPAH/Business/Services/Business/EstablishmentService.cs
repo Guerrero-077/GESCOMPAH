@@ -20,8 +20,6 @@ namespace Business.Services.Business
         IEstablishmentService
     {
         private readonly IEstablishmentsRepository _repo;
-        private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
         private readonly ILogger<EstablishmentService> _logger;
 
         public EstablishmentService(
@@ -32,33 +30,58 @@ namespace Business.Services.Business
         ) : base(repo, mapper)
         {
             _repo = repo;
-            _context = context;
-            _mapper = mapper;
             _logger = logger;
         }
 
+        // ========= LISTAS =========
+
+        /// <summary>Todos: activos e inactivos.</summary>
+        public async Task<IReadOnlyList<EstablishmentSelectDto>> GetAllAnyAsync()
+        {
+            var list = await _repo.GetAllAsync(); // ActivityFilter.Any (compat)
+            return list.Select(e => e.Adapt<EstablishmentSelectDto>()).ToList().AsReadOnly();
+        }
+
+        /// <summary>Solo activos.</summary>
+        public async Task<IReadOnlyList<EstablishmentSelectDto>> GetAllActiveAsync()
+        {
+            var list = await _repo.GetAllAsync(ActivityFilter.ActiveOnly);
+            return list.Select(e => e.Adapt<EstablishmentSelectDto>()).ToList().AsReadOnly();
+        }
+
+        // ========= DETALLE =========
+
+        public async Task<EstablishmentSelectDto?> GetByIdAnyAsync(int id)
+        {
+            var e = await _repo.GetByIdAnyAsync(id);
+            return e?.Adapt<EstablishmentSelectDto>();
+        }
+
+        public async Task<EstablishmentSelectDto?> GetByIdActiveAsync(int id)
+        {
+            var e = await _repo.GetByIdActiveAsync(id);
+            return e?.Adapt<EstablishmentSelectDto>();
+        }
+
+        // ========= CRUD =========
+
         public override async Task<EstablishmentSelectDto> CreateAsync(EstablishmentCreateDto dto)
         {
-            Validate(dto);
-
-            var entity = dto.Adapt<Establishment>();
-
-            await using var tx = await _context.Database.BeginTransactionAsync();
             try
             {
+                Validate(dto);
+
+                var entity = dto.Adapt<Establishment>();
+
                 await _repo.AddAsync(entity);
-                await _context.SaveChangesAsync();
 
-                await tx.CommitAsync();
-
-                var created = await _repo.GetByIdAsync(entity.Id)
-                    ?? throw new BusinessException("No se pudo recargar el establecimiento creado.");
+                // Recarga sin filtro por Active (o usa el entity si no hace falta)
+                var created = await _repo.GetByIdAnyAsync(entity.Id) ?? entity;
 
                 return created.Adapt<EstablishmentSelectDto>();
             }
             catch (Exception ex)
             {
-                await tx.RollbackAsync();
                 _logger.LogError(ex, "Error al crear establecimiento");
                 throw new BusinessException("Error al crear el establecimiento.", ex);
             }
@@ -66,38 +89,41 @@ namespace Business.Services.Business
 
         public override async Task<EstablishmentSelectDto?> UpdateAsync(EstablishmentUpdateDto dto)
         {
-            var entity = await _repo.GetByIdAsync(dto.Id);
-            if (entity is null) return null;
-
-            Validate(dto);
-            dto.Adapt(entity);
-
-            await using var tx = await _context.Database.BeginTransactionAsync();
             try
             {
-                await _repo.UpdateAsync(entity);
-                await _context.SaveChangesAsync();
-                await tx.CommitAsync();
+                var entity = await _repo.GetByIdAnyAsync(dto.Id);
+                if (entity is null) return null;
 
-                var reloaded = await _repo.GetByIdAsync(entity.Id)
-                    ?? throw new BusinessException("No se pudo recargar el establecimiento actualizado.");
+                Validate(dto);
+                dto.Adapt(entity);
+
+                await _repo.UpdateAsync(entity);
+
+                var reloaded = await _repo.GetByIdAnyAsync(entity.Id) ?? entity;
+
                 return reloaded.Adapt<EstablishmentSelectDto>();
             }
             catch (Exception ex)
             {
-                await tx.RollbackAsync();
                 _logger.LogError(ex, "Error al actualizar establecimiento {Id}", dto.Id);
                 throw new BusinessException("Error al actualizar el establecimiento.", ex);
             }
         }
 
+        // ========= PROYECCIÓN =========
+
         public async Task<IReadOnlyList<EstablishmentBasicsDto>> GetBasicsByIdsAsync(IEnumerable<int> ids)
         {
-            var basics = await _repo.GetBasicsByIdsAsync(ids);
+            var distinct = ids?.Distinct().ToList() ?? new List<int>();
+            if (distinct.Count == 0) return Array.Empty<EstablishmentBasicsDto>();
+
+            var basics = await _repo.GetBasicsByIdsAsync(distinct);
             return basics.Select(b => new EstablishmentBasicsDto(b.Id, b.RentValueBase, b.UvtQty))
                          .ToList()
                          .AsReadOnly();
         }
+
+        // ========= VALIDACIONES =========
 
         private static void Validate(EstablishmentCreateDto dto)
         {
@@ -106,6 +132,7 @@ namespace Business.Services.Business
             if (dto.UvtQty <= 0) throw new BusinessException("UvtQty debe ser mayor que 0.");
             if (dto.PlazaId <= 0) throw new BusinessException("PlazaId inválido.");
         }
+
         private static void Validate(EstablishmentUpdateDto dto)
         {
             if (dto.RentValueBase <= 0) throw new BusinessException("RentValueBase debe ser mayor que 0.");

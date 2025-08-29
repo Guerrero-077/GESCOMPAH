@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebGESCOMPAH.Controllers.Module.Business
 {
     [ApiController]
-    [Authorize] // [Authorize(Policy = "CanManageEstablishments")] si usas policies
+    [Authorize] // [Authorize(Policy = "CanManageEstablishments")]
     [Route("api/[controller]")]
     [Produces("application/json")]
     public sealed class EstablishmentsController : ControllerBase
@@ -18,22 +18,34 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             _establishmentService = establishmentService;
         }
 
-        /// <summary>Obtener todos los establecimientos.</summary>
+        /// <summary>
+        /// Obtener establecimientos. 
+        /// Usa ?activeOnly=true para traer solo activos; por defecto trae todos (activos e inactivos).
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EstablishmentSelectDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<EstablishmentSelectDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<EstablishmentSelectDto>>> GetAll([FromQuery] bool activeOnly = false)
         {
-            var result = await _establishmentService.GetAllAsync();
+            var result = activeOnly
+                ? await _establishmentService.GetAllActiveAsync()
+                : await _establishmentService.GetAllAnyAsync();
+
             return Ok(result);
         }
 
-        /// <summary>Obtener un establecimiento por ID.</summary>
+        /// <summary>
+        /// Obtener un establecimiento por ID.
+        /// Usa ?activeOnly=true para forzar que sea activo; por defecto busca cualquiera.
+        /// </summary>
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(EstablishmentSelectDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, [FromQuery] bool activeOnly = false)
         {
-            var result = await _establishmentService.GetByIdAsync(id);
+            var result = activeOnly
+                ? await _establishmentService.GetByIdActiveAsync(id)
+                : await _establishmentService.GetByIdAnyAsync(id);
+
             if (result is null) return NotFound();
             return Ok(result);
         }
@@ -45,7 +57,6 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<EstablishmentSelectDto>> Create([FromBody] EstablishmentCreateDto dto)
         {
-            // [ApiController] validará el modelo automáticamente; si quieres validaciones custom, hazlas en el servicio.
             var result = await _establishmentService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
@@ -61,8 +72,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             if (id <= 0)
                 return BadRequest(new { id = new[] { "El Id debe ser mayor a 0." } });
 
-            // La ruta manda
-            dto.Id = id;
+            dto.Id = id; // la ruta manda
 
             var updated = await _establishmentService.UpdateAsync(dto);
             if (updated is null) return NotFound();
@@ -82,8 +92,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         }
 
         /// <summary>
-        /// (Opcional) Obtener datos básicos por IDs (para sumatorias: RentValueBase, UvtQty).
-        /// Útil si lo necesitas desde front u otra integración. Si solo lo usas internamente, puedes omitir este endpoint.
+        /// (Opcional) Obtener datos básicos por IDs para sumatorias (RentValueBase, UvtQty).
         /// </summary>
         [HttpPost("basics")]
         [Consumes("application/json")]
@@ -94,15 +103,8 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             if (ids is null || ids.Length == 0)
                 return BadRequest(new { ids = new[] { "Debe enviar al menos un ID de establecimiento." } });
 
-            // Exponemos como objeto anónimo liviano para no acoplar con entidades internas
             var basics = await _establishmentService.GetBasicsByIdsAsync(ids);
-            var dto = basics.Select(b => new
-            {
-                b.Id,
-                RentValueBase = b.RentValueBase,
-                UvtQty = b.UvtQty
-            });
-
+            var dto = basics.Select(b => new { b.Id, b.RentValueBase, b.UvtQty });
             return Ok(dto);
         }
     }

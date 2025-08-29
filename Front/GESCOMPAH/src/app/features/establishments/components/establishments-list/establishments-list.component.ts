@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -40,17 +40,19 @@ export class EstablishmentsListComponent {
   establishments$: Observable<EstablishmentSelect[]>;
   establishments: EstablishmentSelect[] = [];
 
-  constructor(
-    private dialog: MatDialog,
-    private store: EstablishmentStore,
-    private sweetAlert: SweetAlertService,
-    private sharedEvents: SharedEventsServiceService
-  ) {
+  private readonly dialog = inject(MatDialog);
+  private readonly store = inject(EstablishmentStore);
+  private readonly sweetAlert = inject(SweetAlertService);
+  private readonly sharedEvents = inject(SharedEventsServiceService);
+
+
+  constructor() {
     this.establishments$ = this.store.establishments$.pipe(
       tap(establishments => this.establishments = establishments)
     );
+
     this.sharedEvents.plazaStateChanged$.subscribe(() => {
-      this.store.loadAll(); // recarga establecimientos filtrados
+      this.store.loadAll();
     });
   }
 
@@ -60,16 +62,17 @@ export class EstablishmentsListComponent {
       data: null
     });
     ref.afterClosed().subscribe(ok => {
-      if (ok) this.store.loadAll(); // ✅ recarga la lista
+      if (ok) this.store.loadAll();
     });
   }
+
   openEditDialog(est: EstablishmentSelect): void {
     const ref = this.dialog.open(FormEstablishmentComponent, {
       width: '600px',
       data: est
     });
     ref.afterClosed().subscribe(ok => {
-      if (ok) this.store.loadAll(); // ✅ recarga la lista
+      if (ok) this.store.loadAll();
     });
   }
 

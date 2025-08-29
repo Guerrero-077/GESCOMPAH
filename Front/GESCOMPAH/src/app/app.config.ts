@@ -6,9 +6,8 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 
-import { provideAnimations, provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideNativeDateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
-// import { provideMatDatepicker } from '@angular/material/datepicker';
 
 export const appConfig: ApplicationConfig = {
   providers: [

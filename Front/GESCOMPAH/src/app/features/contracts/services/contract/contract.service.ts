@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../../environments/environment';
 import { Observable, of, tap } from 'rxjs';
 
 import {
@@ -8,6 +7,8 @@ import {
   ContractSelectModel,
 } from '../../models/contract.models';
 import { ContractStore } from './contract.store';
+import { EstablishmentStore } from '../../../establishments/services/establishment/establishment.store';
+import { environment } from '../../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ import { ContractStore } from './contract.store';
 export class ContractService {
   private readonly http = inject(HttpClient);
   private readonly store = inject(ContractStore);
+  private readonly establishmentStore = inject(EstablishmentStore);
   private readonly baseUrl = `${environment.apiURL}/contract`;
 
   readonly contracts = this.store.contracts;
@@ -25,12 +27,14 @@ export class ContractService {
   createContract(payload: ContractCreateModel): Observable<number> {
     return this.http.post<number>(`${this.baseUrl}`, payload).pipe(
       tap(() => {
-        // After creating, reload all contracts to update the store
+        // refresca la lista de contratos si quieres
         this.getAllContracts({ force: true }).subscribe();
+
+        // 👇 impacta la UI de establecimientos sin eliminar ni recargar
+        this.establishmentStore.patchActiveMany(payload.establishmentIds, false);
       })
     );
   }
-
   /**
    * Obtiene todos los contratos registrados.
    */
