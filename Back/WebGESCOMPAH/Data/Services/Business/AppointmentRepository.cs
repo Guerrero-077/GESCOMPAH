@@ -14,6 +14,7 @@ namespace Data.Services.Business
             return await _dbSet
                 .Where(e => !e.IsDeleted)
                 .Include(e => e.Establishment)
+                .Include(e => e.Person)
                 .ToListAsync();
         }
 

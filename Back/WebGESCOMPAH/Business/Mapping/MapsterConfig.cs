@@ -53,7 +53,8 @@ namespace Business.Mapping
             // ============================================
 
             config.NewConfig<Appointment, AppointmentSelectDto>()
-                    .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
+                    .Map(dest => dest.EstablishmentName, src => src.Establishment.Name)
+                    .Map(dest => dest.PersonName, src => src.Person.FirstName);
 
 
             // Entidad → DTO de selección

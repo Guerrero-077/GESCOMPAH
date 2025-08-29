@@ -512,30 +512,21 @@ namespace Entity.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateTimeAssigned")
+                    b.Property<DateTime?>("DateTimeAssigned")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("EstablishmentId")
                         .HasColumnType("int");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("datetime2");
@@ -547,6 +538,8 @@ namespace Entity.Migrations
 
                     b.HasIndex("EstablishmentId");
 
+                    b.HasIndex("PersonId");
+
                     b.ToTable("Appointments");
 
                     b.HasData(
@@ -557,11 +550,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateTimeAssigned = new DateTime(2025, 1, 4, 10, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Solicitud para conocer el local",
-                            Email = "juan.perez@example.com",
                             EstablishmentId = 1,
-                            FullName = "Juan Pérez",
                             IsDeleted = false,
-                            Phone = "3001234567",
+                            PersonId = 1,
                             RequestDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 1
                         },
@@ -572,11 +563,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateTimeAssigned = new DateTime(2025, 1, 5, 11, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Revisión de contrato anterior",
-                            Email = "maria.gomez@example.com",
                             EstablishmentId = 2,
-                            FullName = "María Gómez",
                             IsDeleted = false,
-                            Phone = "3019876543",
+                            PersonId = 2,
                             RequestDate = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 1
                         },
@@ -587,11 +576,9 @@ namespace Entity.Migrations
                             CreatedAt = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateTimeAssigned = new DateTime(2025, 1, 6, 9, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Consulta sobre requisitos para arriendo",
-                            Email = "carlos.ramirez@example.com",
                             EstablishmentId = 3,
-                            FullName = "Carlos Ramírez",
                             IsDeleted = false,
-                            Phone = "3021122334",
+                            PersonId = 2,
                             RequestDate = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = 1
                         });
@@ -2639,7 +2626,15 @@ namespace Entity.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Entity.Domain.Models.Implements.Persons.Person", "Person")
+                        .WithMany("Appointments")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Establishment");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Business.Contract", b =>
@@ -2853,6 +2848,8 @@ namespace Entity.Migrations
 
             modelBuilder.Entity("Entity.Domain.Models.Implements.Persons.Person", b =>
                 {
+                    b.Navigation("Appointments");
+
                     b.Navigation("User");
                 });
 

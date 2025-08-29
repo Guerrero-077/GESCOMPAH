@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Entity.Migrations
 {
     /// <inheritdoc />
-    public partial class DataBase : Migration
+    public partial class dataBase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -334,35 +334,6 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Appointments",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateTimeAssigned = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EstablishmentId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Active = table.Column<bool>(type: "bit", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Appointments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Appointments_Establishment_EstablishmentId",
-                        column: x => x.EstablishmentId,
-                        principalTable: "Establishment",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Images",
                 columns: table => new
                 {
@@ -383,6 +354,39 @@ namespace Entity.Migrations
                         name: "FK_Images_Establishment_EstablishmentId",
                         column: x => x.EstablishmentId,
                         principalTable: "Establishment",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Appointments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateTimeAssigned = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    EstablishmentId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Appointments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Establishment_EstablishmentId",
+                        column: x => x.EstablishmentId,
+                        principalTable: "Establishment",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Persons_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "Persons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -786,16 +790,6 @@ namespace Entity.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Appointments",
-                columns: new[] { "Id", "Active", "CreatedAt", "DateTimeAssigned", "Description", "Email", "EstablishmentId", "FullName", "IsDeleted", "Phone", "RequestDate", "Status" },
-                values: new object[,]
-                {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), "Solicitud para conocer el local", "juan.perez@example.com", 1, "Juan Pérez", false, "3001234567", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
-                    { 2, true, new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 5, 11, 0, 0, 0, DateTimeKind.Unspecified), "Revisión de contrato anterior", "maria.gomez@example.com", 2, "María Gómez", false, "3019876543", new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
-                    { 3, true, new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 6, 9, 0, 0, 0, DateTimeKind.Unspecified), "Consulta sobre requisitos para arriendo", "carlos.ramirez@example.com", 3, "Carlos Ramírez", false, "3021122334", new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Images",
                 columns: new[] { "Id", "Active", "CreatedAt", "EstablishmentId", "FileName", "FilePath", "IsDeleted", "PublicId" },
                 values: new object[,]
@@ -815,6 +809,16 @@ namespace Entity.Migrations
                 {
                     { 1, true, "Calle Principal 123", 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "123456789", "Administrador", false, "General", "3000000000" },
                     { 2, true, "Calle Principal 123", 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "1000000000", "Usuario", false, "General", "3000000000" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Appointments",
+                columns: new[] { "Id", "Active", "CreatedAt", "DateTimeAssigned", "Description", "EstablishmentId", "IsDeleted", "PersonId", "RequestDate", "Status" },
+                values: new object[,]
+                {
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), "Solicitud para conocer el local", 1, false, 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
+                    { 2, true, new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 5, 11, 0, 0, 0, DateTimeKind.Unspecified), "Revisión de contrato anterior", 2, false, 2, new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
+                    { 3, true, new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 6, 9, 0, 0, 0, DateTimeKind.Unspecified), "Consulta sobre requisitos para arriendo", 3, false, 2, new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -839,6 +843,11 @@ namespace Entity.Migrations
                 name: "IX_Appointments_EstablishmentId",
                 table: "Appointments",
                 column: "EstablishmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_PersonId",
+                table: "Appointments",
+                column: "PersonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cities_DepartmentId",
