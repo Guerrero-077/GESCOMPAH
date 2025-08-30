@@ -1,30 +1,40 @@
+<!-- Overlay de loading -->
+<div class="pdf-loading-overlay" *ngIf="isDownloadingPdf" aria-live="assertive" aria-busy="true">
+  <div class="pdf-loading-card" role="alert" aria-label="Generando y descargando contrato">
+    <svg class="download-anim" viewBox="0 0 64 64" aria-hidden="true">
+      <path class="arrow" d="M32 12 v26 M22 30 l10 10 10-10" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      <rect class="box" x="12" y="44" width="40" height="8" rx="2" ry="2" />
+    </svg>
+    <mat-progress-spinner mode="indeterminate" diameter="48" strokeWidth="4"></mat-progress-spinner>
+    <div class="label">Generando PDF…</div>
+    <div class="sub-label">Esto puede tardar unos segundos</div>
+  </div>
+</div>
+
 <div class="row d-flex justify-content-center">
   <app-generic-table
-    [data]="contracts$()"
+    [data]="rows$()"
     [columns]="columns"
     [titulo]="'Gestión de Contratos'"
-    [subTitulo]="'Administra los contratos del sistema'"
+    [subTitulo]="'Contratos (según tu rol)'"
     [createButtonLabel]="'Nuevo Contrato'"
     [showViewButton]="true"
     (view)="onView($event)"
-    (edit)="onEdit($event)"
-    (delete)="onDelete($event)"
     (create)="onCreateNew()">
   </app-generic-table>
 
-
+  <!-- Template de estado -->
   <ng-template #estadoTemplate let-row>
     <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
       <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
         {{ row.active ? 'Activo' : 'Inactivo' }}
       </span>
 
-      <app-toggle-button-component class="align-middle" [checked]="row.active"
-        (changed)="onToggleActive(row, { checked: $event })" [size]="20" [onColor]="'#16a34a'" [offColor]="'#ef4444'"
-        [thumb]="'#ffffff'">
+      <app-toggle-button-component class="align-middle"
+        [checked]="row.active"
+        (changed)="onToggleActive(row, { checked: $event })"
+        [size]="20" [onColor]="'#16a34a'" [offColor]="'#ef4444'" [thumb]="'#ffffff'">
       </app-toggle-button-component>
-
     </div>
   </ng-template>
-
 </div>

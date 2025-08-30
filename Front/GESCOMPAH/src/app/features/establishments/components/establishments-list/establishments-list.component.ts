@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -40,31 +40,39 @@ export class EstablishmentsListComponent {
   establishments$: Observable<EstablishmentSelect[]>;
   establishments: EstablishmentSelect[] = [];
 
-  constructor(
-    private dialog: MatDialog,
-    private store: EstablishmentStore,
-    private sweetAlert: SweetAlertService,
-    private sharedEvents: SharedEventsServiceService
-  ) {
+  private readonly dialog = inject(MatDialog);
+  private readonly store = inject(EstablishmentStore);
+  private readonly sweetAlert = inject(SweetAlertService);
+  private readonly sharedEvents = inject(SharedEventsServiceService);
+
+
+  constructor() {
     this.establishments$ = this.store.establishments$.pipe(
       tap(establishments => this.establishments = establishments)
     );
+
     this.sharedEvents.plazaStateChanged$.subscribe(() => {
-      this.store.loadAll(); // recarga establecimientos filtrados
+      this.store.loadAll();
     });
   }
 
   openCreateDialog(): void {
-    this.dialog.open(FormEstablishmentComponent, {
+    const ref = this.dialog.open(FormEstablishmentComponent, {
       width: '600px',
       data: null
+    });
+    ref.afterClosed().subscribe(ok => {
+      if (ok) this.store.loadAll();
     });
   }
 
   openEditDialog(est: EstablishmentSelect): void {
-    this.dialog.open(FormEstablishmentComponent, {
+    const ref = this.dialog.open(FormEstablishmentComponent, {
       width: '600px',
       data: est
+    });
+    ref.afterClosed().subscribe(ok => {
+      if (ok) this.store.loadAll();
     });
   }
 
@@ -79,6 +87,11 @@ export class EstablishmentsListComponent {
       }
     });
   }
+
+  onCardUpdated(): void {
+    this.store.loadAll();
+  }
+
 
   onView(id: number) {
     const row = this.establishments.find(e => e.id === id);

@@ -1,97 +1,58 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment.development';
 import { EstablishmentSelect, EstablishmentCreate, EstablishmentUpdate } from '../../models/establishment.models';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface GetAllOptions {
+  /** Si true, trae solo activos; si no lo envías, trae todos (Any). */
+  activeOnly?: boolean;
+}
+
+@Injectable({ providedIn: 'root' })
 export class EstablishmentService {
-  /** Base URL del API (apiURL + /Establishments) */
   private readonly urlBase = `${environment.apiURL}/Establishments`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  /** --------------------------------------------------  CRUD  ----------------------------------------------------- */
-  /** Obtener todos los establecimientos  */
-  getAll(): Observable<EstablishmentSelect[]> {
-    return this.http.get<EstablishmentSelect[]>(this.urlBase);
+  /** -------------------------------  QUERIES  -------------------------------- */
+
+  /** Obtener establecimientos (por defecto TODOS; usa activeOnly=true para SOLO activos) */
+  getAll(options?: GetAllOptions): Observable<EstablishmentSelect[]> {
+    let params = new HttpParams();
+    if (options?.activeOnly === true) params = params.set('activeOnly', 'true');
+    return this.http.get<EstablishmentSelect[]>(this.urlBase, { params });
   }
 
-  /** Obtener un establecimiento por ID */
-  getById(id: number): Observable<EstablishmentSelect> {
-    return this.http.get<EstablishmentSelect>(`${this.urlBase}/${id}`);
+  /** Conveniencias explícitas (opcional) */
+  getAllAny(): Observable<EstablishmentSelect[]> {
+    return this.getAll(); // sin params → Any
   }
 
-  /** Eliminar un establecimiento por ID */
+  getAllActive(): Observable<EstablishmentSelect[]> {
+    return this.getAll({ activeOnly: true });
+  }
+
+  /** Obtener un establecimiento por ID (añade activeOnly=true si requieres que sea activo) */
+  getById(id: number, activeOnly?: boolean): Observable<EstablishmentSelect> {
+    let params = new HttpParams();
+    if (activeOnly === true) params = params.set('activeOnly', 'true');
+    return this.http.get<EstablishmentSelect>(`${this.urlBase}/${id}`, { params });
+  }
+
+  /** ---------------------------------  CRUD  --------------------------------- */
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.urlBase}/${id}`);
   }
 
-  /** ------------------------  CREATE  ------------------------- */
-  create(est: EstablishmentCreate): Observable<EstablishmentSelect> {
-    const fd = this.buildFormData(est);
-    return this.http.post<EstablishmentSelect>(this.urlBase, fd);
+  create(dto: EstablishmentCreate): Observable<EstablishmentSelect> {
+    const { files, images, imagesToDelete, ...body } = dto as any; // limpiar payload
+    return this.http.post<EstablishmentSelect>(this.urlBase, body);
   }
 
-  /** ------------------------  UPDATE  ------------------------- */
-  update(est: EstablishmentUpdate): Observable<EstablishmentSelect> {
-    if (!est.id) throw new Error('ID del establecimiento es obligatorio');
-
-    const fd = this.buildFormData(est);
-    return this.http.put<EstablishmentSelect>(`${this.urlBase}/${est.id}`, fd);
+  update(dto: EstablishmentUpdate): Observable<EstablishmentSelect> {
+    if (!dto.id) throw new Error('ID del establecimiento es obligatorio');
+    return this.http.put<EstablishmentSelect>(`${this.urlBase}/${dto.id}`, dto);
   }
-
-  /**
-   * *FormData* de multipart/form‑data
-   *
-   * Se encarga de montar el objeto que el *ASP.NET Core* espera.
-   * <br><br>
-   * <b>Campos que envía</b>
-   * | Campo | Tipo | Comentario |
-   * |-------|------|------------|
-   * | name   | string | mandatory |
-   * | description | string | mandatory |
-   * | areaM2 | number |
-   * | rentValueBase | number |
-   * | plazaId | number |
-   * | address | string (opcional) |
-   *
-   * • Cuando se trata de *CREATE* se envía la colección `files` con los nuevos archivos.<br>
-   * • Cuando se trata de *UPDATE* se envían `images` (nuevos archivos) y `imagesToDelete` (publicId de las que se borran).
-   */
-  private buildFormData(dto: EstablishmentCreate | EstablishmentUpdate): FormData {
-    const data = new FormData();
-
-    // -------- Campos básicos --------
-    if (dto.name) data.append('name', dto.name);
-    if (dto.description) data.append('description', dto.description);
-
-    if (dto.areaM2 !== undefined) data.append('areaM2', dto.areaM2.toString());
-    if (dto.uvtQty !== undefined) data.append('uvtQty', dto.uvtQty.toString());          // <-- FALTABA
-    if (dto.rentValueBase !== undefined) data.append('rentValueBase', dto.rentValueBase.toString());
-
-    if (dto.plazaId !== undefined) data.append('plazaId', dto.plazaId.toString());
-    if (dto.address !== null && dto.address !== undefined) data.append('address', dto.address);
-
-    // -------- Update opcional --------
-    if ('id' in dto) data.append('id', dto.id.toString());
-
-    // -------- Imágenes --------
-    if ('files' in dto && dto.files?.length) {
-      dto.files.forEach(f => data.append('files', f, f.name));
-    } else if ('images' in dto && dto.images?.length) {
-      dto.images.forEach(f => data.append('images', f, f.name));
-    }
-
-    if ('imagesToDelete' in dto && dto.imagesToDelete?.length) {
-      // Si tu backend NO espera JSON, envíalas una por una:
-      // dto.imagesToDelete.forEach(x => data.append('imagesToDelete', x));
-      data.append('imagesToDelete', JSON.stringify(dto.imagesToDelete));
-    }
-
-    return data;
-  }
-
 }

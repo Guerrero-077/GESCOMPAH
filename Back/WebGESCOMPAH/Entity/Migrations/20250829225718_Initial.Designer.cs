@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
+<<<<<<< HEAD:Back/WebGESCOMPAH/Entity/Migrations/20250828031933_Initial.Designer.cs
 <<<<<<< HEAD:Back/WebGESCOMPAH/Entity/Migrations/20250827020421_Initial.Designer.cs
 <<<<<<<< HEAD:Back/WebGESCOMPAH/Entity/Migrations/20250828135902_initDataBase.Designer.cs
     [Migration("20250828135902_initDataBase")]
@@ -21,6 +22,9 @@ namespace Entity.Migrations
 =======
     [Migration("20250828031933_Initial")]
 >>>>>>> 5188329d2b2c1b8993e26de00e77eed94b602545:Back/WebGESCOMPAH/Entity/Migrations/20250828031933_Initial.Designer.cs
+=======
+    [Migration("20250829225718_Initial")]
+>>>>>>> santiagoGuerrero:Back/WebGESCOMPAH/Entity/Migrations/20250829225718_Initial.Designer.cs
     partial class Initial
 >>>>>>>> 7c6d5f718af321bbfa1cc102fd32861570aec36f:Back/WebGESCOMPAH/Entity/Migrations/20250827020421_Initial.Designer.cs
     {
@@ -656,8 +660,8 @@ namespace Entity.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -665,8 +669,14 @@ namespace Entity.Migrations
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("TotalBaseRentAgreed")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalUvtQtyAgreed")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -722,8 +732,8 @@ namespace Entity.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("AreaM2")
-                        .HasColumnType("float");
+                    b.Property<decimal>("AreaM2")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -742,8 +752,8 @@ namespace Entity.Migrations
                     b.Property<int>("PlazaId")
                         .HasColumnType("int");
 
-                    b.Property<double>("RentValueBase")
-                        .HasColumnType("float");
+                    b.Property<decimal>("RentValueBase")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("UvtQty")
                         .HasColumnType("decimal(18,2)");
@@ -760,13 +770,13 @@ namespace Entity.Migrations
                             Id = 1,
                             Active = true,
                             Address = "Cr 1 ",
-                            AreaM2 = 500.0,
+                            AreaM2 = 500m,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Establecimiento amplio con excelente ubicación.",
                             IsDeleted = false,
                             Name = "Centro Comercial Primavera",
                             PlazaId = 1,
-                            RentValueBase = 2500.0,
+                            RentValueBase = 2500m,
                             UvtQty = 0m
                         },
                         new
@@ -774,13 +784,13 @@ namespace Entity.Migrations
                             Id = 2,
                             Active = true,
                             Address = "Cr 1 ",
-                            AreaM2 = 120.0,
+                            AreaM2 = 120m,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Oficina moderna en zona empresarial.",
                             IsDeleted = false,
                             Name = "Oficina Torre Norte",
                             PlazaId = 2,
-                            RentValueBase = 1500.0,
+                            RentValueBase = 1500m,
                             UvtQty = 0m
                         },
                         new
@@ -788,13 +798,13 @@ namespace Entity.Migrations
                             Id = 3,
                             Active = true,
                             Address = "Cr 1 ",
-                            AreaM2 = 1000.0,
+                            AreaM2 = 1000m,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Espacio para almacenamiento de gran capacidad.",
                             IsDeleted = false,
                             Name = "Bodega Industrial Sur",
                             PlazaId = 1,
-                            RentValueBase = 3000.0,
+                            RentValueBase = 3000m,
                             UvtQty = 0m
                         });
                 });

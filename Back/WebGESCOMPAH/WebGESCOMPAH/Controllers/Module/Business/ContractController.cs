@@ -19,6 +19,13 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             _pdfService = pdfService;
         }
 
+
+
+        [HttpGet("mine")]
+        [ProducesResponseType(typeof(IEnumerable<ContractCardDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMine() => Ok(await _contractService.GetMineAsync());
+
+
         /// <summary>
         /// Crea un nuevo contrato asociado a una persona y usuario (si aplica)
         /// </summary>

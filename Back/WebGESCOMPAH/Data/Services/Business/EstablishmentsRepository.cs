@@ -1,87 +1,69 @@
 ﻿using Data.Interfaz.IDataImplement.Business;
-using Data.Interfaz.IDataImplement.Utilities;
 using Data.Repository;
 using Entity.Domain.Models.Implements.Business;
-using Entity.Domain.Models.Implements.Utilities;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Services.Business
+{
+    public class EstablishmentsRepository : DataGeneric<Establishment>, IEstablishmentsRepository
     {
-        public class EstablishmentsRepository : DataGeneric<Establishment>, IEstablishmentsRepository
-        {
-            private readonly IImagesRepository _imagesRepository;
+        public EstablishmentsRepository(ApplicationDbContext context) : base(context) { }
 
-            public EstablishmentsRepository(ApplicationDbContext context, IImagesRepository imagesRepository)
-                : base(context)
-            {
-                _imagesRepository = imagesRepository ?? throw new ArgumentNullException(nameof(imagesRepository));
-            }
+        // Query base: filtros comunes
+        private IQueryable<Establishment> BaseQuery() =>
+            _dbSet.AsNoTracking()
+                  .Where(e => !e.IsDeleted &&
+                              e.Plaza != null && e.Plaza.Active && !e.Plaza.IsDeleted)
+                  .Include(e => e.Plaza)
+                  .Include(e => e.Images.Where(img => img.Active && !img.IsDeleted));
 
-        public override async Task<IEnumerable<Establishment>> GetAllAsync()
+        // Compatibilidad: trae todos
+        public override Task<IEnumerable<Establishment>> GetAllAsync() =>
+            GetAllAsync(ActivityFilter.Any);
+
+        // Sobrecarga
+        public async Task<IEnumerable<Establishment>> GetAllAsync(ActivityFilter filter)
         {
-            return await _dbSet
-                .AsNoTracking()
-                .Where(e =>
-                    e.Active                       // Establecimiento activo
-                    && !e.IsDeleted                // Establecimiento no borrado
-                    && e.Plaza != null             // Por si la relación no es requerida
-                    && e.Plaza.Active              // Plaza activa
-                    && !e.Plaza.IsDeleted          // Plaza no borrada
-                )
-                .Include(e => e.Plaza)
-                .Include(e => e.Images
-                    .Where(img => img.Active && !img.IsDeleted)) 
+            var q = BaseQuery();
+            if (filter == ActivityFilter.ActiveOnly)
+                q = q.Where(e => e.Active);
+
+            return await q.ToListAsync();
+        }
+
+        // Detalle
+        public Task<Establishment?> GetByIdAnyAsync(int id) =>
+            BaseQuery().FirstOrDefaultAsync(e => e.Id == id);
+
+        public Task<Establishment?> GetByIdActiveAsync(int id) =>
+            BaseQuery().Where(e => e.Active).FirstOrDefaultAsync(e => e.Id == id);
+
+        // Proyección
+        public async Task<IReadOnlyList<EstablishmentBasics>> GetBasicsByIdsAsync(IReadOnlyCollection<int> ids)
+        {
+            if (ids.Count == 0) return Array.Empty<EstablishmentBasics>();
+            return await _dbSet.AsNoTracking()
+                .Where(e => ids.Contains(e.Id) && e.Active && !e.IsDeleted)
+                .Select(e => new EstablishmentBasics(e.Id, e.RentValueBase, e.UvtQty))
                 .ToListAsync();
         }
 
+        // Validación
+        public async Task<IReadOnlyList<int>> GetInactiveIdsAsync(IReadOnlyCollection<int> ids) =>
+            ids.Count == 0
+                ? Array.Empty<int>()
+                : await _dbSet.AsNoTracking()
+                    .Where(e => ids.Contains(e.Id) && !e.IsDeleted && !e.Active)
+                    .Select(e => e.Id)
+                    .ToListAsync();
 
-        public override async Task<Establishment?> GetByIdAsync(int id)
-            {
-                return await _dbSet
-                    .Where(e => e.Id == id && !e.IsDeleted)
-                    .Include(e => e.Plaza)
-                    .Include(e => e.Images)
-                    .FirstOrDefaultAsync();
-            }
-
-            public override async Task<Establishment> AddAsync(Establishment entity)
-            {
-                if (entity == null) throw new ArgumentNullException(nameof(entity));
-
-                _dbSet.Add(entity);
-                // No SaveChanges aquí
-
-                return await Task.FromResult(entity);
-            }
-
-            public override async Task<Establishment> UpdateAsync(Establishment entity)
-            {
-                if (entity == null) throw new ArgumentNullException(nameof(entity));
-
-                var existing = await _dbSet
-                    .Include(e => e.Images)
-                    .FirstOrDefaultAsync(e => e.Id == entity.Id && !e.IsDeleted);
-
-                if (existing == null)
-                    throw new InvalidOperationException($"No se encontró el establecimiento con ID {entity.Id}.");
-
-                _context.Entry(existing).CurrentValues.SetValues(entity);
-
-                // Sincronización imágenes
-                var imagesToRemove = existing.Images.Where(img => !entity.Images.Any(eImg => eImg.Id == img.Id)).ToList();
-                foreach (var img in imagesToRemove)
-                    _context.Set<Images>().Remove(img);
-
-                var imagesToAdd = entity.Images.Where(img => img.Id == 0).ToList();
-                foreach (var img in imagesToAdd)
-                {
-                    img.EstablishmentId = existing.Id;
-                    existing.Images.Add(img);
-                }
-
-                // No SaveChanges aquí
-                return existing;
-            }
-        }
+        // Actualización masiva
+        public async Task<int> SetActiveByIdsAsync(IReadOnlyCollection<int> ids, bool active) =>
+            ids.Count == 0
+                ? 0
+                : await _dbSet
+                    .Where(e => ids.Contains(e.Id) && !e.IsDeleted && e.Active != active)
+                    .ExecuteUpdateAsync(up => up.SetProperty(e => e.Active, _ => active));
     }
+}

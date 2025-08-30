@@ -7,9 +7,8 @@ namespace Entity.DTOs.Implements.Business.Contract
 {
     public class ContractSelectDto : BaseDto
     {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
         public bool Active { get; set; }
 
         // Persona asociada
@@ -18,6 +17,10 @@ namespace Entity.DTOs.Implements.Business.Contract
         public string Document { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public string? Email { get; set; }
+
+        // Totales calculados (faltaban)
+        public decimal TotalBaseRentAgreed { get; set; }
+        public decimal TotalUvtQtyAgreed { get; set; }
 
         // Locales asociados
         public List<PremisesLeasedSelectDto> PremisesLeased { get; set; } = new();

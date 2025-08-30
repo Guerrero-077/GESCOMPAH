@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebGESCOMPAH.Controllers.Module.Business
 {
     [ApiController]
-    [Authorize] // opcional: [Authorize(Policy = "CanManageEstablishments")]
+    [Authorize] // [Authorize(Policy = "CanManageEstablishments")]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class EstablishmentsController : ControllerBase
+    public sealed class EstablishmentsController : ControllerBase
     {
         private readonly IEstablishmentService _establishmentService;
 
@@ -18,62 +18,69 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             _establishmentService = establishmentService;
         }
 
-        /// <summary>Obtener todos los establecimientos activos (considera agregar paginación).</summary>
+        /// <summary>
+        /// Obtener establecimientos. 
+        /// Usa ?activeOnly=true para traer solo activos; por defecto trae todos (activos e inactivos).
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EstablishmentSelectDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<EstablishmentSelectDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<EstablishmentSelectDto>>> GetAll([FromQuery] bool activeOnly = false)
         {
-            var result = await _establishmentService.GetAllAsync();
+            var result = activeOnly
+                ? await _establishmentService.GetAllActiveAsync()
+                : await _establishmentService.GetAllAnyAsync();
+
             return Ok(result);
         }
 
-        /// <summary>Obtener un establecimiento por ID.</summary>
+        /// <summary>
+        /// Obtener un establecimiento por ID.
+        /// Usa ?activeOnly=true para forzar que sea activo; por defecto busca cualquiera.
+        /// </summary>
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(EstablishmentSelectDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, [FromQuery] bool activeOnly = false)
         {
-            var result = await _establishmentService.GetByIdAsync(id);
-            if (result is null) return NotFound(); // ← 404 explícito (si tu servicio devuelve null)
+            var result = activeOnly
+                ? await _establishmentService.GetByIdActiveAsync(id)
+                : await _establishmentService.GetByIdAnyAsync(id);
+
+            if (result is null) return NotFound();
             return Ok(result);
         }
 
-        /// <summary>Crear un nuevo establecimiento con imágenes.</summary>
+        /// <summary>Crear un establecimiento (JSON puro; SIN imágenes).</summary>
         [HttpPost]
-        [Consumes("multipart/form-data")]
-        [RequestFormLimits(MultipartBodyLengthLimit = 25_000_000)] // ~25MB (ajusta)
-        [RequestSizeLimit(25_000_000)]
+        [Consumes("application/json")]
         [ProducesResponseType(typeof(EstablishmentSelectDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EstablishmentSelectDto>> Create(
-            [FromForm] EstablishmentCreateDto dto)
+        public async Task<ActionResult<EstablishmentSelectDto>> Create([FromBody] EstablishmentCreateDto dto)
         {
-            // [ApiController] ya valida ModelState 400 automáticamente
             var result = await _establishmentService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>Actualizar un establecimiento y sus imágenes.</summary>
+        /// <summary>Actualizar un establecimiento (JSON puro; imágenes aparte).</summary>
         [HttpPut("{id:int}")]
-        [Consumes("multipart/form-data")]
-        [RequestFormLimits(MultipartBodyLengthLimit = 25_000_000)] // consistente con POST
-        [RequestSizeLimit(25_000_000)]
+        [Consumes("application/json")]
         [ProducesResponseType(typeof(EstablishmentSelectDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<EstablishmentSelectDto>> Update(
-            int id,
-            [FromForm] EstablishmentUpdateDto dto)
+        public async Task<ActionResult<EstablishmentSelectDto>> Update(int id, [FromBody] EstablishmentUpdateDto dto)
         {
-            if (id != dto.Id)
-                return BadRequest("El ID de la URL no coincide con el ID del cuerpo del formulario.");
+            if (id <= 0)
+                return BadRequest(new { id = new[] { "El Id debe ser mayor a 0." } });
 
-            var result = await _establishmentService.UpdateAsync(dto);
-            if (result is null) return NotFound(); // si tu servicio retorna null si no existe
-            return Ok(result);
+            dto.Id = id; // la ruta manda
+
+            var updated = await _establishmentService.UpdateAsync(dto);
+            if (updated is null) return NotFound();
+
+            return Ok(updated);
         }
 
-        /// <summary>Eliminar lógicamente un establecimiento (soft delete).</summary>
+        /// <summary>Eliminar (borrado lógico).</summary>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -82,6 +89,23 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             var deleted = await _establishmentService.DeleteAsync(id);
             if (!deleted) return NotFound();
             return NoContent();
+        }
+
+        /// <summary>
+        /// (Opcional) Obtener datos básicos por IDs para sumatorias (RentValueBase, UvtQty).
+        /// </summary>
+        [HttpPost("basics")]
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetBasics([FromBody] int[] ids)
+        {
+            if (ids is null || ids.Length == 0)
+                return BadRequest(new { ids = new[] { "Debe enviar al menos un ID de establecimiento." } });
+
+            var basics = await _establishmentService.GetBasicsByIdsAsync(ids);
+            var dto = basics.Select(b => new { b.Id, b.RentValueBase, b.UvtQty });
+            return Ok(dto);
         }
     }
 }

@@ -248,8 +248,8 @@ namespace Entity.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AreaM2 = table.Column<double>(type: "float", nullable: false),
-                    RentValueBase = table.Column<double>(type: "float", nullable: false),
+                    AreaM2 = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    RentValueBase = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UvtQty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PlazaId = table.Column<int>(type: "int", nullable: false),
@@ -393,10 +393,12 @@ namespace Entity.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
                     BusinessPurpose = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PersonId = table.Column<int>(type: "int", nullable: false),
+                    TotalBaseRentAgreed = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalUvtQtyAgreed = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -707,9 +709,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "Address", "AreaM2", "CreatedAt", "Description", "IsDeleted", "Name", "PlazaId", "RentValueBase", "UvtQty" },
                 values: new object[,]
                 {
-                    { 1, true, "Cr 1 ", 500.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Establecimiento amplio con excelente ubicación.", false, "Centro Comercial Primavera", 1, 2500.0, 0m },
-                    { 2, true, "Cr 1 ", 120.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Oficina moderna en zona empresarial.", false, "Oficina Torre Norte", 2, 1500.0, 0m },
-                    { 3, true, "Cr 1 ", 1000.0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Espacio para almacenamiento de gran capacidad.", false, "Bodega Industrial Sur", 1, 3000.0, 0m }
+                    { 1, true, "Cr 1 ", 500m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Establecimiento amplio con excelente ubicación.", false, "Centro Comercial Primavera", 1, 2500m, 0m },
+                    { 2, true, "Cr 1 ", 120m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Oficina moderna en zona empresarial.", false, "Oficina Torre Norte", 2, 1500m, 0m },
+                    { 3, true, "Cr 1 ", 1000m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Espacio para almacenamiento de gran capacidad.", false, "Bodega Industrial Sur", 1, 3000m, 0m }
                 });
 
             migrationBuilder.InsertData(

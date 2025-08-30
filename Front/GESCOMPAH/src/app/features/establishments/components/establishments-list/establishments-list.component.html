@@ -12,10 +12,15 @@
     <!-- Lista de locales -->
     <div *ngIf="establishments.length > 0; else noEstablishment">
       <div class="d-flex flex-wrap gap-3 justify-content-center">
-        <app-card *ngFor="let establishment of establishments" [local]="establishment" [showAvailableTag]="true"
-          (onDelete)="handleDelete(establishment.id)" (onUpdate)="openEditDialog(establishment)"
+        <app-card
+          *ngFor="let establishment of establishments"
+          [local]="establishment"
+          [showAvailableTag]="true"
+          (onDelete)="handleDelete(establishment.id)"
+          (onUpdate)="onCardUpdated()"
           (onView)="onView($event)">
         </app-card>
+        <!-- (onUpdate)="openEditDialog(establishment)" -->
       </div>
     </div>
 

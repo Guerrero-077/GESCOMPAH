@@ -2,6 +2,7 @@
 {
     public class ContractCreateDto
     {
+        // Persona (alta o reuso por documento)
         public required string FirstName { get; init; }
         public required string LastName { get; init; }
         public required string Document { get; init; }
@@ -9,18 +10,19 @@
         public required string Address { get; init; }
         public required int CityId { get; init; }
 
-        public string? Email { get; init; } // si lo envía, se genera usuario
+        public string? Email { get; init; }
 
-        public DateTime StartDate { get; init; }
-        public DateTime EndDate { get; init; }
+        // Contrato
+        public DateOnly StartDate { get; init; }
+        public DateOnly EndDate { get; init; }
 
+        // Selección de locales (los totales salen de aquí)
         public List<int> EstablishmentIds { get; init; } = [];
 
-        public decimal UvtQty { get; init; }
-
+        // Parámetros de cálculo
         public bool UseSystemParameters { get; init; } = true;
 
-        /// <summary>Lista de cláusulas a asociar al contrato</summary>
+        /// <summary>Cláusulas a asociar</summary>
         public List<int> ClauseIds { get; init; } = [];
     }
 }

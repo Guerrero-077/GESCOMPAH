@@ -1,0 +1,64 @@
+/* Layout general del formulario */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;              /* separación vertical entre bloques */
+  padding: 16px;
+}
+
+/* Filas con grid y separación entre campos */
+.row {
+  display: grid;
+  grid-template-columns: 1fr;  /* móvil: 1 columna */
+  gap: 16px;                   /* separación entre campos */
+}
+
+.row.two-cols {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .row.two-cols {
+    grid-template-columns: 1fr 1fr;  /* desktop: 2 columnas */
+  }
+}
+
+.field {
+  width: 100%;
+}
+
+/* Acciones al final */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* Mensaje persona encontrada */
+.info-ok {
+  color: #1e7e34;
+  font-size: 0.95rem;
+}
+
+/* --- Evitar “opaco” en controles deshabilitados --- */
+:host ::ng-deep .no-dim.mat-mdc-form-field.mat-form-field-disabled .mdc-text-field__input,
+:host ::ng-deep .no-dim.mat-mdc-form-field.mat-form-field-disabled .mdc-floating-label,
+:host ::ng-deep .no-dim .mat-mdc-select-disabled .mat-mdc-select-value,
+:host ::ng-deep .no-dim .mat-mdc-select-disabled .mat-mdc-select-arrow {
+  opacity: 1 !important;
+  -webkit-text-fill-color: currentColor; /* Safari */
+}
+
+:host ::ng-deep .no-dim.mat-mdc-form-field.mat-form-field-disabled .mat-mdc-text-field-wrapper,
+:host ::ng-deep .no-dim.mat-mdc-form-field.mat-form-field-disabled .mdc-text-field--filled {
+  opacity: 1 !important;
+}
+
+:host ::ng-deep .no-dim.mat-mdc-form-field.mat-form-field-disabled input[matinput][disabled] {
+  color: inherit !important;
+}
+
+:host ::ng-deep .no-dim .mat-mdc-select-disabled .mat-mdc-select-value-text {
+  opacity: 1 !important;
+}

@@ -46,7 +46,7 @@
 
   <div class=""clause"">
     <h2>Segunda: Canon de Arrendamiento</h2>
-    <p>El canon mensual de arrendamiento será equivalente a <strong>@Model.Terms.UvtQty</strong> UVTs, según el valor vigente al momento de la facturación, determinado por la DIAN. Este valor puede ser ajustado según los parámetros del sistema: <strong>@(Model.Terms.UseSystemParameters ? ""Sí"" : ""No"")</strong>.</p>
+    <p>El canon mensual de arrendamiento será equivalente a  UVTs, según el valor vigente al momento de la facturación, determinado por la DIAN. Este valor puede ser ajustado según los parámetros del sistema.</p>
   </div>
 
   <div class=""clause"">

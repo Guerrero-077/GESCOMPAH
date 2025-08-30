@@ -1,80 +1,121 @@
-<form [formGroup]="form" (ngSubmit)="submit()" class="p-4 space-y-4">
+<form [formGroup]="form" (ngSubmit)="submit()" class="form">
 
-  <!-- Documento + botón buscar -->
-  <div class="flex gap-2">
-    <mat-form-field appearance="fill" class="flex-1">
+  <!-- Documento (reactivo) + spinner -->
+  <div class="row">
+    <mat-form-field appearance="outline" class="field">
       <mat-label>Documento</mat-label>
       <input matInput formControlName="document" />
+      <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
+      <mat-error *ngIf="form.get('document')?.hasError('required')">Requerido</mat-error>
+      <mat-error *ngIf="form.get('document')?.hasError('minlength')">Mínimo 5 caracteres</mat-error>
     </mat-form-field>
-
-    <button mat-stroked-button type="button" (click)="buscarPersona()">
-      Buscar
-    </button>
   </div>
 
-  <!-- Datos personales -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Nombres</mat-label>
-    <input matInput formControlName="firstName" [readonly]="personaEncontrada" />
-  </mat-form-field>
+  <!-- Aviso persona encontrada -->
+  <div *ngIf="personaEncontrada" class="info-ok">
+    Persona encontrada (ID {{ personId }}). Se cargaron: nombre, apellidos, teléfono, email, dirección y ciudad.
+  </div>
 
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Apellidos</mat-label>
-    <input matInput formControlName="lastName" [readonly]="personaEncontrada" />
-  </mat-form-field>
+  <!-- Datos persona -->
+  <div class="row two-cols">
+    <mat-form-field appearance="outline" class="field no-dim">
+      <mat-label>Nombres</mat-label>
+      <input matInput formControlName="firstName" />
+      <mat-error *ngIf="form.get('firstName')?.hasError('required')">Requerido</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Teléfono</mat-label>
-    <input matInput formControlName="phone" [readonly]="personaEncontrada" />
-  </mat-form-field>
+    <mat-form-field appearance="outline" class="field no-dim">
+      <mat-label>Apellidos</mat-label>
+      <input matInput formControlName="lastName" />
+      <mat-error *ngIf="form.get('lastName')?.hasError('required')">Requerido</mat-error>
+    </mat-form-field>
+  </div>
 
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Email</mat-label>
-    <input matInput formControlName="email" type="email" />
-    <mat-hint *ngIf="personaEncontrada && !form.value.email">
-      Si se proporciona un correo, se creará un usuario vinculado.
-    </mat-hint>
-  </mat-form-field>
+  <div class="row two-cols">
+    <mat-form-field appearance="outline" class="field no-dim">
+      <mat-label>Teléfono</mat-label>
+      <input matInput formControlName="phone" />
+      <mat-error *ngIf="form.get('phone')?.hasError('required')">Requerido</mat-error>
+    </mat-form-field>
 
-  <!-- Dirección -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Dirección</mat-label>
-    <input matInput formControlName="address" />
-  </mat-form-field>
+    <mat-form-field appearance="outline" class="field no-dim">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" />
+      <mat-error *ngIf="form.get('email')?.hasError('email')">Correo inválido</mat-error>
+    </mat-form-field>
+  </div>
 
-  <!-- Ciudad -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Ciudad</mat-label>
-    <mat-select formControlName="cityId">
-      <mat-option *ngFor="let c of ciudades" [value]="c.id">{{ c.name }}</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <!-- Ubicación -->
+  <div class="row two-cols">
+    <mat-form-field appearance="outline" class="field no-dim">
+      <mat-label>Dirección</mat-label>
+      <input matInput formControlName="address" />
+      <mat-error *ngIf="form.get('address')?.hasError('required')">Requerida</mat-error>
+    </mat-form-field>
 
-  <!-- Locales -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Locales</mat-label>
-    <mat-select formControlName="establishmentIds" multiple>
-      <mat-option *ngFor="let e of establecimientos" [value]="e.id">{{ e.name }}</mat-option>
-    </mat-select>
-  </mat-form-field>
+    <mat-form-field appearance="outline" class="field no-dim">
+      <mat-label>Ciudad</mat-label>
+      <mat-select formControlName="cityId">
+        <mat-option *ngFor="let c of ciudades" [value]="c.id">{{ c.name }}</mat-option>
+      </mat-select>
+      <mat-hint *ngIf="personaEncontrada && foundCityName">{{ foundCityName }}</mat-hint>
+      <mat-error *ngIf="form.get('cityId')?.hasError('required')">Requerida</mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- Establecimientos -->
+  <div class="row">
+    <mat-form-field appearance="outline" class="field">
+      <mat-label>Locales (establecimientos)</mat-label>
+      <mat-select formControlName="establishmentIds" multiple>
+        <mat-option *ngFor="let e of establecimientos" [value]="e.id">
+          {{ e.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('establishmentIds')?.hasError('required')">
+        Seleccione al menos uno.
+      </mat-error>
+    </mat-form-field>
+  </div>
 
   <!-- Fechas -->
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Fecha de Inicio</mat-label>
-    <input matInput [matDatepicker]="pickerStart" formControlName="startDate" />
-    <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
-    <mat-datepicker #pickerStart></mat-datepicker>
-  </mat-form-field>
+  <div class="row two-cols">
+    <!-- Inicio: readonly, min=max=hoy; el botón abre el calendario -->
+    <mat-form-field appearance="outline" class="field no-dim">
+      <mat-label>Fecha de Inicio</mat-label>
+      <input matInput [matDatepicker]="pickerStart" formControlName="startDate" [min]="startMinDate"
+        [max]="startMaxDate" readonly>
+      <button mat-icon-button matSuffix type="button" (click)="pickerStart.open()"
+        aria-label="Abrir calendario de inicio">
+        <mat-icon>event</mat-icon>
+      </button>
+      <mat-datepicker #pickerStart></mat-datepicker>
+      <mat-error *ngIf="form.get('startDate')?.hasError('required')">Requerida</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill" class="w-full">
-    <mat-label>Fecha de Fin</mat-label>
-    <input matInput [matDatepicker]="pickerEnd" formControlName="endDate" />
-    <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-    <mat-datepicker #pickerEnd></mat-datepicker>
-  </mat-form-field>
+    <!-- Fin: min = start; el botón abre el calendario -->
+    <mat-form-field appearance="outline" class="field">
+      <mat-label>Fecha de Fin</mat-label>
+      <input matInput [matDatepicker]="pickerEnd" formControlName="endDate" [min]="minEndDate">
+      <button mat-icon-button matSuffix type="button" (click)="pickerEnd.open()" aria-label="Abrir calendario de fin">
+        <mat-icon>event</mat-icon>
+      </button>
+      <mat-datepicker #pickerEnd></mat-datepicker>
 
+      <mat-error *ngIf="form.hasError('endBeforeStart')">
+        La fecha de fin no puede ser menor que la fecha de inicio.
+      </mat-error>
+      <mat-error *ngIf="form.get('endDate')?.hasError('required')">
+        Requerida.
+      </mat-error>
+    </mat-form-field>
+  </div>
 
-  <button mat-raised-button color="primary" [disabled]="form.invalid">
-    Crear Contrato
-  </button>
+  <!-- Acciones -->
+  <div class="actions">
+    <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || saving">
+      {{ saving ? 'Creando…' : 'Crear contrato' }}
+    </button>
+  </div>
 </form>
