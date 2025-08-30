@@ -2,7 +2,7 @@
   <!-- Step 1: Person Information -->
   <mat-step [stepControl]="personFormGroup">
     <form [formGroup]="personFormGroup">
-      <ng-template matStepLabel>Información del Arrendatario</ng-template>
+      <ng-template matStepLabel>{{ stepper.selectedIndex === 0 ? 'Información del Arrendatario' : 'Información...' }}</ng-template>
 
       <!-- Documento (reactivo) + spinner -->
       <div class="row">
@@ -59,7 +59,7 @@
   <!-- Step 2: Contract Details -->
   <mat-step [stepControl]="contractFormGroup">
     <form [formGroup]="contractFormGroup">
-      <ng-template matStepLabel>Detalles del Contrato</ng-template>
+      <ng-template matStepLabel>{{ stepper.selectedIndex === 1 ? 'Detalles del Contrato' : 'Detalles...' }}</ng-template>
 
       <!-- Ubicación -->
       <div class="row two-cols">
@@ -114,7 +114,7 @@
   <!-- Step 3: Establishments -->
   <mat-step [stepControl]="establishmentFormGroup">
     <form [formGroup]="establishmentFormGroup">
-      <ng-template matStepLabel>Establecimientos</ng-template>
+      <ng-template matStepLabel>{{ stepper.selectedIndex === 2 ? 'Establecimientos' : 'Establec...' }}</ng-template>
 
       <!-- Plaza -->
       <div class="row">

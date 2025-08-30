@@ -39,7 +39,7 @@
   /* Adjusted position */
   right: 15px;
   /* Adjusted position */
-  background: #4CAF50;
+  background: var(--primary-color);
   color: white;
   padding: 3px 8px;
   /* Reduced padding */
@@ -150,8 +150,13 @@
   font-size: 1.2rem;
   /* Slightly reduced font size */
   font-weight: 700;
-  color: #2E7D32;
+  color: var(--accent-color);
   line-height: 1.2;
+}
+
+.card-content i,
+.card-content mat-icon {
+  color: var(--accent-color);
 }
 
 .footer {

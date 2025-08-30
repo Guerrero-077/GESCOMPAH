@@ -9,17 +9,49 @@ body {
   background-color: var(--background-color);
 }
 
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #F9FAFB;
+  background-color: var(--background-color);
+}
+
 :root {
   --background-color: #F9FAFB;
   --primary-color: #BBF7D0;
   --secondary-color: #6B7280;
-  --text-color-white: #FFFFFF;
+  --text-colo-white: #FFFFFF;
   --text-color-black: #111827;
+  --background-color: #FFFFFF;
+  --primary-color: #2E7D32;
+  --accent-color: #EAB308;
+  --text-color-dark: #111827;
+  --text-color-light: #FFFFFF;
   --danger-color: #EF4444;
-  --border-color: #d6dbe3;
-  --text-color-light-gray: #6d6d6d;
-  --accent-color: #16A34A;
 }
+
+.button-save {
+  background-color: var(--primary-color) !important;
+  color: black !important;
+  color: var(--text-color-light) !important;
+  width: 150px;
+  border-radius: 8px !important;
+}
+
+
+.button-cancel {
+  background-color: var(--danger-color) !important;
+  color: white !important;
+  color: var(--text-color-light) !important;
+  width: 150px;
+  border-radius: 8px !important;
+}
+
 
 .badge {
   display: inline-block;
@@ -33,18 +65,18 @@ body {
 
 .badge-success {
   background: var(--primary-color);
-  color: var(--text-color-black) !important;
+  color: var(--text-color-light) !important;
   border: 1px solid var(--primary-color) !important;
 }
 
 .badge-secondary {
-  background-color: var(--danger-color) !important;
-  color: var(--text-color-white);
-  border: 1px solid var(--border-color);
+  background-color: var(--accent-color) !important;
+  color: var(--text-color-dark);
+  border: 1px solid var(--accent-color);
 }
 
-.text-marmol {
-  color: var(--text-color-light-gray);
+.text-marmol{
+  color: #6d6d6d;
 }
 
 /* Estilo para botones de Material con color primario */
@@ -52,7 +84,7 @@ body {
 .mat-mdc-fab.mat-primary,
 .mat-mdc-mini-fab.mat-primary {
   background-color: var(--primary-color) !important;
-  color: var(--text-color-black) !important;
+  color: var(--text-color-light) !important;
 }
 
 .mat-mdc-button.mat-primary,

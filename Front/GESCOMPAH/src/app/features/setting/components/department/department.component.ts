@@ -11,6 +11,7 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 import { DepartmentStore } from '../../services/department/department.store';
 import { DepartmentSelectModel } from '../../models/department.models';
 import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
 
 @Component({
@@ -21,7 +22,8 @@ import { ToggleButtonComponent } from "../../../../shared/components/toggle-butt
     GenericTableComponent,
     MatButtonModule,
     MatIconModule,
-    ToggleButtonComponent
+    ToggleButtonComponent,
+    HasRoleAndPermissionDirective
   ],
   templateUrl: './department.component.html',
   styleUrls: ['./department.component.css'],

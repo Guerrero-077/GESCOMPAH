@@ -4,6 +4,8 @@
   align-items: center;
   background-color: #fff;
   color: black;
+  background-color: var(--background-color);
+  color: var(--text-color-black);
   padding: 12px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 0;
@@ -17,6 +19,7 @@
 
 .menu-button {
   color: black;
+  color: var(--text-color-black);
   background: transparent;
   border: none;
   border-radius: 8px;
@@ -46,6 +49,7 @@
 .description {
   font-size: 0.85rem;
   color: green;
+  color: var(--primary-color);
 }
 
 .right-content {
