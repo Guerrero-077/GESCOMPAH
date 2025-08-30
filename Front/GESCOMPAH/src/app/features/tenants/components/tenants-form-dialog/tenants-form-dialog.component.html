@@ -44,6 +44,7 @@
         </mat-form-field>
 
         <div class="step-actions">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
           <button mat-raised-button color="primary" matStepperNext [disabled]="locationGroup.invalid">
             Siguiente
           </button>
@@ -132,6 +133,7 @@
         </mat-form-field>
 
         <div class="step-actions">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
           <button mat-button matStepperPrevious>Volver</button>
           <button mat-raised-button color="primary" matStepperNext [disabled]="personGroup.invalid">
             Siguiente
@@ -177,6 +179,7 @@
         </mat-form-field>
 
         <div class="step-actions">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
           <button mat-button matStepperPrevious>Volver</button>
           <button
             mat-raised-button

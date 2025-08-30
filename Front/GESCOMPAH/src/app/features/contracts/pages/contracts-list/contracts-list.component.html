@@ -24,7 +24,7 @@
   </app-generic-table>
 
   <!-- Template de estado -->
-  <ng-template #estadoTemplate let-row>
+  <ng-template #estadoTemplate let-row >
     <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
       <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
         {{ row.active ? 'Activo' : 'Inactivo' }}

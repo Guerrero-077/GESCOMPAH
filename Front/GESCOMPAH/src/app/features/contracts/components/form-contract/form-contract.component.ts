@@ -15,6 +15,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { MatStepperModule } from '@angular/material/stepper';
 import Swal from 'sweetalert2';
 
 import { Subject, of } from 'rxjs';
@@ -27,8 +28,10 @@ import { CitySelectModel } from '../../../setting/models/city.models';
 import { CityService } from '../../../setting/services/city/city.service';
 import { ContractService } from '../../services/contract/contract.service';
 import { ContractCreateModel } from '../../models/contract.models';
+import { SquareService } from '../../../establishments/services/square/square.service';
+import { SquareSelectModel } from '../../../establishments/models/squares.models';
 
-// ---------- Validador: end >= start (normalizando a fecha sin hora) ----------
+// Validator and date functions (unchanged)
 function endAfterOrEqualStartValidator(startCtrlName: string, endCtrlName: string): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
     const start = group.get(startCtrlName)?.value as Date | null;
@@ -39,7 +42,6 @@ function endAfterOrEqualStartValidator(startCtrlName: string, endCtrlName: strin
   };
 }
 
-// YYYY-MM-DD para evitar issues de zona horaria con .NET
 function toDateOnly(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
@@ -59,7 +61,8 @@ function toDateOnly(d: Date): string {
     MatNativeDateModule,
     MatSlideToggleModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
+    MatStepperModule // Added
   ],
   templateUrl: './form-contract.component.html',
   styleUrls: ['./form-contract.component.css']
@@ -70,13 +73,20 @@ export class FormContractComponent implements OnInit, OnDestroy {
   private readonly establishmentService = inject(EstablishmentService);
   private readonly contractService = inject(ContractService);
   private readonly personService = inject(PersonService);
+  private readonly squareService = inject(SquareService); // Added
   private readonly dialogRef = inject(MatDialogRef<FormContractComponent>);
 
   private readonly destroy$ = new Subject<void>();
 
-  form!: FormGroup;
+  // Form Groups for steps
+  personFormGroup!: FormGroup;
+  contractFormGroup!: FormGroup;
+  establishmentFormGroup!: FormGroup;
+
   ciudades: CitySelectModel[] = [];
-  establecimientos: EstablishmentSelect[] = [];
+  plazas: SquareSelectModel[] = []; // Added
+  allEstablishments: EstablishmentSelect[] = []; // Added
+  filteredEstablishments: EstablishmentSelect[] = []; // Added
 
   personaEncontrada = false;
   personId: number | null = null;
@@ -87,18 +97,18 @@ export class FormContractComponent implements OnInit, OnDestroy {
 
   today = new Date();
   minEndDate = this.today;
-
-  // Para inicio: no deshabilitamos el control; lo dejamos readonly en HTML y min=max=hoy
   startMinDate = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
   startMaxDate = this.startMinDate;
 
   private lastQueriedDoc: string | null = null;
 
   ngOnInit(): void {
-    this.initForm();
+    this.initForms();
     this.loadCiudades();
-    this.loadEstablecimientos();
+    this.loadPlazas(); // Added
+    this.loadAllEstablishments(); // Renamed
     this.setupReactivePersonLookup();
+    this.setupPlazaFiltering(); // Added
   }
 
   ngOnDestroy(): void {
@@ -106,42 +116,37 @@ export class FormContractComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private initForm(): void {
-    const startOfToday = this.startMinDate;
-
-    this.form = this.fb.group({
-      // Inicio = HOY (enabled para que el icono abra calendar; lo hacemos readonly en HTML)
-      startDate: [startOfToday, Validators.required],
-      // Fin con mínimo = hoy
-      endDate: [startOfToday, Validators.required],
-
-      address: ['', Validators.required],
-      cityId: [null, Validators.required],
+  private initForms(): void {
+    this.personFormGroup = this.fb.group({
       document: ['', [Validators.required, Validators.minLength(5)]],
-
-      // Requeridos por el backend
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       phone: ['', Validators.required],
-
-      // Backend: email opcional
       email: ['', Validators.email],
+    });
 
-      establishmentIds: [[], Validators.required],
-
-      useSystemParameters: [true],
-      clauseIds: [[]]
+    this.contractFormGroup = this.fb.group({
+      address: ['', Validators.required],
+      cityId: [null, Validators.required],
+      startDate: [this.startMinDate, Validators.required],
+      endDate: [this.startMinDate, Validators.required],
     }, { validators: endAfterOrEqualStartValidator('startDate', 'endDate') });
 
-    // Si cambia inicio (aunque no debería por min=max), mantenemos min de fin
-    this.form.get('startDate')!.valueChanges
+    this.establishmentFormGroup = this.fb.group({
+      plazaId: [null, Validators.required],
+      establishmentIds: [[], Validators.required],
+      useSystemParameters: [true],
+      clauseIds: [[]]
+    });
+
+    this.contractFormGroup.get('startDate')!.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((d: Date) => {
         if (!d) return;
         const onlyDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
         this.minEndDate = onlyDate;
-        const end = this.form.get('endDate')!.value as Date | null;
-        if (end && end < onlyDate) this.form.get('endDate')!.setValue(onlyDate);
+        const end = this.contractFormGroup.get('endDate')!.value as Date | null;
+        if (end && end < onlyDate) this.contractFormGroup.get('endDate')!.setValue(onlyDate);
       });
   }
 
@@ -154,17 +159,42 @@ export class FormContractComponent implements OnInit, OnDestroy {
       });
   }
 
-private loadEstablecimientos(): void {
-  this.establishmentService.getAllActive()
-    .subscribe({
-      next: (res) => this.establecimientos = res,
-      error: (err) => console.error('Error al cargar establecimientos', err)
-    });
-}
+  private loadPlazas(): void {
+    this.squareService.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: res => (this.plazas = res),
+        error: err => console.error('Error al cargar plazas', err)
+      });
+  }
 
-  // Búsqueda reactiva por documento
+  private loadAllEstablishments(): void {
+    this.establishmentService.getAllActive()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.allEstablishments = res;
+          this.filteredEstablishments = []; // Initially empty until a plaza is selected
+        },
+        error: (err) => console.error('Error al cargar establecimientos', err)
+      });
+  }
+
+  private setupPlazaFiltering(): void {
+    this.establishmentFormGroup.get('plazaId')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(plazaId => {
+        this.establishmentFormGroup.get('establishmentIds')!.setValue([], { emitEvent: false });
+        if (plazaId) {
+          this.filteredEstablishments = this.allEstablishments.filter(e => e.plazaId === plazaId);
+        } else {
+          this.filteredEstablishments = [];
+        }
+      });
+  }
+
   private setupReactivePersonLookup(): void {
-    this.form.get('document')!.valueChanges.pipe(
+    this.personFormGroup.get('document')!.valueChanges.pipe(
       takeUntil(this.destroy$),
       map((v: string) => (v ?? '').trim()),
       debounceTime(400),
@@ -198,12 +228,10 @@ private loadEstablecimientos(): void {
         );
       })
     ).subscribe(person => {
-      const currentDoc = (this.form.get('document')!.value ?? '').trim();
+      const currentDoc = (this.personFormGroup.get('document')!.value ?? '').trim();
       if (this.lastQueriedDoc && currentDoc !== this.lastQueriedDoc) return;
 
       if (person) {
-        // Esperado:
-        // { firstName, lastName, document, address, phone, cityName, cityId, email, id }
         this.personaEncontrada = true;
         this.personId = person.id ?? null;
         this.foundCityName = person.cityName ?? null;
@@ -217,11 +245,13 @@ private loadEstablecimientos(): void {
   }
 
   private patchPerson(p: any) {
-    this.form.patchValue({
+    this.personFormGroup.patchValue({
       firstName: p.firstName ?? '',
       lastName:  p.lastName ?? '',
       phone:     p.phone ?? '',
       email:     p.email ?? '',
+    }, { emitEvent: false });
+    this.contractFormGroup.patchValue({
       address:   p.address ?? '',
       cityId:    p.cityId ?? null
     }, { emitEvent: false });
@@ -231,33 +261,34 @@ private loadEstablecimientos(): void {
     this.personaEncontrada = false;
     this.personId = null;
     this.foundCityName = null;
-    this.form.patchValue({
+    this.personFormGroup.patchValue({
       firstName: '',
       lastName:  '',
       phone:     '',
       email:     '',
+    }, { emitEvent: false });
+    this.contractFormGroup.patchValue({
       address:   '',
       cityId:    null
     }, { emitEvent: false });
   }
 
-  // Bloquea los campos de persona encontrada (sin opacar — ver CSS .no-dim)
   private disablePersonFields() {
-    this.form.get('firstName')?.disable({ emitEvent: false });
-    this.form.get('lastName')?.disable({ emitEvent: false });
-    this.form.get('phone')?.disable({ emitEvent: false });
-    this.form.get('email')?.disable({ emitEvent: false });
-    this.form.get('address')?.disable({ emitEvent: false });
-    this.form.get('cityId')?.disable({ emitEvent: false });
+    this.personFormGroup.get('firstName')?.disable({ emitEvent: false });
+    this.personFormGroup.get('lastName')?.disable({ emitEvent: false });
+    this.personFormGroup.get('phone')?.disable({ emitEvent: false });
+    this.personFormGroup.get('email')?.disable({ emitEvent: false });
+    this.contractFormGroup.get('address')?.disable({ emitEvent: false });
+    this.contractFormGroup.get('cityId')?.disable({ emitEvent: false });
   }
 
   private enablePersonFields() {
-    this.form.get('firstName')?.enable({ emitEvent: false });
-    this.form.get('lastName')?.enable({ emitEvent: false });
-    this.form.get('phone')?.enable({ emitEvent: false });
-    this.form.get('email')?.enable({ emitEvent: false });
-    this.form.get('address')?.enable({ emitEvent: false });
-    this.form.get('cityId')?.enable({ emitEvent: false });
+    this.personFormGroup.get('firstName')?.enable({ emitEvent: false });
+    this.personFormGroup.get('lastName')?.enable({ emitEvent: false });
+    this.personFormGroup.get('phone')?.enable({ emitEvent: false });
+    this.personFormGroup.get('email')?.enable({ emitEvent: false });
+    this.contractFormGroup.get('address')?.enable({ emitEvent: false });
+    this.contractFormGroup.get('cityId')?.enable({ emitEvent: false });
   }
 
   cancel(): void {
@@ -265,24 +296,27 @@ private loadEstablecimientos(): void {
   }
 
   submit(): void {
-    if (this.form.invalid || this.saving) return;
+    if (this.personFormGroup.invalid || this.contractFormGroup.invalid || this.establishmentFormGroup.invalid || this.saving) {
+      return;
+    }
 
-    // getRawValue para incluir campos deshabilitados en payload
-    const raw = this.form.getRawValue();
+    const personData = this.personFormGroup.getRawValue();
+    const contractData = this.contractFormGroup.getRawValue();
+    const establishmentData = this.establishmentFormGroup.getRawValue();
 
     const payload: ContractCreateModel = {
-      startDate: toDateOnly(raw.startDate),
-      endDate:   toDateOnly(raw.endDate),
-      address: raw.address,
-      cityId: Number(raw.cityId),
-      document: raw.document,
-      firstName: raw.firstName,
-      lastName: raw.lastName,
-      phone: raw.phone,
-      email: raw.email || null,
-      establishmentIds: raw.establishmentIds,
-      useSystemParameters: !!raw.useSystemParameters,
-      clauseIds: raw.clauseIds || []
+      startDate: toDateOnly(contractData.startDate),
+      endDate:   toDateOnly(contractData.endDate),
+      address: contractData.address,
+      cityId: Number(contractData.cityId),
+      document: personData.document,
+      firstName: personData.firstName,
+      lastName: personData.lastName,
+      phone: personData.phone,
+      email: personData.email || null,
+      establishmentIds: establishmentData.establishmentIds,
+      useSystemParameters: !!establishmentData.useSystemParameters,
+      clauseIds: establishmentData.clauseIds || []
     };
 
     this.saving = true;

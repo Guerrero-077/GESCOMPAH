@@ -12,10 +12,11 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { CommonModule } from '@angular/common';
 import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
 @Component({
   selector: 'app-square-list',
-  imports: [GenericTableComponent, CommonModule, ToggleButtonComponent],
+  imports: [GenericTableComponent, CommonModule, ToggleButtonComponent, HasRoleAndPermissionDirective],
   templateUrl: './square-list.component.html',
   styleUrl: './square-list.component.css'
 })

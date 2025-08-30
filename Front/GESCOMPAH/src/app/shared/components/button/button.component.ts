@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { HasRoleAndPermissionDirective } from '../../../core/Directives/HasRoleAndPermission.directive';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-button',
-  imports: [],
+  imports: [HasRoleAndPermissionDirective],
   templateUrl: './button.component.html',
   styleUrl: './button.component.css'
 })

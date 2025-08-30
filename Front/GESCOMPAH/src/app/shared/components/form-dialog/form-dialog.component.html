@@ -6,6 +6,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button class="button-cancel">Cancelar</button>
-  <button mat-button class="button-save" (click)="dynamicForm.onSubmit()">Guardar</button>
+  <button mat-stroked-button (click)="close(null)">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="dynamicForm.onSubmit()">Guardar</button>
 </mat-dialog-actions>

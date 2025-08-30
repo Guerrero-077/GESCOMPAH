@@ -16,6 +16,7 @@ import { FormEstablishmentComponent } from '../form-establishment/form-establish
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
 import { EstablishmentDetailDialogComponent } from '../establishment-detail-dialog/establishment-detail-dialog.component';
 import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
 
 @Component({
@@ -30,10 +31,11 @@ import { SharedEventsServiceService } from '../../services/shared/shared-events-
     MatSelectModule,
     MatStepperModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    HasRoleAndPermissionDirective
   ],
   templateUrl: './establishments-list.component.html',
-  styleUrl: './establishments-list.component.css',
+  styleUrls: ['./establishments-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EstablishmentsListComponent {

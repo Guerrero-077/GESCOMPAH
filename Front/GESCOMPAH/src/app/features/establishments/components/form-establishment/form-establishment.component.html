@@ -6,7 +6,7 @@
 
       <div class="info mb-4">
         <h3>Información Básica del Local</h3>
-        <span>Ingrese la Información básica del nuevo local</span>
+        <span>Ingrese la Información básica del нового local</span>
       </div>
 
       <div class="d-flex">
@@ -81,7 +81,8 @@
       </mat-form-field>
 
       <div class="d-flex justify-content-end gap-2 mt-4">
-        <button mat-button matStepperNext [disabled]="generalGroup.invalid || isBusy">Siguiente</button>
+        <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="generalGroup.invalid || isBusy">Siguiente</button>
       </div>
     </form>
   </mat-step>
@@ -121,8 +122,11 @@
       </mat-form-field>
 
       <div class="d-flex justify-content-between mt-4">
-        <button mat-button matStepperPrevious [disabled]="isBusy">Anterior</button>
-        <button mat-button matStepperNext [disabled]="ubicacionGroup.invalid || isBusy">Siguiente</button>
+        <div>
+          <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+          <button mat-button matStepperPrevious [disabled]="isBusy" class="ms-2">Anterior</button>
+        </div>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="ubicacionGroup.invalid || isBusy">Siguiente</button>
       </div>
     </form>
   </mat-step>
@@ -180,7 +184,10 @@
     </div>
 
     <div class="d-flex justify-content-between mt-4">
-      <button mat-button matStepperPrevious [disabled]="isBusy">Anterior</button>
+      <div>
+        <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+        <button mat-button matStepperPrevious [disabled]="isBusy" class="ms-2">Anterior</button>
+      </div>
 
       <!-- Botón con un único spinner -->
       <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="isBusy" [attr.aria-busy]="isBusy"
