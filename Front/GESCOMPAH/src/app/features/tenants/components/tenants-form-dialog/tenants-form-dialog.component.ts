@@ -39,20 +39,20 @@ function alphaHumanName(): ValidatorFn {
     return rx.test(v) ? null : { alphaHuman: true };
   };
 }
-function numericString(minLen: number, maxLen: number): ValidatorFn {
-  const rx = new RegExp(`^\d{${minLen},${maxLen}}$`);
+function colombianDocumentValidator(): ValidatorFn {
+  const rx = /^\d{7,10}$/;
   return (c: AbstractControl): ValidationErrors | null => {
     const v = String(c.value ?? '').trim();
-    if (!v) return null;
-    return rx.test(v) ? null : { numericString: true };
+    if (!v) return null; // Handled by Validators.required
+    return rx.test(v) ? null : { colombianDocument: true };
   };
 }
-function phoneE164Like(): ValidatorFn {
-  const rx = /^\+?\d{7,15}$/;
+function colombianPhoneValidator(): ValidatorFn {
+  const rx = /^3\d{9}$/; // Celular de 10 dígitos que empieza por 3
   return (c: AbstractControl): ValidationErrors | null => {
     const v = String(c.value ?? '').trim();
     if (!v) return null;
-    return rx.test(v) ? null : { phone: true };
+    return rx.test(v) ? null : { colombianPhone: true };
   };
 }
 function emailWithDotTld(): ValidatorFn {
@@ -134,8 +134,8 @@ export class TenantsFormDialogComponent {
     person: this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(50), notOnlySpaces(), alphaHumanName()]],
       lastName: ['', [Validators.required, Validators.maxLength(50), notOnlySpaces(), alphaHumanName()]],
-      document: ['', [Validators.required, numericString(5, 20)]], // solo se usa en CREATE
-      phone: ['', [Validators.required, phoneE164Like()]],
+      document: ['', [Validators.required, colombianDocumentValidator()]], // solo se usa en CREATE
+      phone: ['', [Validators.required, colombianPhoneValidator()]],
       address: ['', [Validators.required, Validators.maxLength(100), notOnlySpaces()]],
     }),
     account: this.fb.group({
@@ -168,8 +168,8 @@ export class TenantsFormDialogComponent {
     min: 'Selecciona un valor válido',
     onlySpaces: 'No puede ser solo espacios',
     alphaHuman: 'Solo letras y separadores válidos',
-    numericString: 'Solo dígitos (longitud permitida)',
-    phone: 'Teléfono inválido (7–15 dígitos, opcional +)',
+    colombianDocument: 'La cédula debe ser un número de 7 a 10 dígitos.',
+    colombianPhone: 'El celular debe ser un número de 10 dígitos que empiece por 3.',
   };
 
   // Init
@@ -255,7 +255,7 @@ export class TenantsFormDialogComponent {
 
   private loadRoles(): void {
     this.loadingRoles = true;
-    this.roleService.getAll()
+    this.roleService.getAll() 
       .pipe(
         finalize(() => this.loadingRoles = false),
         catchError(() => {
@@ -288,7 +288,7 @@ export class TenantsFormDialogComponent {
       firstName: firstName ?? '',
       lastName: lastName ?? '',
       document: t?.personDocument ?? '',
-      phone: t?.personPhone ?? '',
+      phone: (t?.personPhone ?? '').replace(/^\+57/, ''),
       address: t?.personAddress ?? ''
     }, { emitEvent: false });
 
@@ -370,7 +370,7 @@ export class TenantsFormDialogComponent {
         firstName: p.firstName,
         lastName: p.lastName,
         document: String(p.document),
-        phone: String(p.phone),
+        phone: `+57${p.phone}`,
         address: p.address,
         cityId: Number(loc.cityId),
         email: acc.email,
@@ -387,7 +387,7 @@ export class TenantsFormDialogComponent {
       id: t.id,
       firstName: p.firstName,
       lastName: p.lastName,
-      phone: String(p.phone),
+      phone: `+57${p.phone}`,
       address: p.address,
       cityId: Number(loc.cityId),
       email: acc.email,

@@ -15,6 +15,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import Swal from 'sweetalert2';
 
 import { Subject, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap, catchError, takeUntil, map } from 'rxjs/operators';
@@ -179,7 +180,20 @@ private loadEstablecimientos(): void {
         this.loadingPerson = true;
         this.lastQueriedDoc = doc;
         return this.personService.getByDocument(doc).pipe(
-          catchError(() => of(null)),
+          catchError((err) => {
+            if (err.status === 404 && typeof err.error === 'string') {
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: err.error,
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true
+              });
+            }
+            return of(null);
+          }),
           tap(() => (this.loadingPerson = false))
         );
       })
@@ -217,6 +231,14 @@ private loadEstablecimientos(): void {
     this.personaEncontrada = false;
     this.personId = null;
     this.foundCityName = null;
+    this.form.patchValue({
+      firstName: '',
+      lastName:  '',
+      phone:     '',
+      email:     '',
+      address:   '',
+      cityId:    null
+    }, { emitEvent: false });
   }
 
   // Bloquea los campos de persona encontrada (sin opacar — ver CSS .no-dim)

@@ -297,3 +297,11 @@ body {
     font-size: 12px;
   }
 }
+
+.step-actions button:disabled {
+  background-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.38);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
