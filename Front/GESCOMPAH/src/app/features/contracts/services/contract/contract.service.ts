@@ -18,42 +18,36 @@ export class ContractService {
   private readonly establishmentStore = inject(EstablishmentStore);
   private readonly baseUrl = `${environment.apiURL}/contract`;
 
-  // Señales públicas
-  readonly contracts = this.store.contracts; // lista completa
-  readonly cards     = this.store.cards;     // lista “mine”
+  // Señal pública para la tabla
+  readonly rows = this.store.rows;
 
   // ------------------------------ CREATE ------------------------------
   createContract(payload: ContractCreateModel): Observable<number> {
     return this.http.post<number>(`${this.baseUrl}`, payload).pipe(
       tap(() => {
-        // refrescar ambas listas si tienen pantallas abiertas
-        this.getAllContracts({ force: true }).subscribe();
-        this.getMineCards({ force: true }).subscribe();
-        // Marcar locales como inactivos en el store del módulo de establecimientos
+        // refresca la lista única (el backend decide por rol)
+        this.getList({ force: true }).subscribe();
+
+        // Impacta establecimientos en UI (si aplica)
         this.establishmentStore.patchActiveMany(payload.establishmentIds, false);
       })
     );
   }
 
   // ------------------------------- READ -------------------------------
-  /** Admin: obtiene la lista COMPLETA. */
-  getAllContracts(options: { force?: boolean } = {}): Observable<ContractSelectModel[]> {
+  /**
+   * ÚNICO método de listado para grilla.
+   * Admin -> todos; Arrendador -> solo los suyos (lo decide el backend).
+   */
+  getList(options: { force?: boolean } = {}): Observable<ContractCard[]> {
     const force = !!options.force;
-    if (this.store.contracts().length > 0 && !force) return of(this.store.contracts());
-    return this.http.get<ContractSelectModel[]>(`${this.baseUrl}`).pipe(
-      tap(list => this.store.setContracts(list))
-    );
-  }
-
-  /** Admin/Arrendador: obtiene /contract/mine (Admin → todos, Arrendador → los suyos). */
-  getMineCards(options: { force?: boolean } = {}): Observable<ContractCard[]> {
-    const force = !!options.force;
-    if (this.store.cards().length > 0 && !force) return of(this.store.cards());
+    if (this.store.rows().length > 0 && !force) return of(this.store.rows());
     return this.http.get<ContractCard[]>(`${this.baseUrl}/mine`, { withCredentials: true }).pipe(
-      tap(list => this.store.setCards(list))
+      tap(list => this.store.setRows(list))
     );
   }
 
+  /** Detalle puntual (ver/editar) */
   getContractById(id: number): Observable<ContractSelectModel> {
     return this.http.get<ContractSelectModel>(`${this.baseUrl}/${id}`);
   }
@@ -61,33 +55,22 @@ export class ContractService {
   // ------------------------------ UPDATE ------------------------------
   updateContract(id: number, payload: Partial<ContractCreateModel>): Observable<ContractSelectModel> {
     return this.http.put<ContractSelectModel>(`${this.baseUrl}/${id}`, payload).pipe(
-      tap(updated => {
-        this.store.updateContract(updated);
-        this.store.patchCardIfDatesMatch(updated);
-      })
+      tap(updated => this.store.patchFromDetail(updated))
     );
   }
 
+  /** Cambia estado activo/inactivo (optimista en grilla). */
   updateContractActive(id: number, active: boolean): Observable<ContractSelectModel> {
-    // Optimista
-    const prev = this.store.snapshot.find(c => c.id === id);
-    if (prev) this.store.updateContract({ ...prev, active });
-
+    this.store.updateRowActive(id, active); // optimista
     return this.http.patch<ContractSelectModel>(`${this.baseUrl}/${id}/estado`, { active }).pipe(
-      tap(updated => {
-        this.store.updateContract(updated);
-        this.store.patchCardActive(updated.id, updated.active);
-      })
+      tap(updated => this.store.updateRowActive(updated.id, updated.active)) // confirma
     );
   }
 
   // ------------------------------ DELETE ------------------------------
   deleteContract(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
-      tap(() => {
-        this.store.deleteContract(id);
-        this.store.deleteCard(id);
-      })
+      tap(() => this.store.deleteRow(id))
     );
   }
 

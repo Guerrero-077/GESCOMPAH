@@ -12,36 +12,16 @@
 </div>
 
 <div class="row d-flex justify-content-center">
-
-  <!-- Tabla MINE -->
-  <ng-container *ngIf="viewMode === 'mine'; else allTable">
-    <app-generic-table
-      [data]="cards$()"
-      [columns]="columnsMine"
-      [titulo]="'Gestión de Contratos'"
-      [subTitulo]="'Tus contratos'"
-      [createButtonLabel]="'Nuevo Contrato'"
-      [showViewButton]="true"
-      (view)="onView($event)"
-      (create)="onCreateNew()">
-    </app-generic-table>
-  </ng-container>
-
-  <!-- Tabla ALL -->
-  <ng-template #allTable>
-    <app-generic-table
-      [data]="contracts$()"
-      [columns]="columnsAll"
-      [titulo]="'Gestión de Contratos'"
-      [subTitulo]="'Administra los contratos del sistema'"
-      [createButtonLabel]="'Nuevo Contrato'"
-      [showViewButton]="true"
-      (view)="onView($event)"
-      (edit)="onEdit($event)"
-      (delete)="onDelete($event)"
-      (create)="onCreateNew()">
-    </app-generic-table>
-  </ng-template>
+  <app-generic-table
+    [data]="rows$()"
+    [columns]="columns"
+    [titulo]="'Gestión de Contratos'"
+    [subTitulo]="'Contratos (según tu rol)'"
+    [createButtonLabel]="'Nuevo Contrato'"
+    [showViewButton]="true"
+    (view)="onView($event)"
+    (create)="onCreateNew()">
+  </app-generic-table>
 
   <!-- Template de estado -->
   <ng-template #estadoTemplate let-row>

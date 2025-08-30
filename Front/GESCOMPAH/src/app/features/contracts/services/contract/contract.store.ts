@@ -1,50 +1,33 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { ContractSelectModel, ContractCard } from '../../models/contract.models';
+import { ContractCard, ContractSelectModel } from '../../models/contract.models';
 
 @Injectable({ providedIn: 'root' })
 export class ContractStore {
-  private _contracts = signal<ContractSelectModel[]>([]); // read-model completo
-  private _cards     = signal<ContractCard[]>([]);        // read-model “mine”
+  // Única fuente de verdad para la grilla
+  private _rows = signal<ContractCard[]>([]);
 
-  readonly contracts = computed(() => this._contracts());
-  readonly cards     = computed(() => this._cards());
+  // Exposición reactiva
+  readonly rows = computed(() => this._rows());
 
   // Setters
-  setContracts(list: ContractSelectModel[]): void { this._contracts.set(list ?? []); }
-  setCards(list: ContractCard[]): void { this._cards.set(list ?? []); }
+  setRows(list: ContractCard[]): void { this._rows.set(list ?? []); }
+  clear(): void { this._rows.set([]); }
 
   // Mutadores
-  addContract(contract: ContractSelectModel): void {
-    this._contracts.update(arr => [...arr, contract]);
+  deleteRow(id: number): void {
+    this._rows.update(arr => arr.filter(c => c.id !== id));
   }
 
-  updateContract(updated: ContractSelectModel): void {
-    this._contracts.update(arr => arr.map(c => c.id === updated.id ? updated : c));
+  updateRowActive(id: number, active: boolean): void {
+    this._rows.update(arr => arr.map(c => c.id === id ? ({ ...c, active }) : c));
   }
 
-  deleteContract(id: number): void {
-    this._contracts.update(arr => arr.filter(c => c.id !== id));
-  }
-
-  deleteCard(id: number): void {
-    this._cards.update(arr => arr.filter(c => c.id !== id));
-  }
-
-  patchCardActive(id: number, active: boolean): void {
-    this._cards.update(arr => arr.map(c => c.id === id ? ({ ...c, active }) : c));
-  }
-
-  /** Parchea algunos campos de la Card desde un update del modelo completo (si aplica). */
-  patchCardIfDatesMatch(updated: ContractSelectModel): void {
-    this._cards.update(arr =>
+  /** Sincroniza algunas propiedades de la fila desde un update de detalle */
+  patchFromDetail(updated: ContractSelectModel): void {
+    this._rows.update(arr =>
       arr.map(c => c.id === updated.id
         ? { ...c, startDate: updated.startDate, endDate: updated.endDate, active: updated.active }
         : c)
     );
   }
-
-  clear(): void { this._contracts.set([]); this._cards.set([]); }
-
-  // Snapshot del modelo completo (para update optimista)
-  get snapshot(): ContractSelectModel[] { return this._contracts(); }
 }

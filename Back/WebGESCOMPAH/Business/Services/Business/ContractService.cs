@@ -4,7 +4,6 @@ using Business.Repository;
 using Data.Interfaz.IDataImplement.Business;
 using Data.Interfaz.IDataImplement.Persons;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -48,7 +47,7 @@ namespace Business.Services.Business
             IPasswordHasher<User> passwordHasher,
             ISendCode emailService,
             ApplicationDbContext context,
-             ICurrentUser user
+            ICurrentUser user
         ) : base(data, mapper)
         {
             _personRepository = personRepository;
@@ -63,23 +62,35 @@ namespace Business.Services.Business
             _user = user;
         }
 
-
+        /// <summary>
+        /// Lista para grilla (admin → todos; arrendador → solo los suyos).
+        /// Proyección liviana: trae datos de persona y totales pactados.
+        /// </summary>
         public async Task<IReadOnlyList<ContractCardDto>> GetMineAsync()
         {
             var list = _user.EsAdministrador
                 ? await _contractRepository.GetCardsAllAsync()
                 : await _contractRepository.GetCardsByPersonAsync(
-                      _user.PersonId ?? throw new BusinessException("Usuario sin persona asociada.")
+                    _user.PersonId ?? throw new BusinessException("Usuario sin persona asociada.")
                   );
 
-            return list.Select(c => new ContractCardDto(
-                c.Id, c.PersonId,
-                c.StartDate.ToString("yyyy-MM-dd"),
-                c.EndDate.ToString("yyyy-MM-dd"),
-                c.TotalBase, c.TotalUvt, c.Active
-            )).ToList().AsReadOnly();
-        }
+            // Mapear 1:1 todos los campos de la card del repositorio
+            var result = list.Select(c => new ContractCardDto(
+                c.Id,
+                c.PersonId,
+                c.PersonFullName,
+                c.PersonDocument,
+                c.PersonPhone,
+                c.PersonEmail,
+                c.StartDate,
+                c.EndDate,
+                c.TotalBase,
+                c.TotalUvt,
+                c.Active
+            )).ToList();
 
+            return result.AsReadOnly();
+        }
 
         // Proyección liviana -> suma totales sin materializar entidades completas.
         private async Task<(decimal totalBase, decimal totalUvt)> SumEstablishmentsAsync(IEnumerable<int> establishmentIds)
@@ -165,7 +176,6 @@ namespace Business.Services.Business
             await _context.SaveChangesAsync();
 
             // 6) Marcar establecimientos como ocupados (Active = false) en BLOQUE
-            //    Filtro por Active != false para no tocar filas innecesarias.
             var rows = await _establishmentsRepository.SetActiveByIdsAsync(targetIds, active: false);
 
             if (rows != targetIds.Count)

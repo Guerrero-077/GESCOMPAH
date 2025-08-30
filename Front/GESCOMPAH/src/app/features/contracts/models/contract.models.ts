@@ -13,7 +13,7 @@ export interface ContractCreateModel {
   clauseIds?: number[];
 }
 
-/** Detalle de locales asociados (para lista completa) */
+// Para listar (detalle de locales, solo cuando se usa el modelo completo)
 export interface PremisesLeasedModel {
   id: number;
   establishmentId: number;
@@ -22,7 +22,7 @@ export interface PremisesLeasedModel {
   address?: string;
 }
 
-/** Read-model COMPLETO (Admin) */
+/** Detalle (ver/editar) */
 export interface ContractSelectModel {
   id: number;
   startDate: string; // "YYYY-MM-DD"
@@ -36,10 +36,14 @@ export interface ContractSelectModel {
   active: boolean;
 }
 
-/** Read-model LIGERO (/contract/mine) */
+/** Read-model ÚNICO para la grilla (admin/arrendador; backend decide por rol) */
 export interface ContractCard {
   id: number;
   personId: number;
+  personFullName: string;
+  personDocument: string;
+  personPhone: string;
+  personEmail: string | null;
   startDate: string;  // "YYYY-MM-DD"
   endDate:   string;  // "YYYY-MM-DD"
   totalBase: number;

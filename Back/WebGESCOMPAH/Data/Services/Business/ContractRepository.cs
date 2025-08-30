@@ -3,7 +3,6 @@ using Data.Repository;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Data.Services.Business
 {
@@ -11,6 +10,7 @@ namespace Data.Services.Business
     {
         public ContractRepository(ApplicationDbContext context) : base(context) { }
 
+        // ⚠️ Mantén este override para casos de detalle/export (no para grillas masivas)
         public override async Task<IEnumerable<Contract>> GetAllAsync()
         {
             return await _dbSet
@@ -30,24 +30,45 @@ namespace Data.Services.Business
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        ///Metodos adicionales para optener los contratos por persona 
-
+        // ============== PROYECCIONES PARA GRID (sin Include) ==============
 
         public async Task<IReadOnlyList<ContractCard>> GetCardsByPersonAsync(int personId) =>
             await _dbSet.AsNoTracking()
                 .Where(c => !c.IsDeleted && c.PersonId == personId)
+                .OrderByDescending(c => c.Id)
                 .Select(c => new ContractCard(
-                    c.Id, c.PersonId, c.StartDate, c.EndDate,
-                    c.TotalBaseRentAgreed, c.TotalUvtQtyAgreed, c.Active))
+                    c.Id,
+                    c.PersonId,
+                    (c.Person.FirstName + " " + c.Person.LastName).Trim(),
+                    c.Person.Document,
+                    c.Person.Phone,
+                    c.Person.User != null ? c.Person.User.Email : null,
+                    c.StartDate,
+                    c.EndDate,
+                    c.TotalBaseRentAgreed,
+                    c.TotalUvtQtyAgreed,
+                    c.Active
+                ))
                 .ToListAsync();
 
-                public async Task<IReadOnlyList<ContractCard>> GetCardsAllAsync() =>
-                    await _dbSet.AsNoTracking()
-                        .Where(c => !c.IsDeleted)
-                        .Select(c => new ContractCard(
-                            c.Id, c.PersonId, c.StartDate, c.EndDate,
-                            c.TotalBaseRentAgreed, c.TotalUvtQtyAgreed, c.Active))
-                        .ToListAsync();
+        public async Task<IReadOnlyList<ContractCard>> GetCardsAllAsync() =>
+            await _dbSet.AsNoTracking()
+                .Where(c => !c.IsDeleted)
+                .OrderByDescending(c => c.Id)
+                .Select(c => new ContractCard(
+                    c.Id,
+                    c.PersonId,
+                    (c.Person.FirstName + " " + c.Person.LastName).Trim(),
+                    c.Person.Document,
+                    c.Person.Phone,
+                    c.Person.User != null ? c.Person.User.Email : null,
+                    c.StartDate,
+                    c.EndDate,
+                    c.TotalBaseRentAgreed,
+                    c.TotalUvtQtyAgreed,
+                    c.Active
+                ))
+                .ToListAsync();
 
     }
 }
