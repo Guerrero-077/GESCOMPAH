@@ -10,15 +10,12 @@ namespace Entity.Infrastructure.Configurations.Base
         {
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Active)
-                   .IsRequired();
+            builder.Property(e => e.Active).IsRequired();
+            builder.Property(e => e.IsDeleted).IsRequired();
 
-            builder.Property(e => e.IsDeleted)
-                   .IsRequired();
-
+            // Elimina configuración específica de motor para CreatedAt
             builder.Property(e => e.CreatedAt)
-                   .HasDefaultValueSql("GETDATE()") // o NOW() en PostgreSQL
-                   .ValueGeneratedOnAdd();
+                   .IsRequired(); // Solo requerir, sin tipo ni default SQL
         }
     }
 }

@@ -40,8 +40,7 @@ namespace Entity.Infrastructure.Configurations.Business
             builder.Property(o => o.Locked)
                 .IsRequired();
 
-            builder.Property(o => o.DueDate)
-                .HasColumnType("datetime2");
+            builder.Property(o => o.DueDate).HasColumnType("timestamp");
 
             builder.HasOne(o => o.Contract)
                 .WithMany(c => c.ObligationMonths) // <-- asegúrate que exista esta navegación en Contract

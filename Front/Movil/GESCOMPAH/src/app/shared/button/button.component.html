@@ -1,0 +1,19 @@
+<div class="action-buttons">
+  <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'VER'">
+    <ion-button *ngIf="showView" fill="clear" size="small" (click)="handleView()" title="Ver">
+      <ion-icon name="eye-outline"></ion-icon>
+    </ion-button>
+  </ng-container>
+
+  <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
+    <ion-button *ngIf="showEdit" fill="clear" size="small" color="warning" (click)="handleEdit()" title="Editar">
+      <ion-icon name="pencil-outline"></ion-icon>
+    </ion-button>
+  </ng-container>
+
+  <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
+    <ion-button *ngIf="showDelete" fill="clear" size="small" color="danger" (click)="handleDelete()" title="Eliminar">
+      <ion-icon name="trash-outline"></ion-icon>
+    </ion-button>
+  </ng-container>
+</div>

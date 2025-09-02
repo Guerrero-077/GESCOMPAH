@@ -11,9 +11,7 @@ namespace Entity.Infrastructure.Context
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options)
-        {
-        }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -21,6 +19,19 @@ namespace Entity.Infrastructure.Context
             modelBuilder.Entity<Images>().HasQueryFilter(img => !img.IsDeleted);
             //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+
+            modelBuilder.Entity<Establishment>(e =>
+            {
+                e.Property(x => x.AreaM2).HasPrecision(18, 2);
+                e.Property(x => x.RentValueBase).HasPrecision(18, 2);
+                e.Property(x => x.UvtQty).HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<Contract>(e =>
+            {
+                e.Property(x => x.TotalBaseRentAgreed).HasPrecision(18, 2);
+                e.Property(x => x.TotalUvtQtyAgreed).HasPrecision(18, 2);
+            });
 
             // Apply configurations from the assembly where UserConfiguration is defined
             //modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);

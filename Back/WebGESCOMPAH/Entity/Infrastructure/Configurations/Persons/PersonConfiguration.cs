@@ -26,8 +26,8 @@ namespace Entity.Infrastructure.Configurations.Persons
                 .HasMaxLength(20);
 
             builder.HasIndex(p => p.Document)
-                .IsUnique()
-                .HasFilter("[Document] IS NOT NULL"); // PostgreSQL: "WHERE Document IS NOT NULL"
+                   .IsUnique();
+
 
             builder.Property(p => p.Address)
                 .HasMaxLength(200);

@@ -9,7 +9,7 @@ namespace Entity.Infrastructure.DataInit.SecurityAuthentication
 
         public void Configure(EntityTypeBuilder<RolUser> builder)
         {
-            var seedDate = new DateTime(2025, 01, 01);
+            var seedDate = new DateTime(2025, 01, 01, 0, 0, 0, DateTimeKind.Utc);
 
             builder.HasData(
                  new RolUser { Id = 1, UserId = 1, RolId = 1, IsDeleted = false, Active = true, CreatedAt = seedDate },

@@ -8,7 +8,7 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
     {
         public void Configure(EntityTypeBuilder<FormModule> builder)
         {
-            var seedDate = new DateTime(2025, 01, 01);
+            var seedDate = new DateTime(2025, 01, 01, 0, 0, 0, DateTimeKind.Utc);
 
             builder.HasData(
                 // Panel Principal

@@ -9,21 +9,15 @@ namespace Entity.Infrastructure.Configurations.AdministrationSystem
     {
         public override void Configure(EntityTypeBuilder<Form> builder)
         {
-            base.Configure(builder); // Aplica configuración heredada: Id, Active, Name, Description
-
+            base.Configure(builder);
             builder.ToTable("Forms");
-
             builder.Property(f => f.Route)
                 .IsRequired()
-                .HasMaxLength(200); // Puedes ajustar según los requerimientos del sistema
-
-            // Relación con RolFormPermission (1:n)
+                .HasMaxLength(200);
             builder.HasMany(f => f.RolFormPermissions)
                 .WithOne(rfp => rfp.Form)
                 .HasForeignKey(rfp => rfp.FormId)
-                .OnDelete(DeleteBehavior.Restrict); // o Cascade si quieres borrar permisos con el form
-
-            // Relación con FormModule (1:n)
+                .OnDelete(DeleteBehavior.Restrict);
             builder.HasMany(f => f.FormModules)
                 .WithOne(fm => fm.Form)
                 .HasForeignKey(fm => fm.FormId)

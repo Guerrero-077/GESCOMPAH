@@ -8,7 +8,7 @@ namespace Entity.Infrastructure.DataInit.SecurityAuthentication
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            var seedDate = new DateTime(2025, 01, 01);
+            var seedDate = new DateTime(2025, 09, 01, 0, 0, 0, DateTimeKind.Utc);
 
             builder.HasData(
                 new User

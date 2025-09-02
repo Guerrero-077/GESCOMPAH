@@ -1,6 +1,5 @@
-﻿using Entity.Domain.Models.Implements.Persons;
+using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.ModelBase;
-using Entity.Enum;
 
 namespace Entity.Domain.Models.Implements.Business
 {

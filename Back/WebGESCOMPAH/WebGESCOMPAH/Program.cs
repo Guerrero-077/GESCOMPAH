@@ -13,16 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 // --------------------------
 // CONFIGURACIÓN Y SERVICIOS
 // --------------------------
-
-
 builder.Services.AddScoped<IContractPdfGeneratorService, ContractPdfService>();
-
-
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // Swagger siempre disponible
+builder.Services.AddSwaggerGen();
 
 // CORS, JWT, DB, Servicios personalizados
 builder.Services.AddCustomCors(builder.Configuration);
@@ -31,10 +26,11 @@ builder.Services.Configure<CookieSettings>(builder.Configuration.GetSection("Coo
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
+
+// 👇 Registrar AMBOS DbContext (SqlServer + Postgres)
 builder.Services.AddDatabase(builder.Configuration);
 
 // Validaciones y CQRS
-//builder.Services.AddScoped<IValidatorService, ValidatorService>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 
@@ -51,20 +47,13 @@ cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
 builder.Services.AddScoped<CloudinaryUtility>();
 
-
 var app = builder.Build();
 
 // --------------------------
 // MIDDLEWARE GLOBAL
 // --------------------------
-
-// Manejo de errores
 app.UseMiddleware<ExceptionMiddleware>();
-
-// Archivos estáticos
 app.UseStaticFiles();
-
-// Swagger
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -72,17 +61,14 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// ✅ AQUI DEBE IR CORS: antes de Auth
 app.UseCors();
-
-// HTTPS
-app.UseHttpsRedirection();
-
-// 🔐 Seguridad
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Ruteo
 app.MapControllers();
 
+// ✅ MIGRACIONES MULTI-DB EN ARRANQUE
+MigrationManager.MigrateAllDatabases(app.Services, builder.Configuration);
+
+// 🔚 Ejecutar aplicación
 app.Run();
