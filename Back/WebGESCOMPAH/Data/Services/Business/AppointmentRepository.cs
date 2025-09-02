@@ -14,6 +14,7 @@ namespace Data.Services.Business
             return await _dbSet
                 .Where(e => !e.IsDeleted)
                 .Include(e => e.Establishment)
+                .Include(e => e.Person)
                 .ToListAsync();
         }
 
@@ -26,13 +27,13 @@ namespace Data.Services.Business
 
         }
 
-        public async Task<bool> ChangeStatusAsync(int id, int status) 
+        public async Task<bool> RejectedAppointment(int id) 
         { 
             var appointment = await _dbSet.FindAsync(id); ;
             if (appointment is null)
                 throw new Exception("La cita no existe");
 
-            appointment.Status = status;
+            appointment.Status = 3;
 
             await context.SaveChangesAsync();
             return true;

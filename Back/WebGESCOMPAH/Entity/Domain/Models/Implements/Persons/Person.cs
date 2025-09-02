@@ -1,4 +1,5 @@
-﻿using Entity.Domain.Models.Implements.Location;
+﻿using Entity.Domain.Models.Implements.Business;
+using Entity.Domain.Models.Implements.Location;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Domain.Models.ModelBase;
 
@@ -21,6 +22,8 @@ namespace Entity.Domain.Models.Implements.Persons
         public City City { get; set; } = null!;
 
         public User? User { get; set; }
+
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 
 }
