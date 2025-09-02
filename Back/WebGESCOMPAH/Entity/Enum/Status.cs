@@ -9,9 +9,7 @@ namespace Entity.Enum
     public enum Status 
     {
         Pendiente = 1,
-        Asignada = 2,
-        Aprobada = 3,   // Generó contrato
-        Finalizada = 4, // Terminó sin contrato
-        Rechazada = 5
+        Agendata = 2,
+        Rechazada = 3
     }
 }

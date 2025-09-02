@@ -55,13 +55,13 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             return Ok(appointment);
         }
 
-        [HttpPut("reject/{id}")]
-        public async Task<ActionResult<bool>> ChangeStatu(int id)
+        [HttpPut]
+        public async Task<ActionResult<bool>> ChangeStatu(int id, Status status)
         {
             if (id <= 0)
                 return BadRequest("ID no pueden ser menores o iguales a cero");
 
-            var appointment = await _appointmentService.RejectedAppointment(id);
+            var appointment = await _appointmentService.ChangesStatusAsync(id, (int)status);
 
             if (!appointment)
                 return NotFound("La cita no existe");

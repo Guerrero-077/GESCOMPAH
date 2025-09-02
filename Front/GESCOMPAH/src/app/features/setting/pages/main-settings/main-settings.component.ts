@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { LocationSettingsComponent } from '../location-settings/location-settings.component';
 import { FinanceComponent } from "../../components/finance/finance.component";
@@ -18,8 +18,7 @@ import { ChangePasswordComponent } from "../../components/change-password/change
     ChangePasswordComponent
 ],
   templateUrl: './main-settings.component.html',
-  styleUrl: './main-settings.component.css',
-  encapsulation: ViewEncapsulation.None,
+  styleUrl: './main-settings.component.css'
 })
 export class MainSettingsComponent {
 

@@ -57,8 +57,7 @@ namespace Business.Mapping
 
             // Appointment
             config.NewConfig<Appointment, AppointmentSelectDto>()
-                    .Map(dest => dest.EstablishmentName, src => src.Establishment.Name)
-                    .Map(dest => dest.PersonName, src => src.Person.FirstName);
+                  .Map(dest => dest.EstablishmentName, src => src.Establishment.Name);
 
             // Establishment -> Select
             config.NewConfig<Establishment, EstablishmentSelectDto>()

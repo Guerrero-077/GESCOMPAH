@@ -1,24 +1,20 @@
-using Entity.Domain.Models.Implements.Persons;
-using Entity.Domain.Models.ModelBase;
+﻿using Entity.Domain.Models.ModelBase;
 
 namespace Entity.Domain.Models.Implements.Business
 {
     public class Appointment : BaseModel
     {
-        public string Description { get; set; }
-        public DateTime RequestDate { get; set; } 
-        public DateTime? DateTimeAssigned { get; set; }       
+        public string FullName { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Phone { get; set; } = null!;
+        public string Description { get; set; } = null!;
 
-        // Ralacion con Persona
-        public int PersonId { get; set; }
-        public Person Person { get; set; }
+        // Cambiar a DateTimeOffset
+        public DateTime RequestDate { get; set; }
+        public DateTime DateTimeAssigned { get; set; }
 
-        // Relacion con Establecimiento
         public int EstablishmentId { get; set; }
-        public  Establishment Establishment { get; set; }
-
         public int Status { get; set; }
-        public bool Active { get; set; }
-
+        public Establishment Establishment { get; set; } = null!;
     }
 }

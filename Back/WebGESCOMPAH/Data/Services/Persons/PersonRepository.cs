@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Services.Persons
 {
-    public class PersonRepository : DataGeneric<Person>, Interfaz.IDataImplement.Persons.IPersonRepository
+    public class PersonRepository : DataGeneric<Person>, IPersonRepository
     {
         public PersonRepository(ApplicationDbContext context) : base(context)
         {

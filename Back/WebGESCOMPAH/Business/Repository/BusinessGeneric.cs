@@ -85,6 +85,7 @@ namespace Business.Repository
             try
             {
                 BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
+
                 var candidate = _mapper.Map<TEntity>(dto);
 
                 // 1) Buscar duplicado (incluye inactivos porque GetAllQueryable no filtra IsDeleted)
