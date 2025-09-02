@@ -44,6 +44,7 @@
         </mat-form-field>
 
         <div class="step-actions">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
           <button mat-raised-button color="primary" matStepperNext [disabled]="locationGroup.invalid">
             Siguiente
           </button>
@@ -63,6 +64,8 @@
               matInput
               formControlName="firstName"
               required
+              placeholder="Jhon"
+              maxlength="50"
               (blur)="personGroup.get('firstName')?.updateValueAndValidity()" />
             <mat-error *ngIf="personGroup.get('firstName')?.errors as errs">
               {{
@@ -77,6 +80,8 @@
               matInput
               formControlName="lastName"
               required
+              placeholder="Doe"
+              maxlength="50"
               (blur)="personGroup.get('lastName')?.updateValueAndValidity()" />
             <mat-error *ngIf="personGroup.get('lastName')?.errors as errs">
               {{
@@ -88,32 +93,47 @@
 
         <div class="grid">
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="phone" required />
-            <mat-hint>7–15 dígitos, opcional prefijo “+”</mat-hint>
-            <mat-error *ngIf="personGroup.get('phone')?.errors as errs">
+            <mat-label>Documento</mat-label>
+            <input matInput formControlName="document" required placeholder="1234567890" maxlength="10" />
+            <mat-hint>7 a 10 dígitos</mat-hint>
+            <mat-error *ngIf="personGroup.get('document')?.errors as errs">
               {{
-                getFirstError(personGroup.get('phone'), ['required','phone'])
+                getFirstError(personGroup.get('document'), ['required','colombianDocument'])
               }}
             </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Dirección</mat-label>
-            <input
-              matInput
-              formControlName="address"
-              required
-              (blur)="personGroup.get('address')?.updateValueAndValidity()" />
-            <mat-error *ngIf="personGroup.get('address')?.errors as errs">
+            <mat-label>Teléfono</mat-label>
+            <span matPrefix>+57&nbsp;</span>
+            <input matInput formControlName="phone" required placeholder="3001234567" maxlength="10" />
+            <mat-hint>Celular de 10 dígitos (ej. 3001234567)</mat-hint>
+            <mat-error *ngIf="personGroup.get('phone')?.errors as errs">
               {{
-                getFirstError(personGroup.get('address'), ['required','onlySpaces','maxlength'])
+                getFirstError(personGroup.get('phone'), ['required','colombianPhone'])
               }}
             </mat-error>
           </mat-form-field>
         </div>
 
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Dirección</mat-label>
+          <input
+            matInput
+            formControlName="address"
+            required
+            placeholder="Carrera 5 # 15 - 25"
+            maxlength="100"
+            (blur)="personGroup.get('address')?.updateValueAndValidity()" />
+          <mat-error *ngIf="personGroup.get('address')?.errors as errs">
+            {{
+              getFirstError(personGroup.get('address'), ['required','onlySpaces','maxlength'])
+            }}
+          </mat-error>
+        </mat-form-field>
+
         <div class="step-actions">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
           <button mat-button matStepperPrevious>Volver</button>
           <button mat-raised-button color="primary" matStepperNext [disabled]="personGroup.invalid">
             Siguiente
@@ -134,6 +154,7 @@
             type="email"
             formControlName="email"
             required
+            placeholder="usuario@example.com"
             (blur)="fixEmail()" />
           <mat-error *ngIf="accountGroup.get('email')?.errors as errs">
             {{
@@ -158,6 +179,7 @@
         </mat-form-field>
 
         <div class="step-actions">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
           <button mat-button matStepperPrevious>Volver</button>
           <button
             mat-raised-button

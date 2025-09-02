@@ -1,47 +1,51 @@
 <div class="local-card bg-white rounded-2">
-    <!-- Contenedor de imagen -->
-    <div class="image-container w-100 position-relative">
-        <img [src]="primaryImage" [alt]="local.name" class="local-image" loading="lazy">
+  <!-- Contenedor de imagen -->
 
-        <!-- Tag de disponibilidad -->
-        <div *ngIf="showAvailableTag && local.active" class="availability-tag">
-            Disponible
-        </div>
+  <div class="image-container w-100 position-relative">
+    <img [src]="primaryImage" [alt]="local.name" class="local-image" loading="lazy">
+
+    <!-- Tag de disponibilidad -->
+    <div *ngIf="showAvailableTag && local.active" class="availability-tag">
+      Disponible
+    </div>
+    <div *ngIf="showAvailableTag && !local.active" class="availability-tag unavailable">
+      Ocupado
+    </div>
+  </div>
+
+  <!-- Contenido de la tarjeta -->
+  <div class="card-content">
+    <!-- Nombre del local -->
+    <h3 class="local-name">{{ local.name }}</h3>
+
+    <!-- Descripción -->
+    <p class="description">{{local.description}}</p>
+
+    <!-- Información en dos columnas: Dirección y Área -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Dirección</span>
+        <span class="info-value ellipsis">{{ local.address }}</span>
+      </div>
+
+      <div class="info-item text-end">
+        <span class="info-label">Área</span>
+        <span class="info-value">{{ local.areaM2 }} m²</span>
+      </div>
     </div>
 
-    <!-- Contenido de la tarjeta -->
-    <div class="card-content">
-        <!-- Nombre del local -->
-        <h3 class="local-name">{{ local.name }}</h3>
+    <hr class="card-divider" />
 
-        <!-- Descripción -->
-        <p class="description">{{local.description}}</p>
+    <!-- Precio y Acciones -->
+    <div class="d-flex justify-content-between align-items-center footer">
+      <div class="rent-section">
+        <span class="rent-label">Precio</span>
+        <div class="rent-price">{{ local.rentValueBase }}</div>
+      </div>
 
-        <!-- Información en dos columnas: Dirección y Área -->
-        <div class="info-grid">
-            <div class="info-item">
-                <span class="info-label">Dirección</span>
-                <span class="info-value ellipsis">{{ local.address }}</span>
-            </div>
-
-            <div class="info-item text-end">
-                <span class="info-label">Área</span>
-                <span class="info-value">{{ local.areaM2 }} m²</span>
-            </div>
-        </div>
-
-        <hr class="card-divider" />
-
-        <!-- Precio y Acciones -->
-        <div class="d-flex justify-content-between align-items-center footer">
-            <div class="rent-section">
-                <span class="rent-label">Precio</span>
-                <div class="rent-price">{{ local.rentValueBase }}</div>
-            </div>
-
-            <!-- Botones de acción -->
-            <app-button (onView)="handleView()" (onEdit)="handleEdit()" (onDelete)="handleDelete()">
-            </app-button>
-        </div>
+      <!-- Botones de acción -->
+      <app-button (onView)="handleView()" (onEdit)="handleEdit()" (onDelete)="handleDelete()">
+      </app-button>
     </div>
+  </div>
 </div>

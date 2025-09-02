@@ -1,11 +1,15 @@
 <div class="container mt-4">
 
   <!-- Botón para abrir el formulario en un modal -->
-  <div class="d-flex justify-content-end mb-4">
-    <button mat-raised-button color="primary" (click)="openCreateDialog()">
-      Nuevo establecimiento
-    </button>
-  </div>
+  <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
+    <div class="d-flex justify-content-end mb-4">
+      <button mat-raised-button color="primary" (click)="openCreateDialog()">
+        Nuevo establecimiento
+      </button>
+    </div>
+  </ng-container>
+
+
 
   <!-- Contenedor principal con el pipe Async -->
   <div *ngIf="establishments$ | async as establishments; else loading">
@@ -13,9 +17,9 @@
     <div *ngIf="establishments.length > 0; else noEstablishment">
       <div class="d-flex flex-wrap gap-3 justify-content-center">
         <app-card *ngFor="let establishment of establishments" [local]="establishment" [showAvailableTag]="true"
-          (onDelete)="handleDelete(establishment.id)" (onUpdate)="openEditDialog(establishment)"
-          (onView)="onView($event)">
+          (onDelete)="handleDelete(establishment.id)" (onUpdate)="onCardUpdated()" (onView)="onView($event)">
         </app-card>
+        <!-- (onUpdate)="openEditDialog(establishment)" -->
       </div>
     </div>
 

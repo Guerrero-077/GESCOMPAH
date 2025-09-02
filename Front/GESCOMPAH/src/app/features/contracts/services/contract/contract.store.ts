@@ -1,41 +1,33 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { ContractSelectModel } from '../../models/contract.models';
+import { ContractCard, ContractSelectModel } from '../../models/contract.models';
 
 @Injectable({ providedIn: 'root' })
 export class ContractStore {
-  
-  private _contracts = signal<ContractSelectModel[]>([]);
+  // Única fuente de verdad para la grilla
+  private _rows = signal<ContractCard[]>([]);
 
-  // Señal pública reactiva
-  readonly contracts = computed(() => this._contracts());
+  // Exposición reactiva
+  readonly rows = computed(() => this._rows());
 
-  setContracts(contracts: ContractSelectModel[]): void {
-    this._contracts.set(contracts);
+  // Setters
+  setRows(list: ContractCard[]): void { this._rows.set(list ?? []); }
+  clear(): void { this._rows.set([]); }
+
+  // Mutadores
+  deleteRow(id: number): void {
+    this._rows.update(arr => arr.filter(c => c.id !== id));
   }
 
-  addContract(contract: ContractSelectModel): void {
-    this._contracts.update(contracts => [...contracts, contract]);
+  updateRowActive(id: number, active: boolean): void {
+    this._rows.update(arr => arr.map(c => c.id === id ? ({ ...c, active }) : c));
   }
 
-  updateContract(updatedContract: ContractSelectModel): void {
-    this._contracts.update(contracts =>
-      contracts.map(contract =>
-        contract.id === updatedContract.id ? updatedContract : contract
-      )
+  /** Sincroniza algunas propiedades de la fila desde un update de detalle */
+  patchFromDetail(updated: ContractSelectModel): void {
+    this._rows.update(arr =>
+      arr.map(c => c.id === updated.id
+        ? { ...c, startDate: updated.startDate, endDate: updated.endDate, active: updated.active }
+        : c)
     );
-  }
-
-  deleteContract(id: number): void {
-    this._contracts.update(contracts =>
-      contracts.filter(contract => contract.id !== id)
-    );
-  }
-
-  clear(): void {
-    this._contracts.set([]);
-  }
-
-  get snapshot(): ContractSelectModel[] {
-    return this._contracts();
   }
 }

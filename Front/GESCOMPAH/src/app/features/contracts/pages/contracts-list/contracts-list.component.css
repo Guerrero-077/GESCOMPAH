@@ -1,3 +1,108 @@
-p{
+p {
   color: red;
+}
+
+/* Overlay de pantalla completa */
+.pdf-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  /* por encima de la tabla/dialog */
+  background: rgba(17, 24, 39, 0.45);
+  /* gris oscuro translúcido */
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+}
+
+/* Tarjeta centrada con spinner + icono */
+.pdf-loading-card {
+  width: 320px;
+  max-width: 90vw;
+  background: #111827;
+  /* gris-900 si estás en dark mode */
+  color: #e5e7eb;
+  /* gris-200 */
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, .08);
+}
+
+/* Texto */
+.pdf-loading-card .label {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.pdf-loading-card .sub-label {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: -6px;
+}
+
+/* Spinner Material: hereda color actual */
+.mat-mdc-progress-spinner circle,
+.mat-progress-spinner circle {
+  stroke: currentColor !important;
+}
+
+/* SVG de descarga animado */
+.download-anim {
+  width: 64px;
+  height: 64px;
+  display: block;
+}
+
+/* Colores del SVG (adaptables a tu tema) */
+.download-anim .arrow {
+  stroke: #60a5fa;
+  /* azul-400 */
+  animation: arrow-bounce 1.2s ease-in-out infinite;
+}
+
+.download-anim .box {
+  fill: #1f2937;
+  /* gris-800 */
+  stroke: #374151;
+  /* gris-700 */
+  stroke-width: 1;
+}
+
+/* Animación de la flecha (rebote hacia caja) */
+@keyframes arrow-bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translateY(6px);
+    opacity: 0.9;
+  }
+}
+
+/* Si usas modo claro, opcionalmente ajusta colores */
+:host-context(body:not(.dark)) .pdf-loading-card {
+  background: #ffffff;
+  color: #111827;
+  border-color: rgba(0, 0, 0, .06);
+}
+
+:host-context(body:not(.dark)) .download-anim .arrow {
+  stroke: #2563eb;
+  /* azul-600 */
+}
+
+:host-context(body:not(.dark)) .download-anim .box {
+  fill: #f3f4f6;
+  /* gris-100 */
+  stroke: #e5e7eb;
+  /* gris-200 */
 }

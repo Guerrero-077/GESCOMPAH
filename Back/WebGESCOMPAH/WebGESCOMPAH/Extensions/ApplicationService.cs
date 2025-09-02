@@ -119,6 +119,11 @@ namespace WebGESCOMPAH.Extensions
 
             services.AddMemoryCache();
 
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+
+
+
 
             //Validaciones
 

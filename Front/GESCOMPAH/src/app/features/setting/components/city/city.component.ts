@@ -11,6 +11,7 @@ import { FormDialogComponent } from '../../../../shared/components/form-dialog/f
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
 import { CitySelectModel } from '../../models/city.models';
 import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
 
 @Component({
@@ -21,7 +22,8 @@ import { ToggleButtonComponent } from "../../../../shared/components/toggle-butt
     GenericTableComponent,
     MatButtonModule,
     MatIconModule,
-    ToggleButtonComponent
+    ToggleButtonComponent,
+    HasRoleAndPermissionDirective
   ],
   templateUrl: './city.component.html',
   styleUrls: ['./city.component.css'],

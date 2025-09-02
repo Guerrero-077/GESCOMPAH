@@ -7,15 +7,15 @@ namespace Entity.DTOs.Implements.Business.EstablishmentDto
     {
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public double AreaM2 { get; set; }
+        public decimal AreaM2 { get; set; }
         public decimal RentValueBase { get; set; }
         public string Address { get; set; } = string.Empty;
         public int PlazaId { get; set; }
         public string PlazaName { get; set; } = null!;
         public bool Active { get; set; }
 
-        /// <summary>Imágenes asociadas al establecimiento</summary>
+        public decimal UvtQty { get; set; }
+
         public List<ImageSelectDto> Images { get; set; } = [];
     }
-
 }

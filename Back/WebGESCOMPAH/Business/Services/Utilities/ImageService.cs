@@ -1,145 +1,117 @@
 ﻿using Business.Interfaces.Implements.Utilities;
 using Business.Repository;
 using Data.Interfaz.IDataImplement.Utilities;
-using Data.Services.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Utilities;
 using Entity.DTOs.Implements.Utilities.Images;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Utilities.Exceptions;
 using Utilities.Helpers.CloudinaryHelper;
 
-namespace Business.Services.Utilities;
-
-public class ImageService : BusinessGeneric<ImageSelectDto, ImageCreateDto, ImageUpdateDto, Images>, IImagesService
+namespace Business.Services.Utilities
 {
-    private readonly IImagesRepository _imagesRepository;
-    private readonly CloudinaryUtility _cloudinaryHelper;
-
-    public ImageService(
-        IImagesRepository imagesRepository,
-        IMapper mapper,
-        CloudinaryUtility cloudinaryHelper
-    ) : base(imagesRepository, mapper)
-    {
-        _imagesRepository = imagesRepository;
-        _cloudinaryHelper = cloudinaryHelper;
-    }
-
     /// <summary>
-    /// Subir nuevas imágenes a un establecimiento (máx. 5)
+    /// Servicio para manejar imágenes con Cloudinary. Incluye:
+    /// - Validación de archivos (delegada a CloudinaryUtility).
+    /// - Subida en paralelo con control de concurrencia.
+    /// - Rollback en Cloudinary si la persistencia falla.
     /// </summary>
-    public async Task<List<ImageSelectDto>> AddImagesAsync(int establishmentId, IFormFileCollection files)
+    public sealed class ImageService :
+        BusinessGeneric<ImageSelectDto, ImageCreateDto, ImageUpdateDto, Images>, IImagesService
     {
-        var filesToUpload = files.Take(5).ToList(); // no subir más de 5 nunca
+        private readonly IImagesRepository _imagesRepository;
+        private readonly CloudinaryUtility _cloudinary;
+        private readonly ILogger<ImageService> _logger;
 
-        var imagesToAdd = new List<Images>();
+        // Ajusta según tu infraestructura: 3 paralelos es buen punto medio
+        private const int MaxParallelUploads = 3;
+        private const int MaxFilesPerRequest = 5;
 
-        try
+        public ImageService(
+            IImagesRepository imagesRepository,
+            CloudinaryUtility cloudinary,
+            IMapper mapper,
+            ILogger<ImageService> logger
+        ) : base(imagesRepository, mapper)
         {
-            // Subida paralela de imágenes a Cloudinary
-            var uploadTasks = filesToUpload.Select(file => _cloudinaryHelper.UploadImageAsync(file, establishmentId));
-            var uploadResults = await Task.WhenAll(uploadTasks);
+            _imagesRepository = imagesRepository;
+            _cloudinary = cloudinary;
+            _logger = logger;
+        }
 
-            for (int i = 0; i < filesToUpload.Count; i++)
+        public async Task<List<ImageSelectDto>> AddImagesAsync(int establishmentId, IFormFileCollection files)
+        {
+            if (files is null || files.Count == 0)
+                throw new BusinessException("Debe adjuntar al menos un archivo.");
+
+            var filesToUpload = files.Take(MaxFilesPerRequest).Where(f => f?.Length > 0).ToList();
+            if (filesToUpload.Count == 0)
+                throw new BusinessException("No se recibieron archivos válidos.");
+
+            var uploadedEntities = new List<Images>();
+            var uploadedPublicIds = new List<string>();
+            using var semaphore = new SemaphoreSlim(MaxParallelUploads);
+
+            try
             {
-                var file = filesToUpload[i];
-                var uploadResult = uploadResults[i];
-
-                var image = new Images
+                var tasks = filesToUpload.Select(async file =>
                 {
-                    FileName = file.FileName,
-                    FilePath = uploadResult.SecureUrl.AbsoluteUri,
-                    PublicId = uploadResult.PublicId,
-                    EstablishmentId = establishmentId
-                };
+                    await semaphore.WaitAsync();
+                    try
+                    {
+                        var result = await _cloudinary.UploadImageAsync(file, establishmentId);
+                        lock (uploadedEntities)
+                        {
+                            uploadedEntities.Add(new Images
+                            {
+                                FileName = file.FileName,
+                                FilePath = result.SecureUrl.AbsoluteUri,
+                                PublicId = result.PublicId,
+                                EstablishmentId = establishmentId
+                            });
+                            uploadedPublicIds.Add(result.PublicId);
+                        }
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                });
 
-                imagesToAdd.Add(image);
+                await Task.WhenAll(tasks);
+
+                // Persistir en BD
+                await _imagesRepository.AddRangeAsync(uploadedEntities);
+
+                _logger.LogInformation("Subidas {Count} imágenes para establecimiento {Id}", uploadedEntities.Count, establishmentId);
+                return _mapper.Map<List<ImageSelectDto>>(uploadedEntities);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Falló la subida/persistencia de imágenes para establecimiento {Id}. Ejecutando rollback...", establishmentId);
 
-            // Llamada al repo para persistir con control transaccional
-            await _imagesRepository.AddAsync(imagesToAdd);
+                // Rollback en Cloudinary para lo que sí subió
+                var deletes = uploadedPublicIds.Select(pid => _cloudinary.DeleteAsync(pid));
+                await Task.WhenAll(deletes);
 
-            return _mapper.Map<List<ImageSelectDto>>(imagesToAdd);
+                throw new BusinessException("Error al adjuntar imágenes al establecimiento.", ex);
+            }
         }
-        catch (InvalidOperationException ex) // capturamos la excepción de límite excedido en repo
+
+        public async Task DeleteByPublicIdAsync(string publicId)
         {
-            // Opcional: eliminar imágenes subidas a Cloudinary para evitar recursos huérfanos
-            var deleteTasks = imagesToAdd.Select(img => _cloudinaryHelper.DeleteAsync(img.PublicId));
-            await Task.WhenAll(deleteTasks);
+            if (string.IsNullOrWhiteSpace(publicId))
+                throw new BusinessException("PublicId requerido.");
 
-            throw new BusinessException(ex.Message);
-        }
-    }
-
-
-
-    /// <summary>
-    /// Reemplaza una imagen existente: sube nueva, elimina anterior y actualiza la BD
-    /// </summary>
-    public async Task<ImageSelectDto> ReplaceImageAsync(int imageId, IFormFile newFile)
-    {
-        var image = await _imagesRepository.GetByIdAsync(imageId)
-            ?? throw new KeyNotFoundException("Imagen no encontrada");
-
-        var uploadResult = await _cloudinaryHelper.UploadImageAsync(newFile, image.EstablishmentId);
-
-        await _cloudinaryHelper.DeleteAsync(image.PublicId);
-
-        image.PublicId = uploadResult.PublicId;
-        image.FilePath = uploadResult.SecureUrl.AbsoluteUri;
-        image.FileName = newFile.FileName;
-
-        await _imagesRepository.UpdateAsync(image);
-
-        return _mapper.Map<ImageSelectDto>(image);
-    }
-
-    /// <summary>
-    /// Eliminar una imagen por ID
-    /// </summary>
-    public async Task DeleteImageByIdAsync(int imageId)
-    {
-        var image = await _imagesRepository.GetByIdAsync(imageId)
-            ?? throw new KeyNotFoundException("Imagen no encontrada");
-
-        await _cloudinaryHelper.DeleteAsync(image.PublicId);
-        await _imagesRepository.DeleteAsync(image.Id);
-    }
-
-
-    /// <summary>
-    /// Eliminar una imagen por ID
-    /// </summary>
-    public async Task<bool> DeleteLogicalByPublicIdAsync(string publicId)
-    {
-        // Simplemente delega la llamada a la capa Data
-        return await _imagesRepository.DeleteLogicalByPublicIdAsync(publicId);
-    }
-
-
-
-    /// <summary>
-    /// Eliminar múltiples imágenes por PublicId
-    /// </summary>
-    public async Task DeleteImagesByPublicIdsAsync(List<string> publicIds)
-    {
-        if (publicIds == null || publicIds.Count == 0)
-            return;
-
-        foreach (var publicId in publicIds)
-        {
-            await _cloudinaryHelper.DeleteAsync(publicId);
+            await _cloudinary.DeleteAsync(publicId);
             await _imagesRepository.DeleteByPublicIdAsync(publicId);
         }
-    }
 
-    /// <summary>
-    /// Obtener todas las imágenes asociadas a un establecimiento
-    /// </summary>
-    public async Task<List<ImageSelectDto>> GetImagesByEstablishmentIdAsync(int establishmentId)
-    {
-        var images = await _imagesRepository.GetByEstablishmentIdAsync(establishmentId);
-        return _mapper.Map<List<ImageSelectDto>>(images);
+        public async Task<List<ImageSelectDto>> GetImagesByEstablishmentIdAsync(int establishmentId)
+        {
+            var images = await _imagesRepository.GetByEstablishmentIdAsync(establishmentId);
+            return _mapper.Map<List<ImageSelectDto>>(images);
+        }
     }
 }

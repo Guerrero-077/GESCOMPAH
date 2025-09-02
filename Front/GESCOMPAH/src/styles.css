@@ -1,4 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--background-color);
+}
 
 html,
 body {
@@ -9,6 +18,7 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background-color: #F9FAFB;
+  background-color: var(--background-color);
 }
 
 :root {
@@ -17,12 +27,18 @@ body {
   --secondary-color: #6B7280;
   --text-colo-white: #FFFFFF;
   --text-color-black: #111827;
+  --background-color: #FFFFFF;
+  --primary-color: #2E7D32;
+  --accent-color: #EAB308;
+  --text-color-dark: #111827;
+  --text-color-light: #FFFFFF;
   --danger-color: #EF4444;
 }
 
 .button-save {
   background-color: var(--primary-color) !important;
   color: black !important;
+  color: var(--text-color-light) !important;
   width: 150px;
   border-radius: 8px !important;
 }
@@ -31,6 +47,7 @@ body {
 .button-cancel {
   background-color: var(--danger-color) !important;
   color: white !important;
+  color: var(--text-color-light) !important;
   width: 150px;
   border-radius: 8px !important;
 }
@@ -48,18 +65,32 @@ body {
 
 .badge-success {
   background: var(--primary-color);
-  color: var(--text-color) !important;
+  color: var(--text-color-light) !important;
   border: 1px solid var(--primary-color) !important;
 }
 
 .badge-secondary {
-  background-color: var(--danger-color) !important;
-  color: var(--text-color-white);
-  border: 1px solid #d6dbe3;
+  background-color: var(--accent-color) !important;
+  color: var(--text-color-dark);
+  border: 1px solid var(--accent-color);
 }
 
 .text-marmol {
   color: #6d6d6d;
+}
+
+/* Estilo para botones de Material con color primario */
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-fab.mat-primary,
+.mat-mdc-mini-fab.mat-primary {
+  background-color: var(--primary-color) !important;
+  color: var(--text-color-light) !important;
+}
+
+.mat-mdc-button.mat-primary,
+.mat-mdc-outlined-button.mat-primary,
+.mat-mdc-icon-button.mat-primary {
+  color: var(--primary-color) !important;
 }
 
 /* Contenedor principal de los tabs */

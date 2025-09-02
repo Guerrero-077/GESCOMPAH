@@ -1,35 +1,26 @@
-:root {
-  --background-color: #F9FAFB;
-  --primary-color: #BBF7D0;
-  --secondary-color: #6B7280;
-  --text-colo-white: #FFFFFF;
-  --text-color-black: #111827;
-  --danger-color: #EF4444;
-}
-
 ::ng-deep .mat-step-header .mat-step-icon-selected {
-  background-color: var(--primary-color) !important;
-  color: var(--text-color-black) !important;
+  background-color: var(--accent-color) !important;
+  color: var(--text-color-white) !important;
 }
 
 ::ng-deep .mat-step-header .mat-step-icon {
   background-color: var(--primary-color) !important;
-  color: black !important;
+  color: var(--text-color-black) !important;
 }
 
 ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
-  background-color: white !important;
+  background-color: var(--text-color-white) !important;
 }
 
 ::ng-deep .mat-raised-button.mat-primary {
-  background-color: var(--primary-color);
-  color: var(--text-color-black);
+  background-color: var(--primary-color) !important;
+  color: var(--text-color-black) !important;
 }
 
 ::ng-deep .mat-step-label {
-  color: black !important;
+  color: var(--text-color-black) !important;
 }
 
 ::ng-deep .mat-step-header[aria-selected="true"] .mat-step-label {
-  color: #16A34A !important;
+  color: var(--accent-color) !important;
 }

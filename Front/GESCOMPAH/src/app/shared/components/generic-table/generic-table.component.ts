@@ -56,7 +56,7 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
 
   @Input() showViewButton = true;
   @Input() showDetailButton = true;
-  @Input() showActionsColumn = true; 
+  @Input() showActionsColumn = true;
 
   @Input() showFilterButton = true;
   @Input() filterParams: any = {};

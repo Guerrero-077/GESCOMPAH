@@ -1,38 +1,21 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Business.Interfaces.IBusiness;
 using Entity.DTOs.Implements.Utilities.Images;
-using Data.Interfaz.DataBasic;
-using Entity.Domain.Models.Implements.Utilities;
-using Business.Interfaces.IBusiness;
+using Microsoft.AspNetCore.Http;
 
 namespace Business.Interfaces.Implements.Utilities
 {
+    /// <summary>
+    /// Servicio de imágenes desacoplado del servicio de Establecimientos.
+    /// </summary>
     public interface IImagesService : IBusiness<ImageSelectDto, ImageCreateDto, ImageUpdateDto>
     {
-        /// <summary>
-        /// Agrega múltiples imágenes a un establecimiento.
-        /// </summary>
+        /// <summary>Sube y asocia imágenes a un establecimiento.</summary>
         Task<List<ImageSelectDto>> AddImagesAsync(int establishmentId, IFormFileCollection files);
 
-        /// <summary>
-        /// Reemplaza una imagen existente (por ID).
-        /// </summary>
-        Task<ImageSelectDto> ReplaceImageAsync(int imageId, IFormFile newFile);
+        /// <summary>Elimina una imagen por su PublicId en Cloudinary.</summary>
+        Task DeleteByPublicIdAsync(string publicId);
 
-        /// <summary>
-        /// Elimina una imagen individual por ID.
-        /// </summary>
-        Task DeleteImageByIdAsync(int imageId);
-
-        /// <summary>
-        /// Elimina múltiples imágenes por sus publicIds en Cloudinary.
-        /// </summary>
-        Task DeleteImagesByPublicIdsAsync(List<string> publicIds);
-        Task<bool> DeleteLogicalByPublicIdAsync(string publicId);
-
-        /// <summary>
-        /// Obtiene todas las imágenes asociadas a un establecimiento.
-        /// </summary>
+        /// <summary>Obtiene imágenes por establecimiento.</summary>
         Task<List<ImageSelectDto>> GetImagesByEstablishmentIdAsync(int establishmentId);
-
     }
 }

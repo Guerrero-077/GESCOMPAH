@@ -172,34 +172,29 @@ namespace Business.CustomJWT
         {
             var now = DateTime.UtcNow;
             var accessExp = now.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes);
-
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub,   user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat,
-                          new DateTimeOffset(now).ToUnixTimeSeconds().ToString(),
-                          ClaimValueTypes.Integer64)
+                new(JwtRegisteredClaimNames.Sub,   user.Id.ToString()),
+                new(JwtRegisteredClaimNames.Email, user.Email),
+                new(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Iat,   new DateTimeOffset(now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
             };
+
+            if (user.PersonId > 0)
+                claims.Add(new Claim("person_id", user.PersonId.ToString()));
 
             foreach (var r in roles.Where(r => !string.IsNullOrWhiteSpace(r)).Distinct())
                 claims.Add(new Claim(ClaimTypes.Role, r));
 
-            var jwt = new JwtSecurityToken(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
-                claims: claims,
-                notBefore: now,
-                expires: accessExp,
-                signingCredentials: creds
-            );
+            var jwt = new JwtSecurityToken(_jwtSettings.Issuer, _jwtSettings.Audience, claims,
+                notBefore: now, expires: accessExp, signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
+
 
         /// <summary>
         /// Hash de refresh tokens con HMAC-SHA512 usando como pepper la key del JWT.

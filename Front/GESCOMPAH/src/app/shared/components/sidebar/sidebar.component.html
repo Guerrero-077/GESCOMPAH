@@ -5,20 +5,61 @@
   </div>
 
   <div class="menu">
-    <mat-accordion>
-      <mat-expansion-panel class="sidebar-expansion-panel" *ngFor="let item of menu()">
-        <mat-expansion-panel-header>
-          <mat-icon>{{ item.icon }}</mat-icon>
-          <span class="item-label">{{ item.label }}</span>
-        </mat-expansion-panel-header>
+    <mat-accordion multi="true">
+      <ng-container *ngFor="let item of menu(); trackBy: trackByItem">
 
-        <mat-nav-list class="submenu" *ngIf="item.children?.length">
-          <a mat-list-item *ngFor="let child of item.children" [routerLink]="child.route" routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }">
-            <span class="submenu-label">{{ child.label }}</span>
-          </a>
-        </mat-nav-list>
-      </mat-expansion-panel>
+        <!-- Panel desplegable cuando hay >1 hijos -->
+        <mat-expansion-panel class="sidebar-expansion-panel"
+                             *ngIf="(item.children?.length ?? 0) > 1"
+                             [expanded]="isGroupActive(item)"
+                             [ngClass]="{ 'active': isGroupActive(item) }">
+
+          <mat-expansion-panel-header class="panel-header"
+                                      [ngClass]="{ 'active-header': isGroupActive(item) }">
+            <mat-panel-title class="panel-title">
+              <div class="header-content">
+                <div class="icon-box">
+                  <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+                </div>
+                <div class="label-box">
+                  <span class="item-label">{{ item.label }}</span>
+                </div>
+              </div>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <mat-nav-list class="submenu">
+            <a mat-list-item
+               *ngFor="let child of item.children; trackBy: trackByChild"
+               [routerLink]="child.route"
+               routerLinkActive="active"
+               [routerLinkActiveOptions]="{ exact: true }"
+               (click)="closeSidebar.emit()">
+              <span class="submenu-label">{{ child.label }}</span>
+            </a>
+          </mat-nav-list>
+        </mat-expansion-panel>
+
+        <!-- Ítem directo cuando hay 0 o 1 hijo -->
+        <a mat-list-item
+           class="single-link"
+           *ngIf="(item.children?.length ?? 0) <= 1 && item.route as r"
+           [routerLink]="r"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }"
+           [ngClass]="{ 'active-single': isSingleActive(item) }"
+           (click)="closeSidebar.emit()">
+          <span class="link-content">
+            <div class="icon-box">
+              <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+            </div>
+            <div class="label-box">
+              <span class="item-label">{{ item.label }}</span>
+            </div>
+          </span>
+        </a>
+
+      </ng-container>
     </mat-accordion>
   </div>
 

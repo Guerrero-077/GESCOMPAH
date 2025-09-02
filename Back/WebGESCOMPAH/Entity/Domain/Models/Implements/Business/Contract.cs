@@ -5,8 +5,8 @@ namespace Entity.Domain.Models.Implements.Business
 {
     public class Contract : BaseModel
     {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
 
         public string? BusinessPurpose { get; set; }
 
@@ -18,6 +18,11 @@ namespace Entity.Domain.Models.Implements.Business
         public ICollection<ObligationMonth> ObligationMonths { get; set; } = new List<ObligationMonth>();
 
         public ICollection<ContractClause> ContractClauses { get; set; } = new List<ContractClause>();
+
+
+        // 🔹 NUEVO: snapshot global inmutable pactado al crear
+        public decimal TotalBaseRentAgreed { get; set; }   // suma de BaseRent de todos los locales
+        public decimal TotalUvtQtyAgreed { get; set; }     // suma de UvtQty de todos los locales
     }
 
 }

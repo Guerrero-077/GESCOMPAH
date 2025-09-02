@@ -11,7 +11,7 @@
 .table-header {
   padding: 1rem;
   border-bottom: 1px solid #ddd;
-  background-color: #F4F7FC;
+  background-color: color-mix(in srgb, var(--background-color), var(--primary-color) 10%);
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
@@ -70,13 +70,13 @@
 }
 
 .data-row:hover {
-  background-color: #f1f8e9;
+  background-color: color-mix(in srgb, var(--background-color), var(--primary-color) 20%);
   cursor: pointer;
 }
 
 .table-footer {
   padding: 0.5rem 1rem;
-  background-color: #F4F7FC;
+  background-color: color-mix(in srgb, var(--background-color), var(--primary-color) 10%);
   display: flex;
   justify-content: flex-end;
   border-top: 1px solid #ddd;

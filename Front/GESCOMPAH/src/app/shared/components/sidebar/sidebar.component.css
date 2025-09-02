@@ -1,98 +1,210 @@
+/* ===================== */
+/* Paleta unificada      */
+/* ===================== */
+:host {
+  --sb-primary: #2e7d32;
+  --sb-primary-contrast: #ffffff;
+  --sb-bg: #ffffff;
+  --sb-hover: #e8f5e9;   /* hover */
+  --sb-active: #c8e6c9;  /* activo */
+  --sb-text: #222222;
+  --sb-muted: #f5f5f5;
+  --sb-border: #e0e0e0;
+  --sb-shadow: rgba(0, 0, 0, 0.05);
+  --sb-item-h: 48px;     /* altura uniforme para headers y links */
+  --sb-icon: 22px;       /* tamaño de icono */
+}
+
+/* Contenedor */
 .sidebar {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  /* border-right: 1px solid #ddd; */
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  background: var(--sb-bg);
+  box-shadow: 2px 0 8px var(--sb-shadow);
   overflow: hidden;
 }
 
+/* Header */
 .header {
-  position: relative;
-  background-color: #2E7D32;
-  color: white;
+  background-color: var(--sb-primary);
+  color: var(--sb-primary-contrast);
   text-align: center;
   padding: 1.5rem 1rem 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
 }
+.header h3 { margin: 0; }
+.header p  { margin: 0; font-size: .85rem; opacity: .9; }
 
-.header h3 {
-  margin: 0;
-}
-
-.header p {
-  margin: 0;
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
+/* Zona de menú */
 .menu {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem 0.25rem;
+  padding: .5rem .25rem;
 }
 
-/* Expansion Panel */
+/* ===================== */
+/* Expansion Panel       */
+/* ===================== */
 .sidebar-expansion-panel {
   background: transparent !important;
   box-shadow: none !important;
   margin-bottom: 4px;
   border-radius: 0 20px 20px 0;
-  transition: all 0.3s ease-in-out;
+  transition: all .2s ease-in-out;
 }
 
+/* Forzar centrado vertical del header MDC */
+:host ::ng-deep .mat-expansion-panel-header {
+  align-items: center !important;
+  min-height: var(--sb-item-h) !important;
+}
+
+/* Título del header como contenedor flex */
+.panel-title {
+  display: block;
+  width: 100%;
+}
+.header-content {
+  display: flex;
+  align-items: center;          /* <- centro vertical real */
+  gap: 10px;
+  width: 100%;
+  min-height: var(--sb-item-h); /* misma altura que el header */
+}
+
+/* Icono y título en contenedores explícitos */
+.icon-box {
+  flex: 0 0 var(--sb-icon);
+  width: var(--sb-icon);
+  height: var(--sb-icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-box mat-icon {
+  font-size: var(--sb-icon);
+  width: var(--sb-icon);
+  height: var(--sb-icon);
+  line-height: 1;               /* elimina baseline raro */
+}
+.label-box {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  min-height: 1em;
+}
+
+/* Estilo del header */
 .sidebar-expansion-panel .mat-expansion-panel-header {
   padding: 0 1rem;
-  min-height: 48px;
   border-radius: 0 20px 20px 0;
-  background: #f5f5f5;
-  color: #222;
+  background: var(--sb-muted);
+  color: var(--sb-text);
   font-weight: 600;
-  transition: background 0.2s;
+  transition: background .15s, color .15s, border-left .15s;
 }
-
+.sidebar-expansion-panel .mat-expansion-panel-header:hover {
+  background: var(--sb-hover);
+  color: var(--sb-primary);
+}
 .sidebar-expansion-panel.mat-expanded .mat-expansion-panel-header {
-  background: #E8F5E9;
-  color: #2E7D32;
+  background: var(--sb-hover);
+  color: var(--sb-primary);
 }
 
-/* Submenú */
+/* Activo cuando algún hijo está activo */
+.sidebar-expansion-panel.active .mat-expansion-panel-header,
+.sidebar-expansion-panel .mat-expansion-panel-header.active-header {
+  background: var(--sb-active) !important;
+  color: var(--sb-primary) !important;
+  border-left: 4px solid var(--sb-primary);
+}
+
+/* ===================== */
+/* Submenú (links hijos) */
+/* ===================== */
 .submenu {
   padding-left: 1.25rem;
   margin: 0;
   background: #f9f9f9;
-  border-left: 2px solid #e0e0e0;
+  border-left: 2px solid var(--sb-border);
   border-radius: 0 0 20px 0;
-  transition: all 0.3s ease-in-out;
+  transition: all .2s ease-in-out;
 }
-
 .submenu a {
-  padding: 0.75rem 1rem;
+  padding: .75rem 1rem;
   background: none;
-  font-size: 0.95rem;
+  font-size: .95rem;
   border-radius: 0 20px 20px 0;
-  color: #222;
-  transition: all 0.2s ease-in-out;
+  color: var(--sb-text);
+  transition: all .15s ease-in-out;
   display: flex;
-  align-items: center;
+  align-items: center;          /* centra vertical el texto del submenu */
+  min-height: var(--sb-item-h);
 }
-
 .submenu a:hover {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--sb-hover);
+  color: var(--sb-primary);
 }
-
 .submenu a.active {
-  background: #c8e6c9;
-  color: #2e7d32;
+  background: var(--sb-active);
+  color: var(--sb-primary);
   font-weight: 600;
-  border-left: 4px solid #2e7d32;
+  border-left: 4px solid var(--sb-primary);
 }
 
+/* ===================== */
+/* Ítem directo (1 ruta) */
+/* ===================== */
+.single-link {
+  margin-bottom: 4px;
+  border-radius: 0 20px 20px 0;
+  background: var(--sb-muted);
+  color: var(--sb-text);
+  font-weight: 600;
+  min-height: var(--sb-item-h);
+  transition: background .15s, color .15s, border-left .15s;
+}
+/* Contenido interno del list-item (nuestro wrapper) */
+.link-content {
+  display: flex;
+  align-items: center;          /* <- centro vertical real */
+  gap: 10px;
+  width: 100%;
+  min-height: var(--sb-item-h);
+  padding: 0 1rem;
+}
+.single-link:hover {
+  background: var(--sb-hover);
+  color: var(--sb-primary);
+}
+
+/* Forzar centrado del contenedor MDC por si aplica */
+:host ::ng-deep a.mat-mdc-list-item.mdc-list-item {
+  align-items: center !important;
+  min-height: var(--sb-item-h) !important;
+}
+:host ::ng-deep a.mat-mdc-list-item .mdc-list-item__primary-text {
+  display: block;               /* nuestro .link-content maneja el flex */
+  width: 100%;
+}
+
+/* Etiquetas */
+.item-label,
 .submenu-label {
-  margin-left: 6px;
+  line-height: 1.1;
+}
+
+/* Activo unificado (panel, submenú e ítem directo) */
+.submenu a.active,
+.single-link.active,
+.single-link.active-single {
+  background: var(--sb-active) !important;
+  color: var(--sb-primary) !important;
+  border-left: 4px solid var(--sb-primary);
+  font-weight: 600;
 }
 
 /* Logout */
@@ -104,12 +216,9 @@
   gap: 10px;
   border-top: 1px solid #ddd;
   background: #f9f9f9;
-  color: #2E7D32;
+  color: var(--sb-primary);
   font-weight: 600;
   justify-content: center;
-  transition: background 0.2s;
+  transition: background .15s;
 }
-
-.logout:hover {
-  background-color: #E8F5E9;
-}
+.logout:hover { background-color: var(--sb-hover); }

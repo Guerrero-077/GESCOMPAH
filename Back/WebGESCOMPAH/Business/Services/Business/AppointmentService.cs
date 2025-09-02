@@ -5,6 +5,7 @@ using Data.Interfaz.IDataImplement.Persons;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.DTOs.Implements.Business.Appointment;
+using Entity.DTOs.Implements.Business.Contract;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Utilities.Exceptions;
