@@ -7,17 +7,17 @@ namespace Entity.DTOs.Validations.Appointment
     {
         public AppointmentBaseDtoValidator()
         {
-            RuleFor(x => x.FullName)
-                .NotEmpty().WithMessage("El nombre completo es obligatorio.")
-                .MaximumLength(200);
+            //RuleFor(x => x.FullName)
+            //    .NotEmpty().WithMessage("El nombre completo es obligatorio.")
+            //    .MaximumLength(200);
 
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("El email es obligatorio.")
-                .EmailAddress().WithMessage("Formato de email inválido.");
+            //RuleFor(x => x.Email)
+            //    .NotEmpty().WithMessage("El email es obligatorio.")
+            //    .EmailAddress().WithMessage("Formato de email inválido.");
 
-            RuleFor(x => x.Phone)
-                .NotEmpty().WithMessage("El teléfono es obligatorio.")
-                .Matches("^\\+?\\d{7,15}$").WithMessage("Formato de teléfono inválido.");
+            //RuleFor(x => x.Phone)
+            //    .NotEmpty().WithMessage("El teléfono es obligatorio.")
+            //    .Matches("^\\+?\\d{7,15}$").WithMessage("Formato de teléfono inválido.");
 
             RuleFor(x => x.Description)
                 .NotEmpty().WithMessage("La descripción es obligatoria.")

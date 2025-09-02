@@ -75,7 +75,7 @@ body {
   border: 1px solid var(--accent-color);
 }
 
-.text-marmol{
+.text-marmol {
   color: #6d6d6d;
 }
 
@@ -91,4 +91,97 @@ body {
 .mat-mdc-outlined-button.mat-primary,
 .mat-mdc-icon-button.mat-primary {
   color: var(--primary-color) !important;
+}
+
+/* Contenedor principal de los tabs */
+.mat-mdc-tab-group {
+  background: transparent;
+}
+
+/* Header de los tabs */
+.mat-mdc-tab-header {
+  border-bottom: none;
+  background: transparent;
+  margin-bottom: 20px;
+}
+
+/* Lista de tabs */
+.mat-mdc-tab-list {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid #e9ecef;
+}
+
+/* Cada tab individual */
+.mat-mdc-tab {
+  background: transparent;
+  border-radius: 8px;
+  margin: 0 2px;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  height: 44px;
+  border: 1px solid transparent;
+}
+
+/* Label del tab */
+.mat-mdc-tab .mdc-tab__text-label {
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 14px;
+  text-transform: capitalize;
+  padding: 0 8px;
+}
+
+/* Tab activo */
+.mat-mdc-tab.mdc-tab--active {
+  background: #ffffff;
+  position: relative;
+}
+
+.mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #495057;
+  font-weight: 600;
+}
+
+/* Hover effect */
+.mat-mdc-tab:hover:not(.mdc-tab--active) {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.mat-mdc-tab:hover:not(.mdc-tab--active) .mdc-tab__text-label {
+  color: #495057;
+}
+
+/* Remover el indicador por defecto */
+.mat-mdc-tab-group.mat-primary .mat-ink-bar,
+.mat-mdc-tab-group.mat-primary .mdc-tab-indicator__content--underline {
+  display: none;
+}
+
+/* Remover el ripple effect si no lo quieres */
+.mat-mdc-tab .mat-ripple-element {
+  display: none;
+}
+
+/* Espaciado para el contenido de los tabs */
+.tab-spacing {
+  padding: 20px 0;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .mat-mdc-tab-list {
+    padding: 3px;
+  }
+
+  .mat-mdc-tab {
+    min-width: 100px;
+    height: 40px;
+  }
+
+  .mat-mdc-tab .mdc-tab__text-label {
+    font-size: 13px;
+    padding: 0 12px;
+  }
 }

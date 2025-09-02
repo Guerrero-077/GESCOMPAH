@@ -5,6 +5,8 @@ namespace Data.Interfaz.IDataImplement.Business
 {
     public interface IAppointmentRepository : IDataGeneric<Appointment>
     {
-        Task<bool> ChangeStatusAsync(int id, int status);
+        Task<bool> RejectedAppointment(int id);
+        //Task<bool> AssignedAppointment(int id, DateTime dateTimeAssigned);
+
     }
 }

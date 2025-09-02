@@ -18,6 +18,11 @@ export const routes: Routes = [
       },
 
       {
+        path: 'auth',
+        // canActivate: [publicGuard],
+        loadChildren: () => import('./feature/auth/auth.routes').then(m => m.AUTH_ROUTES),
+      },
+      {
         path: 'home',
         loadComponent: () =>
           import('./feature/home/home.component').then(
