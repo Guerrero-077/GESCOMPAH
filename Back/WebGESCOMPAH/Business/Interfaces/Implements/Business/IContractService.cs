@@ -11,8 +11,8 @@ namespace Business.Interfaces.Implements.Business
         string PersonDocument,
         string PersonPhone,
         string? PersonEmail,
-        DateOnly StartDate,
-        DateOnly EndDate,
+        DateTime StartDate,
+        DateTime EndDate,
         decimal TotalBase,
         decimal TotalUvt,
         bool Active);

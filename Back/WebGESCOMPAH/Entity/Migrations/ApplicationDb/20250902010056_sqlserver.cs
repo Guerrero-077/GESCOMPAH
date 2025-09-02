@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Entity.Migrations
+namespace Entity.Migrations.ApplicationDb
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class sqlserver : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,7 +55,7 @@ namespace Entity.Migrations
                     Route = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false)
                 },
@@ -73,7 +73,7 @@ namespace Entity.Migrations
                     Icon = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false)
                 },
@@ -109,7 +109,7 @@ namespace Entity.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false)
                 },
@@ -162,7 +162,7 @@ namespace Entity.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false)
                 },
@@ -223,7 +223,7 @@ namespace Entity.Migrations
                     ModuleId = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -248,10 +248,10 @@ namespace Entity.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AreaM2 = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    RentValueBase = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AreaM2 = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    RentValueBase = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UvtQty = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UvtQty = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     PlazaId = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -281,7 +281,7 @@ namespace Entity.Migrations
                     PermissionId = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -320,7 +320,7 @@ namespace Entity.Migrations
                     CityId = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -393,12 +393,12 @@ namespace Entity.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     BusinessPurpose = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PersonId = table.Column<int>(type: "int", nullable: false),
-                    TotalBaseRentAgreed = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalUvtQtyAgreed = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalBaseRentAgreed = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TotalUvtQtyAgreed = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -425,7 +425,7 @@ namespace Entity.Migrations
                     PersonId = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -476,7 +476,7 @@ namespace Entity.Migrations
                     ContractId = table.Column<int>(type: "int", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
                     Month = table.Column<int>(type: "int", nullable: false),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DueDate = table.Column<byte[]>(type: "timestamp", nullable: false),
                     UvtQtyApplied = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     UvtValueApplied = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     VatRateApplied = table.Column<decimal>(type: "decimal(5,4)", precision: 5, scale: 4, nullable: false),
@@ -541,7 +541,7 @@ namespace Entity.Migrations
                     RolId = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -565,38 +565,38 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Amazonas" },
-                    { 2, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Antioquia" },
-                    { 3, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Arauca" },
-                    { 4, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Atlántico" },
-                    { 5, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Bolívar" },
-                    { 6, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Boyacá" },
-                    { 7, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Caldas" },
-                    { 8, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Caquetá" },
-                    { 9, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Casanare" },
-                    { 10, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Cauca" },
-                    { 11, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Cesar" },
-                    { 12, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Chocó" },
-                    { 13, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Córdoba" },
-                    { 14, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Cundinamarca" },
-                    { 15, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Guainía" },
-                    { 16, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Guaviare" },
-                    { 17, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Huila" },
-                    { 18, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "La Guajira" },
-                    { 19, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Magdalena" },
-                    { 20, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Meta" },
-                    { 21, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Nariño" },
-                    { 22, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Norte de Santander" },
-                    { 23, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Putumayo" },
-                    { 24, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Quindío" },
-                    { 25, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Risaralda" },
-                    { 26, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "San Andrés y Providencia" },
-                    { 27, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Santander" },
-                    { 28, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Sucre" },
-                    { 29, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Tolima" },
-                    { 30, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Valle del Cauca" },
-                    { 31, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Vaupés" },
-                    { 32, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Vichada" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Amazonas" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Antioquia" },
+                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Arauca" },
+                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Atlántico" },
+                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Bolívar" },
+                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Boyacá" },
+                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Caldas" },
+                    { 8, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Caquetá" },
+                    { 9, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Casanare" },
+                    { 10, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Cauca" },
+                    { 11, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Cesar" },
+                    { 12, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Chocó" },
+                    { 13, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Córdoba" },
+                    { 14, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Cundinamarca" },
+                    { 15, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Guainía" },
+                    { 16, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Guaviare" },
+                    { 17, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Huila" },
+                    { 18, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "La Guajira" },
+                    { 19, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Magdalena" },
+                    { 20, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Meta" },
+                    { 21, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Nariño" },
+                    { 22, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Norte de Santander" },
+                    { 23, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Putumayo" },
+                    { 24, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Quindío" },
+                    { 25, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Risaralda" },
+                    { 26, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "San Andrés y Providencia" },
+                    { 27, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Santander" },
+                    { 28, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Sucre" },
+                    { 29, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Tolima" },
+                    { 30, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Valle del Cauca" },
+                    { 31, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Vaupés" },
+                    { 32, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Vichada" }
                 });
 
             migrationBuilder.InsertData(
@@ -604,17 +604,17 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "Description", "IsDeleted", "Name", "Route" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Vista general de la pagina principal", false, "Inicio", "dashboard" },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Ver y gestionar establecimientos", false, "Establecimientos", "establishments/main" },
-                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de arrendatarios", false, "Arrendatarios", "tenants" },
-                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de contratos", false, "Contratos", "contracts" },
-                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de Citas", false, "Citas", "appointment" },
-                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Configuración de modelos de seguridad", false, "Modelos de Seguridad", "security/main" },
-                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de roles", false, "Roles", "security/roles" },
-                    { 8, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de Formularios", false, "Formularios", "security/forms" },
-                    { 9, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de módulos", false, "Modulos", "security/modules" },
-                    { 10, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de Permisos", false, "Permisos", "security/permissions" },
-                    { 11, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Ajustes principales del sistema", false, "Configuración Principal", "settings/main" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Vista general de la pagina principal", false, "Inicio", "dashboard" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ver y gestionar establecimientos", false, "Establecimientos", "establishments/main" },
+                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de arrendatarios", false, "Arrendatarios", "tenants" },
+                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de contratos", false, "Contratos", "contracts" },
+                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de Citas", false, "Citas", "appointment" },
+                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Configuración de modelos de seguridad", false, "Modelos de Seguridad", "security/main" },
+                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de roles", false, "Roles", "security/roles" },
+                    { 8, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de Formularios", false, "Formularios", "security/forms" },
+                    { 9, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de módulos", false, "Modulos", "security/modules" },
+                    { 10, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de Permisos", false, "Permisos", "security/permissions" },
+                    { 11, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ajustes principales del sistema", false, "Configuración Principal", "settings/main" }
                 });
 
             migrationBuilder.InsertData(
@@ -622,13 +622,13 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "Description", "Icon", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Panel de control principal", "home", false, "Panel Principal" },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de establecimientos", "store", false, "Establecimientos" },
-                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de arrendatarios", "people", false, "Arrendatarios" },
-                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de contratos", "description", false, "Contratos" },
-                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de citas", "event_note", false, "Gestión de Citas" },
-                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Gestión de seguridad y permisos", "security", false, "Seguridad" },
-                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Configuración general del sistema", "settings", false, "Configuración" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Panel de control principal", "home", false, "Panel Principal" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de establecimientos", "store", false, "Establecimientos" },
+                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de arrendatarios", "people", false, "Arrendatarios" },
+                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de contratos", "description", false, "Contratos" },
+                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de citas", "event_note", false, "Gestión de Citas" },
+                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestión de seguridad y permisos", "security", false, "Seguridad" },
+                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Configuración general del sistema", "settings", false, "Configuración" }
                 });
 
             migrationBuilder.InsertData(
@@ -636,10 +636,10 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "Description", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Permite ver registros", false, "Ver" },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Permite crear registros", false, "Crear" },
-                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Permite editar registros", false, "Editar" },
-                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Permite eliminar registros", false, "Eliminar" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Permite ver registros", false, "Ver" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Permite crear registros", false, "Crear" },
+                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Permite editar registros", false, "Editar" },
+                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Permite eliminar registros", false, "Eliminar" }
                 });
 
             migrationBuilder.InsertData(
@@ -647,8 +647,8 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "Description", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Rol Con permisos Administrativos", false, "Administrador" },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Rol con permisos de arrendador", false, "Arrendador" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Rol Con permisos Administrativos", false, "Administrador" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Rol con permisos de arrendador", false, "Arrendador" }
                 });
 
             migrationBuilder.InsertData(
@@ -665,43 +665,43 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "DepartmentId", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Acevedo" },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Agrado" },
-                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Aipe" },
-                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Algeciras" },
-                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Altamira" },
-                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Baraya" },
-                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Campoalegre" },
-                    { 8, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Colombia" },
-                    { 9, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Elías" },
-                    { 10, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Garzón" },
-                    { 11, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Gigante" },
-                    { 12, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Guadalupe" },
-                    { 13, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Hobo" },
-                    { 14, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Iquira" },
-                    { 15, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Isnos" },
-                    { 16, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "La Argentina" },
-                    { 17, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "La Plata" },
-                    { 18, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Nátaga" },
-                    { 19, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Neiva" },
-                    { 20, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Oporapa" },
-                    { 21, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Paicol" },
-                    { 22, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Palermo" },
-                    { 23, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Palestina" },
-                    { 24, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Pital" },
-                    { 25, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Pitalito" },
-                    { 26, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Rivera" },
-                    { 27, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Saladoblanco" },
-                    { 28, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "San Agustín" },
-                    { 29, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Santa María" },
-                    { 30, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Suaza" },
-                    { 31, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Tarqui" },
-                    { 32, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Tello" },
-                    { 33, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Teruel" },
-                    { 34, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Tesalia" },
-                    { 35, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Timaná" },
-                    { 36, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Villavieja" },
-                    { 37, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 17, false, "Yaguará" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Acevedo" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Agrado" },
+                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Aipe" },
+                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Algeciras" },
+                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Altamira" },
+                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Baraya" },
+                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Campoalegre" },
+                    { 8, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Colombia" },
+                    { 9, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Elías" },
+                    { 10, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Garzón" },
+                    { 11, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Gigante" },
+                    { 12, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Guadalupe" },
+                    { 13, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Hobo" },
+                    { 14, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Iquira" },
+                    { 15, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Isnos" },
+                    { 16, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "La Argentina" },
+                    { 17, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "La Plata" },
+                    { 18, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Nátaga" },
+                    { 19, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Neiva" },
+                    { 20, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Oporapa" },
+                    { 21, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Paicol" },
+                    { 22, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Palermo" },
+                    { 23, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Palestina" },
+                    { 24, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Pital" },
+                    { 25, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Pitalito" },
+                    { 26, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Rivera" },
+                    { 27, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Saladoblanco" },
+                    { 28, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "San Agustín" },
+                    { 29, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Santa María" },
+                    { 30, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Suaza" },
+                    { 31, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Tarqui" },
+                    { 32, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Tello" },
+                    { 33, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Teruel" },
+                    { 34, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Tesalia" },
+                    { 35, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Timaná" },
+                    { 36, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Villavieja" },
+                    { 37, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 17, false, "Yaguará" }
                 });
 
             migrationBuilder.InsertData(
@@ -709,9 +709,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "Address", "AreaM2", "CreatedAt", "Description", "IsDeleted", "Name", "PlazaId", "RentValueBase", "UvtQty" },
                 values: new object[,]
                 {
-                    { 1, true, "Cr 1 ", 500m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Establecimiento amplio con excelente ubicación.", false, "Centro Comercial Primavera", 1, 2500m, 0m },
-                    { 2, true, "Cr 1 ", 120m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Oficina moderna en zona empresarial.", false, "Oficina Torre Norte", 2, 1500m, 0m },
-                    { 3, true, "Cr 1 ", 1000m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Espacio para almacenamiento de gran capacidad.", false, "Bodega Industrial Sur", 1, 3000m, 0m }
+                    { 1, true, "Cr 1 ", 500m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Establecimiento amplio con excelente ubicación.", false, "Centro Comercial Primavera", 1, 2500m, 0m },
+                    { 2, true, "Cr 1 ", 120m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Oficina moderna en zona empresarial.", false, "Oficina Torre Norte", 2, 1500m, 0m },
+                    { 3, true, "Cr 1 ", 1000m, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Espacio para almacenamiento de gran capacidad.", false, "Bodega Industrial Sur", 1, 3000m, 0m }
                 });
 
             migrationBuilder.InsertData(
@@ -719,17 +719,17 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "FormId", "IsDeleted", "ModuleId" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, false, 1 },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, false, 2 },
-                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, false, 3 },
-                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, false, 4 },
-                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, false, 5 },
-                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, false, 6 },
-                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 7, false, 6 },
-                    { 8, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 8, false, 6 },
-                    { 9, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 9, false, 6 },
-                    { 10, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 10, false, 6 },
-                    { 11, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 11, false, 7 }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, 1 },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, false, 2 },
+                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3, false, 3 },
+                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4, false, 4 },
+                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 5, false, 5 },
+                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 6, false, 6 },
+                    { 7, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 7, false, 6 },
+                    { 8, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 8, false, 6 },
+                    { 9, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 9, false, 6 },
+                    { 10, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 10, false, 6 },
+                    { 11, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 11, false, 7 }
                 });
 
             migrationBuilder.InsertData(
@@ -792,9 +792,9 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "DateTimeAssigned", "Description", "Email", "EstablishmentId", "FullName", "IsDeleted", "Phone", "RequestDate", "Status" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 4, 10, 0, 0, 0, DateTimeKind.Unspecified), "Solicitud para conocer el local", "juan.perez@example.com", 1, "Juan Pérez", false, "3001234567", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
-                    { 2, true, new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 5, 11, 0, 0, 0, DateTimeKind.Unspecified), "Revisión de contrato anterior", "maria.gomez@example.com", 2, "María Gómez", false, "3019876543", new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 },
-                    { 3, true, new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 1, 6, 9, 0, 0, 0, DateTimeKind.Unspecified), "Consulta sobre requisitos para arriendo", "carlos.ramirez@example.com", 3, "Carlos Ramírez", false, "3021122334", new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), 1 }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 1, 4, 10, 0, 0, 0, DateTimeKind.Utc), "Solicitud para conocer el local", "juan.perez@example.com", 1, "Juan Pérez", false, "3001234567", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1 },
+                    { 2, true, new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 1, 5, 11, 0, 0, 0, DateTimeKind.Utc), "Revisión de contrato anterior", "maria.gomez@example.com", 2, "María Gómez", false, "3019876543", new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc), 1 },
+                    { 3, true, new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2025, 1, 6, 9, 0, 0, 0, DateTimeKind.Utc), "Consulta sobre requisitos para arriendo", "carlos.ramirez@example.com", 3, "Carlos Ramírez", false, "3021122334", new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc), 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -802,12 +802,12 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "EstablishmentId", "FileName", "FilePath", "IsDeleted", "PublicId" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "primavera_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "primavera_1" },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "primavera_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "primavera_2" },
-                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "torre_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "torre_1" },
-                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "torre_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "torre_2" },
-                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "bodega_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "bodega_1" },
-                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "bodega_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "bodega_2" }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, "primavera_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "primavera_1" },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, "primavera_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "primavera_2" },
+                    { 3, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, "torre_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "torre_1" },
+                    { 4, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, "torre_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "torre_2" },
+                    { 5, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3, "bodega_1.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "bodega_1" },
+                    { 6, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3, "bodega_2.jpg", "https://res.cloudinary.com/dmbndpjlh/image/upload/v1755031443/defaul_cj5nqv.png", false, "bodega_2" }
                 });
 
             migrationBuilder.InsertData(
@@ -815,8 +815,8 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "Address", "CityId", "CreatedAt", "Document", "FirstName", "IsDeleted", "LastName", "Phone" },
                 values: new object[,]
                 {
-                    { 1, true, "Calle Principal 123", 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "123456789", "Administrador", false, "General", "3000000000" },
-                    { 2, true, "Calle Principal 123", 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "1000000000", "Usuario", false, "General", "3000000000" }
+                    { 1, true, "Calle Principal 123", 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "123456789", "Administrador", false, "General", "3000000000" },
+                    { 2, true, "Calle Principal 123", 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "1000000000", "Usuario", false, "General", "3000000000" }
                 });
 
             migrationBuilder.InsertData(
@@ -824,8 +824,8 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "Email", "IsDeleted", "Password", "PersonId" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@gescomph.com", false, "AQAAAAEAACcQAAAAEK1QvWufDHBzB3acG5GKxdQTabH8BhbyLLyyZHo4WoOEvRYijXcOtRqsb3OeOpoGqw==", 1 },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "usuario@gescomph.com", false, "AQAAAAIAAYagAAAAEGNtpwDVV/mpIlUqi5xrPjpvzCejMXq142erkCJONaKJSiXb73eZm1tPxzj+2RvBXw==", 2 }
+                    { 1, true, new DateTime(2025, 9, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@gescomph.com", false, "AQAAAAEAACcQAAAAEK1QvWufDHBzB3acG5GKxdQTabH8BhbyLLyyZHo4WoOEvRYijXcOtRqsb3OeOpoGqw==", 1 },
+                    { 2, true, new DateTime(2025, 9, 1, 0, 0, 0, 0, DateTimeKind.Utc), "usuario@gescomph.com", false, "AQAAAAIAAYagAAAAEGNtpwDVV/mpIlUqi5xrPjpvzCejMXq142erkCJONaKJSiXb73eZm1tPxzj+2RvBXw==", 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -833,8 +833,8 @@ namespace Entity.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "IsDeleted", "RolId", "UserId" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, 1 },
-                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 2, 2 }
+                    { 1, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 1, 1 },
+                    { 2, true, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, 2, 2 }
                 });
 
             migrationBuilder.CreateIndex(

@@ -17,7 +17,7 @@ namespace Entity.Infrastructure.DataInit.SecurityAuthentication
         /// </summary>
         public void Configure(EntityTypeBuilder<RolFormPermission> builder)
         {
-            var seedDate = DateTime.SpecifyKind(new DateTime(2025, 01, 01), DateTimeKind.Utc);
+            var seedDate = new DateTime(2025, 01, 01, 0, 0, 0, DateTimeKind.Utc);
 
             // Unicidad lógica
             builder.HasIndex(x => new { x.RolId, x.FormId, x.PermissionId }).IsUnique();

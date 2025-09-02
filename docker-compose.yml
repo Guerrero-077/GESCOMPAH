@@ -1,0 +1,87 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports: ["1433:1433"]
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Admin123.
+    volumes:
+      - sql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U SA -P $$SA_PASSWORD -Q \"SELECT 1\" || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=gescomph
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Admin123.
+    ports: ["5433:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gescomph"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  mysql:
+    image: mysql:8.3
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=Admin123.
+      - MYSQL_DATABASE=gescomph
+    ports: ["3307:3306"]   # externo 3307, interno 3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 15s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Back/WebGESCOMPAH/WebGESCOMPAH/Dockerfile
+    container_name: backend
+    ports: ["8080:8080"]
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__SqlServer=Server=sqlserver,1433;Database=gescomph;User Id=sa;Password=Admin123.;Encrypt=False;TrustServerCertificate=True
+      - ConnectionStrings__Postgres=Host=postgres;Port=5432;Database=gescomph;Username=postgres;Password=Admin123.
+      - ConnectionStrings__MySql=Server=mysql;Port=3306;Database=gescomph;User ID=root;Password=Admin123.;SslMode=Preferred;AllowPublicKeyRetrieval=True;CharSet=utf8mb4;DefaultCommandTimeout=60;Connection Timeout=60;Pooling=true;MinimumPoolSize=0;MaximumPoolSize=50;
+      # toggles por entorno
+      - MIGRATE_SQLSERVER=true
+      - MIGRATE_POSTGRES=true
+      - MIGRATE_MYSQL=true
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./Front/GESCOMPAH
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports: ["4300:80"]
+    depends_on:
+      - backend
+
+volumes:
+  sql_data:
+  postgres_data:
+  mysql_data:

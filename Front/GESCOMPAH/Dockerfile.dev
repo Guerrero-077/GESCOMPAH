@@ -1,0 +1,18 @@
+
+# 🔧 Etapa de desarrollo para Angular con live reload
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Copia solo los archivos necesarios primero para aprovechar cache
+COPY package*.json ./
+RUN npm install
+
+# Copia el resto del código
+COPY . .
+
+# Expone el puerto donde ng serve corre
+EXPOSE 4200
+
+# Arranca Angular en modo dev con live reload y polling habilitado
+CMD ["npm", "run", "start"]

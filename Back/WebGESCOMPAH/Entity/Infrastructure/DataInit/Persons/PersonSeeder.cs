@@ -9,7 +9,7 @@ namespace Entity.Infrastructure.DataInit.Persons
         public void Configure(EntityTypeBuilder<Person> builder)
         {
 
-            var seedDate = new DateTime(2025, 01, 01);
+            var seedDate = new DateTime(2025, 01, 01, 0, 0, 0, DateTimeKind.Utc);
 
             builder.HasData(
                 new Person

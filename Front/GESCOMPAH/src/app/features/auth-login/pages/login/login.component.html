@@ -4,7 +4,8 @@
     <!-- Logo -->
     <div class="col-4 text-center mb-4">
       <div class="mb-2">
-        <img src="../../../../../..//public/Escudo-palermo.png" alt="Logo" class="imagen-logo">
+        <img src="/Escudo-palermo.png" alt="Logo" class="imagen-logo" />
+
       </div>
       <div class="row d-flex justify-content-center">
         <h2 class="text-green fw-bolder">GESCOMPAH</h2>
@@ -49,7 +50,8 @@
             <input [type]="passwordVisible ? 'text' : 'password'" id="password" class="form-control border-green"
               formControlName="password" placeholder="Contraseña"
               [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched"
-              [attr.aria-invalid]="formLogin.get('password')?.invalid ? 'true' : null" autocomplete="current-password" />
+              [attr.aria-invalid]="formLogin.get('password')?.invalid ? 'true' : null"
+              autocomplete="current-password" />
             <button class="btn btn-outline-secondary" type="button" (click)="togglePasswordVisibility()">
               <i class="fa-regular" [class.fa-eye-slash]="!passwordVisible" [class.fa-eye]="passwordVisible"></i>
             </button>
