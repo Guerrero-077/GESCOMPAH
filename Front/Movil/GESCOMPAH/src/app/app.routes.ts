@@ -26,6 +26,13 @@ export const routes: Routes = [
             (m) => m.EstablishmentComponent
           ),
       },
+      {
+        path: 'contract',
+        loadComponent: () =>
+          import('./feature/contract/contract.component').then(
+            (m) => m.ContractComponent
+          ),
+      },
       // Agrega más children para cada feature
     ],
   },
