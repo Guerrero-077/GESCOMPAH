@@ -99,10 +99,6 @@ namespace Business.Services.Business
                 // Si hay un índice único en BD, traducimos a excepción de negocio más clara
                 throw new BusinessException("Violación de unicidad al crear el registro. Revisa valores únicos.", dbx);
             }
-            catch (Exception ex)
-            {
-                throw new BusinessException("Error al crear el registro.", ex);
-            }
 
         }
     }
