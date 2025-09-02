@@ -10,8 +10,8 @@ namespace Business.Interfaces.Implements.SecurityAuthentication
 
         //Task<UserDto> RegisterAsync(RegisterDto dto);
         Task RequestPasswordResetAsync(string email);   
-        Task ResetPasswordAsync(ConfirmResetDto dto);
         Task<UserMeDto> BuildUserContextAsync(int userId);
+        Task ResetPasswordAsync(ConfirmResetDto dto);
         Task ChangePasswordAsync(ChangePasswordDto dto);
     }
 }

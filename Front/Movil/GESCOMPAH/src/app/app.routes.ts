@@ -9,9 +9,14 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'home',
+        redirectTo: 'auth',
         pathMatch: 'full',
       },
+
+      { path: 'auth',
+        loadChildren: () => import('./feature/auth/auth.routes').then(m => m.AUTH_ROUTES),
+      },
+
       {
         path: 'home',
         loadComponent: () =>

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entity.Migrations.MySqlApplicationDb
 {
     [DbContext(typeof(MySqlApplicationDbContext))]
-    [Migration("20250902005948_mysql")]
+    [Migration("20250902142926_mysql")]
     partial class mysql
     {
         /// <inheritdoc />

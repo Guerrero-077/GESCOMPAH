@@ -1,0 +1,87 @@
+/* =========================
+   Logo
+========================= */
+.imagen-logo {
+  max-width: 120px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+
+/* =========================
+   Cards
+========================= */
+ion-card {
+  border-radius: 16px;
+  border: 1px solid var(--ion-color-success, #146530);
+  box-shadow: 0 6px 14px rgba(20, 101, 48, .08);
+}
+
+/* =========================
+   Inputs
+========================= */
+ion-item {
+  --border-radius: 10px;
+  --border-color: var(--ion-color-medium-shade);
+  --padding-start: 12px;
+}
+
+ion-input {
+  padding: .6rem .9rem;
+}
+
+ion-input.is-invalid {
+  --highlight-color-focused: var(--ion-color-danger);
+  animation: field-pop .12s ease-out;
+}
+
+ion-note[color="danger"] {
+  margin-top: .35rem;
+  font-size: .85rem;
+}
+
+/* =========================
+   Botón principal
+========================= */
+ion-button {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: .8rem 1rem;
+  --box-shadow: 0 6px 14px rgba(20, 101, 48, .18);
+}
+
+ion-button:hover {
+  filter: brightness(1.05);
+}
+
+ion-button:disabled {
+  opacity: .6;
+  --box-shadow: none;
+}
+
+/* Animación de inputs al marcar error */
+@keyframes field-pop {
+  from {
+    transform: scale(1.005);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* =========================
+   Responsividad
+========================= */
+@media (max-width: 575.98px) {
+  ion-card {
+    margin: 0 15px;
+  }
+
+  .imagen-logo {
+    max-width: 100px;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+}
