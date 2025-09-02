@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
+import { Component, EventEmitter, Output, ViewEncapsulation, computed, inject } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -13,6 +13,7 @@ import { BackendMenuItem, SidebarItem } from './sidebar.config';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
+  encapsulation: ViewEncapsulation.None,
   imports: [
     CommonModule,
     RouterModule,
@@ -31,7 +32,6 @@ export class SidebarComponent {
 
   @Output() closeSidebar = new EventEmitter<void>();
 
-  /** Menú proyectado desde permisos del backend → SidebarItem normalizado */
   readonly menu = computed(() => {
     const backendMenu = this.permissionService.menu();
     return this.transformMenu(backendMenu);
@@ -65,13 +65,6 @@ export class SidebarComponent {
       });
   }
 
-  /**
-   * Normaliza el menú:
-   * - >1 forms → ítem con children (desplegable)
-   * - 1 form   → ítem directo (route) y children: []
-   * - 0 forms  → no se incluye
-   * Siempre retorna children como array (nunca undefined).
-   */
   private transformMenu(backendMenu: readonly BackendMenuItem[] | null): SidebarItem[] {
     if (!backendMenu) return [];
 
@@ -106,12 +99,10 @@ export class SidebarComponent {
     });
   }
 
-  /** Verdadero si algún hijo está activo (colorea y expande el panel) */
   isGroupActive(item: SidebarItem): boolean {
     return (item.children ?? []).some(c => this.router.isActive(c.route, this.exactMatch));
   }
 
-  /** Verdadero si el ítem directo está activo */
   isSingleActive(item: SidebarItem): boolean {
     return !!item.route && this.router.isActive(item.route, this.exactMatch);
   }
