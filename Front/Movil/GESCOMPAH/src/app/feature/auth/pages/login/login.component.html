@@ -50,7 +50,7 @@
                 <ion-input
                   [type]="passwordVisible ? 'text' : 'password'"
                   formControlName="password"
-                  placeholder="Contraseña"
+                  placeholder="Contrase帽a"
                   autocomplete="current-password"
                   [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched">
                 </ion-input>
@@ -65,14 +65,12 @@
                 <ng-container *ngIf="e['onlySpaces']">La contraseña no puede ser solo espacios.</ng-container>
               </ion-note>
 
-              <!-- Olvidaste tu contraseña -->
               <div class="ion-text-end ion-margin-top">
                 <ion-router-link [routerLink]="['../password_reset']" class="small link-secondary">
                   ¿Olvidaste tu contraseña?
                 </ion-router-link>
               </div>
 
-              <!-- Botón login -->
               <ion-button expand="block" type="submit" [disabled]="formLogin.invalid || formLogin.pending" class="ion-margin-top">
                 Iniciar Sesión
               </ion-button>
@@ -85,7 +83,6 @@
     </ion-row>
   </ion-grid>
 
-  <!-- 🔹 IonAlert (para mostrar errores o mensajes) -->
   <ion-alert
     [isOpen]="showAlert"
     [header]="alertHeader"
@@ -94,7 +91,6 @@
     (didDismiss)="showAlert = false">
   </ion-alert>
 
-  <!-- 🔹 IonLoading (spinner de carga) -->
   <ion-loading
     [isOpen]="showLoading"
     message="Iniciando sesión..."

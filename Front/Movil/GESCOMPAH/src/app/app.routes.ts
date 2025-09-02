@@ -12,6 +12,11 @@ export const routes: Routes = [
         redirectTo: 'auth',
         pathMatch: 'full',
       },
+
+      { path: 'auth',
+        loadChildren: () => import('./feature/auth/auth.routes').then(m => m.AUTH_ROUTES),
+      },
+
       {
         path: 'auth',
         // canActivate: [publicGuard],

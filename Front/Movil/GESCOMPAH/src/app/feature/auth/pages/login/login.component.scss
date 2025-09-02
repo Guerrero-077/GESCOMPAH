@@ -1,13 +1,10 @@
 /* =========================
-   Estilos originales
+   Logo
 ========================= */
 
 .imagen-logo {
-    height: 8rem;
 }
 
-.border-green {
-    border: 1px solid rgb(134 239 172);
 }
 
 .myn-1 {
@@ -25,70 +22,36 @@
 }
 
 /* =========================
-   Extensiones nuevas
 ========================= */
-
-/* Inputs */
-.form-control {
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    padding: .7rem .9rem;
-    transition: border-color .2s ease, box-shadow .2s ease;
 }
 
-.form-control:focus {
-    border-color: rgb(134 239 172);
-    box-shadow: 0 0 0 3px rgba(20, 101, 48, .15);
-    outline: none;
 }
 
-/* Estados inválidos */
-.form-control.is-invalid {
-    border-color: #dc2626;
-    /* rojo */
-    animation: field-pop .12s ease-out;
+  animation: field-pop .12s ease-out;
 }
 
-/* Mensajes de error */
-.invalid-feedback {
-    margin-top: .35rem;
-    color: #dc2626;
-    font-size: .875rem;
-    line-height: 1.2rem;
+  margin-top: .35rem;
 }
 
-/* Botón hover / disabled */
-.btn-green {
-    border-radius: 10px;
+  border-radius: 10px;
     padding: .8rem 1rem;
-    font-weight: 600;
-    transition: transform .06s ease, background-color .2s ease, box-shadow .2s ease;
-    box-shadow: 0 6px 14px rgba(20, 101, 48, .18);
+  font-weight: 600;
 }
 
-.btn-green:hover {
-    background-color: #166534;
 }
 
-.btn-green:active {
-    transform: translateY(1px);
-}
-
-.btn-green:disabled {
-    opacity: .6;
-    cursor: not-allowed;
-    box-shadow: none;
+  opacity: .6;
 }
 
 /* Animación de inputs al marcar error */
 @keyframes field-pop {
-    from {
-        transform: scale(1.005);
-    }
+  from {
+    transform: scale(1.005);
+  }
 
-    to {
-        transform: scale(1);
-    }
+  to {
+    transform: scale(1);
+  }
 }
 
 
@@ -110,20 +73,18 @@
     height: auto;
 }
 
-/* Responsive breakpoints */
 @media (max-width: 575.98px) {
-    .form {
-        margin: 0 15px;
+    margin: 0 15px;
         padding: 20px !important;
-    }
+  }
 
-    .imagen-logo {
-        max-width: 100px;
-    }
+  .imagen-logo {
+    max-width: 100px;
+  }
 
-    h2 {
-        font-size: 1.5rem !important;
-    }
+  h2 {
+    font-size: 1.5rem !important;
+  }
 
     .fs-5 {
         font-size: 1rem !important;

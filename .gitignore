@@ -417,5 +417,6 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+
 # Ignorar migraciones de Entity Framework
 Back/WebGESCOMPAH/Entity/Migrations/

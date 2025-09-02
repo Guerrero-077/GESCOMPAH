@@ -68,7 +68,7 @@ function appendDefaultTldIfNeeded(email: string, defaultTld = '.com'): string {
   standalone: true,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [IonNote, IonLabel, IonCardContent, IonCardSubtitle, IonCardTitle, IonCardHeader, IonCard, IonImg, IonCol, IonRow, IonGrid, 
+  imports: [IonNote, IonLabel, IonCardContent, IonCardSubtitle, IonCardTitle, IonCardHeader, IonCard, IonImg, IonCol, IonRow, IonGrid,
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
@@ -211,14 +211,17 @@ login() {
 
   this.auth.Login({ email, password }).subscribe({
     next: () => {
-      this.showLoading = false;
-      this.router.navigate(['/admin/dashboard']);
+      this.showLoading = false; // 👈 cierra manualmente
+      setTimeout(() => {
+        this.router.navigate(['/home']); // ✅ navegación luego de cerrar
+      }, 100); // delay corto para asegurar que se cierre el ion-loading
     },
     error: (err) => {
       this.showLoading = false;
       this.showIonAlert('Oops...', err?.error?.message ?? 'Credenciales inválidas');
     },
   });
+
 }
 
 
