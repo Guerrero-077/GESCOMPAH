@@ -21,7 +21,11 @@ namespace Entity.Infrastructure.Context
         public MySqlApplicationDbContext(DbContextOptions<MySqlApplicationDbContext> options)
             : base(options) { }
 
-        // Convenciones globales solo para DateTime
+        // Convenciones globales solo para
+        // 
+
+
+
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
             configurationBuilder.Properties<DateTime>().HaveColumnType("datetime(6)");
