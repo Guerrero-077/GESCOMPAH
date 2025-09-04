@@ -21,20 +21,6 @@ namespace Entity.Infrastructure.Context
 
             modelBuilder.Entity<Images>().HasQueryFilter(img => !img.IsDeleted);
 
-            // PostgreSQL no usa "precision" como SQL Server, sino tipos como numeric(18,2)
-            modelBuilder.Entity<Establishment>(e =>
-            {
-                e.Property(x => x.AreaM2).HasColumnType("numeric(18,2)");
-                e.Property(x => x.RentValueBase).HasColumnType("numeric(18,2)");
-                e.Property(x => x.UvtQty).HasColumnType("numeric(18,2)");
-            });
-
-            modelBuilder.Entity<Contract>(e =>
-            {
-                e.Property(x => x.TotalBaseRentAgreed).HasColumnType("numeric(18,2)");
-                e.Property(x => x.TotalUvtQtyAgreed).HasColumnType("numeric(18,2)");
-            });
-
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
         }
 
