@@ -9,6 +9,7 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 import { PermissionSelectModel, PermissionUpdateModel } from '../../models/permission.models';
 import { PermissionStore } from '../../services/permission/permission.store';
 import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
 @Component({
   selector: 'app-permission',
@@ -20,6 +21,7 @@ export class PermissionComponent implements OnInit {
   private readonly permissionStore = inject(PermissionStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
+  private readonly pageHeaderService = inject(PageHeaderService);
 
   permissions$ = this.permissionStore.permissions$;
 
@@ -30,7 +32,8 @@ export class PermissionComponent implements OnInit {
 
   constructor(private dialog: MatDialog) { }
 
-  ngOnInit(): void {
+    ngOnInit(): void {
+    this.pageHeaderService.setPageHeader('Permisos', 'Gestión de Permisos');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },

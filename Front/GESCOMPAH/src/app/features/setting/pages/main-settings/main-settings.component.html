@@ -1,4 +1,4 @@
-<mat-tab-group>
+<mat-tab-group (selectedIndexChange)="onTabChange($event)">
   <!-- <mat-tab label="General">
     <div class="tab-spacing">
       <app-company></app-company>
@@ -20,3 +20,4 @@
     </div>
   </mat-tab>
 </mat-tab-group>
+

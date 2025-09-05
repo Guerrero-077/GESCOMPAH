@@ -2,8 +2,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff;
+  background-color: #fcfaa7;
   color: black;
+  /* background-color: var(--background-color); */
   background-color: var(--background-color);
   color: var(--text-color-black);
   padding: 12px 20px;

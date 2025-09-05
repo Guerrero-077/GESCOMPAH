@@ -1,4 +1,4 @@
-<mat-tab-group>
+<mat-tab-group (selectedIndexChange)="onTabChange($event)">
     <mat-tab label="Plaza">
         <div class="tab-spacing">
             <app-square-list></app-square-list>

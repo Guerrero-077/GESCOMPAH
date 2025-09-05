@@ -13,6 +13,7 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ContractService } from '../../services/contract/contract.service';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
 // Components
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
@@ -41,6 +42,7 @@ export class ContractsListComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
+  private readonly pageHeaderService = inject(PageHeaderService);
 
   // Única fuente de datos para la tabla
   rows$ = this.contractService.rows;
@@ -54,6 +56,7 @@ export class ContractsListComponent implements OnInit {
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
   ngOnInit(): void {
+    this.pageHeaderService.setPageHeader('Contratos', 'Gestión de Contratos');
     this.setupColumns();
     this.contractService.getList({ force: true }).pipe(
       take(1),

@@ -3,5 +3,14 @@ import { AppointmentListComponent } from "./pages/appointment-list/appointment-l
 
 
 export const APPOINTMENT_ROUTES: Routes = [
-  { path: '', component: AppointmentListComponent }
+  {
+    path: '',
+    component: AppointmentListComponent,
+    data: {
+      header: {
+        title: 'Citas',
+        description: 'Gestione las citas del Sistema - GESCOMPAH'
+      }
+    }
+  }
 ]

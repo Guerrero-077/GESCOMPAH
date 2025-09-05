@@ -10,6 +10,7 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { RoleSelectModel, RoleUpdateModel } from '../../models/role.models';
 import { RoleStore } from '../../services/role/role.store';
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
 @Component({
   selector: 'app-role',
@@ -23,6 +24,7 @@ export class RoleComponent implements OnInit {
   private readonly roleStore = inject(RoleStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
+  private readonly pageHeaderService = inject(PageHeaderService);
 
   roles$ = this.roleStore.roles$;
 
@@ -34,6 +36,7 @@ export class RoleComponent implements OnInit {
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
+    this.pageHeaderService.setPageHeader('Roles', 'Gestión de Roles');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },

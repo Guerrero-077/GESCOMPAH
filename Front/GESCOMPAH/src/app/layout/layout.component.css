@@ -1,13 +1,13 @@
+.body {
+  background-color: var(--background-color);
+}
+
 .layout-container {
   height: 100vh;
 }
 
 .layout-sidebar {
   width: 250px;
-  background-color: #fff;
-  /* border-right: 1px solid #ddd; */
-  background-color: var(--background-color);
-  /* border-right: 1px solid var(--secondary-color); */
   border-radius: 0;
   border-right-width: 0;
 }

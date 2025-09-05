@@ -1,11 +1,11 @@
 <mat-drawer-container class="layout-container" autosize>
   <!-- SIDEBAR -->
-  <mat-drawer #drawer class="layout-sidebar" mode="side" [opened]="true">
+  <mat-drawer #drawer class="layout-sidebar" [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)">
     <app-sidebar (closeSidebar)="drawer.toggle()"></app-sidebar>
   </mat-drawer>
 
   <!-- MAIN CONTENT -->
-  <mat-drawer-content>
+  <mat-drawer-content class="body">
     <app-header [toggleDrawer]="toggleSidebar"></app-header>
 
     <div class="layout-content">

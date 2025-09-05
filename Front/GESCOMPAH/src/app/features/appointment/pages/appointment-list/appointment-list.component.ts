@@ -11,6 +11,7 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { AppointmentSelectModel, AppointmentUpdateModel } from '../../models/appointment.models';
 import { AppointmentStore } from '../../services/appointment/appointment.store';
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
 @Component({
   selector: 'app-appointment-list',
@@ -24,6 +25,7 @@ export class AppointmentListComponent implements OnInit {
   private readonly appointmentStore = inject(AppointmentStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
+  private readonly pageHeaderService = inject(PageHeaderService);
 
 
   // Observable de formularios
@@ -41,6 +43,7 @@ export class AppointmentListComponent implements OnInit {
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
+    this.pageHeaderService.setPageHeader('Citas', 'Gestión de Citas');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'email', header: 'User', template: this.userTemplate },

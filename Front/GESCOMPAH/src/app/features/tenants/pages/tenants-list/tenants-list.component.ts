@@ -9,6 +9,7 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 import { TenantsFormDialogComponent } from '../../components/tenants-form-dialog/tenants-form-dialog.component';
 import { TenantFormData, TenantsSelectModel } from '../../models/tenants.models';
 import { TenantsService } from '../../services/tenants/tenants.service';
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
 @Component({
   selector: 'app-tenants-list',
@@ -22,6 +23,7 @@ export class TenantsListComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly dialog = inject(MatDialog);
+  private readonly pageHeaderService = inject(PageHeaderService);
 
   tenants: TenantsSelectModel[] = [];
   columns: TableColumn<TenantsSelectModel>[] = [];
@@ -30,6 +32,7 @@ export class TenantsListComponent implements OnInit {
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
   ngOnInit(): void {
+    this.pageHeaderService.setPageHeader('Arrendatarios', 'Gestión de Arrendatarios');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'email', header: 'Usuario', template: this.userTemplate },
@@ -167,3 +170,4 @@ export class TenantsListComponent implements OnInit {
     });
   }
 }
+

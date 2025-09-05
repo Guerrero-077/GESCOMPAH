@@ -34,7 +34,7 @@
                [routerLink]="child.route"
                routerLinkActive="active"
                [routerLinkActiveOptions]="{ exact: true }"
-               (click)="closeSidebar.emit()">
+               (click)="onItemClick()">
               <span class="submenu-label">{{ child.label }}</span>
             </a>
           </mat-nav-list>
@@ -48,7 +48,7 @@
            routerLinkActive="active"
            [routerLinkActiveOptions]="{ exact: true }"
            [ngClass]="{ 'active-single': isSingleActive(item) }"
-           (click)="closeSidebar.emit()">
+           (click)="onItemClick()">
           <span class="link-content">
             <div class="icon-box">
               <mat-icon>{{ item.icon }}</mat-icon>
@@ -67,3 +67,4 @@
     <mat-icon>logout</mat-icon> Cerrar Sesión
   </div>
 </div>
+

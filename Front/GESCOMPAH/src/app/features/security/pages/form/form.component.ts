@@ -10,6 +10,7 @@ import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { FormSelectModel, FormUpdateModel } from '../../models/form.models';
 import { FormStore } from '../../services/form/form.store';
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
 @Component({
   selector: 'app-form',
@@ -24,6 +25,7 @@ export class FormComponent implements OnInit {
   private readonly formStore = inject(FormStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
+  private readonly pageHeaderService = inject(PageHeaderService);
 
   // Observable de formularios
   forms$ = this.formStore.forms$;
@@ -35,6 +37,7 @@ export class FormComponent implements OnInit {
   constructor(private dialog: MatDialog) { }
 
   ngOnInit(): void {
+    this.pageHeaderService.setPageHeader('Formularios', 'Gestión de Formularios');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },

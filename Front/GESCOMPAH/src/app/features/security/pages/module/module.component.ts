@@ -10,6 +10,7 @@ import { ModuleSelectModel, ModuleUpdateModel } from '../../models/module.models
 import { ModuleStore } from '../../services/module/module.store';
 import { CommonModule } from '@angular/common';
 import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
 @Component({
   selector: 'app-module',
@@ -20,7 +21,8 @@ import { ToggleButtonComponent } from "../../../../shared/components/toggle-butt
 export class ModuleComponent implements OnInit {
   private readonly moduleStore = inject(ModuleStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
-  private readonly sweetAllertService = inject(SweetAlertService);
+  private readonly sweetAlertService = inject(SweetAlertService);
+  private readonly pageHeaderService = inject(PageHeaderService);
 
   modules$ = this.moduleStore.modules$;
 
@@ -33,6 +35,7 @@ export class ModuleComponent implements OnInit {
   constructor(private dialog: MatDialog, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
+    this.pageHeaderService.setPageHeader('Módulos', 'Gestión de Módulos');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
@@ -62,11 +65,11 @@ export class ModuleComponent implements OnInit {
         this.moduleStore.update(id, result).subscribe({
           next: () => {
             console.log('Módulo actualizado correctamente');
-            this.sweetAllertService.showNotification('Actualización Exitosa', 'Módulo actualizado exitosamente.', 'success');
+            this.sweetAlertService.showNotification('Actualización Exitosa', 'Módulo actualizado exitosamente.', 'success');
           },
           error: err => {
             console.error('Error actualizando el módulo:', err)
-            this.sweetAllertService.showNotification('Error', 'No se pudo actualizar el módulo.', 'error');
+            this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el módulo.', 'error');
           }
         });
       }
@@ -85,11 +88,11 @@ export class ModuleComponent implements OnInit {
       this.moduleStore.deleteLogic(row.id).subscribe({
         next: () => {
           console.log('Módulo eliminado correctamente');
-          this.sweetAllertService.showNotification('Eliminación Exitosa', 'Módulo eliminado exitosamente.', 'success');
+          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Módulo eliminado exitosamente.', 'success');
         },
         error: err => {
           console.error('Error eliminando el módulo:', err)
-          this.sweetAllertService.showNotification('Error', 'No se pudo eliminar el módulo.', 'error');
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el módulo.', 'error');
         }
       });
     }
@@ -107,10 +110,10 @@ export class ModuleComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
         this.moduleStore.create(result).subscribe(res => {
-          this.sweetAllertService.showNotification('Creación Exitosa', 'Módulo creado exitosamente.', 'success');
+          this.sweetAlertService.showNotification('Creación Exitosa', 'Módulo creado exitosamente.', 'success');
         }, err => {
           console.error('Error creando el módulo:', err);
-          this.sweetAllertService.showNotification('Error', 'No se pudo crear el módulo.', 'error');
+          this.sweetAlertService.showNotification('Error', 'No se pudo crear el módulo.', 'error');
         });
       }
     });
@@ -129,7 +132,7 @@ export class ModuleComponent implements OnInit {
       next: (updated) => {
         // sincronizar con lo que devuelve el backend
         row.active = updated.active ?? row.active;
-        this.sweetAllertService.showNotification(
+        this.sweetAlertService.showNotification(
           'Éxito',
           `Modulo ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success'
@@ -138,7 +141,7 @@ export class ModuleComponent implements OnInit {
       error: (err) => {
         // revertir si falla
         row.active = previous;
-        this.sweetAllertService.showNotification(
+        this.sweetAlertService.showNotification(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'
