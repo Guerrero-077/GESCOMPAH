@@ -17,5 +17,8 @@ namespace Business.Interfaces.Implements.Utilities
 
         /// <summary>Obtiene imágenes por establecimiento.</summary>
         Task<List<ImageSelectDto>> GetImagesByEstablishmentIdAsync(int establishmentId);
+
+        /// <summary>Elimina una imgen por su Id.</summary>
+        Task DeleteByIdAsync(int id);
     }
 }

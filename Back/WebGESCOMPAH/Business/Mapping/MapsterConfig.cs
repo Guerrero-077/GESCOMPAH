@@ -208,7 +208,8 @@ namespace Business.Mapping
                 .Map(dest => dest.LastName, src => src.LastName)
                 .Map(dest => dest.Phone, src => src.Phone)
                 .Map(dest => dest.Address, src => src.Address)
-                .Map(dest => dest.CityId, src => src.CityId);
+                .Map(dest => dest.CityId, src => src.CityId)
+                .Ignore(dest => dest.Document); ;
 
             // ============================================
             // Utilities (Images)

@@ -1,9 +1,9 @@
-<!-- Overlay de loading -->
+<!-- Overlay de loading para PDF -->
 <div class="pdf-loading-overlay" *ngIf="isDownloadingPdf" aria-live="assertive" aria-busy="true">
   <div class="pdf-loading-card" role="alert" aria-label="Generando y descargando contrato">
     <svg class="download-anim" viewBox="0 0 64 64" aria-hidden="true">
-      <path class="arrow" d="M32 12 v26 M22 30 l10 10 10-10" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-      <rect class="box" x="12" y="44" width="40" height="8" rx="2" ry="2" />
+      <path class="arrow" d="M32 12 v26 M22 30 l10 10 10-10" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+      <rect class="box" x="12" y="44" width="40" height="8" rx="2" ry="2"></rect>
     </svg>
     <mat-progress-spinner mode="indeterminate" diameter="48" strokeWidth="4"></mat-progress-spinner>
     <div class="label">Generando PDF…</div>
@@ -11,30 +11,83 @@
   </div>
 </div>
 
-<div class="row d-flex justify-content-center">
-  <app-generic-table
-    [data]="rows$()"
-    [columns]="columns"
-    [titulo]="'Gestión de Contratos'"
-    [subTitulo]="'Contratos (según tu rol)'"
-    [createButtonLabel]="'Nuevo Contrato'"
-    [showViewButton]="true"
-    (view)="onView($event)"
-    (create)="onCreateNew()">
-  </app-generic-table>
+<!-- Loading lista -->
+<ng-container *ngIf="loading(); else contentTpl">
+  <div class="d-flex justify-content-center mt-4">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  </div>
+</ng-container>
 
-  <!-- Template de estado -->
-  <ng-template #estadoTemplate let-row >
-    <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
-      <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
-        {{ row.active ? 'Activo' : 'Inactivo' }}
-      </span>
+<ng-template #contentTpl>
+  <!-- Error -->
+  <ng-container *ngIf="!error(); else errorTpl">
+    <div class="row d-flex justify-content-center">
+      <app-generic-table
+        [data]="rows()"
+        [columns]="columns"
+        titulo="Gestión de Contratos"
+        subTitulo="Contratos (según tu rol)"
+        [createButtonLabel]="'Nuevo Contrato'"
+        [showViewButton]="true"
+        [detailTemplate]="accionesContrato"
+        (view)="onView($event)"
+        (create)="onCreateNew()">
+      </app-generic-table>
+    </div>
+  </ng-container>
+</ng-template>
 
-      <app-toggle-button-component class="align-middle"
-        [checked]="row.active"
-        (changed)="onToggleActive(row, { checked: $event })"
-        [size]="20" [onColor]="'#16a34a'" [offColor]="'#ef4444'" [thumb]="'#ffffff'">
+<!-- Error de carga -->
+<ng-template #errorTpl>
+  <div class="alert alert-danger mt-3" role="alert">
+    Ocurrió un error al cargar contratos: {{ error() }}
+  </div>
+</ng-template>
+
+<!-- ===========================================================
+     Template PARA ACCIONES (Descargar + Ver)
+     Ubicado FUERA de *ngIf/*ngTemplate para que exista siempre
+     =========================================================== -->
+<ng-template #accionesContrato let-row>
+  <div class="d-inline-flex align-items-center gap-1">
+    <button mat-icon-button
+            matTooltip="Descargar PDF"
+            (click)="onDownload(row)"
+            [disabled]="isDownloadingPdf"
+            aria-label="Descargar contrato">
+      <mat-icon>download</mat-icon>
+    </button>
+
+    <button mat-icon-button
+            matTooltip="Ver"
+            (click)="onView(row)"
+            aria-label="Ver contrato">
+      <mat-icon>visibility</mat-icon>
+    </button>
+  </div>
+</ng-template>
+
+<!-- ===========================================================
+     Template PARA COLUMNA 'Estado'
+     (ubicado FUERA de *ngIf/*ngTemplate para que ViewChild lo vea)
+     =========================================================== -->
+<ng-template #estadoTemplate let-row>
+  <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
+    <span class="badge align-middle" [ngClass]="row.active ? 'badge-success--solid' : 'badge-warning'">
+      {{ row.active ? 'Activo' : 'Inactivo' }}
+    </span>
+
+    <div *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
+      <app-toggle-button-component
+        class="align-middle"
+        [checked]="!!row?.active"
+        [disabled]="loading()"
+        (changed)="onToggleActive(row, $event)"
+        [size]="20"
+        [onColor]="'#388E3C'"
+        [offColor]="'#9CA3AF'"
+        [thumb]="'#ffffff'">
       </app-toggle-button-component>
     </div>
-  </ng-template>
-</div>
+  </div>
+</ng-template>

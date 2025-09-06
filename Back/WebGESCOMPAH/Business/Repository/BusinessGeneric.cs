@@ -178,20 +178,35 @@ namespace Business.Repository
             }
         }
 
-        public override async Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active)
+        //public override async Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active)
+        //{
+        //    var entity = await Data.GetByIdAsync(id);
+        //    if (entity == null)
+        //        throw new KeyNotFoundException($"No se encontró la plaza con ID {id}");
+
+        //    if (entity.Active != active)
+        //    {
+        //        entity.Active = active;
+        //        await Data.UpdateAsync(entity);
+        //    }
+
+        //    return _mapper.Map<TDtoGet>(entity);
+        //}
+
+
+        public override async Task UpdateActiveStatusAsync(int id, bool active)
         {
-            var entity = await Data.GetByIdAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException($"No se encontró la plaza con ID {id}");
+            BusinessValidationHelper.ThrowIfZeroOrLess(id, "El ID debe ser mayor que cero.");
 
-            if (entity.Active != active)
-            {
-                entity.Active = active;
-                await Data.UpdateAsync(entity);
-            }
+            var entity = await Data.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"No se encontró el registro con ID {id}.");
 
-            return _mapper.Map<TDtoGet>(entity);
+            if (entity.Active == active) return; // idempotente
+
+            entity.Active = active;
+            await Data.UpdateAsync(entity);
         }
+
 
     }
 }

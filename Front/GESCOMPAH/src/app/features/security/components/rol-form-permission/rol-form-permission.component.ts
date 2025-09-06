@@ -10,7 +10,7 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 
 import {
   RolFormPermissionCreateModel,
-  RolFormPermissionGroupedModel, // <--- USAR EL MODELO AGRUPADO
+  RolFormPermissionGroupedModel,
   RolFormPermissionUpdateModel
 } from '../../models/rol-form-permission.models';
 
@@ -20,6 +20,8 @@ import { RolFormPermissionStore } from '../../services/rol-form-permission/rol-f
 import { RoleStore } from '../../services/role/role.store';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
 @Component({
   standalone: true,
@@ -29,7 +31,9 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
   imports: [
     CommonModule,
     GenericTableComponent,
-    MatDialogModule
+    MatDialogModule,
+    ToggleButtonComponent,
+    HasRoleAndPermissionDirective
   ]
 })
 export class RolFormPermissionComponent implements OnInit, AfterViewInit {
@@ -41,37 +45,27 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  // El store ahora debería devolver los items agrupados
   items$ = this.rolFormPermissionStore.rolFormPermissions$;
 
-  // ViewChild para las plantillas de la tabla
   @ViewChild('permissionsTemplate') permissionsTemplate!: TemplateRef<any>;
   @ViewChild('estadoTemplate') estadoTemplate!: TemplateRef<any>;
 
-  // Las columnas ahora se basan en el modelo agrupado
-  columns: TableColumn<RolFormPermissionGroupedModel>[] = [
-    { key: 'index', header: 'Nº', type: 'index' },
-    { key: 'rolName', header: 'Rol' },
-    { key: 'formName', header: 'Formulario' },
-    // La columna de permisos usará un template
-    { key: 'permissions', header: 'Permisos' }
-  ];
+  columns!: TableColumn<RolFormPermissionGroupedModel>[];
 
   constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    // Cargar datos necesarios para los diálogos
     this.roleStore.loadAll();
     this.formStore.loadAll();
     this.permissionStore.loadAll();
-    // Esto debería llamar al endpoint /grouped
     this.rolFormPermissionStore.loadAll();
   }
 
   ngAfterViewInit(): void {
-    // Asignar los templates a las columnas después de que la vista se inicialice
     this.columns = [
-      ...this.columns.filter(c => c.key !== 'permissions'),
+      { key: 'index', header: 'Nº', type: 'index' },
+      { key: 'rolName', header: 'Rol' },
+      { key: 'formName', header: 'Formulario' },
       { key: 'permissions', header: 'Permisos', template: this.permissionsTemplate },
       { key: 'active', header: 'Estado', template: this.estadoTemplate }
     ];
@@ -130,7 +124,6 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
     ])
       .pipe(take(1))
       .subscribe(([roles, forms, permissions]) => {
-        // Pre-seleccionar los permisos que el grupo ya tiene
         const entityForDialog = {
           rolId: row.rolId,
           formId: row.formId,
@@ -186,7 +179,6 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
 
     if (!confirmed) return;
 
-    // Llamar al nuevo método del store para borrar por grupo
     this.rolFormPermissionStore.deleteByGroup(row.rolId, row.formId).subscribe({
       next: () => {
         this.sweetAlertService.showNotification('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success');
@@ -201,4 +193,30 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   onView(row: RolFormPermissionGroupedModel): void {
     console.log('Vista detalle:', row);
   }
+
+  // ----- Toggle estado (activo/inactivo) -----
+  onToggleActive(row: RolFormPermissionGroupedModel, e: { checked: boolean }) {
+    const previous = row.active;
+    row.active = e.checked;
+    this.rolFormPermissionStore.changeActiveStatus(row.id, e.checked).subscribe({
+      next: (updated) => {
+        row.active = updated.active ?? row.active;
+        this.sweetAlertService.showNotification(
+          'Éxito',
+          `Permiso ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        row.active = previous;
+        this.sweetAlertService.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
+    });
+  }
+
+
 }

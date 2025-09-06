@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { RolFormPermissionGroupedModel, RolFormPermissionCreateModel, RolFormPermissionUpdateModel, RolFormPermissionSelectModel } from '../../models/rol-form-permission.models';
+import { RolFormPermissionCreateModel, RolFormPermissionGroupedModel, RolFormPermissionUpdateModel } from '../../models/rol-form-permission.models';
 import { RolFormPermissionService } from './rol-form-permission.service';
 
 @Injectable({
@@ -26,7 +26,7 @@ export class RolFormPermissionStore {
 
   // loadAll ahora usa el nuevo método del servicio
   loadAll() {
-    this.rolFormPermissionService.getAllGrouped().pipe(
+    this.rolFormPermissionService.getAll().pipe(
       tap(data => this.rolFormPermissions = data),
       catchError(err => {
         console.error('Error loading grouped rolFormPermissions', err);
@@ -36,7 +36,7 @@ export class RolFormPermissionStore {
   }
 
   // create y update ahora refrescan la lista agrupada
-  create(rolFormPermission: RolFormPermissionCreateModel): Observable<RolFormPermissionSelectModel> {
+  create(rolFormPermission: RolFormPermissionCreateModel): Observable<RolFormPermissionGroupedModel> {
     return this.rolFormPermissionService.create(rolFormPermission).pipe(
       tap(() => {
         this.loadAll();
@@ -44,7 +44,7 @@ export class RolFormPermissionStore {
     );
   }
 
-  update(updateDto: RolFormPermissionUpdateModel): Observable<RolFormPermissionSelectModel> {
+  update(updateDto: RolFormPermissionUpdateModel): Observable<RolFormPermissionGroupedModel> {
     return this.rolFormPermissionService.update(updateDto.id, updateDto).pipe(
       tap(() => {
         this.loadAll();
@@ -79,4 +79,12 @@ export class RolFormPermissionStore {
       })
     );
   }
+
+    changeActiveStatus(id: number, active: boolean): Observable<RolFormPermissionGroupedModel> {
+      return this.rolFormPermissionService.changeActiveStatus(id, active).pipe(
+        tap(() => {
+          this.loadAll()
+        })
+      );
+    }
 }

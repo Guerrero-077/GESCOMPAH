@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, TemplateRef, ViewChild, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
@@ -13,10 +13,11 @@ import { CityService } from '../../../setting/services/city/city.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PersonSelectModel } from '../../models/person.models';
 import { PersonStore } from '../../services/person/person.store';
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 
 @Component({
   selector: 'app-person',
-  imports: [CommonModule, GenericTableComponent],
+  imports: [CommonModule, GenericTableComponent, ToggleButtonComponent],
   templateUrl: './person.component.html',
   styleUrl: './person.component.css'
 })
@@ -32,6 +33,8 @@ export class PersonComponent implements OnInit {
   persons$ = this.personStore.persons$;
   columns: TableColumn<PersonSelectModel>[] = [];
 
+  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
+
   ngOnInit(): void {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
@@ -40,7 +43,8 @@ export class PersonComponent implements OnInit {
       { key: 'document', header: 'Documento' },
       { key: 'address', header: 'Dirección' },
       { key: 'phone', header: 'Teléfono' },
-      { key: 'cityName', header: 'Ciudad' }
+      { key: 'cityName', header: 'Ciudad' },
+      { key: 'active',           header: 'Estado', type: 'custom', template: this.estadoTemplate }
     ];
   }
 
@@ -128,5 +132,29 @@ export class PersonComponent implements OnInit {
 
   onView(row: PersonSelectModel) {
     console.log('Ver persona:', row);
+  }
+
+  // ----- Toggle estado (activo/inactivo) -----
+  onToggleActive(row: PersonSelectModel, e: { checked: boolean }) {
+    const previous = row.active;
+    row.active = e.checked;
+    this.personStore.changeActiveStatus(row.id, e.checked).subscribe({
+      next: (updated) => {
+        row.active = updated.active ?? row.active;
+        this.sweetAllertService.showNotification(
+          'Éxito',
+          `Permiso ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        row.active = previous;
+        this.sweetAllertService.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
+    });
   }
 }

@@ -60,5 +60,16 @@ namespace WebGESCOMPAH.Controllers.Module.Utilities
             var images = await _imagesService.GetImagesByEstablishmentIdAsync(establishmentId);
             return Ok(images);
         }
+
+
+        // DELETE por ID numérico (recomendado)
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> DeleteById(int id, CancellationToken ct)
+        {
+            await _imagesService.DeleteByIdAsync(id);
+            return NoContent();
+        }
+
     }
 }

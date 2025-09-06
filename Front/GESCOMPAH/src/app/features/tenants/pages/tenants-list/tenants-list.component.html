@@ -1,32 +1,59 @@
-<app-generic-table
-  [data]="tenants"
-  [columns]="columns"
-  [titulo]="'Gestión de Usuario'"
-  [subTitulo]="'Gesione los usuarios del sistema'"
-  [createButtonLabel]="'Crear Usuario'"
-  [showViewButton]="false"
-  (create)="onCreate()"
-  (edit)="onEdit($event)"
-  (delete)="onDelete($event)"
-  (view)="onView($event)">
+<!-- Loading -->
+<ng-container *ngIf="loading(); else content">
+  <div class="d-flex justify-content-center mt-4">
+    <mat-spinner></mat-spinner>
+  </div>
+</ng-container>
 
-</app-generic-table>
-
-<ng-template #userTemplate let-row>
-  <div>{{ row.personName }}</div>
-  <small>{{ row.email }}</small>
+<!-- Contenido -->
+<ng-template #content>
+  <ng-container *ngIf="!error(); else errorTpl">
+    <app-generic-table
+      [data]="tenants()"
+      [columns]="columns"
+      titulo="Gestión de Usuario"
+      subTitulo="Gesione los usuarios del sistema"
+      [createButtonLabel]="'Crear Usuario'"
+      [showViewButton]="false"
+      (create)="onCreate()"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+      (view)="onView($event)">
+    </app-generic-table>
+  </ng-container>
 </ng-template>
 
+<!-- Error -->
+<ng-template #errorTpl>
+  <div class="alert alert-danger mt-3" role="alert">
+    Ocurrió un error al cargar usuarios: {{ error() }}
+  </div>
+</ng-template>
+
+<!-- Template columna Usuario -->
+<ng-template #userTemplate let-row>
+  <div class="fw-medium">{{ row.personName }}</div>
+  <small class="text-muted">{{ row.email }}</small>
+</ng-template>
+
+<!-- Template columna Estado -->
 <ng-template #estadoTemplate let-row>
   <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
-    <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+    <span class="badge align-middle" [ngClass]="row.active ? 'badge-success--solid' : 'badge-warning'">
       {{ row.active ? 'Activo' : 'Inactivo' }}
     </span>
 
-    <app-toggle-button-component class="align-middle" [checked]="row.active"
-      (changed)="onToggleActive(row, { checked: $event })" [size]="20" [onColor]="'#16a34a'" [offColor]="'#ef4444'"
-      [thumb]="'#ffffff'">
-    </app-toggle-button-component>
-
+    <div *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
+      <app-toggle-button-component
+        class="align-middle"
+        [checked]="!!row.active"
+        [disabled]="loading()"
+        (changed)="onToggleActive(row.id, $event)" 
+        [size]="20"
+        [onColor]="'#388E3C'"
+        [offColor]="'#9CA3AF'"
+        [thumb]="'#ffffff'">
+      </app-toggle-button-component>
+    </div>
   </div>
 </ng-template>

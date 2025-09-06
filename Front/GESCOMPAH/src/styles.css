@@ -230,15 +230,6 @@ body {
   border: 1px solid transparent;
 }
 
-/* Éxito (suave AA por defecto) */
-.badge-success {
-  background: var(--chip-active-bg);
-  /* green-50 */
-  color: var(--chip-active-text);
-  /* green-900 */
-  border-color: var(--green-200);
-}
-
 /* Éxito sólido (cuando necesites más “punch”) */
 .badge-success--solid {
   background: var(--green-600);

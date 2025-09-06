@@ -1,30 +1,58 @@
-<app-generic-table
-  [data]="squares$ | async"
-  [columns]="columns"
-  [titulo]="'Gestión de plazas comerciales'"
-  [subTitulo]="'Administra las plazas comerciales del sistema'"
-  [showViewButton]="false"
-  [showActionsColumn]="false"
-  [createButtonLabel]="'Nueva Plaza'"
-  (view)="onView($event)"
-  (create)="onCreate()"
-  (edit)="onEdit($event)"
-  (delete)="onDelete($event)">
-</app-generic-table>
+<!-- Loading -->
+<ng-container *ngIf="loading(); else content">
+  <div class="d-flex justify-content-center mt-4">
+    <mat-spinner></mat-spinner>
+  </div>
+</ng-container>
 
+<!-- Contenido cuando NO está cargando -->
+<ng-template #content>
+  <!-- Error -->
+  <ng-container *ngIf="!error(); else errorTpl">
 
+    <app-generic-table
+      [data]="squares()"
+      [columns]="columns"
+      titulo="Gestión de plazas comerciales"
+      subTitulo="Administra las plazas comerciales del sistema"
+      [showViewButton]="false"
+      [showActionsColumn]="true"
+      [createButtonLabel]="'Nueva Plaza'"
+      (view)="onView($event)"
+      (create)="onCreate()"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)">
+    </app-generic-table>
+
+  </ng-container>
+</ng-template>
+
+<!-- Template de error -->
+<ng-template #errorTpl>
+  <div class="alert alert-danger mt-3" role="alert">
+    Ocurrió un error al cargar las plazas: {{ error() }}
+  </div>
+</ng-template>
+
+<!-- Template para la columna 'Estado' -->
 <ng-template #estadoTemplate let-row>
   <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
-    <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+    <span class="badge align-middle" [ngClass]="row.active ? 'badge-success--solid' : 'badge-warning'">
       {{ row.active ? 'Activo' : 'Inactivo' }}
     </span>
 
     <div *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
-      <app-toggle-button-component class="align-middle" [checked]="row.active"
-        (changed)="onToggleActive(row, { checked: $event })" [size]="20" [onColor]="'#16a34a'" [offColor]="'#ef4444'"
+      <app-toggle-button-component
+        class="align-middle"
+        [checked]="!!row?.active"
+        [disabled]="loading()"
+        (changed)="onToggleActive(row?.id, $event)"
+        [size]="20"
+        [onColor]="'#388E3C'"
+        [offColor]="'#9CA3AF'"
         [thumb]="'#ffffff'">
       </app-toggle-button-component>
     </div>
-
   </div>
 </ng-template>
+

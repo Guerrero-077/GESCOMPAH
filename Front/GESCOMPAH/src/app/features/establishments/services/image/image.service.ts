@@ -17,14 +17,33 @@ export class ImageService {
   }
 
   /** SUBIR imágenes (flujo 2da fase) → POST /api/Images/{establishmentId} */
-  uploadImages(establishmentId: number, files: File[]): Observable<HttpEvent<unknown>> {
-    const fd = new FormData();
-    files.forEach(f => fd.append('files', f, f.name));
-    return this.http.post(`${this.baseUrl}/${establishmentId}`, fd, {
-      observe: 'events',
-      reportProgress: true
-    });
+  // uploadImages(establishmentId: number, files: File[]): Observable<HttpEvent<unknown>> {
+  //   const fd = new FormData();
+  //   files.forEach(f => fd.append('files', f, f.name));
+  //   return this.http.post(`${this.baseUrl}/${establishmentId}`, fd, {
+  //     observe: 'events',
+  //     reportProgress: true
+  //   });
+  // }
+
+
+  uploadImages(establishmentId: number, files: File[]): Observable<ImageSelectDto[]> {
+    const form = new FormData();
+    files.forEach(f => form.append('files', f, f.name));
+    return this.http.post<ImageSelectDto[]>(`${this.baseUrl}/${establishmentId}`, form);
   }
+
+  // Opcional: con progreso
+  uploadImagesWithProgress(establishmentId: number, files: File[]): Observable<HttpEvent<ImageSelectDto[]>> {
+    const form = new FormData();
+    files.forEach(f => form.append('files', f, f.name));
+    return this.http.post<ImageSelectDto[]>(
+      `${this.baseUrl}/${establishmentId}`,
+      form,
+      { observe: 'events', reportProgress: true }
+    );
+  }
+
 
   /** Eliminar varias imágenes por sus publicId (si tu backend lo soporta) */
   deleteImagesByPublicIds(publicIds: string[]): Observable<void> {

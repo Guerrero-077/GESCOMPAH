@@ -1,4 +1,9 @@
-﻿using Entity.Domain.Models.ModelBase;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Entity.Domain.Models.ModelBase;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,15 +20,19 @@ namespace Data.Repository
             _dbSet = _context.Set<T>();
         }
 
+        private IQueryable<T> BaseQuery() =>
+            _dbSet.AsNoTracking()
+                  .Where(e => !e.IsDeleted)
+                  .OrderByDescending(e => e.CreatedAt)
+                  .ThenByDescending(e => e.Id);
+
+        // ===== CRUD =====
         public override async Task<IEnumerable<T>> GetAllAsync()
-        {
-            return await _dbSet.AsNoTracking().Where(e => !e.IsDeleted).ToListAsync();
-        }
+            => await BaseQuery().ToListAsync();
 
         public override async Task<T?> GetByIdAsync(int id)
-        {
-            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
-        }
+            => await _dbSet.AsNoTracking()
+                           .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
 
         public override async Task<T> AddAsync(T entity)
         {
@@ -34,20 +43,25 @@ namespace Data.Repository
 
         public override async Task<T> UpdateAsync(T entity)
         {
-            var existingEntity = await _dbSet.FindAsync(entity.Id);
-            if (existingEntity == null)
+            var existing = await _dbSet.FirstOrDefaultAsync(x => x.Id == entity.Id && !x.IsDeleted);
+            if (existing is null)
                 throw new InvalidOperationException($"No se encontró entidad con ID {entity.Id}");
 
-            _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+            var originalCreatedAt = existing.CreatedAt;
+            var originalId = existing.Id;
+
+            _context.Entry(existing).CurrentValues.SetValues(entity);
+            existing.Id = originalId;
+            existing.CreatedAt = originalCreatedAt;
+
             await _context.SaveChangesAsync();
-            return existingEntity;
+            return existing;
         }
 
         public override async Task<bool> DeleteAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity == null) return false;
-
             _dbSet.Remove(entity);
             return await _context.SaveChangesAsync() > 0;
         }
@@ -62,8 +76,7 @@ namespace Data.Repository
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public override IQueryable<T> GetAllQueryable() => _dbSet.AsNoTracking().AsQueryable();
+        public override IQueryable<T> GetAllQueryable() => BaseQuery();
 
     }
-
 }

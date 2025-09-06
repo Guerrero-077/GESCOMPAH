@@ -108,6 +108,20 @@ namespace Business.Services.Utilities
             await _imagesRepository.DeleteByPublicIdAsync(publicId);
         }
 
+        public async Task DeleteByIdAsync(int id)
+        {
+            // Cargar desde DB
+            var img = await _imagesRepository.GetByIdAsync(id);
+            if (img is null)
+                return; // idempotente: nada que borrar
+
+            // Borrar en Cloudinary (idempotente)
+            await _cloudinary.DeleteAsync(img.PublicId);
+
+            // Borrar fisicamente en DB (o soft si prefieres)
+            await _imagesRepository.DeleteAsync(id);
+        }
+
         public async Task<List<ImageSelectDto>> GetImagesByEstablishmentIdAsync(int establishmentId)
         {
             var images = await _imagesRepository.GetByEstablishmentIdAsync(establishmentId);

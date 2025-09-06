@@ -9,18 +9,11 @@ namespace Utilities.Helpers.CloudinaryHelper
     {
         private readonly Cloudinary _cloudinary;
 
-        // Configuración personalizada
         private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
         private const long _maxFileSizeInBytes = 5 * 1024 * 1024; // 5 MB
 
-        public CloudinaryUtility(Cloudinary cloudinary)
-        {
-            _cloudinary = cloudinary;
-        }
+        public CloudinaryUtility(Cloudinary cloudinary) => _cloudinary = cloudinary;
 
-        /// <summary>
-        /// Sube una imagen a Cloudinary en la carpeta virtual establishments/{establishmentId}
-        /// </summary>
         public async Task<ImageUploadResult> UploadImageAsync(IFormFile file, int establishmentId)
         {
             ValidateImage(file);
@@ -30,8 +23,8 @@ namespace Utilities.Helpers.CloudinaryHelper
             var uniqueSuffix = Guid.NewGuid().ToString("N");
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
             var sanitizedFileName = Path.GetFileNameWithoutExtension(file.FileName)
-                                        .Replace(" ", "_")
-                                        .Replace(".", "_"); // opcional
+                                            .Replace(" ", "_")
+                                            .Replace(".", "_");
 
             var publicId = $"establishments/{establishmentId}/{sanitizedFileName}_{uniqueSuffix}";
 
@@ -48,31 +41,34 @@ namespace Utilities.Helpers.CloudinaryHelper
             var result = await _cloudinary.UploadAsync(uploadParams);
 
             if (result.Error != null || string.IsNullOrWhiteSpace(result.SecureUrl?.AbsoluteUri))
-            {
                 throw new BusinessException($"Error al subir imagen: {result.Error?.Message ?? "Respuesta vacía o inválida"}");
-            }
 
             return result;
         }
 
-        /// <summary>
-        /// Elimina una imagen de Cloudinary usando su PublicId
-        /// </summary>
         public async Task DeleteAsync(string publicId)
         {
             if (string.IsNullOrWhiteSpace(publicId))
                 throw new BusinessException("PublicId no puede estar vacío.");
 
-            var deletionParams = new DeletionParams(publicId);
+            var deletionParams = new DeletionParams(publicId)
+            {
+                ResourceType = ResourceType.Image,
+                Invalidate = true,
+                Type = "upload"
+            };
+
             var result = await _cloudinary.DestroyAsync(deletionParams);
 
-            if (result.Result != "ok" && result.Result != "not_found")
-                throw new BusinessException($"Error al eliminar imagen: {result.Error?.Message ?? result.Result}");
+            // Acepta 'ok' y 'not found' (¡ojo al espacio!) como éxito (idempotente)
+            var r = (result?.Result ?? string.Empty).Trim().ToLowerInvariant();
+            if (r == "ok" || r == "not found" || r == "not_found")
+                return;
+
+            var msg = result?.Error?.Message ?? result?.Result ?? "unknown";
+            throw new BusinessException($"Error al eliminar imagen: {msg}");
         }
 
-        /// <summary>
-        /// Valida tamaño, extensión y contenido del archivo
-        /// </summary>
         private void ValidateImage(IFormFile file)
         {
             if (file == null || file.Length <= 0)
@@ -83,7 +79,7 @@ namespace Utilities.Helpers.CloudinaryHelper
 
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!_allowedExtensions.Contains(extension))
-                throw new BusinessException($"Extensión de archivo no permitida. Extensiones válidas: {string.Join(", ", _allowedExtensions)}");
+                throw new BusinessException($"Extensión de archivo no permitida. Válidas: {string.Join(", ", _allowedExtensions)}");
         }
     }
 }

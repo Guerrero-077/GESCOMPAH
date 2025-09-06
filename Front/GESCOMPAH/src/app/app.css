@@ -1,11 +1,11 @@
 ::ng-deep .mat-step-header .mat-step-icon-selected {
   background-color: var(--accent-color) !important;
-  color: var(--text-color-white) !important;
+  color: var(--white) !important;
 }
 
 ::ng-deep .mat-step-header .mat-step-icon {
-  background-color: var(--primary-color) !important;
-  color: var(--text-color-black) !important;
+  background-color: var(--color-primary) !important;
+  color: var(--white) !important;
 }
 
 ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
@@ -13,12 +13,12 @@
 }
 
 ::ng-deep .mat-raised-button.mat-primary {
-  background-color: var(--primary-color) !important;
-  color: var(--text-color-black) !important;
+  background-color: var(--color-primary) !important;
+  color: var(--white) !important;
 }
 
 ::ng-deep .mat-step-label {
-  color: var(--text-color-black) !important;
+  color: var(--text-color-black ) !important;
 }
 
 ::ng-deep .mat-step-header[aria-selected="true"] .mat-step-label {

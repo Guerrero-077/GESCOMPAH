@@ -15,6 +15,7 @@ namespace Data.Services.Persons
         public override async Task<IEnumerable<Person>> GetAllAsync()
         {
             return  await _dbSet
+                .Where(e => !e.IsDeleted)
                 .Include(e => e.City)
                 .Include(e => e.User)
                 .ToListAsync();
@@ -27,7 +28,7 @@ namespace Data.Services.Persons
                 .Include(p => p.City)
                 .Include(e => e.User)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
 
         public async Task<bool> ExistsByDocumentAsync(string document)

@@ -1,23 +1,25 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { forkJoin, map, of, catchError, Observable, BehaviorSubject } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { BehaviorSubject, catchError, forkJoin, map, Observable, of } from 'rxjs';
 
+import { FormModuleService } from '../../services/form-module/form-module.service';
 import { FormService } from '../../services/form/form.service';
 import { ModuleService } from '../../services/module/module.service';
-import { FormModuleService } from '../../services/form-module/form-module.service';
 
+import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
+import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
-import { FormModuleCreateModel, FormModuleSelectModel, FormModuleUpdateModel } from '../../models/form-module.model';
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { FormModuleCreateModel, FormModuleSelectModel, FormModuleUpdateModel } from '../../models/form-module.model';
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
 @Component({
   selector: 'app-form-module',
   standalone: true,
-  imports: [GenericTableComponent, CommonModule],
+  imports: [GenericTableComponent, CommonModule, ToggleButtonComponent, HasRoleAndPermissionDirective],
   templateUrl: './form-module.component.html',
   styleUrl: './form-module.component.css'
 })
@@ -30,16 +32,19 @@ export class FormModuleComponent implements OnInit {
   private readonly sweetAlertService = inject(SweetAlertService);
 
   private formModulesSubject = new BehaviorSubject<FormModuleSelectModel[]>([]);
+  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
+
   formModules$ = this.formModulesSubject.asObservable();
 
-  columns: TableColumn<FormModuleSelectModel>[] = [
-    { key: 'index', header: 'Nº', type: 'index' },
-    { key: 'formName', header: 'Formulario' },
-    { key: 'moduleName', header: 'Módulo' },
-    { key: 'active', header: 'Estado', type: 'boolean' }
-  ];
+  columns!: TableColumn<FormModuleSelectModel>[];
 
   ngOnInit(): void {
+    this.columns = [
+      { key: 'index', header: 'Nº', type: 'index' },
+      { key: 'formName', header: 'Formulario' },
+      { key: 'moduleName', header: 'Módulo' },
+      { key: 'active', header: 'Estado', type: 'custom', template: this.estadoTemplate }
+    ];
     this.loadFormModules();
   }
 
@@ -214,5 +219,40 @@ export class FormModuleComponent implements OnInit {
 
   onView(row: FormModuleSelectModel): void {
     console.log('Detalle FormModule:', row);
+  }
+
+
+  // Toggle activo/inactivo
+  onToggleActive(row: FormModuleSelectModel, e: { checked: boolean }) {
+    const nextValue = e.checked;
+
+    // Store original data for potential revert
+    const originalModules = this.formModulesSubject.getValue();
+
+    // Optimistic UI update
+    const updatedModules = originalModules.map(item =>
+      item.id === row.id ? { ...item, active: nextValue } : item
+    );
+    this.formModulesSubject.next(updatedModules);
+
+    this.formModuleService.changeActiveStatus(row.id, nextValue).subscribe({
+      next: () => {
+        this.sweetAlertService.showNotification(
+          'Éxisto',
+          `Estado de la relación actualizado correctamente.`,
+          'success'
+        );
+      },
+      error: (err) => {
+        // Revert UI on error
+        this.formModulesSubject.next(originalModules);
+
+        this.sweetAlertService.showNotification(
+          'Error',
+          err?.error?.detail || 'No se pudo cambiar el estado.',
+          'error'
+        );
+      }
+    });
   }
 }

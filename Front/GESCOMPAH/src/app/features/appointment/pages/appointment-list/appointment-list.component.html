@@ -21,7 +21,7 @@
       <div class="d-inline-flex align-items-center gap-2">
         <!-- Activar -->
         <button mat-icon-button matTooltip="Activar" aria-label="Activar" class="text-white"
-          class="badge-success"
+          class="badge-success--solid"
           [disabled]="row.active || pendingId === row.id"
           (click)="confirmState(row, true)">
 
@@ -34,7 +34,7 @@
         </button>
 
         <!-- Desactivar -->
-        <button mat-icon-button matTooltip="Desactivar" aria-label="Desactivar" class="text-white badge-secondary"
+        <button mat-icon-button matTooltip="Desactivar" aria-label="Desactivar" class="text-white badge-warning"
 
           [disabled]="!row.active || pendingId === row.id" (click)="confirmState(row, false)">
 
