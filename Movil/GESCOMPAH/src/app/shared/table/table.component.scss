@@ -1,0 +1,141 @@
+.table-wrapper {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--ion-background-color);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+
+    .header {
+        margin: 0.5rem;
+        display: flex;
+        flex-direction: column;
+
+        h3 {
+            margin: 0;
+            padding: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: var(--font-heading);
+            color: var(--ion-text-color);
+        }
+
+        span {
+            margin: 0;
+            padding: 0;
+            font-size: 0.85rem;
+            color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.6);
+            font-family: var(--font-body);
+        }
+    }
+
+    ion-searchbar {
+        margin-bottom: 1rem;
+        min-width: 250px;
+        width: 100%;
+    }
+
+    ion-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem; // espacio entre cards
+
+        .data-card {
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            background-color: var(--ion-background-color);
+            color: var(--ion-text-color);
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            }
+
+            ion-card-header {
+                padding-bottom: 0.5rem;
+
+                ion-card-title {
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    font-family: var(--font-heading);
+                    color: var(--ion-text-color);
+                }
+
+                ion-card-subtitle {
+                    font-size: 0.85rem;
+                    color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.6);
+                    font-family: var(--font-body);
+                }
+
+                div {
+                    strong {
+                        color: var(--ion-text-color);
+                        font-weight: 500;
+                    }
+
+                    margin-top: 0.25rem;
+                }
+            }
+
+            ion-card-content {
+                div {
+                    strong {
+                        color: var(--ion-text-color);
+                    }
+
+                    margin-top: 0.25rem;
+                }
+            }
+
+            ion-row {
+                justify-content: flex-end;
+                padding: 0.5rem;
+
+                ion-button {
+                    margin-left: 0.25rem;
+
+                    ion-icon {
+                        color: var(--ion-color-primary);
+                    }
+                }
+            }
+        }
+    }
+
+    .no-data-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.5);
+
+        .no-data-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-data-text {
+            font-size: 1rem;
+            font-family: var(--font-body);
+        }
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table-wrapper {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        ion-searchbar {
+            width: 100%;
+        }
+    }
+}

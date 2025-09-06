@@ -3,6 +3,9 @@ import { Routes } from '@angular/router';
 import { MenuComponent } from './shared/menu/menu.component';
 
 export const routes: Routes = [
+  { path: 'auth',
+    loadChildren: () => import('./feature/auth/auth.routes').then(m => m.AUTH_ROUTES),
+  },
   {
     path: '',
     component: MenuComponent,
@@ -11,10 +14,6 @@ export const routes: Routes = [
         path: '',
         redirectTo: 'auth',
         pathMatch: 'full',
-      },
-
-      { path: 'auth',
-        loadChildren: () => import('./feature/auth/auth.routes').then(m => m.AUTH_ROUTES),
       },
 
       {

@@ -15,7 +15,7 @@
 
       <!-- Formulario -->
       <ion-col size="12" size-md="8" size-lg="6" size-xl="5">
-        <ion-card class="border-green shadow-sm">
+        <ion-card class="login-card border-green shadow-sm">
           <ion-card-header>
             <ion-card-title class="text-green fw-medium">Iniciar Sesión</ion-card-title>
             <ion-card-subtitle class="text-marmol">Ingrese sus credenciales para acceder al sistema</ion-card-subtitle>
@@ -27,10 +27,7 @@
               <!-- Email -->
               <ion-item lines="full">
                 <ion-label position="stacked">Correo Electrónico</ion-label>
-                <ion-input
-                  type="email"
-                  formControlName="email"
-                  placeholder="Correo Electrónico"
+                <ion-input type="email" formControlName="email" placeholder="Correo Electrónico"
                   (ionBlur)="onEmailBlur()"
                   [class.is-invalid]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched"
                   autocomplete="username">
@@ -41,24 +38,24 @@
                 <ng-container *ngIf="e['email']">Ingresa un correo válido (ej. usuario&#64;dominio.com).</ng-container>
                 <ng-container *ngIf="e['maxlength']">El correo no puede superar 254 caracteres.</ng-container>
                 <ng-container *ngIf="e['onlySpaces']">El correo no puede ser solo espacios.</ng-container>
-                <ng-container *ngIf="e['pattern']">Ingresa un correo completo con dominio y TLD (ej. usuario&#64;dominio.com).</ng-container>
+                <ng-container *ngIf="e['pattern']">Ingresa un correo completo con dominio y TLD (ej.
+                  usuario&#64;dominio.com).</ng-container>
               </ion-note>
 
               <!-- Password -->
               <ion-item lines="full">
                 <ion-label position="stacked">Contraseña</ion-label>
-                <ion-input
-                  [type]="passwordVisible ? 'text' : 'password'"
-                  formControlName="password"
-                  placeholder="Contrase帽a"
-                  autocomplete="current-password"
+                <ion-input [type]="passwordVisible ? 'text' : 'password'" formControlName="password"
+                  placeholder="Contraseña" autocomplete="current-password"
                   [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched">
                 </ion-input>
-                <ion-button fill="clear" slot="end" (click)="togglePasswordVisibility()">
+                <!-- <ion-button slot="end" fill="clear" class="password-toggle" (click)="togglePasswordVisibility()">
                   <ion-icon [name]="passwordVisible ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
-                </ion-button>
+                </ion-button> -->
               </ion-item>
-              <ion-note color="danger" *ngIf="formLogin.get('password')?.touched && formLogin.get('password')?.errors as e">
+
+              <ion-note color="danger"
+                *ngIf="formLogin.get('password')?.touched && formLogin.get('password')?.errors as e">
                 <ng-container *ngIf="e['required']">La contraseña es obligatoria.</ng-container>
                 <ng-container *ngIf="e['minlength']">La contraseña debe tener al menos 6 caracteres.</ng-container>
                 <ng-container *ngIf="e['maxlength']">La contraseña no puede superar 128 caracteres.</ng-container>
@@ -71,7 +68,8 @@
                 </ion-router-link>
               </div>
 
-              <ion-button expand="block" type="submit" [disabled]="formLogin.invalid || formLogin.pending" class="ion-margin-top">
+              <ion-button expand="block" type="submit" [disabled]="formLogin.invalid || formLogin.pending"
+                class="ion-margin-top">
                 Iniciar Sesión
               </ion-button>
 
@@ -83,18 +81,11 @@
     </ion-row>
   </ion-grid>
 
-  <ion-alert
-    [isOpen]="showAlert"
-    [header]="alertHeader"
-    [message]="alertMessage"
-    [buttons]="alertButtons"
+  <ion-alert [isOpen]="showAlert" [header]="alertHeader" [message]="alertMessage" [buttons]="alertButtons"
     (didDismiss)="showAlert = false">
   </ion-alert>
 
-  <ion-loading
-    [isOpen]="showLoading"
-    message="Iniciando sesión..."
-    spinner="crescent"
+  <ion-loading [isOpen]="showLoading" message="Iniciando sesión..." spinner="crescent"
     (didDismiss)="showLoading = false">
   </ion-loading>
 

@@ -1,0 +1,109 @@
+.local-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.image-container {
+    height: 150px;
+    position: relative;
+
+    ion-img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+    }
+
+    .availability-tag {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        background: var(--ion-color-primary);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 10px;
+        text-transform: uppercase;
+    }
+
+    .unavailable {
+        background: var(--ion-color-danger);
+    }
+}
+
+.card-content {
+    padding: 12px;
+}
+
+.local-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.description {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 8px;
+    height: 3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.info-grid {
+    margin-bottom: 8px;
+
+    .info-label {
+        font-size: 0.7rem;
+        color: #888;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .info-value {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+}
+
+.card-divider {
+    margin: 8px 0;
+    --background: #eee;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .rent-section {
+        .rent-label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .rent-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--ion-color-success);
+        }
+    }
+
+    .actions {
+        display: flex;
+        gap: 4px;
+
+        ion-button {
+            --padding-start: 4px;
+            --padding-end: 4px;
+        }
+    }
+}

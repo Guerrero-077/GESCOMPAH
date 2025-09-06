@@ -1,87 +1,96 @@
 /* =========================
-   Logo
+   Login Styles (Fixes)
 ========================= */
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+ion-card.login-card {
+  max-width: 380px;
+  --background: var(--ion-background-color);
+  /* ancho controlado */
+  margin: 0 auto;
+  border-radius: 14px;
+  border: 1px solid var(--app-color-green);
+  box-shadow: 0 6px 14px rgba(20, 101, 48, 0.08);
+
+  ion-card-header {
+    text-align: center;
+    margin-bottom: 0.5rem;
+
+    ion-card-title {
+      color: var(--app-color-green);
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    ion-card-subtitle {
+      color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
+      font-size: 0.9rem;
+    }
+  }
+
+  ion-card-content {
+    form {
+      ion-item {
+        --background: var(--ion-background-color);
+        --color: var(--ion-text-color);
+        --border-radius: 8px;
+        --min-height: 48px;
+        --padding-start: 12px;
+        --inner-padding-end: 8px;
+        margin-bottom: 12px;
+        border: 1px solid color-mix(in srgb, var(--app-color-green) 25%, transparent);
+        border-radius: 8px;
+
+        ion-label {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--app-color-green);
+        }
+
+        ion-input {
+          font-size: 14px;
+          flex: 1;
+          /* 👈 hace que el input use todo el espacio disponible */
+          min-width: 0;
+          /* 👈 evita que se rompa el layout */
+          padding: 0.5rem 0.6rem;
+        }
+
+        ion-button[fill="clear"] {
+          --color: var(--app-color-green);
+          flex-shrink: 0;
+          /* 👈 evita que el botón encoja el input */
+          margin-right: 4px;
+        }
+      }
+
+      ion-note[color="danger"] {
+        margin-top: 4px;
+        font-size: 0.8rem;
+      }
+
+      ion-button {
+        margin-top: 14px;
+        width: 100%;
+        --background: var(--app-color-green);
+        --border-radius: 8px;
+        font-weight: 600;
+        --box-shadow: 0 4px 10px rgba(20, 101, 48, 0.2);
+      }
+  
+    }
+  }
+}
+
+/* Fix para la imagen del logo */
 .imagen-logo {
   max-width: 120px;
+  /* 👈 tamaño controlado */
   height: auto;
-  margin: 0 auto;
   display: block;
+  margin: 0 auto 1rem;
 }
 
-/* =========================
-   Cards
-========================= */
-ion-card {
-  border-radius: 16px;
-  border: 1px solid var(--ion-color-success, #146530);
-  box-shadow: 0 6px 14px rgba(20, 101, 48, .08);
-}
 
-/* =========================
-   Inputs
-========================= */
-ion-item {
-  --border-radius: 10px;
-  --border-color: var(--ion-color-medium-shade);
-  --padding-start: 12px;
-}
-
-ion-input {
-  padding: .6rem .9rem;
-}
-
-ion-input.is-invalid {
-  --highlight-color-focused: var(--ion-color-danger);
-  animation: field-pop .12s ease-out;
-}
-
-ion-note[color="danger"] {
-  margin-top: .35rem;
-  font-size: .85rem;
-}
-
-/* =========================
-   Botón principal
-========================= */
-ion-button {
-  border-radius: 10px;
-  font-weight: 600;
-  padding: .8rem 1rem;
-  --box-shadow: 0 6px 14px rgba(20, 101, 48, .18);
-}
-
-ion-button:hover {
-  filter: brightness(1.05);
-}
-
-ion-button:disabled {
-  opacity: .6;
-  --box-shadow: none;
-}
-
-/* Animación de inputs al marcar error */
-@keyframes field-pop {
-  from {
-    transform: scale(1.005);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-/* =========================
-   Responsividad
-========================= */
-@media (max-width: 575.98px) {
-  ion-card {
-    margin: 0 15px;
-  }
-
-  .imagen-logo {
-    max-width: 100px;
-  }
-
-  h2 {
-    font-size: 1.5rem !important;
-  }
-}

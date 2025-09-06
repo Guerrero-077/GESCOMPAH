@@ -1,38 +1,56 @@
-<!-- <ion-card class="local-card">
+<ion-card class="local-card">
+  <!-- Imagen principal -->
   <div class="image-container">
-    <ion-img [src]="primaryImage" [alt]="local.name" class="local-image"></ion-img>
+    <ion-img [src]="primaryImage" [alt]="local.name"></ion-img>
 
-    <div *ngIf="showAvailableTag" class="availability-tag" [class.unavailable]="!local.active">
+    <!-- Tag disponibilidad -->
+    <div *ngIf="showAvailableTag" [ngClass]="local.active ? 'availability-tag' : 'availability-tag unavailable'">
       {{ local.active ? 'Disponible' : 'Ocupado' }}
     </div>
   </div>
 
+  <!-- Contenido -->
   <ion-card-content class="card-content">
+    <!-- Nombre -->
     <h3 class="local-name">{{ local.name }}</h3>
+
+    <!-- Descripción -->
     <p class="description">{{ local.description }}</p>
 
+    <!-- Dirección y área -->
     <ion-grid class="info-grid">
       <ion-row>
-        <ion-col size="6">
+        <ion-col size="6" class="info-item">
           <span class="info-label">Dirección</span>
           <span class="info-value ellipsis">{{ local.address }}</span>
         </ion-col>
-        <ion-col size="6" class="text-end">
+        <ion-col size="6" class="info-item text-end">
           <span class="info-label">Área</span>
           <span class="info-value">{{ local.areaM2 }} m²</span>
         </ion-col>
       </ion-row>
     </ion-grid>
 
-    <hr class="card-divider" />
+    <!-- <ion-item-divider class="card-divider"></ion-item-divider> -->
 
-    <div class="d-flex justify-content-between align-items-center footer">
+    <!-- Precio y botones -->
+    <div class="footer">
       <div class="rent-section">
         <span class="rent-label">Precio</span>
         <div class="rent-price">{{ formattedRent }}</div>
       </div>
 
-      <app-button (onView)="handleView()" (onEdit)="handleEdit()" (onDelete)="handleDelete()"></app-button>
+      <div class="actions">
+        <ion-button fill="clear" size="small" color="primary" (click)="handleView()">
+          <ion-icon name="eye-outline"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" size="small" color="warning" (click)="handleEdit()">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" size="small" color="danger" (click)="handleDelete()">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+      </div>
     </div>
   </ion-card-content>
-</ion-card> -->
+</ion-card>

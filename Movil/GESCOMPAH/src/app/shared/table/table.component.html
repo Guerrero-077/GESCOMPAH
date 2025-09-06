@@ -1,0 +1,71 @@
+<ion-content>
+  <div class="table-wrapper p-3">
+
+    <!-- Encabezado -->
+    <div class="header m-2">
+      <h3 class="m-0 p-0">{{ titulo }}</h3>
+      <span class="m-0 p-0">{{ subTitulo }}</span>
+    </div>
+
+    <!-- 🔍 Buscador -->
+    <ion-searchbar
+      [(ngModel)]="filterKey"
+      (ionInput)="onFilterChange($event.detail.value || '')"
+      placeholder="Buscar...">
+    </ion-searchbar>
+
+    <!-- 📌 Lista en tarjetas responsive -->
+    <ion-grid *ngIf="hasData; else noDataTemplate">
+      <ion-row>
+        <ion-col
+          *ngFor="let row of dataSource"
+          size="12"
+          size-sm="6"
+          size-md="4"
+          size-lg="3"
+        >
+          <ion-card class="data-card">
+
+            <!-- Encabezado de la card -->
+            <ion-card-header>
+              <ion-card-title>{{ getValue(row, columns[0]?.key) }}</ion-card-title>
+              <ion-card-subtitle *ngIf="columns[1]">
+                {{ getValue(row, columns[1]?.key) }}
+              </ion-card-subtitle>
+              <div *ngFor="let col of columns.slice(2)">
+                <strong>{{ col.header }}:</strong> {{ getValue(row, col.key) }}
+              </div>
+            </ion-card-header>
+
+            <!-- Contenido dinámico -->
+            <ion-card-content>
+              <div *ngFor="let col of columns.slice(2)">
+                <strong>{{ col.header }}:</strong> {{ getValue(row, col.key) }}
+              </div>
+            </ion-card-content>
+
+            <!-- Acciones -->
+            <ion-row class="ion-justify-content-end ion-padding">
+              <ion-button size="small" fill="clear" *ngIf="showViewButton" (click)="onView(row)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
+              <ion-button size="small" fill="clear" (click)="onDownload?.(row)">
+                <ion-icon name="download-outline"></ion-icon>
+              </ion-button>
+            </ion-row>
+
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- 📌 Si no hay datos -->
+    <ng-template #noDataTemplate>
+      <div class="no-data-container">
+        <ion-icon name="cube-outline" class="no-data-icon"></ion-icon>
+        <div class="no-data-text">No hay registros disponibles.</div>
+      </div>
+    </ng-template>
+
+  </div>
+</ion-content>

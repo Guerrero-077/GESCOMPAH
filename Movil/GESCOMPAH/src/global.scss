@@ -35,3 +35,52 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Importar fuentes */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;500&display=swap');
+
+:root {
+    --font-heading: 'Montserrat', sans-serif;
+    --font-body: 'Open Sans', sans-serif;
+}
+
+/* Aplicar global */
+body {
+    font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ion-title,
+.menu-title {
+    font-family: var(--font-heading);
+}
+
+
+body.dark {
+    --ion-color-primary: #D1A500;
+    /* Amarillo oscuro moderado */
+    --ion-color-secondary: #1B5E20;
+    /* Verde oscuro */
+    --ion-background-color: #121212;
+    --ion-text-color: #E0E0E0;
+
+    --app-color-yellow: #D1A500;
+    --app-color-green: #1B5E20;
+}
+
+body.light {
+    --ion-color-primary: #FFC107;
+    /* Amarillo brillante */
+    --ion-color-secondary: #4CAF50;
+    /* Verde vibrante */
+    --ion-background-color: #FFFFFF;
+    --ion-text-color: #000000;
+
+    --app-color-yellow: #FFC107;
+    --app-color-green: #4CAF50;
+}

@@ -7,5 +7,10 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
-  constructor() {}
+  constructor() {
+    document.body.classList.remove('light'); // 👈 fuerza modo light
+    document.body.classList.add('dark'); // 👈 asegura light al iniciar
+  }
+
+
 }

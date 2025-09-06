@@ -1,0 +1,164 @@
+/* ====== STYLES: ION MENU ====== */
+ion-menu {
+    --width: 280px;
+    --background: var(--ion-background-color);
+
+    ion-header.menu-header {
+        ion-toolbar {
+            --background: var(--app-color-green);
+            /* dinámico */
+            --color: #fff;
+            height: 84px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            box-shadow: none;
+            font-family: var(--font-heading);
+        }
+
+        .menu-header-inner {
+            width: 100%;
+        }
+
+        .menu-brand {
+            color: #fff;
+
+            .menu-title {
+                font-family: var(--font-heading);
+                font-weight: 700;
+                font-size: 16px;
+            }
+
+            .menu-sub {
+                font-family: var(--font-body);
+                font-size: 12px;
+                opacity: 0.9;
+            }
+        }
+    }
+
+    ion-content {
+        background-color: var(--ion-background-color);
+        /* dinámico */
+        padding: 6px 0;
+    }
+
+    ion-list {
+        background-color: var(--ion-background-color);
+        /* dinámico */
+        margin-top: 6px;
+    }
+
+    ion-item {
+        --background: var(--ion-background-color);
+        --padding-start: 12px;
+        --min-height: 46px;
+        --border-style: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        --color: var(--ion-text-color);
+        /* dinámico */
+        font-family: var(--font-body);
+
+        ion-icon {
+            font-size: 18px;
+            color: var(--app-color-green);
+            /* dinámico */
+            opacity: 0.95;
+        }
+
+        ion-label {
+            font-size: 14px;
+            margin-left: 6px;
+        }
+
+        &:hover {
+            --background: color-mix(in srgb, var(--app-color-green) 6%, transparent);
+        }
+
+        &.selected {
+            --background: color-mix(in srgb, var(--app-color-green) 12%, transparent);
+            --color: var(--app-color-green);
+            font-weight: 600;
+        }
+    }
+
+    .menu-footer-spacer {
+        height: 12px;
+        display: block;
+    }
+}
+
+/* ====== STYLES: MAIN HEADER (inside #main-content) ====== */
+#main-content {
+    ion-header {
+        ion-toolbar {
+            --background: var(--ion-background-color);
+            /* dinámico */
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+            .app-toolbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                gap: 12px;
+            }
+
+            .brand {
+                display: flex;
+                flex-direction: column;
+
+                .brand-title {
+                    font-family: var(--font-heading);
+                    color: var(--app-color-green);
+                    /* dinámico */
+                    font-size: 18px;
+                    font-weight: 700;
+                    line-height: 1;
+                }
+
+                .brand-sub {
+                    font-family: var(--font-body);
+                    color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
+                    font-size: 12px;
+                    margin-top: 4px;
+                }
+            }
+
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .avatar {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: color-mix(in srgb, var(--app-color-green) 8%, transparent);
+
+                ion-icon {
+                    color: var(--app-color-green);
+                    font-size: 18px;
+                }
+            }
+
+            .user-meta {
+                .user-name {
+                    font-family: var(--font-body);
+                    color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
+                    font-size: 14px;
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+
+    ion-content {
+        padding: 16px;
+    }
+}

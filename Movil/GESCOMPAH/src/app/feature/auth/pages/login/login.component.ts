@@ -30,8 +30,7 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardSubtitle,
-  IonCardContent,
-  IonRouterLink
+  IonCardContent
 } from '@ionic/angular/standalone';
 
 function notOnlySpaces(): (

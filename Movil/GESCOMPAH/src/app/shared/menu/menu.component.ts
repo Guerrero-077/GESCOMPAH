@@ -18,7 +18,6 @@ import {
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss'],
   imports: [IonRouterOutlet, IonLabel,
-
     RouterModule,               // ⬅️ NECESARIO para routerLink
     IonIcon,
     IonItem,
@@ -34,5 +33,5 @@ import {
   ],
 })
 export class MenuComponent {
-
+  constructor() {}
 }
