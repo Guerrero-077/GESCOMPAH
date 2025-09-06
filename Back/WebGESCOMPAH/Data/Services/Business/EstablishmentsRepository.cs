@@ -13,6 +13,8 @@ namespace Data.Services.Business
         // Query base: filtros comunes
         private IQueryable<Establishment> BaseQuery() =>
             _dbSet.AsNoTracking()
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                   .Where(e => !e.IsDeleted &&
                               e.Plaza != null && e.Plaza.Active && !e.Plaza.IsDeleted)
                   .Include(e => e.Plaza)

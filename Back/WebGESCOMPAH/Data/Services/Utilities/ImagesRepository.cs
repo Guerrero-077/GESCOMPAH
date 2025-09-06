@@ -20,6 +20,8 @@ namespace Data.Services.Utilities
         {
             return await _dbSet
                 .AsNoTracking()
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Where(i => i.Active && !i.IsDeleted)
                 .ToListAsync();
         }

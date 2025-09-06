@@ -16,6 +16,8 @@ namespace Data.Services.Persons
         {
             return  await _dbSet
                 .Where(e => !e.IsDeleted)
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Include(e => e.City)
                 .Include(e => e.User)
                 .ToListAsync();

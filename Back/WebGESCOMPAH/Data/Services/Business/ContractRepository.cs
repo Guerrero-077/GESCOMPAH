@@ -14,6 +14,8 @@ namespace Data.Services.Business
         public override async Task<IEnumerable<Contract>> GetAllAsync()
         {
             return await _dbSet
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Include(c => c.Person).ThenInclude(p => p.User)
                 .Include(c => c.PremisesLeased).ThenInclude(pl => pl.Establishment).ThenInclude(e => e.Plaza)
                 .AsNoTracking()
@@ -35,7 +37,8 @@ namespace Data.Services.Business
         public async Task<IReadOnlyList<ContractCard>> GetCardsByPersonAsync(int personId) =>
             await _dbSet.AsNoTracking()
                 .Where(c => !c.IsDeleted && c.PersonId == personId)
-                .OrderByDescending(c => c.Id)
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Select(c => new ContractCard(
                     c.Id,
                     c.PersonId,

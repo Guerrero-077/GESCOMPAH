@@ -13,6 +13,8 @@ namespace Data.Services.Business
         {
             return await _dbSet
                 .Where(e => !e.IsDeleted)
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Include(e => e.Establishment)
                 .Include(e => e.Person)
                 .ToListAsync();

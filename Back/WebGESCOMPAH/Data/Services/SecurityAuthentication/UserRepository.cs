@@ -17,6 +17,8 @@ namespace Data.Services.SecurityAuthentication
             return await _dbSet
                 .AsNoTracking()
                 .Where(u => !u.IsDeleted)
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Include(u => u.Person)
                     .ThenInclude(p => p.City)
                 .ToListAsync();
