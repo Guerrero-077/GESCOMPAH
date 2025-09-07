@@ -6,6 +6,8 @@ import { FinanceComponent } from "../../components/finance/finance.component";
 import { CompanyComponent } from "../../components/company/company.component";
 import { ChangePasswordComponent } from "../../components/change-password/change-password.component";
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { ProfileFormComponent } from '../../components/profile-form/profile-form.component';
 
 @Component({
   selector: 'app-main-settings',
@@ -16,7 +18,9 @@ import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-h
     LocationSettingsComponent,
     FinanceComponent,
     // CompanyComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
+    HasRoleAndPermissionDirective,
+    ProfileFormComponent
 ],
   templateUrl: './main-settings.component.html',
   styleUrl: './main-settings.component.css',
@@ -35,6 +39,8 @@ export class MainSettingsComponent implements OnInit {
     } else if (index === 1) {
       this.pageHeaderService.setPageHeader('Ubicación', 'Gestión de ubicaciones');
     } else if (index === 2) {
+      this.pageHeaderService.setPageHeader('Actualiza tu información', 'Actualiza tus datos personales');
+    } else if (index === 3) {
       this.pageHeaderService.setPageHeader('Seguridad', 'Cambio de contraseña');
     }
   }

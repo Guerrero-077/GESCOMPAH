@@ -1,0 +1,87 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Tu Información Personal</mat-card-title>
+    <mat-card-subtitle>Actualiza tus datos personales.</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div *ngIf="isLoading" class="spinner-container">
+      <mat-spinner></mat-spinner>
+    </div>
+
+    <form [formGroup]="form" *ngIf="!isLoading">
+      <div class="form-row">
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Nombres</mat-label>
+          <input matInput formControlName="firstName">
+          <mat-error *ngIf="form.get('firstName')?.hasError('required')">El nombre es requerido.</mat-error>
+          <mat-error *ngIf="form.get('firstName')?.hasError('alphaHuman')">El nombre solo debe contener letras.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Apellidos</mat-label>
+          <input matInput formControlName="lastName">
+          <mat-error *ngIf="form.get('lastName')?.hasError('required')">El apellido es requerido.</mat-error>
+          <mat-error *ngIf="form.get('lastName')?.hasError('alphaHuman')">El apellido solo debe contener letras.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Documento</mat-label>
+          <input matInput formControlName="document" readonly>
+          <mat-error *ngIf="form.get('document')?.hasError('required')">El documento es requerido.</mat-error>
+          <mat-error *ngIf="form.get('document')?.hasError('colombianDocument')">El documento no es válido.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="phone">
+          <mat-error *ngIf="form.get('phone')?.hasError('required')">El teléfono es requerido.</mat-error>
+          <mat-error *ngIf="form.get('phone')?.hasError('colombianPhone')">El teléfono no es válido.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" readonly>
+        <mat-error *ngIf="form.get('email')?.hasError('required')">El email es requerido.</mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('email')">El email no es válido.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Dirección</mat-label>
+        <input matInput formControlName="address">
+        <mat-error *ngIf="form.get('address')?.hasError('required')">La dirección es requerida.</mat-error>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Departamento</mat-label>
+          <mat-select formControlName="departmentId">
+            <mat-option *ngFor="let dept of departments$ | async" [value]="dept.id">
+              {{ dept.name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('departmentId')?.hasError('required')">El departamento es requerido.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Ciudad</mat-label>
+          <mat-select formControlName="cityId">
+            <mat-option *ngFor="let city of cities$ | async" [value]="city.id">
+              {{ city.name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('cityId')?.hasError('required')">La ciudad es requerida.</mat-error>
+        </mat-form-field>
+      </div>
+
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || isSaving">
+      <span *ngIf="!isSaving">Guardar Cambios</span>
+      <mat-spinner *ngIf="isSaving" diameter="20"></mat-spinner>
+    </button>
+  </mat-card-actions>
+</mat-card>

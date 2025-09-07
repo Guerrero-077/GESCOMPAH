@@ -32,7 +32,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatProgressSpinnerModule,
     MatDialogModule,
     HasRoleAndPermissionDirective,
-
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
@@ -55,7 +54,6 @@ export class ContractsListComponent implements OnInit {
   columns: TableColumn<ContractCard>[] = [];
   isDownloadingPdf = false;
 
-  // IMPORTANTE: al estar FUERA de *ngIf, podemos usar static:true
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
   async ngOnInit(): Promise<void> {
@@ -79,7 +77,7 @@ export class ContractsListComponent implements OnInit {
     ];
   }
 
-  onCreateNew(): void {
+  onCreate(): void {
     const ref = this.dialog.open(FormContractComponent, {
       width: '800px',
       disableClose: true,
@@ -94,8 +92,9 @@ export class ContractsListComponent implements OnInit {
     });
   }
 
-  onView(row: ContractCard): void {}
-
+  onView(_row: ContractCard): void {
+    // TODO: abrir modal o navegar a detalle
+  }
 
   onDownload(row: ContractCard): void {
     if (this.isDownloadingPdf) {
@@ -131,6 +130,7 @@ export class ContractsListComponent implements OnInit {
       },
     });
   }
+
   async onToggleActive(row: ContractCard, e: { checked: boolean } | boolean): Promise<void> {
     const next = typeof e === 'boolean' ? e : !!e?.checked;
     try {
@@ -140,7 +140,6 @@ export class ContractsListComponent implements OnInit {
       this.toast.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
     }
   }
-
 
   async onDelete(row: ContractCard): Promise<void> {
     const ok = await this.confirmDialog.confirm({

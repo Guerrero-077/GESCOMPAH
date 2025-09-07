@@ -1,9 +1,11 @@
-<mat-tab-group (selectedIndexChange)="onTabChange($event)">
-  <!-- <mat-tab label="General">
+<mat-tab-group (selectedIndexChange)="onTabChange($event)" *appHasRoleAndPermission="'Administrador'; perms: 'VER'">
+
+  <mat-tab label="Actualiza tu información">
     <div class="tab-spacing">
-      <app-company></app-company>
+      <app-profile-form></app-profile-form>
     </div>
-  </mat-tab> -->
+  </mat-tab>
+
   <mat-tab label="finanzas">
     <div class="tab-spacing">
       <app-finance></app-finance>
@@ -21,3 +23,19 @@
   </mat-tab>
 </mat-tab-group>
 
+
+<mat-tab-group (selectedIndexChange)="onTabChange($event)" *appHasRoleAndPermission="'Arrendador'; perms: 'VER'">
+
+  <mat-tab label="Actualiza tu información">
+    <div class="tab-spacing">
+      <app-profile-form></app-profile-form>
+    </div>
+  </mat-tab>
+
+
+  <mat-tab label="Seguridad">
+    <div class="tab-spacing">
+      <app-change-password></app-change-password>
+    </div>
+  </mat-tab>
+</mat-tab-group>

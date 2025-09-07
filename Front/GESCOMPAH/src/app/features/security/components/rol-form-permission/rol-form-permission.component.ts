@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { combineLatest, take } from 'rxjs';
+import { combineLatest, EMPTY } from 'rxjs';
+import { catchError, finalize, filter, map, switchMap, take, tap } from 'rxjs/operators';
 
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
@@ -20,14 +21,14 @@ import { RolFormPermissionStore } from '../../services/rol-form-permission/rol-f
 import { RoleStore } from '../../services/role/role.store';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
+import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
 @Component({
   standalone: true,
   selector: 'app-rol-form-permission',
   templateUrl: './rol-form-permission.component.html',
-  styleUrl: './rol-form-permission.component.css',
+  styleUrls: ['./rol-form-permission.component.css'],
   imports: [
     CommonModule,
     GenericTableComponent,
@@ -37,6 +38,7 @@ import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRo
   ]
 })
 export class RolFormPermissionComponent implements OnInit, AfterViewInit {
+  // ===== Inyección =====
   private readonly rolFormPermissionStore = inject(RolFormPermissionStore);
   private readonly roleStore = inject(RoleStore);
   private readonly formStore = inject(FormStore);
@@ -45,14 +47,18 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
+  // ===== Estado =====
   items$ = this.rolFormPermissionStore.rolFormPermissions$;
+  columns!: TableColumn<RolFormPermissionGroupedModel>[];
+
+  // Lock por ítem para evitar doble clic y pérdida de feedback
+  private busyIds = new Set<number>();
+  isBusy = (id: number) => this.busyIds.has(id);
 
   @ViewChild('permissionsTemplate') permissionsTemplate!: TemplateRef<any>;
   @ViewChild('estadoTemplate') estadoTemplate!: TemplateRef<any>;
 
-  columns!: TableColumn<RolFormPermissionGroupedModel>[];
-
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.roleStore.loadAll();
@@ -72,12 +78,9 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
     this.cdr.detectChanges();
   }
 
+  // ===== Crear =====
   onCreateNew(): void {
-    combineLatest([
-      this.roleStore.roles$,
-      this.formStore.forms$,
-      this.permissionStore.permissions$
-    ])
+    combineLatest([this.roleStore.roles$, this.formStore.forms$, this.permissionStore.permissions$])
       .pipe(take(1))
       .subscribe(([roles, forms, permissions]) => {
         const dialogRef = this.dialog.open(FormDialogComponent, {
@@ -94,34 +97,30 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           }
         });
 
-        dialogRef.afterClosed().subscribe((result: any) => {
-          if (!result) return;
-
-          const payload: RolFormPermissionCreateModel = {
+        dialogRef.afterClosed().pipe(
+          filter(Boolean),
+          map((result: any) => ({
             rolId: +result.rolId,
             formId: +result.formId,
             permissionIds: result.permissionIds
-          };
-
-          this.rolFormPermissionStore.create(payload).subscribe({
-            next: () => {
-              this.sweetAlertService.showNotification('Creado', 'Relación creada con éxito.', 'success');
-            },
-            error: err => {
-              console.error('Error creando:', err);
-              this.sweetAlertService.showNotification('Error', 'No se pudo crear.', 'error');
-            }
-          });
-        });
+          }) as RolFormPermissionCreateModel),
+          switchMap(payload =>
+            this.rolFormPermissionStore.create(payload).pipe(
+              tap(() => this.sweetAlertService.showNotification('Creado', 'Relación creada con éxito.', 'success')),
+              catchError(err => {
+                console.error('Error creando:', err);
+                this.sweetAlertService.showNotification('Error', 'No se pudo crear.', 'error');
+                return EMPTY;
+              })
+            )
+          )
+        ).subscribe();
       });
   }
 
+  // ===== Editar =====
   onEdit(row: RolFormPermissionGroupedModel): void {
-    combineLatest([
-      this.roleStore.roles$,
-      this.formStore.forms$,
-      this.permissionStore.permissions$
-    ])
+    combineLatest([this.roleStore.roles$, this.formStore.forms$, this.permissionStore.permissions$])
       .pipe(take(1))
       .subscribe(([roles, forms, permissions]) => {
         const entityForDialog = {
@@ -145,30 +144,30 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           }
         });
 
-        dialogRef.afterClosed().subscribe((result: any) => {
-          if (!result) return;
-
-          const payload: RolFormPermissionUpdateModel = {
-            id: 0, // El ID ya no es relevante para un grupo, pero el DTO lo requiere
+        dialogRef.afterClosed().pipe(
+          filter(Boolean),
+          map((result: any) => ({
+            id: row.id, // si tu backend usa clave compuesta, cambia a método por grupo
             rolId: +result.rolId,
             formId: +result.formId,
             permissionIds: result.permissionIds,
             active: result.active
-          };
-
-          this.rolFormPermissionStore.update(payload).subscribe({
-            next: () => {
-              this.sweetAlertService.showNotification('Actualizado', 'Relación actualizada con éxito.', 'success');
-            },
-            error: err => {
-              console.error('Error actualizando:', err);
-              this.sweetAlertService.showNotification('Error', 'No se pudo actualizar.', 'error');
-            }
-          });
-        });
+          }) as RolFormPermissionUpdateModel),
+          switchMap(payload =>
+            this.rolFormPermissionStore.update(payload).pipe(
+              tap(() => this.sweetAlertService.showNotification('Actualizado', 'Relación actualizada con éxito.', 'success')),
+              catchError(err => {
+                console.error('Error actualizando:', err);
+                this.sweetAlertService.showNotification('Error', 'No se pudo actualizar.', 'error');
+                return EMPTY;
+              })
+            )
+          )
+        ).subscribe();
       });
   }
 
+  // ===== Eliminar (grupo) =====
   async onDelete(row: RolFormPermissionGroupedModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar Grupo de Permisos',
@@ -176,13 +175,10 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar'
     });
-
     if (!confirmed) return;
 
-    this.rolFormPermissionStore.deleteByGroup(row.rolId, row.formId).subscribe({
-      next: () => {
-        this.sweetAlertService.showNotification('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success');
-      },
+    this.rolFormPermissionStore.deleteByGroup(row.rolId, row.formId).pipe(take(1)).subscribe({
+      next: () => this.sweetAlertService.showNotification('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success'),
       error: err => {
         console.error('Error eliminando:', err);
         this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el grupo.', 'error');
@@ -194,29 +190,45 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
     console.log('Vista detalle:', row);
   }
 
-  // ----- Toggle estado (activo/inactivo) -----
-  onToggleActive(row: RolFormPermissionGroupedModel, e: { checked: boolean }) {
+  // ===== Toggle Activo/Inactivo =====
+  /**
+   * Acepta boolean o {checked:boolean}. Evita perder feedback si el toggle emite boolean puro.
+   * HTML: (toggleChange)="onToggleActive(row, $event)"
+   */
+  onToggleActive(row: RolFormPermissionGroupedModel, e: boolean | { checked: boolean }): void {
+    if (this.isBusy(row.id)) return;
+
+    const checked = typeof e === 'boolean' ? e : !!e?.checked;
     const previous = row.active;
-    row.active = e.checked;
-    this.rolFormPermissionStore.changeActiveStatus(row.id, e.checked).subscribe({
-      next: (updated) => {
-        row.active = updated.active ?? row.active;
+
+    // Optimistic UI + lock por ítem
+    this.busyIds.add(row.id);
+    row.active = checked;
+
+    // Nota: si tu backend expone cambio por grupo, usa:
+    // this.rolFormPermissionStore.changeActiveStatusByGroup(row.rolId, row.formId, checked)
+    this.rolFormPermissionStore.changeActiveStatus(row.id, checked).pipe(
+      take(1),
+      tap(updated => {
+        // Si la API devuelve 204, updated puede venir undefined
+        row.active = updated?.active ?? checked;
         this.sweetAlertService.showNotification(
           'Éxito',
-          `Permiso ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          `Permisos del grupo ${row.active ? 'activados' : 'desactivados'} correctamente.`,
           'success'
         );
-      },
-      error: (err) => {
-        row.active = previous;
+      }),
+      catchError(err => {
+        console.error('Error cambiando estado:', err);
+        row.active = previous; // revertir
         this.sweetAlertService.showNotification(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'
         );
-      }
-    });
+        return EMPTY;
+      }),
+      finalize(() => this.busyIds.delete(row.id))
+    ).subscribe();
   }
-
-
 }

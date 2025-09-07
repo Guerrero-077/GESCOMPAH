@@ -15,12 +15,11 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/service/auth/auth.service';
 import { PermissionService } from '../../../core/service/permission/permission.service';
 import { SweetAlertService } from '../../Services/sweet-alert/sweet-alert.service';
-import { BackendMenuItem, SidebarItem } from './sidebar.config';
+import { BackendMenuItem, BackendSubMenuItem, SidebarItem, SidebarNode } from './sidebar.config';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  // ✅ Encapsulación por defecto (Emulated). ¡No uses None!
   imports: [CommonModule, RouterModule, MatListModule, MatIconModule, MatExpansionModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
@@ -70,53 +69,101 @@ export class SidebarComponent {
       });
   }
 
-  // ---------- Helpers de menú ----------
+  // =========================================================
+  // Menú: transforma módulo -> árbol (hasta 3 niveles)
+  // =========================================================
   private transformMenu(backendMenu: readonly BackendMenuItem[] | null): SidebarItem[] {
     if (!backendMenu) return [];
 
-    const sortedMenu = [...backendMenu].sort((a, b) => a.id - b.id);
+    // Orden estable por id de módulo
+    const modules = [...backendMenu].sort((a, b) => a.id - b.id);
 
-    return sortedMenu.flatMap<SidebarItem>((module) => {
-      const forms = [...(module.forms ?? [])]
-        .sort((a, b) => a.id - b.id)
-        .filter((f, i, arr) => arr.findIndex((x) => x.route === f.route) === i);
+    return modules.flatMap<SidebarItem>((mod) => {
+      const forms = dedupeByRoute([...mod.forms].sort((a, b) => a.id - b.id));
 
       if (forms.length === 0) return [];
 
-      if (forms.length === 1) {
-        const only = forms[0];
-        return [
-          {
-            label: module.name,
-            icon: module.icon,
-            route: `/admin/${only.route}`,
-            children: [],
-          },
-        ];
+      // 1) Construimos árbol por parentId (scope: dentro del módulo)
+      const nodesById = new Map<number, SidebarNode>();
+      forms.forEach(f =>
+        nodesById.set(f.id, {
+          id: f.id,
+          label: f.name,
+          route: f.route || undefined,
+          children: [],
+        })
+      );
+
+      const roots: SidebarNode[] = [];
+      for (const f of forms) {
+        const node = nodesById.get(f.id)!;
+        if (f.parentId && nodesById.has(f.parentId)) {
+          nodesById.get(f.parentId)!.children.push(node);
+        } else {
+          roots.push(node);
+        }
       }
 
-      return [
-        {
-          label: module.name,
-          icon: module.icon,
-          children: forms.map((f) => ({
-            label: f.name,
-            icon: '',
-            route: `/admin/${f.route}`,
-          })),
-        },
-      ];
+      // 2) Normalizamos:
+      // - Si hay 1 root y no tiene hijos => ítem directo (link)
+      // - En caso contrario => acordeón con children (roots)
+      if (roots.length === 1 && roots[0].children.length === 0) {
+        // Ítem directo: módulo con único form simple
+        const only = roots[0];
+        return [{
+          label: mod.name,
+          icon: mod.icon,
+          route: `/admin/${only.route}`,
+          children: [],
+        }];
+      }
+
+      // Acordeón: módulo con 1..n roots (cada root puede tener hijos)
+      return [{
+        label: mod.name,
+        icon: mod.icon,
+        children: roots.map(r => normalizeRoutes(r)), // asegura que los leaves tengan route
+      }];
     });
+
+    // --- helpers locales ---
+    function dedupeByRoute(arr: BackendSubMenuItem[]): BackendSubMenuItem[] {
+      const seen = new Set<string>();
+      return arr.filter(x => {
+        const key = x.route;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    // si un nodo "root" no tiene route pero tiene hijos, no pasa nada:
+    // el template lo pintará como título de subgrupo (no clickeable)
+    function normalizeRoutes(n: SidebarNode): SidebarNode {
+      return {
+        ...n,
+        children: (n.children ?? []).map(c => normalizeRoutes(c)),
+      };
+    }
   }
 
+  // ============== Active states ==================
   isGroupActive(item: SidebarItem): boolean {
-    return (item.children ?? []).some((c) => this.router.isActive(c.route, this.exactMatch));
+    // activo si alguno de sus hijos (o subhijos) está activo
+    return (item.children ?? []).some(c => this.isNodeActive(c));
+  }
+
+  private isNodeActive(node: SidebarNode): boolean {
+    if (node.route && this.router.isActive(`/admin/${node.route}`, this.exactMatch)) return true;
+    return (node.children ?? []).some(ch => this.isNodeActive(ch));
   }
 
   isSingleActive(item: SidebarItem): boolean {
     return !!item.route && this.router.isActive(item.route, this.exactMatch);
   }
 
+  // ============== trackBys ==================
   trackByItem = (_: number, item: SidebarItem) => item.label;
-  trackByChild = (_: number, child: { route: string }) => child.route;
+  trackByChild = (_: number, child: SidebarNode) => String(child.id ?? child.label);
+  trackByGrand = (_: number, child: SidebarNode) => String(child.id ?? child.label);
 }

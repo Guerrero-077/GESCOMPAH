@@ -31,7 +31,7 @@
         [showViewButton]="true"
         [detailTemplate]="accionesContrato"
         (view)="onView($event)"
-        (create)="onCreateNew()">
+        (create)="onCreate()">
       </app-generic-table>
     </div>
   </ng-container>
@@ -44,10 +44,7 @@
   </div>
 </ng-template>
 
-<!-- ===========================================================
-     Template PARA ACCIONES (Descargar + Ver)
-     Ubicado FUERA de *ngIf/*ngTemplate para que exista siempre
-     =========================================================== -->
+<!-- Template para ACCIONES (Descargar + Ver) -->
 <ng-template #accionesContrato let-row>
   <div class="d-inline-flex align-items-center gap-1">
     <button mat-icon-button
@@ -67,10 +64,7 @@
   </div>
 </ng-template>
 
-<!-- ===========================================================
-     Template PARA COLUMNA 'Estado'
-     (ubicado FUERA de *ngIf/*ngTemplate para que ViewChild lo vea)
-     =========================================================== -->
+<!-- Template PARA COLUMNA 'Estado' -->
 <ng-template #estadoTemplate let-row>
   <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
     <span class="badge align-middle" [ngClass]="row.active ? 'badge-success--solid' : 'badge-warning'">

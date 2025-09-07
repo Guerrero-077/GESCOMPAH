@@ -6,7 +6,7 @@
         public string FullName { get; set; } = null!;
         public string Email { get; set; } = null!;
 
-
+        public int PersonId { get; set; }
         public IEnumerable<string> Roles { get; set; } = [];
         //public IEnumerable<string> Permissions { get; set; } = [];
 

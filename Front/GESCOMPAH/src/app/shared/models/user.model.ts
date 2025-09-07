@@ -6,4 +6,5 @@ export interface User {
   email: string;
   roles: string[];
   menu: BackendMenuItem[];
+  personId?: number; // Optional for safety
 }

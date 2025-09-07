@@ -1,18 +1,19 @@
-import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
-import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { CityStore } from '../../services/city/city.store';
-import { Observable } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
-import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service'
-import { CitySelectModel } from '../../models/city.models';
-import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { Observable, EMPTY } from 'rxjs';
+import { catchError, finalize, take, tap } from 'rxjs/operators';
 
+import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
+import { TableColumn } from '../../../../shared/models/TableColumn.models';
+import { CityStore } from '../../services/city/city.store';
+import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { CitySelectModel } from '../../models/city.models';
+import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
 @Component({
   selector: 'app-city',
@@ -31,7 +32,6 @@ import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRo
 })
 export class CityComponent implements OnInit {
   cities$: Observable<CitySelectModel[]>;
-
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
   columns: TableColumn<CitySelectModel>[] = [
@@ -39,6 +39,13 @@ export class CityComponent implements OnInit {
     { key: 'name', header: 'Nombre' },
     { key: 'departmentName', header: 'Departamento' }
   ];
+
+  // ---- Lock por ítem (evita doble clic durante la llamada)
+  private busyIds = new Set<number>();
+  isBusy = (id: number) => this.busyIds.has(id);
+
+  // DI
+  private readonly cdr = inject(ChangeDetectorRef);
 
   constructor(
     private store: CityStore,
@@ -51,93 +58,100 @@ export class CityComponent implements OnInit {
   ngOnInit(): void {
     this.columns = [
       ...this.columns,
-      {
-        key: 'active',
-        header: 'Estado',
-        type: 'custom',
-        template: this.estadoTemplate
-      }
+      { key: 'active', header: 'Estado', type: 'custom', template: this.estadoTemplate }
     ];
   }
 
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '400px',
-      data: {
-        entity: {},
-        formType: 'City'
-      }
+      data: { entity: {}, formType: 'City' }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.create(result).subscribe({
-          next: () => {
-            this.sweetAlert.showNotification('Éxito', 'Ciudad creada exitosamente', 'success');
-          }
-        });
-      }
+      if (!result) return;
+      this.store.create(result).pipe(take(1)).subscribe({
+        next: () => {
+          this.sweetAlert.showNotification('Éxito', 'Ciudad creada exitosamente', 'success');
+          this.cdr.markForCheck();
+        }
+      });
     });
   }
 
   openEditDialog(row: CitySelectModel): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '400px',
-      data: {
-        entity: row,
-        formType: 'City'
-      }
+      data: { entity: row, formType: 'City' }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.update(result).subscribe({
-          next: () => {
-            this.sweetAlert.showNotification('Éxito', 'Ciudad actualizada exitosamente', 'success');
-          }
-        });
-      }
+      if (!result) return;
+      this.store.update(result).pipe(take(1)).subscribe({
+        next: () => {
+          this.sweetAlert.showNotification('Éxito', 'Ciudad actualizada exitosamente', 'success');
+          this.cdr.markForCheck();
+        }
+      });
     });
   }
 
   handleDelete(row: CitySelectModel): void {
-    if (row.id) {
-      this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(result => {
-        if (result.isConfirmed) {
-          this.store.delete(row.id).subscribe({
-            next: () => {
-              this.sweetAlert.showNotification('Éxito', 'Ciudad eliminada exitosamente', 'success');
-            }
-          });
+    if (!row.id) return;
+    this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(res => {
+      if (!res.isConfirmed) return;
+      this.store.delete(row.id!).pipe(take(1)).subscribe({
+        next: () => {
+          this.sweetAlert.showNotification('Éxito', 'Ciudad eliminada exitosamente', 'success');
+          this.cdr.markForCheck();
         }
       });
-    }
+    });
   }
 
+  // ===== Toggle Activo/Inactivo =====
+  /**
+   * Acepta boolean o {checked:boolean}. Con OnPush, marcamos la vista tras cambios.
+   * En el HTML: (toggleChange)="onToggleActive(row, $event)"  [disabled]="isBusy(row.id)"
+   */
+  onToggleActive(row: CitySelectModel, e: boolean | { checked: boolean }) {
+    if (this.isBusy(row.id)) return;
 
-  // ----- Toggle estado (activo/inactivo) -----
-  onToggleActive(row: CitySelectModel, e: { checked: boolean }) {
+    const checked = typeof e === 'boolean' ? e : !!e?.checked;
     const previous = row.active;
-    row.active = e.checked;
-    this.store.changeActiveStatus(row.id, e.checked).subscribe({
-      next: (updated) => {
-        // sincronizar con lo que devuelve el backend
-        row.active = updated.active ?? row.active;
+
+    // Optimistic UI + lock
+    this.busyIds.add(row.id);
+    row.active = checked;
+    this.cdr.markForCheck();
+
+    this.store.changeActiveStatus(row.id, checked).pipe(
+      take(1),
+      tap(updated => {
+        // Si la API devuelve 204 No Content, updated será undefined
+        row.active = updated?.active ?? checked;
         this.sweetAlert.showNotification(
           'Éxito',
-          `Ciudad ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          `Ciudad ${row.active ? 'activada' : 'desactivada'} correctamente.`,
           'success'
         );
-      },
-      error: (err) => {
-        // revertir si falla
+        this.cdr.markForCheck();
+      }),
+      catchError(err => {
+        // revertimos
         row.active = previous;
         this.sweetAlert.showNotification(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'
         );
-      }
-    });
+        this.cdr.markForCheck();
+        return EMPTY;
+      }),
+      finalize(() => {
+        this.busyIds.delete(row.id);
+        this.cdr.markForCheck();
+      })
+    ).subscribe();
   }
 }

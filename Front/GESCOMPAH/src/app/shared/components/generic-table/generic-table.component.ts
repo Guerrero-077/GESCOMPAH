@@ -11,7 +11,7 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
-  TemplateRef, // 👈 nuevo
+  TemplateRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,7 +26,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { TableColumn } from '../../models/TableColumn.models';
 import { HasRoleAndPermissionDirective } from '../../../core/Directives/HasRoleAndPermission.directive';
-
 
 export type RowDetailContext<T> = { $implicit: T; row: T };
 
@@ -51,7 +50,10 @@ export type RowDetailContext<T> = { $implicit: T; row: T };
   styleUrls: ['./generic-table.component.css']
 })
 export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  @Input() data: T[] | null = null;
+  // ★ Acepta readonly arrays también
+  @Input() data: readonly T[] | T[] | null = null;
+  // (opcional) podrías hacer también readonly aquí:
+  // @Input() columns: ReadonlyArray<TableColumn<T>> = [];
   @Input() columns: TableColumn<T>[] = [];
 
   @Input() createButtonLabel = '+ Crear';
@@ -72,10 +74,9 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   @Output() view = new EventEmitter<T>();
   @Output() create = new EventEmitter<void>();
 
-  // 👇 Nuevo: template de detalle y expansión
   @Input() detailTemplate?: TemplateRef<RowDetailContext<T>>;
-  @Input() expandableRows = true;              // permite expandir en la tabla
-  expandedRow: T | null = null;                // expansión simple; si quieres múltiple, usa un Set<T>
+  @Input() expandableRows = true;
+  expandedRow: T | null = null;
 
   displayedColumns: string[] = [];
   dataSource = new MatTableDataSource<T>();
@@ -101,7 +102,8 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
 
   ngOnInit() {
     this.updateDisplayedColumns();
-    this.dataSource.data = this.data || [];
+    // ★ Clona para romper readonly y evitar mutaciones del input
+    this.dataSource.data = this.data ? [...this.data] as T[] : [];
 
     this.filterSubject
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
@@ -117,7 +119,8 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     }
 
     if (changes['data']) {
-      this.dataSource.data = this.data || [];
+      // ★ Siempre clona al asignar
+      this.dataSource.data = this.data ? [...this.data] as T[] : [];
 
       if (this._paginator) {
         const pageSize = this._paginator.pageSize || 5;
@@ -143,7 +146,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   private updateDisplayedColumns(): void {
     this.displayedColumns = this.columns.map(col => col.key.toString());
     if (this.showActionsColumn) this.displayedColumns.push('actions');
-    // Nota: NO agregamos 'detail' a displayedColumns; es una fila aparte.
   }
 
   private connectPaginator() {
@@ -165,7 +167,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   onEdit(row: T) { this.edit.emit(row); }
   onDelete(row: T) { this.delete.emit(row); }
 
-  // 👇 Si hay detailTemplate, el botón "Ver" alterna la expansión; si no, emite view() como antes
   onView(row: T) {
     if (this.expandableRows && this.detailTemplate) {
       this.expandedRow = (this.expandedRow === row) ? null : row;
