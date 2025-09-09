@@ -35,6 +35,7 @@ using Entity.DTOs.Implements.Business.Clause;
 using Entity.Infrastructure.Binder;
 using Mapster;
 using Utilities.Messaging.Implements;
+using Utilities.Messaging.Factories;
 using Utilities.Messaging.Interfaces;
 using WebGESCOMPAH.Infrastructure;
 using WebGESCOMPAH.Middleware;
@@ -51,7 +52,8 @@ namespace WebGESCOMPAH.Extensions
 
             services.AddScoped<IUserMeRepository, MeRepository>();
 
-            //Email
+            //Email (Factory + fachada)
+            services.AddSingleton<IEmailServiceFactory, EmailServiceFactory>();
             services.AddTransient<ISendCode, EmailService>();
 
             //Auth

@@ -7,6 +7,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Hangfire.SqlServer;
+using Hangfire.Server;                   // ✅ Necesario para JobCancellationToken.Null
 using TimeZoneConverter;
 using Utilities.Helpers.CloudinaryHelper;
 using WebGESCOMPAH.Extensions;
@@ -32,7 +33,7 @@ builder.Services.AddCustomCors(builder.Configuration);
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<CookieSettings>(builder.Configuration.GetSection("Cookie"));
 builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddApplicationServices();
+builder.Services.AddApplicationServices();   // ← aquí registras tus servicios de capa Business/Data
 
 // MULTI-DB (SqlServer + Postgres según tu extensión)
 builder.Services.AddDatabase(builder.Configuration);
@@ -81,7 +82,7 @@ builder.Services.AddHangfire(cfg =>
            });
 });
 
-// Servidor de procesos Hangfire (ANTES de Build) — UNA sola vez
+// Servidor de procesos Hangfire — UNA sola vez
 builder.Services.AddHangfireServer(options =>
 {
     options.Queues = new[] { "default", "maintenance" };
@@ -121,7 +122,7 @@ app.MapHub<ContractsHub>("/api/hubs/contracts");
 // HANGFIRE Dashboard + Recurring Job
 // --------------------------
 
-// En Dev: abre para loopback (HangfireDashboardDevAuth). En Prod: exige rol "Administrador".
+// En Dev: abre para loopback (HangfireDashboardAuth). En Prod: exige rol "Administrador".
 var dashboardAuth = app.Environment.IsDevelopment()
     ? (Hangfire.Dashboard.IDashboardAuthorizationFilter)new HangfireDashboardAuth()
     : new HangfireDashboardAuth();
@@ -138,12 +139,12 @@ var tz = TZConvert.GetTimeZoneInfo(builder.Configuration["Hangfire:TimeZoneIana"
 // Registrar job recurrente (cola "maintenance")
 RecurringJob.AddOrUpdate<ObligationJobs>(
     recurringJobId: "obligations-monthly",
-    methodCall: j => j.GenerateForCurrentMonthAsync(CancellationToken.None),
+    methodCall: j => j.GenerateForCurrentMonthAsync(JobCancellationToken.Null), 
     cronExpression: cron,
     options: new RecurringJobOptions { TimeZone = tz, QueueName = "maintenance" }
 );
 
-// (Opcional) Smoke test en cola default:
+// (Opcional) Smoke test:
 // BackgroundJob.Enqueue(() => Console.WriteLine($"Hangfire OK {DateTime.UtcNow:O}"));
 
 // --------------------------

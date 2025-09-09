@@ -16,7 +16,7 @@
 
 .custom-card .icon {
     font-size: 48px;
-    color: #c99400; /* Amarillo café */
+    color: var(--yellow-400); /* Amarillo café */
     margin-bottom: 0.5rem;
 }
 

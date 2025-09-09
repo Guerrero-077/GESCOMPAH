@@ -1,7 +1,13 @@
 ﻿using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.ObligationMonth;
 using Hangfire;
+using Hangfire.Server;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TimeZoneConverter;
 using WebGESCOMPAH.Controllers.Base;
 using WebGESCOMPAH.RealTime;
@@ -11,7 +17,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
     [ApiController]
     [Route("api/obligation-months")]
     [Produces("application/json")]
-    // [Authorize(Roles = "Administrador")] // ← habilítalo en producción si aplica
+    // [Authorize(Roles = "Administrador")]
     public sealed class ObligationMonthsController
            : BaseController<ObligationMonthSelectDto, ObligationMonthDto, ObligationMonthUpdateDto>
     {
@@ -34,17 +40,15 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         }
 
         /// <summary>
-        /// Ejecuta sincrónicamente el cálculo de obligaciones para el período indicado (o el actual).
+        /// Ejecuta SINCRÓNICAMENTE el cálculo de obligaciones para el período indicado (o el actual).
         /// </summary>
-        /// <param name="year">Año (opcional)</param>
-        /// <param name="month">Mes 1-12 (opcional)</param>
         [HttpPost("generate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Generate([FromQuery] int? year, [FromQuery] int? month, CancellationToken ct)
         {
             var (y, m) = ResolvePeriod(year, month);
-            if (m < 1 || m > 12) return BadRequest("El parámetro 'month' debe estar entre 1 y 12.");
+            if (m is < 1 or > 12) return BadRequest("El parámetro 'month' debe estar entre 1 y 12.");
 
             _logger.LogInformation("Generación SINCRONA de obligaciones para {Year}-{Month}", y, m);
             await _svc.GenerateMonthlyAsync(y, m);
@@ -60,11 +64,11 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         public IActionResult Enqueue([FromQuery] int? year, [FromQuery] int? month)
         {
             var (y, m) = ResolvePeriod(year, month);
-            if (m < 1 || m > 12) return BadRequest("El parámetro 'month' debe estar entre 1 y 12.");
+            if (m is < 1 or > 12) return BadRequest("El parámetro 'month' debe estar entre 1 y 12.");
 
-            // Encola en la cola "maintenance" (coincide con tu Program.cs)
+            // Encola en la cola "maintenance" y pasa un IJobCancellationToken válido
             var jobId = _jobs.Enqueue<ObligationJobs>(
-                j => j.GenerateForPeriodAsync(y, m, CancellationToken.None));
+                j => j.GenerateForPeriodAsync(y, m, JobCancellationToken.Null));
 
             _logger.LogInformation("Job encolado para obligaciones {Year}-{Month}. JobId={JobId}", y, m, jobId);
             return Accepted(new { message = "Job encolado", jobId, year = y, month = m });
@@ -94,14 +98,11 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             return NoContent();
         }
 
-        // ------------------------
-        // Helpers
-        // ------------------------
+        // ------------------------ Helpers ------------------------
         private (int year, int month) ResolvePeriod(int? year, int? month)
         {
             if (year.HasValue && month.HasValue) return (year.Value, month.Value);
 
-            // Usa la zona en config para que “mes actual” sea consistente con tu negocio
             var tzId = _cfg["Hangfire:TimeZoneIana"] ?? "America/Bogota";
             var tz = TZConvert.GetTimeZoneInfo(tzId);
             var nowLocal = TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
