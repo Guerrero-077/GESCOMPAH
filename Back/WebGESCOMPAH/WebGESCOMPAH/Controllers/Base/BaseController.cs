@@ -69,14 +69,11 @@ namespace WebGESCOMPAH.Controllers.Base
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ChangeActiveStatus(
-            int id,
-            [FromBody] ChangeActiveStatusRequest body)
+        public virtual async Task<IActionResult> ChangeActiveStatus(int id, [FromBody] ChangeActiveStatusRequest body)
         {
             await Service.UpdateActiveStatusAsync(id, body.Active!.Value);
-            return NoContent(); // 204
+            return NoContent();
         }
-
 
         //public virtual async Task<ActionResult<TGet>> ChangeActiveStatus(
         //    int id, [FromBody] ChangeActiveStatusDto body)

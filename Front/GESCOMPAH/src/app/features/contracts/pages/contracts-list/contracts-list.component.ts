@@ -1,19 +1,16 @@
-import { Component, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { take, switchMap, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 import { ContractCard } from '../../models/contract.models';
-import { TableColumn } from '../../../../shared/models/TableColumn.models';
-
 import { ContractStore } from '../../services/contract/contract.store';
 import { ContractService } from '../../services/contract/contract.service';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
-import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormContractComponent } from '../../components/form-contract/form-contract.component';
@@ -21,60 +18,80 @@ import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRo
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
+import { ContractsRealtimeService } from '../../../../core/service/realtime/contracts-realtime.service';
+import { ContractDetailDialogComponent } from '../../components/contract-detail-dialog/contract-detail-dialog.component';
 
 @Component({
   selector: 'app-contracts-list',
   standalone: true,
   imports: [
     CommonModule,
-    GenericTableComponent,
-    ToggleButtonComponent,
-    MatProgressSpinnerModule,
+    // UI
     MatDialogModule,
-    HasRoleAndPermissionDirective,
+    MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
+    // Custom
+    ToggleButtonComponent,
+    HasRoleAndPermissionDirective,
   ],
   templateUrl: './contracts-list.component.html',
   styleUrls: ['./contracts-list.component.css'],
 })
-export class ContractsListComponent implements OnInit {
+export class ContractsListComponent implements OnInit, OnDestroy {
   private readonly store = inject(ContractStore);
   private readonly svc = inject(ContractService);
   private readonly dialog = inject(MatDialog);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly toast = inject(SweetAlertService);
   private readonly pageHeader = inject(PageHeaderService);
+  private readonly realtime = inject(ContractsRealtimeService);
 
-  readonly rows = this.store.items;
-  readonly loading = this.store.loading;
-  readonly error = this.store.error;
+  readonly rows = this.store.items;       // signal<readonly ContractCard[]>
+  readonly loading = this.store.loading;  // signal<boolean>
+  readonly error = this.store.error;      // signal<string|null>
 
-  columns: TableColumn<ContractCard>[] = [];
+  // --- Filtro y derivadas ---
+  readonly filterKey = signal<string>('');
+
+  // ✅ Nota: devolvemos "readonly ContractCard[]" para no chocar con store.items
+  readonly filtered = computed<readonly ContractCard[]>(() => {
+    const list = this.rows() ?? [];
+    const q = this.filterKey().trim().toLowerCase();
+    if (!q) return list; // ya es readonly
+    // Array.filter<T> devuelve T[], que es asignable a readonly T[]
+    return list.filter(it => (
+      it.personFullName?.toLowerCase().includes(q) ||
+      it.personDocument?.toLowerCase().includes(q) ||
+      it.personPhone?.toLowerCase().includes(q) ||
+      (it.personEmail || '').toLowerCase().includes(q)
+    ));
+  });
+
+  readonly totalCount    = computed(() => (this.rows()?.length ?? 0));
+  readonly activeCount   = computed(() => (this.rows()?.filter(x => x.active).length ?? 0));
+  readonly inactiveCount = computed(() => (this.rows()?.filter(x => !x.active).length ?? 0));
+
   isDownloadingPdf = false;
-
-  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
   async ngOnInit(): Promise<void> {
     this.pageHeader.setPageHeader('Contratos', 'Gestión de Contratos');
-    this.setupColumns();
+    this.realtime.connect();
     await this.store.loadAll({ force: true });
   }
 
-  private setupColumns(): void {
-    this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
-      { key: 'personFullName', header: 'Arrendatario' },
-      { key: 'personDocument', header: 'Documento' },
-      { key: 'personPhone', header: 'Teléfono' },
-      { key: 'personEmail', header: 'Email' },
-      { key: 'startDate', header: 'Inicio' },
-      { key: 'endDate', header: 'Fin' },
-      { key: 'totalBase', header: 'Total Base' },
-      { key: 'totalUvt', header: 'Total UVT' },
-      { key: 'active', header: 'Estado', type: 'custom', template: this.estadoTemplate },
-    ];
+  ngOnDestroy(): void {
+    this.realtime.disconnect();
+  }
+
+  onFilterChange(v: string): void {
+    this.filterKey.set(v || '');
   }
 
   onCreate(): void {
@@ -92,8 +109,14 @@ export class ContractsListComponent implements OnInit {
     });
   }
 
-  onView(_row: ContractCard): void {
-    // TODO: abrir modal o navegar a detalle
+  onView(row: ContractCard): void {
+    this.dialog.open(ContractDetailDialogComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      data: { id: row.id },
+      autoFocus: false,
+      disableClose: false,
+    });
   }
 
   onDownload(row: ContractCard): void {

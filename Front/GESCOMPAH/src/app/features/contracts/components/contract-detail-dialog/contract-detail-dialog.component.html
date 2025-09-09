@@ -1,0 +1,164 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="title-wrap">
+      <div class="accent"></div>
+      <h2 class="title" id="dialog-title">
+        <mat-icon class="mr-1" aria-hidden="true">description</mat-icon>
+        Detalle del Contrato
+      </h2>
+    </div>
+    <button mat-icon-button (click)="close()" aria-label="Cerrar diálogo">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido -->
+  <mat-dialog-content class="dialog-content" *ngIf="!loading && !error; else stateTpl">
+    <!-- Card: Información de contrato -->
+    <section class="section card" *ngIf="contract as c" aria-labelledby="contract-info">
+      <div class="section-header">
+        <h3 id="contract-info">Información del Contrato</h3>
+        <span class="chip" [ngClass]="c.active ? 'chip--success' : 'chip--warning'" aria-live="polite">
+          {{ c.active ? 'Activo' : 'Inactivo' }}
+        </span>
+      </div>
+
+      <div class="grid info-grid">
+        <div class="field">
+          <span class="label">Arrendatario</span>
+          <span class="value">{{ c.fullName }}</span>
+        </div>
+        <div class="field">
+          <span class="label">Documento</span>
+          <span class="value">{{ c.document }}</span>
+        </div>
+        <div class="field">
+          <span class="label">Teléfono</span>
+          <span class="value">{{ c.phone }}</span>
+        </div>
+        <div class="field">
+          <span class="label">Email</span>
+          <span class="value">{{ c.email || '—' }}</span>
+        </div>
+        <div class="field">
+          <span class="label">Inicio</span>
+          <span class="value">{{ c.startDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="field">
+          <span class="label">Fin</span>
+          <span class="value">{{ c.endDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <div class="premises" *ngIf="c.premisesLeased?.length">
+        <h4>Locales Arrendados</h4>
+        <ul>
+          <li *ngFor="let p of c.premisesLeased">
+            {{ p.establishmentName }}<span *ngIf="p.plazaName"> — {{ p.plazaName }}</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Card: Obligaciones en formato timeline/cards -->
+    <section class="section card" aria-labelledby="monthly-obligations">
+      <div class="section-header">
+        <h3 id="monthly-obligations">Obligaciones Mensuales</h3>
+        <span class="chip chip--muted">{{ obligations.length || 0 }} registro(s)</span>
+      </div>
+
+      <ng-container *ngIf="obligations.length; else noObligations">
+        <ol class="timeline" aria-label="Línea de tiempo de obligaciones">
+          <li
+            class="timeline-item"
+            *ngFor="let o of obligations; trackBy: trackByObligationId"
+            [class.timeline-item--overdue]="o.status === 'OVERDUE'">
+
+            <!-- Línea + punto -->
+            <div class="rail">
+              <span class="dot" [ngClass]="{
+                'dot--success': o.status === 'PAID',
+                'dot--warning': o.status === 'PENDING',
+                'dot--danger':  o.status === 'OVERDUE'
+              }"></span>
+              <span class="line"></span>
+            </div>
+
+            <!-- Card de obligación -->
+            <article class="ob-card" aria-label="Obligación mensual">
+              <header class="ob-header">
+                <div class="ob-title">
+                  <div class="period">
+                    <span class="year">{{ o.year }}</span>
+                    <span class="sep">/</span>
+                    <span class="month">{{ o.month }}</span>
+                  </div>
+                  <span class="chip"
+                        [ngClass]="{
+                          'chip--success': o.status === 'PAID',
+                          'chip--warning': o.status === 'PENDING',
+                          'chip--danger':  o.status === 'OVERDUE'
+                        }">
+                    <mat-icon class="chip-icon" *ngIf="o.status === 'PAID'">check_circle</mat-icon>
+                    <mat-icon class="chip-icon" *ngIf="o.status === 'PENDING'">schedule</mat-icon>
+                    <mat-icon class="chip-icon" *ngIf="o.status === 'OVERDUE'">error</mat-icon>
+                    {{ getStatusText(o.status) }}
+                  </span>
+                </div>
+
+                <div class="ob-total">
+                  <span class="label">Total</span>
+                  <span class="value amount strong">{{ o.totalAmount | number:'1.0-0' }}</span>
+                </div>
+              </header>
+
+              <div class="ob-body">
+                <div class="kv">
+                  <span class="k">Vence</span>
+                  <span class="v">{{ o.dueDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="kv">
+                  <span class="k">Base</span>
+                  <span class="v amount">{{ o.baseAmount | number:'1.0-0' }}</span>
+                </div>
+                <div class="kv">
+                  <span class="k">IVA</span>
+                  <span class="v amount">{{ o.vatAmount | number:'1.0-0' }}</span>
+                </div>
+                <div class="kv">
+                  <span class="k">Tarde</span>
+                  <span class="v">
+                    <ng-container *ngIf="o.daysLate != null; else dash">{{ o.daysLate }} días</ng-container>
+                    <ng-template #dash>—</ng-template>
+                  </span>
+                </div>
+              </div>
+            </article>
+          </li>
+        </ol>
+      </ng-container>
+
+      <ng-template #noObligations>
+        <div class="no-data muted">No hay obligaciones registradas.</div>
+      </ng-template>
+    </section>
+  </mat-dialog-content>
+
+  <!-- Estados -->
+  <ng-template #stateTpl>
+    <div class="state" *ngIf="loading" aria-live="polite" aria-busy="true">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      <div>Cargando detalle…</div>
+    </div>
+    <div class="state error" *ngIf="!loading && error" aria-live="assertive">
+      <mat-icon>error</mat-icon>
+      <div>{{ error }}</div>
+    </div>
+  </ng-template>
+
+  <!-- Actions -->
+  <mat-dialog-actions align="end" class="dialog-actions" *ngIf="!loading && !error">
+    <button mat-stroked-button color="primary" (click)="close()">Cerrar</button>
+  </mat-dialog-actions>
+</div>

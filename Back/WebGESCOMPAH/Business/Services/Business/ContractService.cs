@@ -41,6 +41,7 @@ namespace Business.Services.Business
         private readonly ISendCode _emailService;
         private readonly ApplicationDbContext _context;
         private readonly ICurrentUser _user;
+        private readonly IObligationMonthRepository _obligationRepository;
 
         public ContractService(
             IContractRepository data,
@@ -53,7 +54,8 @@ namespace Business.Services.Business
             IPasswordHasher<User> passwordHasher,
             ISendCode emailService,
             ApplicationDbContext context,
-            ICurrentUser user
+            ICurrentUser user,
+            IObligationMonthRepository obligationRepository
         ) : base(data, mapper)
         {
             _personRepository = personRepository;
@@ -66,6 +68,7 @@ namespace Business.Services.Business
             _emailService = emailService;
             _context = context;
             _user = user;
+            _obligationRepository = obligationRepository;
         }
 
         /// <summary>
@@ -240,6 +243,45 @@ namespace Business.Services.Business
 
             return contractId;
         }
+
+
+
+
+        public async Task<ExpirationSweepResult> RunExpirationSweepAsync(CancellationToken ct = default)
+        {
+            var now = DateTime.UtcNow;
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                await using var tx = await _context.Database.BeginTransactionAsync(ct);
+                try
+                {
+                    var deactivatedIds = await _contractRepository.DeactivateExpiredAsync(now);
+                    var reactivated = await _contractRepository.ReleaseEstablishmentsForExpiredAsync(now);
+
+                    await tx.CommitAsync(ct);
+                    return new ExpirationSweepResult(deactivatedIds, reactivated);
+                }
+                catch
+                {
+                    await tx.RollbackAsync(ct);
+                    throw;
+                }
+            });
+        }
+
+        public async Task<IReadOnlyList<Entity.DTOs.Implements.Business.ObligationMonth.ObligationMonthSelectDto>> GetObligationsAsync(int contractId)
+        {
+            if (contractId <= 0) throw new BusinessException("contractId inválido.");
+
+            var query = _obligationRepository.GetByContractQueryable(contractId);
+            var list = await query.ToListAsync();
+            return _mapper.Map<List<Entity.DTOs.Implements.Business.ObligationMonth.ObligationMonthSelectDto>>(list).AsReadOnly();
+        }
+
+
+
 
     }
 }

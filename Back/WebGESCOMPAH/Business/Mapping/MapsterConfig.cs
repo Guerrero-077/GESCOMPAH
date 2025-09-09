@@ -13,6 +13,7 @@ using Entity.DTOs.Implements.AdministrationSystem.SystemParameter;
 using Entity.DTOs.Implements.Business.Appointment;
 using Entity.DTOs.Implements.Business.Contract;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
+using Entity.DTOs.Implements.Business.ObligationMonth;
 using Entity.DTOs.Implements.Business.Plaza;
 using Entity.DTOs.Implements.Business.PremisesLeased;
 
@@ -147,6 +148,14 @@ namespace Business.Mapping
                 .Map(dest => dest.Address, src => src.Establishment.Address)
                 .Map(dest => dest.PlazaName, src => src.Establishment.Plaza.Name)
                 .Map(dest => dest.Images, src => src.Establishment.Images.Adapt<List<ImageSelectDto>>());
+
+
+            // ObligationMonth
+            config.NewConfig<ObligationMonth, ObligationMonthSelectDto>();
+            config.NewConfig<ObligationMonth, ObligationMonthDto>();
+            config.NewConfig<ObligationMonthDto, ObligationMonth>();
+            config.NewConfig<ObligationMonthUpdateDto, ObligationMonth>();
+
 
             // (Si luego habilitas Terms:)
             // TypeAdapterConfig<Contract, ContractSelectDto>.NewConfig()

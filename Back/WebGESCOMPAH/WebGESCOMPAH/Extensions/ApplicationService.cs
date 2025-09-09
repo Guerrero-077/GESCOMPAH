@@ -39,6 +39,7 @@ using Utilities.Messaging.Interfaces;
 using WebGESCOMPAH.Infrastructure;
 using WebGESCOMPAH.Middleware;
 using WebGESCOMPAH.Middleware.Handlers;
+using WebGESCOMPAH.Workers;
 
 namespace WebGESCOMPAH.Extensions
 {
@@ -80,7 +81,11 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IClauseService, ClauseService>();
             services.AddScoped<IContractClauseService, ContractClauseService>();
 
+            services.AddScoped<IObligationMonthService, ObligationMonthService>();
 
+
+
+            services.AddHostedService<ContractExpirationWorker>();
 
 
             //Mapping
@@ -106,7 +111,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IContractRepository, ContractRepository>();
             //services.AddScoped<IContractTermsRepository, ContractTermsRepository>();
             services.AddScoped<IPremisesLeasedRepository, PremisesLeasedRepository>();
-
+            services.AddScoped<IObligationMonthRepository, ObligationMonthRepository>();
 
 
 

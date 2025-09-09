@@ -17,9 +17,21 @@ namespace Business.Interfaces.Implements.Business
         decimal TotalUvt,
         bool Active);
 
+    public sealed record ExpirationSweepResult(
+    IReadOnlyList<int> DeactivatedContractIds,
+    int ReactivatedEstablishments);
+
+
     public interface IContractService : IBusiness<ContractSelectDto, ContractCreateDto, ContractUpdateDto>
     {
         Task<int> CreateContractWithPersonHandlingAsync(ContractCreateDto dto);
         Task<IReadOnlyList<ContractCardDto>> GetMineAsync();
+
+        // NUEVO: barrido de expiración (solo maneja Active)
+        Task<ExpirationSweepResult> RunExpirationSweepAsync(CancellationToken ct = default);
+
+        // Obligaciones del contrato
+        Task<IReadOnlyList<Entity.DTOs.Implements.Business.ObligationMonth.ObligationMonthSelectDto>>
+            GetObligationsAsync(int contractId);
     }
 }

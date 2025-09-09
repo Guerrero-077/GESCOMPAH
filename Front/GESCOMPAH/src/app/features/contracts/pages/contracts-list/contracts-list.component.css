@@ -1,108 +1,148 @@
-p {
-  color: red;
+:host {
+  --primary-color: #1976d2;
+  --primary-light: #42a5f5;
+  --success-color: #137333;
+  --success-bg: #e6f4ea;
+  --warning-color: #b26a00;
+  --warning-bg: #fff4e5;
+  --danger-color: #b00020;
+  --muted-color: #6b7280;
+  --muted-bg: #eef2f7;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+  --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  --radius: 12px;
 }
 
-/* Overlay de pantalla completa */
+/* Layout */
+.loading-wrap { display: grid; place-items: center; padding: 2rem; }
+
+.page-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: end;
+  margin: 0 0 1rem 0;
+}
+.page-title h2 { margin: 0; color: var(--text-primary); }
+.page-title .muted { margin: 2px 0 0; color: var(--text-muted); }
+.header-actions { display: flex; gap: .75rem; align-items: center; }
+.search-field { width: min(420px, 60vw); }
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+.stat-card {
+  display: flex; align-items: center; gap: .75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+.stat-card mat-icon { color: var(--primary-color); }
+.stat-text span { display: block; font-size: .8rem; color: var(--text-muted); }
+.stat-text strong { font-size: 1.15rem; color: var(--text-primary); }
+
+/* Cards grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: .9rem;
+}
+.contract-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+  transition: box-shadow .2s ease, transform .1s ease;
+}
+.contract-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,.08); transform: translateY(-1px); }
+
+/* Card content */
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .75rem; padding: 1rem 1rem .25rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+.card-header .title { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.card-header h3 { margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.card-actions { display: inline-flex; gap: .25rem; align-items: center; }
+
+.card-body { padding: .75rem 1rem 1rem; display: grid; gap: .85rem; }
+
+.meta-grid {
+  display: grid; gap: .5rem 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.field { display: flex; flex-direction: column; }
+.label { font-size: .8rem; color: var(--text-muted); }
+.value { font-size: .98rem; color: var(--text-primary); font-weight: 500; }
+
+.amounts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.amount { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px dashed #edf2f7; padding-top: .5rem; }
+.amount-mono { font-variant-numeric: tabular-nums; font-family: 'Roboto Mono', monospace; }
+.amount .strong { font-weight: 700; }
+
+/* Chips */
+.chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .25rem .6rem; border-radius: 999px;
+  font-size: .75rem; font-weight: 600; line-height: 1; white-space: nowrap;
+}
+.chip--success { background: var(--success-bg); color: var(--success-color); }
+.chip--warning { background: var(--warning-bg); color: var(--warning-color); }
+
+/* No results / error */
+.no-results, .alert-error {
+  display: grid; place-items: center; gap: .5rem; padding: 1.5rem; text-align: center;
+  color: var(--text-muted);
+}
+.alert-error { color: var(--danger-color); }
+
+/* Overlay descarga PDF (conservado y pulido) */
 .pdf-loading-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  /* por encima de la tabla/dialog */
+  position: fixed; inset: 0; z-index: 2000;
   background: rgba(17, 24, 39, 0.45);
-  /* gris oscuro translúcido */
   backdrop-filter: blur(2px);
-  display: grid;
-  place-items: center;
+  display: grid; place-items: center;
 }
-
-/* Tarjeta centrada con spinner + icono */
 .pdf-loading-card {
-  width: 320px;
-  max-width: 90vw;
-  background: #111827;
-  /* gris-900 si estás en dark mode */
-  color: #e5e7eb;
-  /* gris-200 */
-  border-radius: 16px;
-  padding: 22px 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
-  display: grid;
-  justify-items: center;
-  gap: 14px;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, .08);
+  width: 320px; max-width: 90vw;
+  background: #111827; color: #e5e7eb;
+  border-radius: 16px; padding: 22px 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  display: grid; justify-items: center; gap: 14px; text-align: center;
+  border: 1px solid rgba(255,255,255,.08);
 }
+.pdf-loading-card .label { font-weight: 600; font-size: 15px; }
+.pdf-loading-card .sub-label { font-size: 12px; opacity: .8; margin-top: -6px; }
+.mat-mdc-progress-spinner circle, .mat-progress-spinner circle { stroke: currentColor !important; }
+.download-anim { width: 64px; height: 64px; display: block; }
+.download-anim .arrow { stroke: #60a5fa; animation: arrow-bounce 1.2s ease-in-out infinite; }
+.download-anim .box { fill: #1f2937; stroke: #374151; stroke-width: 1; }
 
-/* Texto */
-.pdf-loading-card .label {
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.pdf-loading-card .sub-label {
-  font-size: 12px;
-  opacity: 0.8;
-  margin-top: -6px;
-}
-
-/* Spinner Material: hereda color actual */
-.mat-mdc-progress-spinner circle,
-.mat-progress-spinner circle {
-  stroke: currentColor !important;
-}
-
-/* SVG de descarga animado */
-.download-anim {
-  width: 64px;
-  height: 64px;
-  display: block;
-}
-
-/* Colores del SVG (adaptables a tu tema) */
-.download-anim .arrow {
-  stroke: #60a5fa;
-  /* azul-400 */
-  animation: arrow-bounce 1.2s ease-in-out infinite;
-}
-
-.download-anim .box {
-  fill: #1f2937;
-  /* gris-800 */
-  stroke: #374151;
-  /* gris-700 */
-  stroke-width: 1;
-}
-
-/* Animación de la flecha (rebote hacia caja) */
 @keyframes arrow-bounce {
-
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  50% {
-    transform: translateY(6px);
-    opacity: 0.9;
-  }
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50%       { transform: translateY(6px); opacity: .9; }
 }
 
-/* Si usas modo claro, opcionalmente ajusta colores */
-:host-context(body:not(.dark)) .pdf-loading-card {
-  background: #ffffff;
-  color: #111827;
-  border-color: rgba(0, 0, 0, .06);
-}
+/* Modo claro para la tarjeta del overlay */
+:host-context(body:not(.dark)) .pdf-loading-card { background: #ffffff; color: #111827; border-color: rgba(0,0,0,.06); }
+:host-context(body:not(.dark)) .download-anim .arrow { stroke: #2563eb; }
+:host-context(body:not(.dark)) .download-anim .box { fill: #f3f4f6; stroke: #e5e7eb; }
 
-:host-context(body:not(.dark)) .download-anim .arrow {
-  stroke: #2563eb;
-  /* azul-600 */
-}
-
-:host-context(body:not(.dark)) .download-anim .box {
-  fill: #f3f4f6;
-  /* gris-100 */
-  stroke: #e5e7eb;
-  /* gris-200 */
+/* Responsivo */
+@media (max-width: 900px) {
+  .stats { grid-template-columns: 1fr; }
+  .header-actions { flex-wrap: wrap; }
+  .search-field { width: 100%; }
 }

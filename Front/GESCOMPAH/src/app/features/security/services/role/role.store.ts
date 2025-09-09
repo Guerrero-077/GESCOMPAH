@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { RoleCreateModel, RoleSelectModel, RoleUpdateModel } from '../../models/role.models';
 import { RoleService } from './role.service';
+import { IsActive } from '../../../../core/models/IsAcitve.models';
 
 @Injectable({
   providedIn: 'root'
@@ -65,10 +66,10 @@ export class RoleStore {
     );
   }
 
-  changeActiveStatus(id: number, active: boolean): Observable<RoleSelectModel> {
+  changeActiveStatus(id: number, active: boolean): Observable<IsActive> {
     return this.roleService.changeActiveStatus(id, active).pipe(
       tap(() => {
-        this.loadAll(); // Force refresh
+        this.loadAll();
       })
     );
   }

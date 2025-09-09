@@ -1,4 +1,4 @@
-<!-- Overlay de loading para PDF -->
+<!-- Overlay descarga PDF (se conserva) -->
 <div class="pdf-loading-overlay" *ngIf="isDownloadingPdf" aria-live="assertive" aria-busy="true">
   <div class="pdf-loading-card" role="alert" aria-label="Generando y descargando contrato">
     <svg class="download-anim" viewBox="0 0 64 64" aria-hidden="true">
@@ -11,9 +11,9 @@
   </div>
 </div>
 
-<!-- Loading lista -->
+<!-- Loading -->
 <ng-container *ngIf="loading(); else contentTpl">
-  <div class="d-flex justify-content-center mt-4">
+  <div class="loading-wrap">
     <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
   </div>
 </ng-container>
@@ -21,67 +21,149 @@
 <ng-template #contentTpl>
   <!-- Error -->
   <ng-container *ngIf="!error(); else errorTpl">
-    <div class="row d-flex justify-content-center">
-      <app-generic-table
-        [data]="rows()"
-        [columns]="columns"
-        titulo="Gestión de Contratos"
-        subTitulo="Contratos (según tu rol)"
-        [createButtonLabel]="'Nuevo Contrato'"
-        [showViewButton]="true"
-        [detailTemplate]="accionesContrato"
-        (view)="onView($event)"
-        (create)="onCreate()">
-      </app-generic-table>
+
+    <!-- Encabezado de página -->
+    <header class="page-header">
+      <div class="page-title">
+        <h2>Gestión de Contratos</h2>
+        <p class="muted">Contratos (según tu rol)</p>
+      </div>
+
+      <div class="header-actions">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar</mat-label>
+          <input
+            matInput
+            [value]="filterKey()"
+            (input)="onFilterChange($any($event.target).value || '')"
+            placeholder="Nombre, documento, teléfono o email" />
+
+        </mat-form-field>
+
+        <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
+          <button mat-raised-button color="primary" (click)="onCreate()">
+            Nuevo Contrato
+          </button>
+        </ng-container>
+      </div>
+    </header>
+
+    <!-- Métricas rápidas -->
+    <section class="stats">
+      <div class="stat-card">
+        <mat-icon aria-hidden="true">assignment</mat-icon>
+        <div class="stat-text">
+          <span>Total</span>
+          <strong>{{ totalCount() }}</strong>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+        <div class="stat-text">
+          <span>Activos</span>
+          <strong>{{ activeCount() }}</strong>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <div class="stat-text">
+          <span>Inactivos</span>
+          <strong>{{ inactiveCount() }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid de tarjetas -->
+    <section class="cards-grid" role="list" aria-label="Listado de contratos">
+      <article
+        class="contract-card"
+        *ngFor="let row of filtered(); trackBy: trackById"
+        role="listitem"
+        [attr.aria-label]="'Contrato de ' + row.personFullName">
+
+        <header class="card-header">
+          <div class="title">
+            <h3 class="truncate" [matTooltip]="row.personFullName">{{ row.personFullName }}</h3>
+            <span class="chip" [ngClass]="row.active ? 'chip--success' : 'chip--warning'">
+              {{ row.active ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <div class="card-actions">
+            <button
+              mat-icon-button
+              matTooltip="Descargar PDF"
+              (click)="onDownload(row)"
+              [disabled]="isDownloadingPdf"
+              aria-label="Descargar contrato">
+              <mat-icon>download</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              matTooltip="Ver detalle"
+              (click)="onView(row)"
+              aria-label="Ver detalle">
+              <mat-icon>visibility</mat-icon>
+            </button>
+
+            <div *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
+              <app-toggle-button-component
+                [checked]="!!row?.active"
+                [disabled]="loading()"
+                (changed)="onToggleActive(row, $event)">
+              </app-toggle-button-component>
+            </div>
+          </div>
+        </header>
+
+        <div class="card-body">
+          <div class="meta-grid">
+            <div class="field">
+              <span class="label">Documento</span>
+              <span class="value">{{ row.personDocument }}</span>
+            </div>
+            <div class="field">
+              <span class="label">Teléfono</span>
+              <span class="value">{{ row.personPhone }}</span>
+            </div>
+            <div class="field">
+              <span class="label">Email</span>
+              <span class="value">{{ row.personEmail || '—' }}</span>
+            </div>
+            <div class="field">
+              <span class="label">Periodo</span>
+              <span class="value">
+                {{ row.startDate | date: 'yyyy-MM-dd' }} → {{ row.endDate | date: 'yyyy-MM-dd' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="amounts">
+            <div class="amount">
+              <span class="label">Total Base</span>
+              <span class="value amount-mono">{{ row.totalBase | number: '1.0-0' }}</span>
+            </div>
+            <div class="amount">
+              <span class="label">Total UVT</span>
+              <span class="value amount-mono strong">{{ row.totalUvt | number: '1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <div class="no-results" *ngIf="!filtered()?.length">
+      <mat-icon aria-hidden="true">search_off</mat-icon>
+      <p>No hay contratos que coincidan con la búsqueda.</p>
     </div>
+
   </ng-container>
 </ng-template>
 
-<!-- Error de carga -->
+<!-- Error -->
 <ng-template #errorTpl>
-  <div class="alert alert-danger mt-3" role="alert">
+  <div class="alert-error" role="alert">
     Ocurrió un error al cargar contratos: {{ error() }}
-  </div>
-</ng-template>
-
-<!-- Template para ACCIONES (Descargar + Ver) -->
-<ng-template #accionesContrato let-row>
-  <div class="d-inline-flex align-items-center gap-1">
-    <button mat-icon-button
-            matTooltip="Descargar PDF"
-            (click)="onDownload(row)"
-            [disabled]="isDownloadingPdf"
-            aria-label="Descargar contrato">
-      <mat-icon>download</mat-icon>
-    </button>
-
-    <button mat-icon-button
-            matTooltip="Ver"
-            (click)="onView(row)"
-            aria-label="Ver contrato">
-      <mat-icon>visibility</mat-icon>
-    </button>
-  </div>
-</ng-template>
-
-<!-- Template PARA COLUMNA 'Estado' -->
-<ng-template #estadoTemplate let-row>
-  <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
-    <span class="badge align-middle" [ngClass]="row.active ? 'badge-success--solid' : 'badge-warning'">
-      {{ row.active ? 'Activo' : 'Inactivo' }}
-    </span>
-
-    <div *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
-      <app-toggle-button-component
-        class="align-middle"
-        [checked]="!!row?.active"
-        [disabled]="loading()"
-        (changed)="onToggleActive(row, $event)"
-        [size]="20"
-        [onColor]="'#388E3C'"
-        [offColor]="'#9CA3AF'"
-        [thumb]="'#ffffff'">
-      </app-toggle-button-component>
-    </div>
   </div>
 </ng-template>

@@ -19,6 +19,21 @@ namespace Entity.Infrastructure.Context
             modelBuilder.Entity<Images>().HasQueryFilter(img => !img.IsDeleted);
             //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+            modelBuilder.Entity<ObligationMonth>(e =>
+            {
+                e.Property(p => p.UvtQtyApplied).HasPrecision(18, 2);
+                e.Property(p => p.UvtValueApplied).HasPrecision(18, 2);
+                e.Property(p => p.VatRateApplied).HasPrecision(5, 4);  // tasas 0..1 con 4 decimales
+                e.Property(p => p.BaseAmount).HasPrecision(18, 2);
+                e.Property(p => p.VatAmount).HasPrecision(18, 2);
+                e.Property(p => p.TotalAmount).HasPrecision(18, 2);
+                e.Property(p => p.LateAmount).HasPrecision(18, 2);
+            });
+
+            // Idempotencia dura: evita duplicados por período
+            modelBuilder.Entity<ObligationMonth>()
+                .HasIndex(o => new { o.ContractId, o.Year, o.Month })
+                .IsUnique();
 
 
             // Apply configurations from the assembly where UserConfiguration is defined
@@ -66,7 +81,8 @@ namespace Entity.Infrastructure.Context
         public DbSet<Contract> contracts { get; set; }
         //public DbSet<ContractTerms> ContractTerms { get; set; }
         public DbSet<PremisesLeased> premisesLeaseds { get; set; }
-        public DbSet<Clause> clauses { get; set; }  
-        public DbSet<ContractClause> contractClauses { get; set; }   
+        public DbSet<Clause> clauses { get; set; }
+        public DbSet<ContractClause> contractClauses { get; set; }
+        public DbSet<ObligationMonth> obligationMonths { get; set; }
     }
 }

@@ -93,5 +93,6 @@ namespace Entity.Infrastructure.Context
         public DbSet<PremisesLeased> premisesLeaseds { get; set; }
         public DbSet<Clause> clauses { get; set; }
         public DbSet<ContractClause> contractClauses { get; set; }
+        public DbSet<ObligationMonth> obligationMonths { get; set; }
     }
 }

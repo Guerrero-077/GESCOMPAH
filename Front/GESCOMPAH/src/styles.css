@@ -1,270 +1,321 @@
 /***********************************************************
- * 1) PALETA GLOBAL (tu :root, sin cambios funcionales)
- *    — Solo define valores. No pintamos nada aquí.
+ * 1) PALETA GLOBAL MEJORADA (más vibrante y moderna)
+ *    — Verdes más vivos y amarillos más brillantes
  ***********************************************************/
 :root {
-  /* ======= Brand (Verde) ======= */
-  --green-50: #E8F5E9;
-  /* fondo sutil */
-  --green-100: #C8E6C9;
-  --green-200: #A5D6A7;
-  --green-300: #81C784;
-  --green-400: #66BB6A;
-  --green-500: #4CAF50;
-  /* primario claro / hover */
-  --green-600: #43A047;
-  --green-700: #388E3C;
-  --green-800: #2E7D32;
-  /* PRIMARIO institucional */
-  --green-900: #1B5E20;
-  /* énfasis / foco fuerte */
+  /* ======= Brand (Verde) - MÁS VIBRANTE ======= */
+  --green-50: #f0fdf4;    /* fondo más fresco */
+  --green-100: #dcfce7;   /* más luminoso */
+  --green-200: #bbf7d0;   /* más saturado */
+  --green-300: #86efac;   /* más brillante */
+  --green-400: #4ade80;   /* más moderno */
+  --green-500: #22c55e;   /* primario más vibrante */
+  --green-600: #16a34a;   /* hover más definido */
+  --green-700: #15803d;   /* institucional corregido */
+  --green-800: #166534;   /* PRIMARIO más fuerte */
+  --green-900: #14532d;   /* énfasis más profundo */
 
-  /* ======= Accent (Amarillo) ======= */
-  --yellow-50: #FFF9E5;
-  /* fondo de alerta leve */
-  --yellow-100: #FFECB3;
-  --yellow-200: #FFE082;
-  --yellow-300: #FFD54F;
-  --yellow-400: #FFCA28;
-  --yellow-500: #FFC107;
-  --yellow-600: #FBC02D;
-  /* acento principal */
-  --yellow-700: #F9A825;
-  /* hover/énfasis */
-  --yellow-800: #F57F17;
-  /* badges intensos */
+  /* ======= Accent (Amarillo) - MÁS BRILLANTE ======= */
+  --yellow-50: #fefce8;   /* fondo más cálido */
+  --yellow-100: #fef3c7;  /* más dorado */
+  --yellow-200: #fde68a;  /* más luminoso */
+  --yellow-300: #fcd34d;  /* más saturado */
+  --yellow-400: #fbbf24;  /* más vibrante */
+  --yellow-500: #f59e0b;  /* más intenso */
+  --yellow-600: #eab308;  /* acento principal mejorado */
+  --yellow-700: #d97706;  /* hover más definido */
+  --yellow-800: #b45309;  /* badges más contrastados */
 
-  /* ======= Neutros / Texto / Bordes ======= */
-  --white: #FFFFFF;
-  --gray-50: #F9FAFB;
-  /* fondo de secciones */
-  --gray-100: #F3F4F6;
-  --gray-200: #E5E7EB;
-  /* bordes / divisores */
-  --gray-300: #D1D5DB;
-  --gray-400: #9CA3AF;
-  --gray-500: #6B7280;
-  /* texto secundario */
-  --gray-600: #4B5563;
-  --gray-700: #374151;
-  --gray-800: #1F2937;
-  /* texto principal */
-  --gray-900: #111827;
+  /* ======= Neutros MEJORADOS / Texto / Bordes ======= */
+  --white: #ffffff;
+  --gray-50: #f8fafc;     /* fondo más suave */
+  --gray-100: #f1f5f9;    /* superficies mejoradas */
+  --gray-200: #e2e8f0;    /* bordes más definidos */
+  --gray-300: #cbd5e1;    /* divisores más visibles */
+  --gray-400: #94a3b8;    /* textos secundarios */
+  --gray-500: #64748b;    /* mejorado */
+  --gray-600: #475569;    /* más legible */
+  --gray-700: #334155;    /* texto principal fuerte */
+  --gray-800: #1e293b;    /* títulos */
+  --gray-900: #0f172a;    /* máximo contraste */
 
-  /* ======= Tokens semánticos ======= */
-  --color-bg: var(--white);
-  /* fondo de página */
+  /* ======= Tokens semánticos CORREGIDOS ======= */
+  --color-bg: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%);
   --color-surface: var(--white);
-  /* tarjetas/paneles */
-  --color-surface-muted: var(--gray-50);
-  /* superficies suaves */
+  --color-surface-muted: var(--gray-50);  /* más sutil */
 
-  --color-border: var(--gray-200);
-  --color-text: var(--gray-800);
-  --color-text-muted: var(--gray-500);
+  --color-border: var(--gray-200);        /* más visible */
+  --color-text: var(--gray-800);          /* más contrastado */
+  --color-text-muted: var(--gray-600);    /* legible AA */
 
-  /* Marca / Acciones */
-  --color-primary: var(--green-800);
-  --color-primary-contrast: #FFFFFF;
-  --color-primary-hover: var(--green-700);
+  /* Marca / Acciones MEJORADAS */
+  --color-primary: var(--green-600);      /* más vibrante que 800 */
+  --color-primary-contrast: var(--white);
+  --color-primary-hover: var(--green-500); /* más brillante en hover */
   --color-primary-soft: var(--green-50);
-  /* fondos de hover/selección suaves */
 
-  /* Acentos / Estados no críticos */
-  --color-accent: var(--yellow-600);
-  --color-accent-hover: var(--yellow-700);
+  /* Acentos CORREGIDOS */
+  --color-accent: var(--yellow-500);      /* más vibrante */
+  --color-accent-hover: var(--yellow-600);
   --color-accent-soft: var(--yellow-50);
-  --color-accent-contrast: #1F2937;
+  --color-accent-contrast: var(--gray-900); /* mejor contraste */
 
-  /* Estados (sin rojo) */
-  --state-success: var(--green-700);
-  --state-success-bg: var(--green-50);
-  --state-warning: var(--yellow-700);
-  --state-warning-bg: var(--yellow-50);
+  /* Estados MEJORADOS */
+  --state-success: var(--green-600);      /* más visible */
+  --state-success-bg: var(--green-100);   /* fondo más presente */
+  --state-warning: var(--yellow-600);
+  --state-warning-bg: var(--yellow-100);
 
-  /* Componentes habituales */
-  --sidebar-bg: var(--green-800);
-  --sidebar-text: #FFFFFF;
-  --sidebar-hover: var(--green-700);
-  --sidebar-active: var(--green-600);
+  /* Componentes ACTUALIZADOS */
+  --sidebar-bg: linear-gradient(135deg, var(--green-700) 0%, var(--green-600) 100%);
+  --sidebar-text: var(--white);
+  --sidebar-hover: var(--green-500);      /* más brillante */
+  --sidebar-active: var(--green-400);     /* muy visible */
 
   --table-row-alt: var(--gray-50);
-  --chip-active-bg: var(--green-100);
+  --chip-active-bg: var(--green-100);     /* más presente */
   --chip-active-text: var(--green-800);
 
-  /* Accesibilidad */
-  --focus-ring: var(--yellow-600);
+  /* Accesibilidad MEJORADA */
+  --focus-ring: var(--yellow-500);        /* más vibrante */
+  --focus-ring-offset: 2px;
+  --focus-ring-width: 3px;
 
-  /* Sombras (neutras) */
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, .06);
-  --shadow-2: 0 4px 12px rgba(0, 0, 0, .08);
+  /* Sombras COLOREADAS */
+  --shadow-1: 0 1px 3px rgba(22, 163, 74, 0.08);        /* sombra verde sutil */
+  --shadow-2: 0 4px 16px rgba(22, 163, 74, 0.12);       /* sombra verde media */
+  --shadow-3: 0 8px 32px rgba(22, 163, 74, 0.16);       /* sombra verde fuerte */
+  --shadow-accent: 0 4px 16px rgba(245, 158, 11, 0.2);   /* sombra amarilla */
 }
 
 /***********************************************************
- * 2) AJUSTES DE CONTRASTE (mejor legibilidad AA)
- *    — Neutros un poco más fuertes y chips legibles.
+ * 2) GRADIENTES Y EFECTOS MODERNOS
  ***********************************************************/
 :root {
-  --color-surface-muted: var(--gray-100);
-  /* antes: gray-50 */
-  --color-border: var(--gray-300);
-  /* antes: gray-200 */
-  --color-text-muted: var(--gray-700);
-  /* antes: gray-500/600 */
+  /* Gradientes principales */
+  --gradient-primary: linear-gradient(135deg, var(--green-600) 0%, var(--green-500) 100%);
+  --gradient-primary-hover: linear-gradient(135deg, var(--green-500) 0%, var(--green-400) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--yellow-500) 0%, var(--yellow-400) 100%);
+  --gradient-surface: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%);
 
-  /* Chip de éxito por defecto (suave AA) */
-  --chip-active-bg: var(--green-50);
-  /* antes: green-100 */
-  --chip-active-text: var(--green-900);
-  /* antes: green-800 */
-
-  /* Acento visible (amarillo) */
-  --accent-outline: var(--yellow-600);
-  /* contornos/hover */
-  --accent-surface: var(--yellow-50);
-  /* superficies suaves */
+  /* Efectos glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 /***********************************************************
- * 3) RESET Y BASE TIPOGRÁFICA
+ * 3) RESET Y BASE TIPOGRÁFICA MEJORADA
  ***********************************************************/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", Arial, system-ui, sans-serif;
-  background-color: var(--color-bg);
-  /* fondo de página */
+  font-family: 'Inter', 'Roboto', "Helvetica Neue", Arial, system-ui, sans-serif;
+  background: var(--gradient-surface);
   color: var(--color-text);
-  /* texto por defecto */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mejoras tipográficas */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--gray-800);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+p {
+  color: var(--color-text);
+  margin: 0;
 }
 
 /***********************************************************
- * 4) BOTONES DE ACCIÓN
+ * 4) BOTONES DE ACCIÓN MODERNIZADOS
  ***********************************************************/
-/* Primario (verde) */
+/* Reset común */
+.button-save,
+.button-cancel,
+.button-cancel--warn,
+.btn-accent {
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 12px 24px;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-1);
+  text-transform: capitalize;
+  letter-spacing: 0.025em;
+}
+
+/* Primario (verde) con gradiente */
 .button-save {
-  background-color: var(--color-primary);
+  background: var(--gradient-primary);
   color: var(--color-primary-contrast);
   width: 150px;
-  border-radius: 8px;
-  border: 1px solid var(--green-900);
-  transition: background-color .2s ease, box-shadow .2s ease, transform .02s ease;
+  box-shadow: var(--shadow-2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .button-save:hover {
-  background-color: var(--color-primary-hover);
+  background: var(--gradient-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-3);
 }
 
 .button-save:focus-visible {
-  /* outline: 3px solid var(--focus-ring); */
-  /* anillo amarillo accesible */
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--shadow-3), 0 0 0 var(--focus-ring-width) var(--focus-ring);
 }
 
 .button-save:active {
-  transform: translateY(0.5px);
+  transform: translateY(0);
 }
 
-/* Secundario neutral (gris) */
+/* Efecto shimmer en botón primario */
+.button-save::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.button-save:hover::before {
+  left: 100%;
+}
+
+/* Secundario neutral mejorado */
 .button-cancel {
-  background-color: var(--color-surface-muted);
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
   color: var(--color-text);
   width: 150px;
-  border-radius: 8px;
   border: 1px solid var(--color-border);
-  transition: background-color .2s ease, box-shadow .2s ease, transform .02s ease;
 }
 
 .button-cancel:hover {
-  background-color: var(--color-primary-soft);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
 }
 
 .button-cancel:focus-visible {
-  /* outline: 3px solid var(--focus-ring); */
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
-.button-cancel:active {
-  transform: translateY(0.5px);
-}
-
-/* Secundario de acento (amarillo) — para acciones destacadas */
+/* Acento (amarillo) mejorado */
 .btn-accent {
-  background: var(--color-accent);
+  background: var(--gradient-accent);
   color: var(--white);
-  /* border: 1px solid var(--color-accent-hover); */
-  border-radius: 8px;
-  transition: background-color .2s ease, box-shadow .2s ease;
+  box-shadow: var(--shadow-accent);
+  font-weight: 700;
 }
 
 .btn-accent:hover {
-  background: var(--color-accent-hover);
+  background: var(--gradient-accent);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
 }
 
-/* Variante “cancelar con riesgo” (amarillo suave) */
+/* Variante warning mejorada */
 .button-cancel--warn {
-  background-color: var(--color-accent-soft);
+  background: var(--color-accent-soft);
   color: var(--color-accent-contrast);
-  border: 1px solid var(--color-accent);
+  border: 2px solid var(--color-accent);
 }
 
 .button-cancel--warn:hover {
-  background-color: var(--yellow-100);
+  background: var(--color-accent);
+  color: var(--white);
+  transform: translateY(-1px);
 }
 
 /***********************************************************
- * 5) BADGES / CHIPS DE ESTADO
+ * 5) BADGES / CHIPS MODERNIZADOS
  ***********************************************************/
 .badge {
-  display: inline-block;
-  padding: .25rem .6rem;
-  font-size: .75rem;
-  font-weight: 700;
-  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
   line-height: 1;
   white-space: nowrap;
   border: 1px solid transparent;
+  box-shadow: var(--shadow-1);
+  transition: all 0.2s ease;
 }
 
-/* Éxito sólido (cuando necesites más “punch”) */
+.badge:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-2);
+}
+
+/* Éxito con gradiente */
 .badge-success--solid {
-  background: var(--green-600);
+  background: var(--gradient-primary);
   color: var(--white);
-  border-color: var(--green-700);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Advertencia (amarillo visible) */
+/* Advertencia vibrante */
 .badge-warning {
-  background: var(--color-accent);
+  background: var(--gradient-accent);
   color: var(--white);
+  box-shadow: var(--shadow-accent);
 }
 
-/* Neutro */
+/* Neutro mejorado */
 .badge-neutral {
-  background: var(--gray-200);
-  color: var(--gray-800);
-  border-color: var(--gray-300);
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  color: var(--gray-700);
+  border-color: var(--color-border);
 }
 
 /***********************************************************
- * 6) ANGULAR MATERIAL (MDC) — BOTONES
+ * 6) ANGULAR MATERIAL (MDC) — BOTONES MEJORADOS
  ***********************************************************/
 .mat-mdc-raised-button.mat-primary,
 .mat-mdc-fab.mat-primary,
 .mat-mdc-mini-fab.mat-primary {
-  background-color: var(--color-primary) !important;
+  background: var(--gradient-primary) !important;
   color: var(--color-primary-contrast) !important;
-  border: 1px solid var(--green-900) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--shadow-2) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .mat-mdc-raised-button.mat-primary:hover,
 .mat-mdc-fab.mat-primary:hover,
 .mat-mdc-mini-fab.mat-primary:hover {
-  background-color: var(--color-primary-hover) !important;
+  background: var(--gradient-primary-hover) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-3) !important;
 }
 
 .mat-mdc-button.mat-primary,
@@ -272,88 +323,111 @@ body {
 .mat-mdc-icon-button.mat-primary {
   color: var(--color-primary) !important;
   --mdc-icon-button-icon-color: var(--color-primary);
-  /* icon buttons */
+  font-weight: 600 !important;
 }
 
 .mat-mdc-outlined-button.mat-primary {
   border-color: var(--color-primary) !important;
+  border-width: 2px !important;
 }
 
 .mat-mdc-outlined-button.mat-primary:hover {
   background-color: var(--color-primary-soft) !important;
+  transform: translateY(-1px) !important;
 }
 
 /***********************************************************
- * 7) ANGULAR MATERIAL — TABS (legibles + acento amarillo)
+ * 7) ANGULAR MATERIAL — TABS COMPLETAMENTE REDISEÑADOS
  ***********************************************************/
-/* Contenedor tipo “píldora” */
 .mat-mdc-tab-list {
-  background: var(--color-surface-muted);
-  border-radius: 12px;
-  padding: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 6px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-1);
 }
 
-/* Cada Tab */
 .mat-mdc-tab {
   background: transparent;
-  border-radius: 10px;
+  border-radius: 12px;
   min-width: 120px;
-  height: 44px;
+  height: 48px;
   border: 1px solid transparent;
-  /* para mostrar contorno en hover */
-  transition: background-color .2s, color .2s, border-color .2s, box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Texto INACTIVO: oscuro (legible) */
+/* Texto INACTIVO: más contrastado */
 .mat-mdc-tab .mdc-tab__text-label {
   color: var(--color-text);
   font-weight: 600;
   font-size: 14px;
   text-transform: capitalize;
-  padding: 0 8px;
+  padding: 0 16px;
+  transition: all 0.2s ease;
 }
 
-/* Hover inactivo: fondo verde muy suave + borde/halo amarillo */
+/* Hover inactivo: efecto glassmorphism */
 .mat-mdc-tab:hover:not(.mdc-tab--active) {
   background: var(--color-primary-soft);
+  backdrop-filter: blur(10px);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-1);
 }
 
 .mat-mdc-tab:hover:not(.mdc-tab--active) .mdc-tab__text-label {
   color: var(--color-primary);
 }
 
-/* ACTIVO: verde sólido + TEXTO BLANCO (forzado) */
+/* ACTIVO: gradiente verde con efecto especial */
 .mat-mdc-tab.mdc-tab--active {
-  background: var(--color-primary);
-  border-color: var(--green-900);
-  /* box-shadow: 0 0 0 2px var(--focus-ring); */
-  /* anillo amarillo de marca */
+  background: var(--gradient-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-2px);
 }
 
 .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
-  color: var(--color-primary-contrast) !important;
-  /* BLANCO visible */
+  color: var(--white) !important;
   font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Sin ink-bar (usamos nuestro contorno) */
+/* Efecto shimmer en tab activo */
+.mat-mdc-tab.mdc-tab--active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Sin ink-bar tradicional */
 .mat-mdc-tab-group.mat-primary .mat-ink-bar,
 .mat-mdc-tab-group.mat-primary .mdc-tab-indicator__content--underline {
   display: none;
 }
 
-/* Ripple opcional off */
 .mat-mdc-tab .mat-ripple-element {
   display: none;
 }
 
-/* Espaciado de contenido bajo tabs */
 .tab-spacing {
-  padding: 20px 0;
+  padding: 24px 0;
 }
 
 /***********************************************************
- * 8) ACCESIBILIDAD: FOCUS VISIBLE
+ * 8) ACCESIBILIDAD MEJORADA: FOCUS VISIBLE
  ***********************************************************/
 .button-save:focus-visible,
 .button-cancel:focus-visible,
@@ -363,26 +437,137 @@ body {
 .mat-mdc-raised-button:focus-visible,
 .mat-mdc-outlined-button:focus-visible,
 .mat-mdc-icon-button:focus-visible,
-.mat-mdc-tab:focus-visible {
-  outline-offset: 2px;
-  border-radius: 8px;
+.mat-mdc-tab:focus-visible,
+.badge:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: 12px;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring);
 }
 
 /***********************************************************
- * 9) RESPONSIVE
+ * 9) ANIMACIONES Y TRANSICIONES GLOBALES
+ ***********************************************************/
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Aplicar animaciones suaves */
+.badge,
+.button-save,
+.button-cancel,
+.btn-accent,
+.mat-mdc-tab {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Hover especiales */
+.badge-success--solid:hover {
+  animation: pulse 0.5s ease-in-out;
+}
+
+/***********************************************************
+ * 10) RESPONSIVE MEJORADO
  ***********************************************************/
 @media (max-width: 768px) {
   .mat-mdc-tab-list {
-    padding: 3px;
+    padding: 4px;
+    border-radius: 12px;
   }
 
   .mat-mdc-tab {
-    min-width: 100px;
-    height: 40px;
+    min-width: 90px;
+    height: 44px;
+    border-radius: 10px;
   }
 
   .mat-mdc-tab .mdc-tab__text-label {
     font-size: 13px;
-    padding: 0 12px;
+    padding: 0 8px;
   }
+
+  .button-save,
+  .button-cancel {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mat-mdc-tab {
+    min-width: 80px;
+    height: 40px;
+  }
+
+  .mat-mdc-tab .mdc-tab__text-label {
+    font-size: 12px;
+  }
+}
+
+/***********************************************************
+ * 11) UTILIDADES ADICIONALES
+ ***********************************************************/
+/* Clases helper para efectos */
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.shadow-green {
+  box-shadow: var(--shadow-2);
+}
+
+.shadow-accent {
+  box-shadow: var(--shadow-accent);
+}
+
+/* Estados de carga */
+.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

@@ -6,6 +6,8 @@
     [data]="cities$ | async"
     [createButtonLabel]="'Nueva Ciudad'"
     [showActionsColumn]="false"
+    [titulo]="'Ciudades'"
+    [subTitulo]="'Gestione las ciudades'"
     (edit)="openEditDialog($event)"
     (delete)="handleDelete($event)"
     (create)="openCreateDialog()">
@@ -14,13 +16,15 @@
 
   <ng-template #estadoTemplate let-row>
     <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
-      <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+      <span class="badge align-middle" [ngClass]="row.active ? 'badge-success--solid' : 'badge-warning'">
         {{ row.active ? 'Activo' : 'Inactivo' }}
       </span>
 
       <div *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
-        <app-toggle-button-component class="align-middle" [checked]="row.active"
-          (changed)="onToggleActive(row, { checked: $event })"
+        <app-toggle-button-component
+          class="align-middle"
+          [checked]="!!row?.active"
+          (changed)="onToggleActive(row, $event)"
           [size]="20"
           [onColor]="'#388E3C'"
           [offColor]="'#9CA3AF'"

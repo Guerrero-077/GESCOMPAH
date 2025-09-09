@@ -112,6 +112,30 @@ export class ContractStore {
     });
   }
 
+  patchActiveMany(ids: number[], value: boolean): void {
+    if (!ids?.length) return;
+
+    this._items.update(curr => {
+      const index = this._index();
+      const next = curr.slice();
+      let touched = false;
+
+      for (const id of ids) {
+        const pos = index.get(id);
+        if (pos !== undefined) {
+          const row = next[pos];
+          if (row.active !== value) {
+            next[pos] = { ...row, active: value };
+            touched = true;
+          }
+        }
+      }
+
+      if (!touched) return curr;      // nada cambió → no alterar referencia
+      this.rebuildIndex(next);
+      return next;
+    });
+  }
   remove(id: number): void {
     this._items.update(curr => {
       const filtered = curr.filter(x => x.id !== id);

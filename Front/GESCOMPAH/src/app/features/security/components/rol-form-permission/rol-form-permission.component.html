@@ -27,8 +27,13 @@
     </span>
 
     <div *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
-      <app-toggle-button-component class="align-middle" [checked]="row.active"
-        (changed)="onToggleActive(row, { checked: $event })" [size]="20" [onColor]="'#388E3C'" [offColor]="'#9CA3AF'"
+      <app-toggle-button-component
+        class="align-middle"
+        [checked]="row.active"
+        (changed)="onToggleActive(row, $event)"
+        [size]="20"
+        [onColor]="'#388E3C'"
+        [offColor]="'#9CA3AF'"
         [thumb]="'#ffffff'">
       </app-toggle-button-component>
     </div>

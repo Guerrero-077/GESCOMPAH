@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 import {
   ContractCreateModel,
   ContractSelectModel,
-  ContractCard
+  ContractCard,
+  MonthlyObligation,
 } from '../../models/contract.models';
 import { environment } from '../../../../../environments/environment.development';
 
@@ -56,5 +57,13 @@ export class ContractService {
   /** Descargar PDF. */
   downloadContractPdf(id: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/${id}/pdf`, { responseType: 'blob' });
+  }
+
+  /**
+   * Listar obligaciones mensuales asociadas a un contrato.
+   * Ajusta el endpoint si tu backend usa otra ruta.
+   */
+  getMonthlyObligations(contractId: number): Observable<MonthlyObligation[]> {
+    return this.http.get<MonthlyObligation[]>(`${this.baseUrl}/${contractId}/obligations`);
   }
 }

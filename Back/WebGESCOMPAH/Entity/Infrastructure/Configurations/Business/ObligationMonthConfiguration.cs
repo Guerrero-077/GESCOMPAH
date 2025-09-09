@@ -40,7 +40,11 @@ namespace Entity.Infrastructure.Configurations.Business
             builder.Property(o => o.Locked)
                 .IsRequired();
 
-            builder.Property(o => o.DueDate).HasColumnType("timestamp");
+            // No forzar tipo de columna aquí para soportar multi‑DB.
+            // Dejar que cada provider mapée correctamente:
+            // - SQL Server: datetime2 (por defecto)
+            // - PostgreSQL: timestamp without time zone (por defecto)
+            // - MySQL: datetime(6) (ajustado vía ConfigureConventions en MySqlApplicationDbContext)
 
             builder.HasOne(o => o.Contract)
                 .WithMany(c => c.ObligationMonths) // <-- asegúrate que exista esta navegación en Contract

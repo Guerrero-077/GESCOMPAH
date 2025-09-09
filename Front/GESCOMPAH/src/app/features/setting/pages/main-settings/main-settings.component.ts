@@ -17,7 +17,6 @@ import { ProfileFormComponent } from '../../components/profile-form/profile-form
     MatTabsModule,
     LocationSettingsComponent,
     FinanceComponent,
-    // CompanyComponent,
     ChangePasswordComponent,
     HasRoleAndPermissionDirective,
     ProfileFormComponent
