@@ -1,16 +1,16 @@
 <div class="sidebar">
   <div class="header">
     <h3>GESCOMPAH</h3>
-    <p>Palermo Locales</p>
+    <p class="text-white">Palermo Locales</p>
   </div>
 
   <div class="menu">
     <mat-accordion multi="true">
       <ng-container *ngFor="let item of menu(); trackBy: trackByItem">
 
-        <!-- Panel desplegable -->
+        <!-- Acordeón (módulo con 1+ hijos) -->
         <mat-expansion-panel class="sidebar-expansion-panel"
-                             *ngIf="(item.children?.length ?? 0) > 1"
+                             *ngIf="(item.children?.length ?? 0) > 0"
                              [expanded]="isGroupActive(item)"
                              [ngClass]="{ 'active': isGroupActive(item) }">
 
@@ -28,34 +28,52 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
 
+          <!-- Submenú nivel 1 -->
           <mat-nav-list class="submenu">
-            <a mat-list-item
-               *ngFor="let child of item.children; trackBy: trackByChild"
-               [routerLink]="child.route"
-               routerLinkActive="active"
-               [routerLinkActiveOptions]="{ exact: true }"
-               (click)="closeSidebar.emit()">
-              <span class="submenu-label">{{ child.label }}</span>
-            </a>
+            <ng-container *ngFor="let child of item.children; trackBy: trackByChild">
+
+              <!-- Si el hijo es hoja (tiene route y no hijos) -->
+              <a mat-list-item
+                 *ngIf="(child.children?.length ?? 0) === 0 && child.route as r1"
+                 [routerLink]="'/admin/' + r1"
+                 routerLinkActive="active"
+                 [routerLinkActiveOptions]="{ exact: true }"
+                 (click)="onItemClick()">
+                <span class="submenu-label">{{ child.label }}</span>
+              </a>
+
+              <!-- Si el hijo tiene subhijos (sub-submenú) -->
+              <div class="submenu-group" *ngIf="(child.children?.length ?? 0) > 0">
+                <div class="submenu-group-title">{{ child.label }}</div>
+
+                <div class="submenu-group-items">
+                  <a mat-list-item
+                     *ngFor="let grand of child.children; trackBy: trackByGrand"
+                     [routerLink]="'/admin/' + grand.route"
+                     routerLinkActive="active"
+                     [routerLinkActiveOptions]="{ exact: true }"
+                     (click)="onItemClick()">
+                    <span class="submenu-label">{{ grand.label }}</span>
+                  </a>
+                </div>
+              </div>
+
+            </ng-container>
           </mat-nav-list>
         </mat-expansion-panel>
 
-        <!-- Ítem directo -->
+        <!-- Ítem directo (módulo con un solo form simple) -->
         <a mat-list-item
            class="single-link"
-           *ngIf="(item.children?.length ?? 0) <= 1 && item.route as r"
+           *ngIf="(item.children?.length ?? 0) === 0 && item.route as r"
            [routerLink]="r"
            routerLinkActive="active"
            [routerLinkActiveOptions]="{ exact: true }"
            [ngClass]="{ 'active-single': isSingleActive(item) }"
-           (click)="closeSidebar.emit()">
+           (click)="onItemClick()">
           <span class="link-content">
-            <div class="icon-box">
-              <mat-icon>{{ item.icon }}</mat-icon>
-            </div>
-            <div class="label-box">
-              <span class="item-label">{{ item.label }}</span>
-            </div>
+            <div class="icon-box"><mat-icon>{{ item.icon }}</mat-icon></div>
+            <div class="label-box"><span class="item-label">{{ item.label }}</span></div>
           </span>
         </a>
 

@@ -50,3 +50,23 @@ export interface ContractCard {
   totalUvt:  number;
   active:    boolean;
 }
+
+/** Obligación mensual asociada a un contrato */
+export interface MonthlyObligation {
+  id: number;
+  contractId: number;
+  year: number;
+  month: number; // 1-12
+  dueDate: string; // ISO string
+  uvtQtyApplied: number;
+  uvtValueApplied: number;
+  vatRateApplied: number; // 0.19, etc
+  baseAmount: number;
+  vatAmount: number;
+  totalAmount: number;
+  daysLate: number | null;
+  lateAmount: number | null;
+  status: 'PENDING' | 'PAID' | 'OVERDUE' | string;
+  locked: boolean;
+  active: boolean;
+}

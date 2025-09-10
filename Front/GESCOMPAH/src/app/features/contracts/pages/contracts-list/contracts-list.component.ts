@@ -1,155 +1,185 @@
-// src/app/features/contracts/components/contracts-list/contracts-list.component.ts
-import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { EMPTY, of } from 'rxjs';
-import { catchError, take, finalize, switchMap, tap } from 'rxjs/operators';
+import { take, switchMap, tap, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 
-// Models
-import { ContractCard, ContractSelectModel } from '../../models/contract.models';
-import { TableColumn } from '../../../../shared/models/TableColumn.models';
-
-// Services
+import { ContractCard } from '../../models/contract.models';
+import { ContractStore } from '../../services/contract/contract.store';
 import { ContractService } from '../../services/contract/contract.service';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
-// Components
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
-import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
-
-// Angular Material
+import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormContractComponent } from '../../components/form-contract/form-contract.component';
+import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
+import { ContractsRealtimeService } from '../../../../core/service/realtime/contracts-realtime.service';
+import { ContractDetailDialogComponent } from '../../components/contract-detail-dialog/contract-detail-dialog.component';
 
 @Component({
   selector: 'app-contracts-list',
   standalone: true,
   imports: [
     CommonModule,
-    GenericTableComponent,
-    ToggleButtonComponent,
-    MatProgressSpinnerModule,
+    // UI
     MatDialogModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
+    // Custom
+    ToggleButtonComponent,
+    HasRoleAndPermissionDirective,
   ],
   templateUrl: './contracts-list.component.html',
-  styleUrls: ['./contracts-list.component.css']
+  styleUrls: ['./contracts-list.component.css'],
 })
-export class ContractsListComponent implements OnInit {
-
-  private readonly contractService = inject(ContractService);
+export class ContractsListComponent implements OnInit, OnDestroy {
+  private readonly store = inject(ContractStore);
+  private readonly svc = inject(ContractService);
   private readonly dialog = inject(MatDialog);
   private readonly confirmDialog = inject(ConfirmDialogService);
-  private readonly sweetAlertService = inject(SweetAlertService);
+  private readonly toast = inject(SweetAlertService);
+  private readonly pageHeader = inject(PageHeaderService);
+  private readonly realtime = inject(ContractsRealtimeService);
 
-  // Única fuente de datos para la tabla
-  rows$ = this.contractService.rows;
+  readonly rows = this.store.items;       // signal<readonly ContractCard[]>
+  readonly loading = this.store.loading;  // signal<boolean>
+  readonly error = this.store.error;      // signal<string|null>
 
-  // Columnas para ContractCard
-  columns: TableColumn<ContractCard>[] = [];
+  // --- Filtro y derivadas ---
+  readonly filterKey = signal<string>('');
 
-  /** Flag de loading mientras se genera/descarga el PDF */
+  // ✅ Nota: devolvemos "readonly ContractCard[]" para no chocar con store.items
+  readonly filtered = computed<readonly ContractCard[]>(() => {
+    const list = this.rows() ?? [];
+    const q = this.filterKey().trim().toLowerCase();
+    if (!q) return list; // ya es readonly
+    // Array.filter<T> devuelve T[], que es asignable a readonly T[]
+    return list.filter(it => (
+      it.personFullName?.toLowerCase().includes(q) ||
+      it.personDocument?.toLowerCase().includes(q) ||
+      it.personPhone?.toLowerCase().includes(q) ||
+      (it.personEmail || '').toLowerCase().includes(q)
+    ));
+  });
+
+  readonly totalCount    = computed(() => (this.rows()?.length ?? 0));
+  readonly activeCount   = computed(() => (this.rows()?.filter(x => x.active).length ?? 0));
+  readonly inactiveCount = computed(() => (this.rows()?.filter(x => !x.active).length ?? 0));
+
   isDownloadingPdf = false;
 
-  @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
-
-  ngOnInit(): void {
-    this.setupColumns();
-    this.contractService.getList({ force: true }).pipe(
-      take(1),
-      catchError(err => {
-        console.error('Error loading contracts:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudieron cargar los contratos.', 'error');
-        return EMPTY;
-      })
-    ).subscribe();
+  async ngOnInit(): Promise<void> {
+    this.pageHeader.setPageHeader('Contratos', 'Gestión de Contratos');
+    this.realtime.connect();
+    await this.store.loadAll({ force: true });
   }
 
-  private setupColumns(): void {
-    this.columns = [
-      { key: 'index',            header: 'Nº', type: 'index' },
-      { key: 'personFullName',   header: 'Arrendatario' },
-      { key: 'personDocument',   header: 'Documento' },
-      { key: 'personPhone',      header: 'Teléfono' },
-      { key: 'personEmail',      header: 'Email' },
-      { key: 'startDate',        header: 'Inicio' },
-      { key: 'endDate',          header: 'Fin' },
-      { key: 'totalBase',        header: 'Total Base' },
-      { key: 'totalUvt',         header: 'Total UVT' },
-      { key: 'active',           header: 'Estado', type: 'custom', template: this.estadoTemplate }
-    ];
+  ngOnDestroy(): void {
+    this.realtime.disconnect();
   }
 
-  /** Crear */
-  onCreateNew() {
+  onFilterChange(v: string): void {
+    this.filterKey.set(v || '');
+  }
+
+  onCreate(): void {
     const ref = this.dialog.open(FormContractComponent, {
       width: '800px',
       disableClose: true,
       autoFocus: true,
-      data: null
+      data: null,
     });
 
-    ref.afterClosed().pipe(take(1)).subscribe((created: boolean) => {
-      if (created) {
-        this.sweetAlertService.showNotification('Éxito', 'Contrato creado correctamente.', 'success');
-        this.contractService.getList({ force: true }).pipe(take(1)).subscribe();
-      }
+    ref.afterClosed().pipe(take(1)).subscribe(async (created: boolean) => {
+      if (!created) return;
+      this.toast.showNotification('Éxito', 'Contrato creado correctamente.', 'success');
+      await this.store.loadAll({ force: true });
     });
   }
 
-  /** Descargar PDF */
-  onView(row: ContractCard) {
+  onView(row: ContractCard): void {
+    this.dialog.open(ContractDetailDialogComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      data: { id: row.id },
+      autoFocus: false,
+      disableClose: false,
+    });
+  }
+
+  onDownload(row: ContractCard): void {
     if (this.isDownloadingPdf) {
-      this.sweetAlertService.showNotification('Información', 'Ya hay una descarga en curso.', 'info');
+      this.toast.showNotification('Información', 'Ya hay una descarga en curso.', 'info');
       return;
     }
     this.isDownloadingPdf = true;
 
     const fileName$ = of(`Contrato_${row.personFullName || row.id}.pdf`);
-
-    this.contractService.downloadContractPdf(row.id).pipe(
+    this.svc.downloadContractPdf(row.id).pipe(
       take(1),
-      switchMap(blob => fileName$.pipe(
-        take(1),
-        tap((fileName: string) => {
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        })
-      )),
-      finalize(() => this.isDownloadingPdf = false)
+      switchMap(blob =>
+        fileName$.pipe(
+          take(1),
+          tap((fileName: string) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          })
+        )
+      ),
+      finalize(() => (this.isDownloadingPdf = false))
     ).subscribe({
-      next: () => this.sweetAlertService.showNotification('Éxito', 'La descarga del contrato ha comenzado.', 'success'),
-      error: err => {
+      next: () => this.toast.showNotification('Éxito', 'La descarga del contrato ha comenzado.', 'success'),
+      error: (err) => {
         console.error('Error downloading PDF:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo descargar el contrato.', 'error');
-      }
+        this.toast.showNotification('Error', 'No se pudo descargar el contrato.', 'error');
+      },
     });
   }
 
-  // Toggle activo/inactivo
-  onToggleActive(row: ContractCard, e: { checked: boolean }) {
-    const nextValue = e.checked;
-    this.contractService.updateContractActive(row.id, nextValue).subscribe({
-      next: (updated) => {
-        this.sweetAlertService.showNotification(
-          'Éxito',
-          `Contrato ${updated.active ? 'activado' : 'desactivado'} correctamente.`,
-          'success'
-        );
-      },
-      error: (err) => {
-        this.sweetAlertService.showNotification(
-          'Error',
-          err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error'
-        );
-      }
-    });
+  async onToggleActive(row: ContractCard, e: { checked: boolean } | boolean): Promise<void> {
+    const next = typeof e === 'boolean' ? e : !!e?.checked;
+    try {
+      await this.store.changeActiveStatusRemote(row.id, next);
+      this.toast.showNotification('Éxito', `Contrato ${next ? 'activado' : 'desactivado'} correctamente.`, 'success');
+    } catch (err: any) {
+      this.toast.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
+    }
   }
+
+  async onDelete(row: ContractCard): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: 'Eliminar contrato',
+      text: `¿Deseas eliminar el contrato de "${row.personFullName}"?`,
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+    });
+    if (!ok) return;
+
+    try {
+      await this.store.delete(row.id);
+      this.toast.showNotification('Eliminación Exitosa', 'Contrato eliminado correctamente.', 'success');
+    } catch {
+      this.toast.showNotification('Error', 'No se pudo eliminar el contrato.', 'error');
+    }
+  }
+
+  trackById = (_: number, item: ContractCard) => item.id;
 }

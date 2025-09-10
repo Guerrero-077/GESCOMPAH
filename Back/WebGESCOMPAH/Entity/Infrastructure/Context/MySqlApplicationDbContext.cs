@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿
+using System.Reflection;
 using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
@@ -92,5 +93,6 @@ namespace Entity.Infrastructure.Context
         public DbSet<PremisesLeased> premisesLeaseds { get; set; }
         public DbSet<Clause> clauses { get; set; }
         public DbSet<ContractClause> contractClauses { get; set; }
+        public DbSet<ObligationMonth> obligationMonths { get; set; }
     }
 }

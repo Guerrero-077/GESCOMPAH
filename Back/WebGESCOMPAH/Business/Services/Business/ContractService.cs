@@ -1,77 +1,87 @@
 ﻿using Business.CustomJWT;
 using Business.Interfaces.Implements.Business;
+using Business.Interfaces.Implements.Persons;
+using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Repository;
 using Data.Interfaz.IDataImplement.Business;
 using Data.Interfaz.IDataImplement.Persons;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
-using Data.Services.Business;
-using Data.Services.Persons;
-using Data.Services.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.Business.Contract;
+using Entity.DTOs.Implements.Business.ObligationMonth;
+using Entity.DTOs.Implements.Persons.Person;
 using Entity.Infrastructure.Context;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Net.Mail;
 using Utilities.Exceptions;
 using Utilities.Helpers.GeneratePassword;
-using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
 
 namespace Business.Services.Business
 {
     /// <summary>
-    /// Crea contratos (persona/usuario opcional), asocia locales y marca sus establecimientos como ocupados (Active = false).
-    /// Patrón aplicado: ExecutionStrategy + transacción local para soportar reintentos de EF Core con SQL Server.
+    /// Servicio de contratos: orquesta el caso de uso y delega reglas a servicios existentes.
+    /// TODO (seguridad): migrar password temporal a token de set-password cuando uses UserManager.
     /// </summary>
     public class ContractService
         : BusinessGeneric<ContractSelectDto, ContractCreateDto, ContractUpdateDto, Contract>, IContractService
     {
         private readonly IContractRepository _contractRepository;
+        private readonly IPersonService _personService;
         private readonly IPersonRepository _personRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRolUserRepository _rolUserRepository;
         private readonly IPremisesLeasedRepository _premisesLeasedRepository;
         private readonly IEstablishmentsRepository _establishmentsRepository;
+        private readonly IEstablishmentService _establishmentService;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ISendCode _emailService;
         private readonly ApplicationDbContext _context;
         private readonly ICurrentUser _user;
+        private readonly IObligationMonthRepository _obligationRepository;
+        private readonly IObligationMonthService _obligationMonthSvc;
+        private readonly IUserContextService _userContextService;
 
         public ContractService(
-            IContractRepository data,
+            IContractRepository contracts,
+            IPersonService personService,
             IPersonRepository personRepository,
             IUserRepository userRepository,
             IRolUserRepository rolUserRepository,
             IPremisesLeasedRepository premisesLeasedRepository,
             IEstablishmentsRepository establishmentsRepository,
+            IEstablishmentService establishmentService,
             IMapper mapper,
             IPasswordHasher<User> passwordHasher,
             ISendCode emailService,
             ApplicationDbContext context,
-            ICurrentUser user
-        ) : base(data, mapper)
+            ICurrentUser currentUser,
+            IObligationMonthRepository obligationRepository,
+            IObligationMonthService obligationMonthSvc,
+            IUserContextService userContextService
+        ) : base(contracts, mapper)
         {
+            _contractRepository = contracts;
+            _personService = personService;
             _personRepository = personRepository;
             _userRepository = userRepository;
             _rolUserRepository = rolUserRepository;
-            _contractRepository = data;
             _premisesLeasedRepository = premisesLeasedRepository;
             _establishmentsRepository = establishmentsRepository;
+            _establishmentService = establishmentService;
             _passwordHasher = passwordHasher;
             _emailService = emailService;
             _context = context;
-            _user = user;
+            _user = currentUser;
+            _obligationRepository = obligationRepository;
+            _obligationMonthSvc = obligationMonthSvc;
+            _userContextService = userContextService;
         }
 
-        /// <summary>
-        /// Lista para grilla (admin → todos; arrendador → solo los suyos).
-        /// Proyección liviana: trae datos de persona y totales pactados.
-        /// </summary>
         public async Task<IReadOnlyList<ContractCardDto>> GetMineAsync()
         {
             var list = _user.EsAdministrador
@@ -80,137 +90,118 @@ namespace Business.Services.Business
                     _user.PersonId ?? throw new BusinessException("Usuario sin persona asociada.")
                   );
 
-            var result = list.Select(c => new ContractCardDto(
-                c.Id,
-                c.PersonId,
-                c.PersonFullName,
-                c.PersonDocument,
-                c.PersonPhone,
-                c.PersonEmail,
-                c.StartDate,
-                c.EndDate,
-                c.TotalBase,
-                c.TotalUvt,
-                c.Active
-            )).ToList();
-
+            // Mapster en vez de constructor manual
+            var result = _mapper.Map<List<ContractCardDto>>(list);
             return result.AsReadOnly();
         }
 
-        // Proyección liviana -> suma totales sin materializar entidades completas.
-        private async Task<(decimal totalBase, decimal totalUvt)> SumEstablishmentsAsync(IEnumerable<int> establishmentIds)
+        private static bool IsValidEmail(string? email)
         {
-            var ids = establishmentIds?.Distinct().ToList() ?? [];
-            if (ids.Count == 0) return (0m, 0m);
-
-            var basics = await _establishmentsRepository.GetBasicsByIdsAsync(ids); // <- Debe materializar en repo
-            var totalBase = basics.Sum(b => b.RentValueBase);
-            var totalUvt = basics.Sum(b => b.UvtQty);
-            return (totalBase, totalUvt);
+            if (string.IsNullOrWhiteSpace(email)) return false;
+            try { _ = new MailAddress(email); return true; }
+            catch { return false; }
         }
 
-        /// <summary>
-        /// Crea contrato + (opcional) usuario, asocia locales y los marca inactivos.
-        /// Usa ExecutionStrategy para que EF pueda reintentar la unidad transaccional completa sin lanzar
-        /// "SqlServerRetryingExecutionStrategy no soporta transacciones de usuario".
-        /// </summary>
-        
-    //  helper de validación (dentro de tu ContractService)
-    private static bool IsValidEmail(string? email)
-    {
-        if (string.IsNullOrWhiteSpace(email)) return false;
-        try { _ = new MailAddress(email); return true; }
-        catch { return false; }
-    }
-
-    public async Task<int> CreateContractWithPersonHandlingAsync(ContractCreateDto dto)
-    {
+        public async Task<int> CreateContractWithPersonHandlingAsync(ContractCreateDto dto)
+        {
             if (dto.EstablishmentIds is null || dto.EstablishmentIds.Count == 0)
                 throw new BusinessException("Debe seleccionar al menos un establecimiento.");
 
             var targetIds = dto.EstablishmentIds.Distinct().ToList();
-
-            // Validación previa (fail-fast) si se pretende crear usuario
             var wantsUser = !string.IsNullOrWhiteSpace(dto.Email);
+
             if (wantsUser && !IsValidEmail(dto.Email))
                 throw new BusinessException("El correo proporcionado no es válido.");
 
             var strategy = _context.Database.CreateExecutionStrategy();
 
-            // Datos para notificación post-commit
+            // Variables para side-effects post-commit
             string? emailToNotify = null;
             string? fullNameToNotify = null;
             string? tempPassToNotify = null;
+            int? createdUserId = null;
 
             var contractId = await strategy.ExecuteAsync(async () =>
             {
                 await using var tx = await _context.Database.BeginTransactionAsync();
+
                 try
                 {
-                    // 0) Validación de disponibilidad
+                    // 1) Chequeo de disponibilidad
                     var alreadyInactive = await _establishmentsRepository.GetInactiveIdsAsync(targetIds);
                     if (alreadyInactive.Count > 0)
                         throw new BusinessException($"Los establecimientos {string.Join(", ", alreadyInactive)} no están disponibles (Active = false).");
 
-                    // 1) Persona
-                    var person = await _personRepository.GetByDocumentAsync(dto.Document);
-                    if (person is null)
+                    // 2) Persona (reutiliza PersonService). Si no existe, crear usando Mapster (dto -> PersonDto)
+                    Person personEntity;
+                    var existingPerson = await _personService.GetByDocumentAsync(dto.Document);
+                    if (existingPerson is null)
                     {
-                        person = _mapper.Map<Person>(dto);
-                        await _personRepository.AddAsync(person);
-                        await _context.SaveChangesAsync();
+                        var personDto = _mapper.Map<PersonDto>(dto); // Mapster config: ContractCreateDto -> PersonDto
+                        var created = await _personService.CreateAsync(personDto);
+
+                        personEntity = await _context.Set<Person>().FindAsync(created.Id)
+                                       ?? throw new BusinessException("No se pudo materializar la persona creada.");
+                    }
+                    else
+                    {
+                        personEntity = await _context.Set<Person>().FindAsync(existingPerson.Id)
+                                       ?? throw new BusinessException("Persona no encontrada en el contexto.");
                     }
 
-                    // 2) Usuario opcional (crear sin enviar correo aquí)
-                    var user = await _userRepository.GetByPersonIdAsync(person.Id);
-                    if (user is null && wantsUser)
+                    // 3) Usuario opcional (si no existe)
+                    User? createdUser = null;
+                    if (wantsUser)
                     {
-                        if (await _userRepository.ExistsByEmailAsync(dto.Email!))
-                            throw new BusinessException("El correo ya está registrado.");
-
-                        var tempPass = PasswordGenerator.Generate(12);
-                        user = new User
+                        var existingUser = await _userRepository.GetByPersonIdAsync(personEntity.Id);
+                        if (existingUser is null)
                         {
-                            Email = dto.Email!.Trim(),
-                            PersonId = person.Id,
-                            Password = _passwordHasher.HashPassword(null!, tempPass),
-                            // Recomendado: RequirePasswordChange = true
-                        };
-                        await _userRepository.AddAsync(user);
-                        await _rolUserRepository.AsignateRolDefault(user);
-                        await _context.SaveChangesAsync();
+                            if (await _userRepository.ExistsByEmailAsync(dto.Email!))
+                                throw new BusinessException("El correo ya está registrado.");
 
-                        // payload para el envío post-commit
-                        tempPassToNotify = tempPass;
-                        emailToNotify = user.Email;
-                        fullNameToNotify = $"{person.FirstName} {person.LastName}".Trim();
+                            var tempPass = PasswordGenerator.Generate(12);
+                            createdUser = new User
+                            {
+                                Email = dto.Email!.Trim(),
+                                PersonId = personEntity.Id,
+                                Password = _passwordHasher.HashPassword(null!, tempPass),
+                            };
+
+                            await _userRepository.AddAsync(createdUser);
+                            await _rolUserRepository.AsignateRolDefault(createdUser);
+
+                            // Datos para notificación
+                            tempPassToNotify = tempPass;
+                            emailToNotify = createdUser.Email;
+                            fullNameToNotify = $"{personEntity.FirstName} {personEntity.LastName}".Trim();
+                        }
                     }
 
-                    // 3) Contrato
-                    var contract = _mapper.Map<Contract>(dto);
-                    contract.PersonId = person.Id;
+                    // 4) Totales BASE/UVT (proyección liviana desde EstablishmentService)
+                    var basics = await _establishmentService.GetBasicsByIdsAsync(targetIds);
+                    var totalBase = basics.Sum(b => b.RentValueBase);
+                    var totalUvt = basics.Sum(b => b.UvtQty);
 
-                    // 4) Totales
-                    var (totalBase, totalUvt) = await SumEstablishmentsAsync(targetIds);
+                    // 5) Construir agregado contrato + locales (Mapster para contrato)
+                    var contract = _mapper.Map<Contract>(dto); // ContractCreateDto -> Contract
+                    contract.PersonId = personEntity.Id;
                     contract.TotalBaseRentAgreed = totalBase;
                     contract.TotalUvtQtyAgreed = totalUvt;
 
+                    foreach (var estId in targetIds)
+                        contract.PremisesLeased.Add(new PremisesLeased { EstablishmentId = estId });
+
                     await _contractRepository.AddAsync(contract);
-                    await _context.SaveChangesAsync(); // genera Id
 
-                    // 5) Premises
-                    var premises = targetIds.Select(id => new PremisesLeased
-                    {
-                        ContractId = contract.Id,
-                        EstablishmentId = id
-                    }).ToList();
-                    await _premisesLeasedRepository.AddRangeAsync(premises);
-                    await _context.SaveChangesAsync();
-
-                    // 6) Ocupa locales
+                    // 6) Desactivar establecimientos (chequeo de filas afectadas)
                     var rows = await _establishmentsRepository.SetActiveByIdsAsync(targetIds, active: false);
                     if (rows != targetIds.Count)
                         throw new BusinessException("Conflicto de concurrencia al actualizar estados de establecimientos. Verifique disponibilidad.");
+
+                    // 7) Persistencia única
+                    await _context.SaveChangesAsync();
+
+                    if (createdUser is not null) createdUserId = createdUser.Id;
 
                     await tx.CommitAsync();
                     return contract.Id;
@@ -222,24 +213,63 @@ namespace Business.Services.Business
                 }
             });
 
-            // === POST-COMMIT: envío de email tolerante a fallos (no rompe el flujo) ===
+            // === POST-COMMIT ===
+
+            // (A) Email con contraseña temporal
             if (!string.IsNullOrWhiteSpace(emailToNotify) &&
                 !string.IsNullOrWhiteSpace(fullNameToNotify) &&
                 !string.IsNullOrWhiteSpace(tempPassToNotify))
             {
-                try
-                {
-                    await _emailService.SendTemporaryPasswordAsync(emailToNotify!, fullNameToNotify!, tempPassToNotify!);
-                }
-                catch (Exception ex)
-                {
-                    // loguea y sigue; evita rollback del negocio por SMTP
-                    // _logger.LogError(ex, "Fallo al enviar contraseña temporal a {Email}", emailToNotify);
-                }
+                try { await _emailService.SendTemporaryPasswordAsync(emailToNotify!, fullNameToNotify!, tempPassToNotify!); }
+                catch { /* log y continuar */ }
+            }
+
+            // (B) Generar obligación del mes actual (idempotente en tu servicio)
+            var tz = TimeZoneConverter.TZConvert.GetTimeZoneInfo("America/Bogota");
+            var nowLocal = TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
+            await _obligationMonthSvc.GenerateForContractMonthAsync(contractId, nowLocal.Year, nowLocal.Month);
+
+            // (C) Invalidar caché del contexto de usuario si se creó
+            if (createdUserId.HasValue)
+            {
+                try { _userContextService.InvalidateCache(createdUserId.Value); }
+                catch { /* log y continuar */ }
             }
 
             return contractId;
         }
 
+        public async Task<ExpirationSweepResult> RunExpirationSweepAsync(CancellationToken ct = default)
+        {
+            var now = DateTime.UtcNow;
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                await using var tx = await _context.Database.BeginTransactionAsync(ct);
+                try
+                {
+                    var deactivatedIds = await _contractRepository.DeactivateExpiredAsync(now);
+                    var reactivated = await _contractRepository.ReleaseEstablishmentsForExpiredAsync(now);
+
+                    await tx.CommitAsync(ct);
+                    return new ExpirationSweepResult(deactivatedIds, reactivated);
+                }
+                catch
+                {
+                    await tx.RollbackAsync(ct);
+                    throw;
+                }
+            });
+        }
+
+        public async Task<IReadOnlyList<ObligationMonthSelectDto>> GetObligationsAsync(int contractId)
+        {
+            if (contractId <= 0) throw new BusinessException("contractId inválido.");
+
+            var query = _obligationRepository.GetByContractQueryable(contractId);
+            var list = await query.ToListAsync();
+            return _mapper.Map<List<ObligationMonthSelectDto>>(list).AsReadOnly();
+        }
     }
 }

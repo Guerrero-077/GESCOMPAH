@@ -14,6 +14,8 @@ namespace Data.Services.Business
         public override async Task<IEnumerable<Contract>> GetAllAsync()
         {
             return await _dbSet
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Include(c => c.Person).ThenInclude(p => p.User)
                 .Include(c => c.PremisesLeased).ThenInclude(pl => pl.Establishment).ThenInclude(e => e.Plaza)
                 .AsNoTracking()
@@ -35,7 +37,8 @@ namespace Data.Services.Business
         public async Task<IReadOnlyList<ContractCard>> GetCardsByPersonAsync(int personId) =>
             await _dbSet.AsNoTracking()
                 .Where(c => !c.IsDeleted && c.PersonId == personId)
-                .OrderByDescending(c => c.Id)
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Select(c => new ContractCard(
                     c.Id,
                     c.PersonId,
@@ -70,5 +73,69 @@ namespace Data.Services.Business
                 ))
                 .ToListAsync();
 
+
+
+
+
+
+
+
+        /// <summary>
+        /// Desactiva contratos con EndDate &lt; utcNow y que sigan activos.
+        /// </summary>
+        public async Task<IReadOnlyList<int>> DeactivateExpiredAsync(DateTime utcNow)
+        {
+            var ids = await _dbSet
+                .Where(c => !c.IsDeleted && c.Active && c.EndDate < utcNow)
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            if (ids.Count == 0) return ids;
+
+            await _dbSet
+                .Where(c => ids.Contains(c.Id))
+                .ExecuteUpdateAsync(s => s.SetProperty(c => c.Active, false));
+
+            return ids;
+        }
+
+
+        /// <summary>
+        /// Libera establecimientos de esos contratos expirados SI no están ocupados por otro contrato activo.
+        /// </summary>
+        public async Task<int> ReleaseEstablishmentsForExpiredAsync(DateTime utcNow)
+        {
+            // Contratos inactivos cuya fecha ya pasó (defensivo)
+            var expiredIds = await _dbSet
+                .Where(c => !c.IsDeleted && !c.Active && c.EndDate < utcNow)
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            if (expiredIds.Count == 0) return 0;
+
+            // Establecimientos vinculados a contratos expirados
+            var estIds = await _context.Set<PremisesLeased>()
+                .Where(p => expiredIds.Contains(p.ContractId))
+                .Select(p => p.EstablishmentId)
+                .Distinct()
+                .ToListAsync();
+
+            if (estIds.Count == 0) return 0;
+
+            // Establecimientos SIN otro contrato activo que los mantenga ocupados
+            var estToActivate = await _context.Set<PremisesLeased>()
+                .Where(pl => estIds.Contains(pl.EstablishmentId))
+                .GroupBy(pl => pl.EstablishmentId)
+                .Where(g => !g.Any(pl =>
+                    _dbSet.Any(c => !c.IsDeleted && c.Id == pl.ContractId && c.Active)))
+                .Select(g => g.Key)
+                .ToListAsync();
+
+            if (estToActivate.Count == 0) return 0;
+
+            return await _context.Set<Establishment>()
+                .Where(e => estToActivate.Contains(e.Id) && !e.Active)
+                .ExecuteUpdateAsync(s => s.SetProperty(e => e.Active, true));
+        }
     }
 }

@@ -4,7 +4,7 @@ using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Services.AdministratiosSystem
+namespace Data.Repositories.Implementations.SecurityAuthentication
 {
     public class RolFormPermissionRepository : DataGeneric<RolFormPermission>, IRolFormPermissionRepository
     {
@@ -14,16 +14,11 @@ namespace Data.Services.AdministratiosSystem
         {
             return await _dbSet.AsNoTracking()
                 .Where(e => !e.IsDeleted)
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Include(e => e.Rol)
                 .Include(e => e.Form)
                 .Include(e => e.Permission)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<RolFormPermission>> GetByRolAndFormAsync(int rolId, int formId)
-        {
-            return await _dbSet
-                .Where(e => e.RolId == rolId && e.FormId == formId && !e.IsDeleted)
                 .ToListAsync();
         }
 
@@ -36,15 +31,21 @@ namespace Data.Services.AdministratiosSystem
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
         }
 
-        // Usuarios que están asignados a un rol (activos)
-        public async Task<List<int>> GetUserIdsByRoleIdAsync(int roleId)
+        public async Task<IEnumerable<RolFormPermission>> GetByRolAndFormAsync(int rolId, int formId)
         {
-            var q = _context.Set<RolUser>().AsNoTracking()
-                .Where(ru => ru.RolId == roleId && ru.Active && !ru.IsDeleted)
-                .Select(ru => ru.UserId)
-                .Distinct();
+            return await _dbSet
+                .Where(e => e.RolId == rolId && e.FormId == formId && !e.IsDeleted)
+                .ToListAsync();
+        }
 
-            return await q.ToListAsync();
+        public async Task<List<int>> GetUserIdsByRoleIdAsync(int rolId)
+        {
+            return await _context.Set<RolUser>()
+                .AsNoTracking()
+                .Where(ru => ru.RolId == rolId && ru.Active && !ru.IsDeleted)
+                .Select(ru => ru.UserId)
+                .Distinct()
+                .ToListAsync();
         }
     }
 }

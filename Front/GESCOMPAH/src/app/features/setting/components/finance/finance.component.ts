@@ -2,19 +2,20 @@ import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
 import { MatDialog } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { FinanceSelectModels } from '../../models/finance.models';
 import { CommonModule } from '@angular/common';
 import { FinanceStore } from '../../services/finance/finance.store';
+import { IsActive } from '../../../../core/models/IsAcitve.models';
 
 @Component({
   selector: 'app-finance',
   imports: [GenericTableComponent, ToggleButtonComponent, CommonModule],
   templateUrl: './finance.component.html',
-  styleUrl: './finance.component.css'
+  styleUrls: ['./finance.component.css']
 })
 export class FinanceComponent {
   finances$: Observable<FinanceSelectModels[]>;
@@ -104,29 +105,32 @@ export class FinanceComponent {
   }
 
 
-  // ----- Toggle estado (activo/inactivo) -----
-  onToggleActive(row: FinanceSelectModels, e: { checked: boolean }) {
-    const previous = row.active;
-    row.active = e.checked;
-    this.store.changeActiveStatus(row.id, e.checked).subscribe({
-      next: (updated) => {
-        // sincronizar con lo que devuelve el backend
-        row.active = updated.active ?? row.active;
-        this.sweetAlert.showNotification(
-          'Éxito',
-          `Ciudad ${row.active ? 'activado' : 'desactivado'} correctamente.`,
-          'success'
-        );
+  // ===== Toggle Activo/Inactivo (optimista + rollback sencillo) =====
+  // En el HTML: (toggleChange)="onToggleActive(row, $event)"
+  onToggleActive(row: IsActive, e: boolean | { checked: boolean }) {
+    const checked = typeof e === 'boolean' ? e : !!e?.checked;
+    const prev = row.active;
+
+    // UI optimista
+    row.active = checked;
+
+    this.store.changeActiveStatus(row.id, checked).pipe(take(1)).subscribe({
+      next: updated => {
+        // Si la API devuelve 204, mantenemos el valor; si devuelve DTO, sincronizamos
+        row.active = updated?.active ?? checked;
+        this.sweetAlert.showNotification('Éxito',
+          `Departamento ${row.active ? 'activado' : 'desactivado'} correctamente.`,
+          'success');
       },
-      error: (err) => {
-        // revertir si falla
-        row.active = previous;
-        this.sweetAlert.showNotification(
-          'Error',
+      error: err => {
+        // Rollback
+        row.active = prev;
+        this.sweetAlert.showNotification('Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error'
-        );
+          'error');
       }
     });
   }
+
+
 }

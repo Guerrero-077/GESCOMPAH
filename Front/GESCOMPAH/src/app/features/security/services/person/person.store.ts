@@ -64,4 +64,13 @@ export class PersonStore {
       })
     );
   }
+
+
+  changeActiveStatus(id: number, active: boolean): Observable<PersonSelectModel> {
+    return this.personService.changeActiveStatus(id, active).pipe(
+      tap(() => {
+        this.loadAll()
+      })
+    );
+  }
 }

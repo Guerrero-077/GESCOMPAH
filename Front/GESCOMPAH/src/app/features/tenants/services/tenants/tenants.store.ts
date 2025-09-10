@@ -1,74 +1,174 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
-import { TenantsCreateModel, TenantsSelectModel, TenantsUpdateModel } from "../../models/tenants.models";
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { TenantsService } from './tenants.service';
+import {
+  TenantsCreateModel,
+  TenantsSelectModel,
+  TenantsUpdateModel
+} from '../../models/tenants.models';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class tenantStore {
+@Injectable({ providedIn: 'root' })
+export class TenantStore {
+  private readonly svc = inject(TenantsService);
 
-  private readonly _tenants = new BehaviorSubject<TenantsSelectModel[]>([]);
-  readonly tenant$ = this._tenants.asObservable();
+  // ===== Estado base =====
+  private readonly _items   = signal<TenantsSelectModel[]>([]);
+  private readonly _loading = signal(false);
+  private readonly _error   = signal<string | null>(null);
 
-  constructor(private tenantService: TenantsService) {
-    this.loadAll();
+  // Control de concurrencia por ítem (p. ej., toggle estado)
+  private readonly _busyIds = signal<Set<number>>(new Set());
+
+  // ===== Selectores =====
+  readonly items   = computed(() => this._items());
+  readonly loading = computed(() => this._loading());
+  readonly error   = computed(() => this._error());
+  readonly count   = computed(() => this._items().length);
+  readonly busyIds = computed(() => this._busyIds());
+
+  isBusy(id: number): boolean {
+    return this._busyIds().has(id);
   }
 
-  private get tenants(): TenantsSelectModel[] {
-    return this._tenants.getValue();
+  // ===== Helpers colección =====
+  setAll(list: TenantsSelectModel[]): void {
+    this._items.set(list ?? []);
   }
 
-  private set tenants(val: TenantsSelectModel[]) {
-    this._tenants.next(val);
+  /** Inserta/actualiza preservando orden actual (no reordena todo el array). */
+  upsertMany(list: TenantsSelectModel[]): void {
+    if (!list?.length) return;
+    const byId = new Map(list.map(it => [it.id, it]));
+    this._items.update(arr => {
+      const next = arr.map(it => byId.get(it.id) ?? it);
+      // agrega los que no estaban
+      byId.forEach((it, id) => {
+        if (!arr.some(x => x.id === id)) next.unshift(it);
+      });
+      return next;
+    });
   }
 
-  loadAll() {
-    this.tenantService.getAll().pipe(
-      tap(data => this.tenants = data),
-      catchError(err => {
-        console.log('Error loading tenants', err);
-        return throwError(() => err);
-      })
-    ).subscribe();
+  upsertOne(item: TenantsSelectModel): void {
+    this._items.update(arr => {
+      const i = arr.findIndex(x => x.id === item.id);
+      if (i === -1) return [item, ...arr];
+      const copy = arr.slice();
+      copy[i] = item;
+      return copy;
+    });
   }
 
-  create(tenant: TenantsCreateModel): Observable<TenantsSelectModel> {
-    return this.tenantService.create(tenant).pipe(
-      tap(() => {
-        this.loadAll();
-      })
-    )
+  patchOne(id: number, patch: Partial<TenantsSelectModel>): void {
+    this._items.update(arr => arr.map(x => x.id === id ? { ...x, ...patch } : x));
   }
 
-  update(id: number, updateDto: TenantsUpdateModel): Observable<TenantsSelectModel> {
-    return this.tenantService.update(id, updateDto).pipe(
-      tap(() => {
-        this.loadAll();
-      })
-    )
+  remove(id: number): void {
+    this._items.update(arr => arr.filter(x => x.id !== id));
   }
 
-  delete(id: number): Observable<void> {
-    return this.tenantService.delete(id).pipe(
-      tap(() => {
-        this.tenants = this.tenants.filter(c => c.id !== id);
-      })
-    )
+  clear(): void {
+    this._items.set([]);
+    this._error.set(null);
+    this._loading.set(false);
+    this._busyIds.set(new Set());
   }
 
-  deleteLogic(id: number): Observable<void> {
-    return this.tenantService.deleteLogic(id).pipe(
-      tap(() => {
-        this.loadAll();
-      })
-    );
+  changeActiveStatus(id: number, active: boolean): void {
+    this.patchOne(id, { active } as Partial<TenantsSelectModel>);
   }
-  changeActiveStatus(id: number, active: boolean): Observable<TenantsSelectModel> {
-    return this.tenantService.changeActiveStatus(id, active).pipe(
-      tap(() => {
-        this.loadAll();
-      })
-    );
+
+  getById(id: number): TenantsSelectModel | undefined {
+    return this._items().find(x => x.id === id);
+  }
+
+  private markBusy(id: number, val: boolean): void {
+    this._busyIds.update(set => {
+      const next = new Set(set);
+      val ? next.add(id) : next.delete(id);
+      return next;
+    });
+  }
+
+  private setError(e: unknown): void {
+    this._error.set(String((e as any)?.message ?? e ?? 'Error'));
+  }
+
+  // ===== I/O =====
+  async loadAll(): Promise<void> {
+    this._loading.set(true);
+    this._error.set(null);
+    try {
+      const data = await firstValueFrom(this.svc.getAll());
+      this.setAll(data ?? []);
+    } catch (e) {
+      this.setError(e);
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  async create(dto: TenantsCreateModel): Promise<void> {
+    try {
+      const created = await firstValueFrom(this.svc.create(dto));
+      this.upsertOne(created);
+    } catch (e) {
+      this.setError(e);
+      throw e;
+    }
+  }
+
+  async update(id: number, dto: TenantsUpdateModel): Promise<void> {
+    try {
+      const updated = await firstValueFrom(this.svc.update(id, dto));
+      this.upsertOne(updated);
+    } catch (e) {
+      this.setError(e);
+      throw e;
+    }
+  }
+
+  async delete(id: number): Promise<void> {
+    try {
+      await firstValueFrom(this.svc.delete(id));
+      this.remove(id);
+    } catch (e) {
+      this.setError(e);
+      throw e;
+    }
+  }
+
+  // Si tu API hace borrado lógico y no quieres mantenerlo visible, removemos localmente.
+  // Si prefieres mostrarlo "inactivo", cambia por: this.changeActiveStatus(id, false)
+  async deleteLogic(id: number): Promise<void> {
+    try {
+      await firstValueFrom(this.svc.deleteLogic(id));
+      this.remove(id);
+    } catch (e) {
+      this.setError(e);
+      throw e;
+    }
+  }
+
+  /**
+   * Cambia el estado remoto con estrategia optimista, rollback y “busy por id”.
+   * Si el API devuelve la entidad actualizada, la sincroniza; si devuelve void, no hace falta.
+   */
+  async changeActiveStatusRemote(id: number, active: boolean): Promise<void> {
+    if (this.isBusy(id)) return; // evita doble clic
+    const prev = this.getById(id)?.active; // true/false/undefined
+    this.markBusy(id, true);
+    this.changeActiveStatus(id, active); // optimista
+
+    try {
+      const updated = await firstValueFrom(this.svc.changeActiveStatus(id, active));
+      if (updated) this.upsertOne(updated);
+    } catch (err) {
+      if (prev !== undefined) this.changeActiveStatus(id, prev); // rollback
+      this.setError(err);
+      throw err;
+    } finally {
+      this.markBusy(id, false);
+    }
   }
 }

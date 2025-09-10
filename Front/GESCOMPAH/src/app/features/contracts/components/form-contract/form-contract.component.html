@@ -2,18 +2,22 @@
   <!-- Step 1: Person Information -->
   <mat-step [stepControl]="personFormGroup">
     <form [formGroup]="personFormGroup">
-      <ng-template matStepLabel>{{ stepper.selectedIndex === 0 ? 'Información del Arrendatario' : 'Información...' }}</ng-template>
+      <ng-template matStepLabel>
+        {{ stepper.selectedIndex === 0 ? 'Información del Arrendatario' : 'Información...' }}
+      </ng-template>
 
-      <!-- Documento (reactivo) + spinner -->
-      <div class="row">
-        <mat-form-field appearance="outline" class="field">
-          <mat-label>Documento</mat-label>
-          <input matInput formControlName="document" />
-          <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
-          <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">Requerido</mat-error>
-          <mat-error *ngIf="personFormGroup.get('document')?.hasError('minlength')">Mínimo 5 caracteres</mat-error>
-        </mat-form-field>
-      </div>
+      <!-- Documento -->
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Documento</mat-label>
+        <input matInput formControlName="document"
+          (keydown.enter)="personFormGroup.get('document')!.markAsTouched(); personFormGroup.get('document')!.updateValueAndValidity();">
+
+        <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
+        <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">Requerido</mat-error>
+        <mat-error *ngIf="personFormGroup.get('document')?.hasError('colombianDocument')">
+          Debe tener entre 7 y 10 dígitos.
+        </mat-error>
+      </mat-form-field>
 
       <!-- Aviso persona encontrada -->
       <div *ngIf="personaEncontrada" class="info-ok">
@@ -22,30 +26,59 @@
 
       <!-- Datos persona -->
       <div class="row two-cols">
+
+
+        <!-- Nombres -->
         <mat-form-field appearance="outline" class="field no-dim">
           <mat-label>Nombres</mat-label>
           <input matInput formControlName="firstName" />
           <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('required')">Requerido</mat-error>
+          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('onlySpaces')">No puede contener solo
+            espacios</mat-error>
+          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('alphaHuman')">Nombre inválido</mat-error>
         </mat-form-field>
 
+        <!-- Apellidos  -->
         <mat-form-field appearance="outline" class="field no-dim">
           <mat-label>Apellidos</mat-label>
           <input matInput formControlName="lastName" />
           <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('required')">Requerido</mat-error>
+          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('onlySpaces')">No puede contener solo
+            espacios</mat-error>
+          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('alphaHuman')">Apellido inválido</mat-error>
         </mat-form-field>
       </div>
 
       <div class="row two-cols">
+        <!-- Teléfono -->
         <mat-form-field appearance="outline" class="field no-dim">
           <mat-label>Teléfono</mat-label>
           <input matInput formControlName="phone" />
           <mat-error *ngIf="personFormGroup.get('phone')?.hasError('required')">Requerido</mat-error>
+          <mat-error *ngIf="personFormGroup.get('phone')?.hasError('colombianPhone')">Debe ser un número celular válido
+            (empieza en 3 y tiene 10 dígitos)</mat-error>
         </mat-form-field>
 
+
+        <!-- Email -->
         <mat-form-field appearance="outline" class="field no-dim">
           <mat-label>Email</mat-label>
-          <input matInput formControlName="email" type="email" />
-          <mat-error *ngIf="personFormGroup.get('email')?.hasError('email')">Correo inválido</mat-error>
+          <input matInput type="email" formControlName="email" required placeholder="usuario@example.com"
+            (blur)="fixEmail()" />
+          <mat-error *ngIf="personFormGroup.get('email')?.errors as errs">
+            {{
+            getFirstError(personFormGroup.get('email'),
+            ['required','email','domainMissing','tldMissing','tldInvalid','domainInvalid']
+            )
+            }}
+          </mat-error>
+          <mat-error *ngIf="personFormGroup.get('email')?.hasError('required')">Requerida</mat-error>
+          <mat-error *ngIf="personFormGroup.get('email')?.hasError('email')">Formato inválido</mat-error>
+          <mat-error *ngIf="personFormGroup.get('email')?.hasError('domainMissing')">Falta el dominio</mat-error>
+          <mat-error *ngIf="personFormGroup.get('email')?.hasError('domainInvalid')">Dominio inválido</mat-error>
+          <mat-error *ngIf="personFormGroup.get('email')?.hasError('tldMissing')">Falta el TLD (como .com)</mat-error>
+          <mat-error *ngIf="personFormGroup.get('email')?.hasError('tldInvalid')">TLD inválido (mín 2
+            letras)</mat-error>
         </mat-form-field>
       </div>
 
@@ -59,14 +92,20 @@
   <!-- Step 2: Contract Details -->
   <mat-step [stepControl]="contractFormGroup">
     <form [formGroup]="contractFormGroup">
-      <ng-template matStepLabel>{{ stepper.selectedIndex === 1 ? 'Detalles del Contrato' : 'Detalles...' }}</ng-template>
+      <ng-template matStepLabel>
+        {{ stepper.selectedIndex === 1 ? 'Detalles del Contrato' : 'Detalles...' }}
+      </ng-template>
 
       <!-- Ubicación -->
       <div class="row two-cols">
+        <!-- Dirección -->
         <mat-form-field appearance="outline" class="field no-dim">
           <mat-label>Dirección</mat-label>
           <input matInput formControlName="address" />
           <mat-error *ngIf="contractFormGroup.get('address')?.hasError('required')">Requerida</mat-error>
+          <mat-error *ngIf="contractFormGroup.get('address')?.hasError('addressInvalid')">
+            Usa solo letras, números, espacios y # - , .
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="field no-dim">
@@ -83,8 +122,10 @@
       <div class="row two-cols">
         <mat-form-field appearance="outline" class="field no-dim">
           <mat-label>Fecha de Inicio</mat-label>
-          <input matInput [matDatepicker]="pickerStart" formControlName="startDate" [min]="startMinDate" [max]="startMaxDate" readonly>
-          <button mat-icon-button matSuffix type="button" (click)="pickerStart.open()" aria-label="Abrir calendario de inicio">
+          <!-- Corregido: sin [max], usa solo [min]="startMinDate" -->
+          <input matInput [matDatepicker]="pickerStart" formControlName="startDate" [min]="startMinDate" readonly />
+          <button mat-icon-button matSuffix type="button" (click)="pickerStart.open()"
+            aria-label="Abrir calendario de inicio">
             <mat-icon>event</mat-icon>
           </button>
           <mat-datepicker #pickerStart></mat-datepicker>
@@ -93,12 +134,15 @@
 
         <mat-form-field appearance="outline" class="field">
           <mat-label>Fecha de Fin</mat-label>
-          <input matInput [matDatepicker]="pickerEnd" formControlName="endDate" [min]="minEndDate">
-          <button mat-icon-button matSuffix type="button" (click)="pickerEnd.open()" aria-label="Abrir calendario de fin">
+          <input matInput [matDatepicker]="pickerEnd" formControlName="endDate" [min]="minEndDate" />
+          <button mat-icon-button matSuffix type="button" (click)="pickerEnd.open()"
+            aria-label="Abrir calendario de fin">
             <mat-icon>event</mat-icon>
           </button>
           <mat-datepicker #pickerEnd></mat-datepicker>
-          <mat-error *ngIf="contractFormGroup.hasError('endBeforeStart')">La fecha de fin no puede ser menor que la fecha de inicio.</mat-error>
+          <mat-error *ngIf="contractFormGroup.hasError('endBeforeStart')">
+            La fecha de fin no puede ser menor que la fecha de inicio.
+          </mat-error>
           <mat-error *ngIf="contractFormGroup.get('endDate')?.hasError('required')">Requerida.</mat-error>
         </mat-form-field>
       </div>
@@ -114,7 +158,9 @@
   <!-- Step 3: Establishments -->
   <mat-step [stepControl]="establishmentFormGroup">
     <form [formGroup]="establishmentFormGroup">
-      <ng-template matStepLabel>{{ stepper.selectedIndex === 2 ? 'Establecimientos' : 'Establec...' }}</ng-template>
+      <ng-template matStepLabel>
+        {{ stepper.selectedIndex === 2 ? 'Establecimientos' : 'Establec...' }}
+      </ng-template>
 
       <!-- Plaza -->
       <div class="row">
@@ -134,14 +180,17 @@
           <mat-select formControlName="establishmentIds" multiple>
             <mat-option *ngFor="let e of filteredEstablishments" [value]="e.id">{{ e.name }}</mat-option>
           </mat-select>
-          <mat-error *ngIf="establishmentFormGroup.get('establishmentIds')?.hasError('required')">Seleccione al menos uno.</mat-error>
+          <mat-error *ngIf="establishmentFormGroup.get('establishmentIds')?.hasError('required')">
+            Seleccione al menos uno.
+          </mat-error>
         </mat-form-field>
       </div>
 
       <div class="actions">
         <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
         <button mat-button matStepperPrevious>Atrás</button>
-        <button mat-raised-button color="primary" (click)="submit()" [disabled]="personFormGroup.invalid || contractFormGroup.invalid || establishmentFormGroup.invalid || saving">
+        <button mat-raised-button color="primary" (click)="submit()"
+          [disabled]="personFormGroup.invalid || contractFormGroup.invalid || establishmentFormGroup.invalid || saving">
           {{ saving ? 'Creando…' : 'Crear contrato' }}
         </button>
       </div>

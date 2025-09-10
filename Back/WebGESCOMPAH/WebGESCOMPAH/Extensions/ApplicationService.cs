@@ -22,6 +22,7 @@ using Data.Interfaz.IDataImplement.Persons;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Data.Interfaz.IDataImplement.Utilities;
 using Data.Interfaz.Security;
+using Data.Repositories.Implementations.SecurityAuthentication;
 using Data.Repository;
 using Data.Services.AdministratiosSystem;
 using Data.Services.Business;
@@ -34,10 +35,12 @@ using Entity.DTOs.Implements.Business.Clause;
 using Entity.Infrastructure.Binder;
 using Mapster;
 using Utilities.Messaging.Implements;
+using Utilities.Messaging.Factories;
 using Utilities.Messaging.Interfaces;
 using WebGESCOMPAH.Infrastructure;
 using WebGESCOMPAH.Middleware;
 using WebGESCOMPAH.Middleware.Handlers;
+using WebGESCOMPAH.Workers;
 
 namespace WebGESCOMPAH.Extensions
 {
@@ -49,7 +52,8 @@ namespace WebGESCOMPAH.Extensions
 
             services.AddScoped<IUserMeRepository, MeRepository>();
 
-            //Email
+            //Email (Factory + fachada)
+            services.AddSingleton<IEmailServiceFactory, EmailServiceFactory>();
             services.AddTransient<ISendCode, EmailService>();
 
             //Auth
@@ -79,7 +83,11 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IClauseService, ClauseService>();
             services.AddScoped<IContractClauseService, ContractClauseService>();
 
+            services.AddScoped<IObligationMonthService, ObligationMonthService>();
 
+
+
+            services.AddHostedService<ContractExpirationWorker>();
 
 
             //Mapping
@@ -105,7 +113,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IContractRepository, ContractRepository>();
             //services.AddScoped<IContractTermsRepository, ContractTermsRepository>();
             services.AddScoped<IPremisesLeasedRepository, PremisesLeasedRepository>();
-
+            services.AddScoped<IObligationMonthRepository, ObligationMonthRepository>();
 
 
 

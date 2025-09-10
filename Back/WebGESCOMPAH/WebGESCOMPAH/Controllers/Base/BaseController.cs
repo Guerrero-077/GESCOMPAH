@@ -1,6 +1,7 @@
 ﻿using Business.Interfaces.IBusiness;
 using Entity.DTOs.Base;
 using Microsoft.AspNetCore.Mvc;
+using WebGESCOMPAH.Contracts.Requests;
 
 namespace WebGESCOMPAH.Controllers.Base
 {
@@ -63,19 +64,22 @@ namespace WebGESCOMPAH.Controllers.Base
         public virtual async Task<IActionResult> DeleteLogic(int id)
             => await Service.DeleteLogicAsync(id) ? NoContent() : NotFound();
 
-        public record ChangeActiveStatusDto(bool Active);
-
         [HttpPatch("{id:int}/estado")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<ActionResult<TGet>> ChangeActiveStatus(
-            int id, [FromBody] ChangeActiveStatusDto body)
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public virtual async Task<IActionResult> ChangeActiveStatus(int id, [FromBody] ChangeActiveStatusRequest body)
         {
-            var updated = await Service.UpdateActiveStatusAsync(id, body.Active );
-            return updated is null ? NotFound() : Ok(updated);
+            await Service.UpdateActiveStatusAsync(id, body.Active!.Value);
+            return NoContent();
         }
 
-
-
+        //public virtual async Task<ActionResult<TGet>> ChangeActiveStatus(
+        //    int id, [FromBody] ChangeActiveStatusDto body)
+        //{
+        //    var updated = await Service.UpdateActiveStatusAsync(id, body.Active );
+        //    return updated is null ? NotFound() : Ok(updated);
+        //}
     }
 }

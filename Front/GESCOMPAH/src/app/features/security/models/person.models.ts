@@ -8,6 +8,7 @@ export interface PersonSelectModel {
   phone?: string;
   cityName: string;   // viene desde SelectDto
   email?: string;
+  active: boolean;
 }
 
 export interface PersonCreateModel {
@@ -19,4 +20,12 @@ export interface PersonCreateModel {
   cityId: number;
 }
 
-export interface PersonUpdateModel extends PersonCreateModel { }
+export interface PersonUpdateModel {
+
+  id: number;
+  firstName: string;
+  lastName: string;
+  address?: string;
+  phone?: string;
+  cityId: number;
+}

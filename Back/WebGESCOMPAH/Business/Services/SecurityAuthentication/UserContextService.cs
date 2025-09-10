@@ -13,7 +13,6 @@ namespace Business.Services.SecurityAuthentication
     public class UserContextService : IUserContextService
     {
         private readonly IUserMeRepository _repo;
-        private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
         private readonly TimeSpan _cacheTtl = TimeSpan.FromMinutes(10);
 
@@ -22,7 +21,6 @@ namespace Business.Services.SecurityAuthentication
         public UserContextService(IUserMeRepository repo, IMapper mapper, IMemoryCache cache)
         {
             _repo = repo;
-            _mapper = mapper;
             _cache = cache;
         }
 
@@ -35,15 +33,17 @@ namespace Business.Services.SecurityAuthentication
             var user = await _repo.GetUserWithFullContextAsync(userId)
                        ?? throw new BusinessException("Usuario no encontrado");
 
+            // Roles activos y no eliminados (sin duplicados por Id)
             var roles = user.RolUsers?
                 .Select(ru => ru.Rol)
                 .Where(r => r != null && r.Active && !r.IsDeleted)
-                .DistinctBy(r => r!.Id)
+                .DistinctBy(r => r!.Id) // LINQ DistinctBy (>= .NET 6)
                 .Cast<Rol>()
                 .ToList() ?? new();
 
             var roleNames = roles.Select(r => r.Name!).ToList();
 
+            // Forms permitidos por los roles
             var allowedForms = roles
                 .SelectMany(r => r.RolFormPermissions ?? Enumerable.Empty<RolFormPermission>())
                 .Select(rfp => rfp.Form)
@@ -52,6 +52,7 @@ namespace Business.Services.SecurityAuthentication
                 .Cast<Form>()
                 .ToList();
 
+            // Módulos (con forms filtrados por pertenencia al módulo)
             var modules = allowedForms
                 .SelectMany(f => f.FormModules ?? Enumerable.Empty<FormModule>())
                 .Select(fm => fm.Module)
@@ -62,12 +63,14 @@ namespace Business.Services.SecurityAuthentication
                 .Select(module =>
                 {
                     var moduleDto = module.Adapt<MenuModuleDto>();
+
                     var moduleForms = allowedForms
                         .Where(f => f.FormModules.Any(fm => fm.ModuleId == module.Id))
                         .OrderBy(f => f.Name)
                         .Select(f =>
                         {
                             var formDto = f.Adapt<FormDto>();
+
                             var formPerms = roles
                                 .SelectMany(r => r.RolFormPermissions ?? Enumerable.Empty<RolFormPermission>())
                                 .Where(rfp => rfp.FormId == f.Id && rfp.Permission != null)
@@ -85,10 +88,14 @@ namespace Business.Services.SecurityAuthentication
                 })
                 .ToList();
 
+            // ⚠️ Asigna también PersonId
             var dto = new UserMeDto
             {
                 Id = user.Id,
-                FullName = $"{user.Person?.FirstName} {user.Person?.LastName}".Trim(),
+                PersonId = user.PersonId,
+                FullName = string.Join(" ",
+                             new[] { user.Person?.FirstName, user.Person?.LastName }
+                             .Where(s => !string.IsNullOrWhiteSpace(s))).Trim(),
                 Email = user.Email,
                 Roles = roleNames,
                 Menu = modules
@@ -97,6 +104,7 @@ namespace Business.Services.SecurityAuthentication
             _cache.Set(cacheKey, dto, _cacheTtl);
             return dto;
         }
+
 
         public void InvalidateCache(int userId) => _cache.Remove(Key(userId));
 

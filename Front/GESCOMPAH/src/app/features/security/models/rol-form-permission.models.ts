@@ -1,13 +1,3 @@
-export interface RolFormPermissionSelectModel {
-  id: number;
-  rolName: string;
-  rolId: number;
-  formName: string;
-  formId: number;
-  permissionName: string;
-  permissionId: number;
-  active: boolean;
-}
 export interface RolFormPermissionCreateModel {
   rolId: number;
   formId: number;
@@ -26,6 +16,7 @@ export interface RolFormPermissionUpdateModel {
 
 // --- NUEVOS MODELOS PARA LA VISTA AGRUPADA ---
 export interface RolFormPermissionGroupedModel {
+  id: number;
   rolId: number;
   rolName: string;
   formId: number;

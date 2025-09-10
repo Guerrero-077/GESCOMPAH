@@ -13,19 +13,21 @@ namespace Business.Services.SecurityAuthentication
     {
         private readonly IRolFormPermissionRepository _repo;
         private readonly IUserContextService _auth;
-        private readonly IMapper _mapper;
 
         public RolFormPermissionService(IRolFormPermissionRepository data, IMapper mapper, IUserContextService auth)
             : base(data, mapper)
         {
             _repo = data;
             _auth = auth;
-            _mapper = mapper;
         }
 
         public override async Task<RolFormPermissionSelectDto> CreateAsync(RolFormPermissionCreateDto dto)
         {
+            // 1. Validar duplicados antes de crear
+            await ValidateDuplicatesAsync(dto.RolId, dto.FormId, dto.PermissionIds);
+
             var createdEntities = new List<RolFormPermission>();
+
             foreach (var permissionId in dto.PermissionIds)
             {
                 var entity = new RolFormPermission
@@ -35,45 +37,104 @@ namespace Business.Services.SecurityAuthentication
                     PermissionId = permissionId,
                     Active = true
                 };
-                // We assume the base repository AddAsync adds the entity and saves changes.
+
                 await _repo.AddAsync(entity);
                 createdEntities.Add(entity);
             }
 
-            // Invalidate cache for users with this role
-            var userIds = await _repo.GetUserIdsByRoleIdAsync(dto.RolId);
-            foreach (var uid in userIds) _auth.InvalidateCache(uid);
+            await InvalidateUsersByRole(dto.RolId);
 
-            var lastEntity = createdEntities.LastOrDefault();
-            if (lastEntity == null)
-            {
-                return null; // Or handle as appropriate
-            }
+            if (createdEntities.Count == 0)
+                return null;
 
-            // Fetch the entity again to load navigation properties for mapping
-            var entityToReturn = await _repo.GetByIdAsync(lastEntity.Id);
+            var entityToReturn = await _repo.GetByIdAsync(createdEntities.Last().Id);
             return _mapper.Map<RolFormPermissionSelectDto>(entityToReturn);
         }
+
+        public override async Task<RolFormPermissionSelectDto?> UpdateAsync(RolFormPermissionUpdateDto dto)
+        {
+            // 1. Traer el grupo actual (solo los activos/no borrados)
+            var group = (await _repo.GetByRolAndFormAsync(dto.RolId, dto.FormId)).ToList();
+
+            // 2. Normalizar listas
+            var existingPermissionIds = group.Select(g => g.PermissionId).ToHashSet();
+            var incomingPermissionIds = dto.PermissionIds.Distinct().ToHashSet();
+
+            // 3. Calcular diferencias
+            var toAdd = incomingPermissionIds.Except(existingPermissionIds).ToList();
+            var toRemove = group.Where(g => !incomingPermissionIds.Contains(g.PermissionId)).ToList();
+            var toKeep = group.Where(g => incomingPermissionIds.Contains(g.PermissionId)).ToList();
+
+            // 4. Validar duplicados solo para los nuevos permisos
+            if (toAdd.Any())
+                await ValidateDuplicatesAsync(dto.RolId, dto.FormId, toAdd);
+
+            // 5. Eliminar los que sobran (solo esos, no todo el grupo)
+            foreach (var item in toRemove)
+                await _repo.DeleteAsync(item.Id);
+
+            // 6. Agregar los que faltan
+            foreach (var pid in toAdd)
+            {
+                var entity = new RolFormPermission
+                {
+                    RolId = dto.RolId,
+                    FormId = dto.FormId,
+                    PermissionId = pid,
+                    Active = true
+                };
+                await _repo.AddAsync(entity);
+                group.Add(entity); // Actualizar snapshot local
+            }
+
+            await InvalidateUsersByRole(dto.RolId);
+
+            // 7. Armar el DTO agrupado final
+            if (group.Count == 0)
+                return null;
+
+            var dtoOut = new RolFormPermissionSelectDto
+            {
+                Id = group.First().Id,
+                RolId = group.First().RolId,
+                RolName = group.First().Rol?.Name ?? "",
+                FormId = group.First().FormId,
+                FormName = group.First().Form?.Name ?? "",
+                Permissions = group
+                    .Select(g => new PermissionInfoDto
+                    {
+                        PermissionId = g.PermissionId,
+                        PermissionName = g.Permission?.Name ?? ""
+                    })
+                    .ToList(),
+                Active = group.Any(g => g.Active)
+            };
+
+            return dtoOut;
+        }
+
         public async Task<IEnumerable<RolFormPermissionSelectDto>> GetAllGroupedAsync()
         {
-            var allPermissions = await _repo.GetAllAsync();
+            var all = await _repo.GetAllAsync();
 
-            var grouped = allPermissions
-                .GroupBy(rfp => new { rfp.RolId, rfp.FormId })
+            var grouped = all
+                .GroupBy(x => new { x.RolId, x.FormId })
                 .Select(g =>
                 {
                     var first = g.First();
-                    return new RolFormPermissionSelectDto                    {
+                    return new RolFormPermissionSelectDto
+                    {
+                        Id = first.Id,
                         RolId = g.Key.RolId,
-                        RolName = first.Rol.Name,
+                        RolName = first.Rol?.Name ?? "",
                         FormId = g.Key.FormId,
-                        FormName = first.Form.Name,
+                        FormName = first.Form?.Name ?? "",
                         Permissions = g.Select(p => new PermissionInfoDto
                         {
-                            PermissionId = p.Permission.Id,
-                            PermissionName = p.Permission.Name
+                            PermissionId = p.PermissionId,
+                            PermissionName = p.Permission?.Name ?? ""
                         }).ToList(),
-                        Active = g.Any(p => p.Active) // El grupo está activo si al menos un permiso lo está
+                        Active = g.Any(p => p.Active)
                     };
                 });
 
@@ -82,81 +143,73 @@ namespace Business.Services.SecurityAuthentication
 
         public async Task<bool> DeleteByGroupAsync(int rolId, int formId)
         {
-            var recordsToDelete = await _repo.GetByRolAndFormAsync(rolId, formId);
-            if (recordsToDelete == null || !recordsToDelete.Any())
-            {
-                return false;
-            }
+            var records = await _repo.GetByRolAndFormAsync(rolId, formId);
+            if (!records.Any()) return false;
 
-            foreach (var record in recordsToDelete)
-            {
+            foreach (var record in records)
                 await _repo.DeleteAsync(record.Id);
-            }
 
-            // Invalidar caché
-            var userIds = await _repo.GetUserIdsByRoleIdAsync(rolId);
-            foreach (var uid in userIds)
-            {
-                _auth.InvalidateCache(uid);
-            }
-
+            await InvalidateUsersByRole(rolId);
             return true;
-        }
-        
-
-        public override async Task<RolFormPermissionSelectDto> UpdateAsync(RolFormPermissionUpdateDto dto)
-        {
-            // Get all existing permissions for the role and form
-            var existingRecords = await _repo.GetByRolAndFormAsync(dto.RolId, dto.FormId);
-
-            // Delete existing records
-            foreach (var record in existingRecords)
-            {
-                await _repo.DeleteAsync(record.Id); // Assumes soft delete
-            }
-
-            // Add the new set of permissions
-            var createdEntities = new List<RolFormPermission>();
-            foreach (var permissionId in dto.PermissionIds)
-            {
-                var entity = new RolFormPermission
-                {
-                    RolId = dto.RolId,
-                    FormId = dto.FormId,
-                    PermissionId = permissionId
-                };
-                await _repo.AddAsync(entity);
-                createdEntities.Add(entity);
-            }
-
-            // Invalidate cache
-            var userIds = await _repo.GetUserIdsByRoleIdAsync(dto.RolId);
-            foreach (var uid in userIds) _auth.InvalidateCache(uid);
-
-            var lastEntity = createdEntities.LastOrDefault();
-            if (lastEntity == null)
-            {
-                return null; // Or handle as appropriate
-            }
-
-            // Fetch one of the new records to return
-            var entityToReturn = await _repo.GetByIdAsync(lastEntity.Id);
-            return _mapper.Map<RolFormPermissionSelectDto>(entityToReturn);
         }
 
         public override async Task<bool> DeleteAsync(int id)
         {
-            // This method remains unchanged as it deletes a single permission record
             var rfp = await _repo.GetByIdAsync(id);
-            var ok = await base.DeleteAsync(id);
+            var result = await base.DeleteAsync(id);
 
-            if (ok && rfp != null)
+            if (result && rfp != null)
+                await InvalidateUsersByRole(rfp.RolId);
+
+            return result;
+        }
+
+        private async Task InvalidateUsersByRole(int rolId)
+        {
+            var userIds = await _repo.GetUserIdsByRoleIdAsync(rolId);
+            foreach (var uid in userIds)
+                _auth.InvalidateCache(uid);
+        }
+
+        public override async Task<RolFormPermissionSelectDto> UpdateActiveStatusAsync(int id, bool active)
+        {
+            var target = await _repo.GetByIdAsync(id);
+            if (target == null)
+                throw new KeyNotFoundException($"No se encontró el permiso con ID {id}");
+
+            // 1. Obtener el grupo completo
+            var group = await _repo.GetByRolAndFormAsync(target.RolId, target.FormId);
+
+            // 2. Actualizar el estado de todos los elementos en el grupo
+            foreach (var item in group)
             {
-                var userIds = await _repo.GetUserIdsByRoleIdAsync(rfp.RolId);
-                foreach (var uid in userIds) _auth.InvalidateCache(uid);
+                if (item.Active != active)
+                {
+                    item.Active = active;
+                    await _repo.UpdateAsync(item);
+                }
             }
 
-            return ok;
+            await InvalidateUsersByRole(target.RolId);
+
+            // 3. Devolver el DTO de uno de los elementos (todos tienen el mismo Rol y Form)
+            var refreshed = await _repo.GetByIdAsync(id);
+            return _mapper.Map<RolFormPermissionSelectDto>(refreshed);
+        }
+
+        private async Task ValidateDuplicatesAsync(int rolId, int formId, IEnumerable<int> permissionIds)
+        {
+            var existing = await _repo.GetByRolAndFormAsync(rolId, formId);
+
+            foreach (var pid in permissionIds)
+            {
+                var existingPerm = existing.FirstOrDefault(p => p.PermissionId == pid);
+                if (existingPerm != null)
+                {
+                    // Verificar si ya existe un permiso con el mismo ID
+                    throw new InvalidOperationException($"El permiso con ID {pid} ya existe en este formulario.");
+                }
+            }
         }
     }
 }

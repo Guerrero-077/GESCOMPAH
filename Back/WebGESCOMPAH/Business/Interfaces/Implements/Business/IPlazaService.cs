@@ -9,7 +9,7 @@ namespace Business.Interfaces.Implements.Business
         //Task<PlazaSelectDto> CreatePlazaAsync(PlazaCreateDto plazaDto);
         //Task<PlazaSelectDto> UpdatePlazaAsync(PlazaUpdateDto dto);
         //Task<PlazaSelectDto?> GetPlazaByIdAsync(int id);
-        Task<PlazaSelectDto> UpdateActiveStatusAsync(int id, bool active);
+        //Task<PlazaSelectDto> UpdateActiveStatusAsync(int id, bool active);
 
 
 

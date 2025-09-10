@@ -16,6 +16,7 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 import { UserCreateModel, UserSelectModel, UserUpdateModel } from '../../models/user.models';
 import { PersonService } from '../../services/person/person.service';
 import { UserStore } from '../../services/user/user.store';
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
 @Component({
   selector: 'app-user',
@@ -30,6 +31,7 @@ export class UserComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
   private readonly sweetAlertService = inject(SweetAlertService);
+  private readonly pageHeaderService = inject(PageHeaderService);
   
   @ViewChild('estadoTemplate', { static: true }) estadoTpl!: TemplateRef<any>;
 
@@ -37,6 +39,7 @@ export class UserComponent implements OnInit {
   columns: TableColumn<UserSelectModel>[] = [];
 
   ngOnInit(): void {
+    this.pageHeaderService.setPageHeader('Usuarios', 'Gestión de Usuarios');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
       { key: 'personName', header: 'Nombre Completo' },

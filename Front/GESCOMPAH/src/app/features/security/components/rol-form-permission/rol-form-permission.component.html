@@ -20,9 +20,24 @@
   </ng-template>
 
   <!-- Template para mostrar el estado (Activo/Inactivo) -->
-  <ng-template #estadoTemplate let-row>
-    <span class="badge" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+<ng-template #estadoTemplate let-row>
+  <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
+    <span class="badge align-middle" [ngClass]="row.active ? 'badge-success--solid' : 'badge-warning'">
       {{ row.active ? 'Activo' : 'Inactivo' }}
     </span>
-  </ng-template>
+
+    <div *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
+      <app-toggle-button-component
+        class="align-middle"
+        [checked]="row.active"
+        (changed)="onToggleActive(row, $event)"
+        [size]="20"
+        [onColor]="'#388E3C'"
+        [offColor]="'#9CA3AF'"
+        [thumb]="'#ffffff'">
+      </app-toggle-button-component>
+    </div>
+
+  </div>
+</ng-template>
 </div>

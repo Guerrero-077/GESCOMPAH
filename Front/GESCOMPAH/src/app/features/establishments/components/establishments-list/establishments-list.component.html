@@ -1,40 +1,53 @@
 <div class="container mt-4">
-
   <!-- Botón para abrir el formulario en un modal -->
   <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
     <div class="d-flex justify-content-end mb-4">
-      <button mat-raised-button color="primary" (click)="openCreateDialog()">
+      <button mat-raised-button color="primary"
+              (click)="openCreateDialog()"
+              [disabled]="loading()">
         Nuevo establecimiento
       </button>
     </div>
   </ng-container>
 
-
-
-  <!-- Contenedor principal con el pipe Async -->
-  <div *ngIf="establishments$ | async as establishments; else loading">
-    <!-- Lista de locales -->
-    <div *ngIf="establishments.length > 0; else noEstablishment">
-      <div class="d-flex flex-wrap gap-3 justify-content-center">
-        <app-card *ngFor="let establishment of establishments" [local]="establishment" [showAvailableTag]="true"
-          (onDelete)="handleDelete(establishment.id)" (onUpdate)="onCardUpdated()" (onView)="onView($event)">
-        </app-card>
-        <!-- (onUpdate)="openEditDialog(establishment)" -->
-      </div>
-    </div>
-
-    <!-- Si no hay locales -->
-    <ng-template #noEstablishment>
-      <div class="text-center text-muted mt-4">
-        No hay locales registrados aún.
-      </div>
-    </ng-template>
-  </div>
-
-  <!-- Template de Carga -->
-  <ng-template #loading>
+  <!-- Loading -->
+  <ng-container *ngIf="loading(); else content">
     <div class="d-flex justify-content-center mt-4">
       <mat-spinner></mat-spinner>
+    </div>
+  </ng-container>
+
+  <!-- Contenido cuando NO está cargando -->
+  <ng-template #content>
+    <!-- Error -->
+    <ng-container *ngIf="!error(); else errorTpl">
+      <!-- Lista -->
+      <ng-container *ngIf="establishments().length > 0; else noEstablishment">
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+          <app-card
+            *ngFor="let establishment of establishments()"
+            [local]="establishment"
+            [showAvailableTag]="true"
+            (onDelete)="handleDelete(establishment.id)"
+            (onUpdate)="onCardUpdated()"
+            (onView)="onView($event)">
+          </app-card>
+        </div>
+      </ng-container>
+    </ng-container>
+  </ng-template>
+
+  <!-- Si no hay locales -->
+  <ng-template #noEstablishment>
+    <div class="text-center text-muted mt-4">
+      No hay locales registrados aún.
+    </div>
+  </ng-template>
+
+  <!-- Template de error -->
+  <ng-template #errorTpl>
+    <div class="alert alert-danger mt-3" role="alert">
+      Ocurrió un error al cargar los establecimientos: {{ error() }}
     </div>
   </ng-template>
 </div>

@@ -7,7 +7,10 @@ namespace Entity.DTOs.Validations.Persons
     {
         public PersonDtoValidator()
         {
-            // Si deseas agregar reglas exclusivas de creación aquí
+            RuleFor(x => (string?)Get(x, "Document"))
+                  .NotEmpty().WithMessage("La identificación es obligatoria.")
+                  .MaximumLength(20)
+                  .Matches(@"^\d{6,20}$").WithMessage("El documento debe contener solo números entre 6 y 20 dígitos.");
         }
     }
 

@@ -1,18 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { Observable } from 'rxjs';
+import { Observable, EMPTY } from 'rxjs';
+import { take } from 'rxjs/operators';
+
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
-import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
+import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { DepartmentStore } from '../../services/department/department.store';
 import { DepartmentSelectModel } from '../../models/department.models';
-import { ToggleButtonComponent } from "../../../../shared/components/toggle-button-component/toggle-button-component.component";
+import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
-
+import { IsActive } from '../../../../core/models/IsAcitve.models';
 
 @Component({
   selector: 'app-department',
@@ -30,7 +32,8 @@ import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRo
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DepartmentComponent implements OnInit {
-  departments$: Observable<DepartmentSelectModel[]>;
+  // Estado básico
+  departments$: Observable<DepartmentSelectModel[]> = inject(DepartmentStore).departments$;
 
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
@@ -39,102 +42,81 @@ export class DepartmentComponent implements OnInit {
     { key: 'name', header: 'Nombre' }
   ];
 
+  // DI explícita donde sí la usamos
   constructor(
-    private store: DepartmentStore,
-    private dialog: MatDialog,
-    private sweetAlert: SweetAlertService
-  ) {
-    this.departments$ = this.store.departments$;
-  }
+    private readonly store: DepartmentStore,
+    private readonly dialog: MatDialog,
+    private readonly sweetAlert: SweetAlertService
+  ) {}
 
   ngOnInit(): void {
     this.columns = [
       ...this.columns,
-      {
-        key: 'active',
-        header: 'Estado',
-        type: 'custom',
-        template: this.estadoTemplate
-      }
+      { key: 'active', header: 'Estado', type: 'custom', template: this.estadoTemplate }
     ];
   }
 
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '400px',
-      data: {
-        entity: {},
-        formType: 'Department'
-      }
+      data: { entity: {}, formType: 'Department' }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.create(result).subscribe({
-          next: () => {
-            this.sweetAlert.showNotification('Éxito', 'Departamento creado exitosamente', 'success');
-          }
-        });
-      }
+    dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
+      if (!result) return;
+      this.store.create(result).pipe(take(1)).subscribe({
+        next: () => this.sweetAlert.showNotification('Éxito', 'Departamento creado exitosamente', 'success')
+      });
     });
   }
 
   openEditDialog(row: DepartmentSelectModel): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '400px',
-      data: {
-        entity: row,
-        formType: 'Department'
-      }
+      data: { entity: row, formType: 'Department' }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.update(result).subscribe({
-          next: () => {
-            this.sweetAlert.showNotification('Éxito', 'Departamento actualizado exitosamente', 'success');
-          }
-        });
-      }
+    dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
+      if (!result) return;
+      this.store.update(result).pipe(take(1)).subscribe({
+        next: () => this.sweetAlert.showNotification('Éxito', 'Departamento actualizado exitosamente', 'success')
+      });
     });
   }
 
   handleDelete(row: DepartmentSelectModel): void {
-    if (row.id) {
-      this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(result => {
-        if (result.isConfirmed) {
-          this.store.delete(row.id).subscribe({
-            next: () => {
-              this.sweetAlert.showNotification('Éxito', 'Departamento eliminado exitosamente', 'success');
-            }
-          });
-        }
+    if (!row.id) return;
+    this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(res => {
+      if (!res.isConfirmed) return;
+      this.store.delete(row.id!).pipe(take(1)).subscribe({
+        next: () => this.sweetAlert.showNotification('Éxito', 'Departamento eliminado exitosamente', 'success')
       });
-    }
+    });
   }
 
-  // ----- Toggle estado (activo/inactivo) -----
-  onToggleActive(row: DepartmentSelectModel, e: { checked: boolean }) {
-    const previous = row.active;
-    row.active = e.checked;
-    this.store.changeActiveStatus(row.id, e.checked).subscribe({
-      next: (updated) => {
-        // sincronizar con lo que devuelve el backend
-        row.active = updated.active ?? row.active;
-        this.sweetAlert.showNotification(
-          'Éxito',
+  // ===== Toggle Activo/Inactivo (optimista + rollback sencillo) =====
+  // En el HTML: (toggleChange)="onToggleActive(row, $event)"
+  onToggleActive(row: IsActive, e: boolean | { checked: boolean }) {
+    const checked = typeof e === 'boolean' ? e : !!e?.checked;
+    const prev = row.active;
+
+    // UI optimista
+    row.active = checked;
+
+    this.store.changeActiveStatus(row.id, checked).pipe(take(1)).subscribe({
+      next: updated => {
+        // Si la API devuelve 204, mantenemos el valor; si devuelve DTO, sincronizamos
+        row.active = updated?.active ?? checked;
+        this.sweetAlert.showNotification('Éxito',
           `Departamento ${row.active ? 'activado' : 'desactivado'} correctamente.`,
-          'success'
-        );
+          'success');
       },
-      error: (err) => {
-        // revertir si falla
-        row.active = previous;
-        this.sweetAlert.showNotification(
-          'Error',
+      error: err => {
+        // Rollback
+        row.active = prev;
+        this.sweetAlert.showNotification('Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error'
-        );
+          'error');
       }
     });
   }

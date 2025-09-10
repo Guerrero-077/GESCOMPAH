@@ -1,18 +1,20 @@
 <div class="header-container">
   <div class="left-content">
-    <button mat-icon-button (click)="toggleDrawer()" class="menu-button" aria-label="Menú">
+    <button
+      mat-icon-button
+      (click)="toggleDrawer()"
+      class="menu-button"
+      aria-label="Menú"
+    >
       <mat-icon class="menu-icon">menu</mat-icon>
     </button>
     <div class="header-text">
-      <h2 class="title">{{ title }}</h2>
-      <span class="description">{{ description }}</span>
+      <h2 class="title">{{ displayTitle() }}</h2>
+      <span class="description">{{ displayDescription() }}</span>
     </div>
   </div>
 
   <div class="right-content">
-    <div class="user-icon">
-      <mat-icon>person</mat-icon>
-    </div>
-    <span class="user-label">{{ username }}</span>
+    <span class="user-label">{{ username() }}</span>
   </div>
 </div>

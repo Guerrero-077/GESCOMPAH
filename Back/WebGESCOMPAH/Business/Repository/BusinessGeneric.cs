@@ -92,7 +92,7 @@ namespace Business.Repository
                 if (query is not null)
                 {
                     // Importante: FirstOrDefaultAsync ejecuta en BD sin trackeo (consulta segura)
-                    var existing = await query.FirstOrDefaultAsync();
+                    var existing = query.FirstOrDefault();
                     if (existing is not null)
                     {
                         if (!existing.IsDeleted)
@@ -131,14 +131,17 @@ namespace Business.Repository
         /// </summary>
         public override async Task<TDtoGet> UpdateAsync(TDtoUpdate dto)
         {
-            BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
-
-            // Mapear a entidad con Id (asegúrate en tu BaseController de inyectar el Id de ruta en el DTO)
-            var entity = _mapper.Map<TEntity>(dto);
-
-            // No forzar IsDeleted = false aquí; deja que las reglas del servicio concreto lo controlen
-            var updated = await Data.UpdateAsync(entity);
-            return _mapper.Map<TDtoGet>(updated);
+            try
+            {
+                BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
+                var entity = _mapper.Map<TEntity>(dto);
+                var updated = await Data.UpdateAsync(entity);
+                return _mapper.Map<TDtoGet>(updated);
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException("Error al actualizar el registro.", ex);
+            }
         }
 
         /// <summary>
@@ -178,20 +181,41 @@ namespace Business.Repository
             }
         }
 
-        public override async Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active)
-        {
-            var entity = await Data.GetByIdAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException($"No se encontró la plaza con ID {id}");
+        //public override async Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active)
+        //{
+        //    var entity = await Data.GetByIdAsync(id);
+        //    if (entity == null)
+        //        throw new KeyNotFoundException($"No se encontró la plaza con ID {id}");
 
-            if (entity.Active != active)
+        //    if (entity.Active != active)
+        //    {
+        //        entity.Active = active;
+        //        await Data.UpdateAsync(entity);
+        //    }
+
+        //    return _mapper.Map<TDtoGet>(entity);
+        //}
+
+
+        public override async Task UpdateActiveStatusAsync(int id, bool active)
+        {
+            try
             {
+                BusinessValidationHelper.ThrowIfZeroOrLess(id, "El ID debe ser mayor que cero.");
+                var entity = await Data.GetByIdAsync(id)
+                    ?? throw new KeyNotFoundException($"No se encontró el registro con ID {id}.");
+
+                if (entity.Active == active) return;
+
                 entity.Active = active;
                 await Data.UpdateAsync(entity);
             }
-
-            return _mapper.Map<TDtoGet>(entity);
+            catch (Exception ex)
+            {
+                throw new BusinessException($"Error al actualizar el estado del registro con ID {id}.", ex);
+            }
         }
+
 
     }
 }

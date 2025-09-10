@@ -23,5 +23,10 @@ namespace Data.Interfaz.IDataImplement.Business
     {
         Task<IReadOnlyList<ContractCard>> GetCardsByPersonAsync(int personId);
         Task<IReadOnlyList<ContractCard>> GetCardsAllAsync();
+
+
+        // NUEVOS
+        Task<IReadOnlyList<int>> DeactivateExpiredAsync(DateTime utcNow);
+        Task<int> ReleaseEstablishmentsForExpiredAsync(DateTime utcNow);
     }
 }

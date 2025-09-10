@@ -1,70 +1,382 @@
+/* ========================================
+ * OPCIÓN 1: HEADER GRADIENTE PRINCIPAL (RECOMENDADA)
+ * ======================================== */
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff;
-  color: black;
-  background-color: var(--background-color);
-  color: var(--text-color-black);
-  padding: 12px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-primary);
+  color: var(--white);
+  padding: 16px 24px;
+  box-shadow:
+    0 4px 16px rgba(22, 163, 74, 0.15),
+    0 2px 8px rgba(22, 163, 74, 0.1);
   margin: 0;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+/* Efecto shimmer sutil en el header */
+.header-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: headerShimmer 4s infinite;
+}
+
+@keyframes headerShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
 .left-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .menu-button {
-  color: black;
-  color: var(--text-color-black);
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  padding: 6px;
-  transition: background-color 0.3s ease;
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  justify-self: center;
+  align-self: center;
 }
 
 .menu-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+
 .menu-icon {
-  font-size: 28px;
+  font-size: 24px;
+  transition: transform 0.2s ease;
 }
+
+
 
 .header-text {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .title {
   margin: 0;
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--white);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.025em;
 }
 
 .description {
-  font-size: 0.85rem;
-  color: green;
-  color: var(--primary-color);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .right-content {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.user-icon {
-  font-size: 24px;
-  display: flex;
-  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
 }
 
 .user-label {
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.user-label:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ========================================
+ * OPCIÓN 2: HEADER CON ACENTO AMARILLO
+ * ======================================== */
+.header-container-accent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--green-700) 0%, var(--green-600) 70%, var(--yellow-500) 100%);
+  color: var(--white);
+  padding: 16px 24px;
+  box-shadow:
+    0 4px 20px rgba(22, 163, 74, 0.2),
+    0 0 40px rgba(245, 158, 11, 0.1);
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-container-accent::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.2));
+  pointer-events: none;
+}
+
+/* ========================================
+ * OPCIÓN 3: HEADER GLASSMORPHISM
+ * ======================================== */
+.header-container-glass {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(22, 163, 74, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--white);
+  padding: 16px 24px;
+  box-shadow:
+    0 8px 32px rgba(22, 163, 74, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+ * OPCIÓN 4: HEADER MINIMALISTA ELEGANTE
+ * ======================================== */
+.header-container-minimal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--white);
+  color: var(--gray-800);
+  padding: 20px 24px;
+  box-shadow:
+    0 1px 0 rgba(22, 163, 74, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+  margin: 0;
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(90deg, var(--green-500), var(--yellow-500)) 1;
+}
+
+.header-container-minimal .menu-button {
+  color: var(--green-600);
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+}
+
+.header-container-minimal .menu-button:hover {
+  background: var(--green-100);
+  color: var(--green-700);
+}
+
+.header-container-minimal .title {
+  color: var(--gray-800);
+  text-shadow: none;
+}
+
+.header-container-minimal .description {
+  color: var(--green-600);
+  text-shadow: none;
+}
+
+.header-container-minimal .user-label {
+  color: var(--gray-800);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  text-shadow: none;
+}
+
+/* ========================================
+ * OPCIÓN 5: HEADER DINÁMICO CON PATRONES
+ * ======================================== */
+.header-container-pattern {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background:
+    linear-gradient(135deg, var(--green-600) 0%, var(--green-500) 100%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3C/g%3E%3C/svg%3E");
+  color: var(--white);
+  padding: 16px 24px;
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.2);
+  margin: 0;
+  position: relative;
+}
+
+/* ========================================
+ * MEJORAS GENERALES PARA TODOS LOS ESTILOS
+ * ======================================== */
+
+/* Animación de entrada del header */
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header-container,
+.header-container-accent,
+.header-container-glass,
+.header-container-minimal,
+.header-container-pattern {
+  animation: slideInDown 0.5s ease-out;
+}
+
+/* Efecto hover en el título */
+.title {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.title:hover {
+  transform: translateY(-1px);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Badge de notificación para el usuario */
+.user-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--yellow-500);
+  color: var(--gray-900);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+/* Avatar placeholder */
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--yellow-400), var(--yellow-500));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* ========================================
+ * RESPONSIVE
+ * ======================================== */
+@media (max-width: 768px) {
+  .header-container,
+  .header-container-accent,
+  .header-container-glass,
+  .header-container-minimal,
+  .header-container-pattern {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .left-content {
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+  }
+
+  .user-label {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+
+  .menu-icon {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .right-content {
+    display: none; /* Ocultar en pantallas muy pequeñas */
+  }
+
+  .header-text {
+    max-width: calc(100vw - 120px);
+  }
+
+  .title {
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* ========================================
+ * MODO OSCURO (OPCIONAL)
+ * ======================================== */
+@media (prefers-color-scheme: dark) {
+  .header-container-minimal {
+    background: var(--gray-900);
+    color: var(--gray-100);
+    border-image: linear-gradient(90deg, var(--green-400), var(--yellow-400)) 1;
+  }
+
+  .header-container-minimal .title {
+    color: var(--gray-100);
+  }
+
+  .header-container-minimal .description {
+    color: var(--green-400);
+  }
 }

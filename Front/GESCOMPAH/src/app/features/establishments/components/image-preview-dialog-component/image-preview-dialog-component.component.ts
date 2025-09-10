@@ -1,43 +1,85 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, HostListener, signal } from '@angular/core';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, HostListener, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { PreviewData } from '../../models/establishment.models';
+import { MatIconModule } from '@angular/material/icon';
+
+export interface ImagePreviewData {
+  /** Título opcional del visor */
+  title?: string;
+  /** Modo simple: una sola imagen */
+  imageSrc?: string;
+  /** Modo carrusel: lista completa de imágenes */
+  imageList?: string[];
+  /** Índice inicial dentro de imageList */
+  startIndex?: number;
+}
 
 @Component({
   selector: 'app-image-preview-dialog',
-  imports: [CommonModule, MatDialogModule, MatIconModule, MatButtonModule],
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, MatIconModule],
   templateUrl: './image-preview-dialog-component.component.html',
-  styleUrls: ['./image-preview-dialog-component.component.css']
+  styleUrls: ['./image-preview-dialog-component.component.css'],
 })
 export class ImagePreviewDialogComponent {
-  sources: string[] = [];
-  currentIndex = signal(0);
+  readonly sources: string[];
+  index: number;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: PreviewData,
-    private ref: MatDialogRef<ImagePreviewDialogComponent>
+    private readonly ref: MatDialogRef<ImagePreviewDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: ImagePreviewData
   ) {
-    this.sources = data?.sources ?? [];
-    const start = Math.min(Math.max(0, data?.index ?? 0), Math.max(0, this.sources.length - 1));
-    this.currentIndex.set(start);
+    const list = (data?.imageList ?? [])
+      .filter((s) => !!s && typeof s === 'string');
+
+    this.sources = list.length > 0
+      ? list
+      : (data?.imageSrc ? [data.imageSrc] : []);
+
+    const start = data?.startIndex ?? 0;
+    this.index = this.clamp(start, 0, Math.max(this.sources.length - 1, 0));
   }
 
-  @HostListener('document:keydown', ['$event'])
+  get title(): string {
+    return this.data?.title ?? 'Vista previa';
+  }
+
+  get total(): number {
+    return this.sources.length;
+  }
+
+  get current(): number {
+    return this.index + 1;
+  }
+
+  get currentSrc(): string {
+    return this.sources[this.index] ?? '';
+  }
+
+  close(): void {
+    this.ref.close();
+  }
+
+  next(): void {
+    if (!this.total) return;
+    this.index = (this.index + 1) % this.total;
+  }
+
+  prev(): void {
+    if (!this.total) return;
+    this.index = (this.index - 1 + this.total) % this.total;
+  }
+
+  @HostListener('window:keydown', ['$event'])
   onKey(e: KeyboardEvent) {
-    if (e.key === 'Escape') this.close();
-    if (e.key === 'ArrowRight') this.next(e);
-    if (e.key === 'ArrowLeft') this.prev(e);
+    if (!this.total) return;
+    if (e.key === 'ArrowRight') { this.next(); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { this.prev(); e.preventDefault(); }
+    else if (e.key === 'Escape') { this.close(); }
   }
 
-  next(ev?: Event) {
-    ev?.stopPropagation(); if (!this.sources.length) return;
-    this.currentIndex.update(i => (i + 1) % this.sources.length);
+  private clamp(n: number, min: number, max: number): number {
+    return Math.min(Math.max(n, min), max);
   }
-  prev(ev?: Event) {
-    ev?.stopPropagation(); if (!this.sources.length) return;
-    this.currentIndex.update(i => (i - 1 + this.sources.length) % this.sources.length);
-  }
-  close() { this.ref.close(); }
 }

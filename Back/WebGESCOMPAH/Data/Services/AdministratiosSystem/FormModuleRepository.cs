@@ -15,6 +15,8 @@ namespace Data.Services.AdministratiosSystem
         {
             return await _dbSet.AsNoTracking()
                 .Where(e => !e.IsDeleted)
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
                 .Include(e => e.Form)
                 .Include(e => e.Module)
                 .ToListAsync();

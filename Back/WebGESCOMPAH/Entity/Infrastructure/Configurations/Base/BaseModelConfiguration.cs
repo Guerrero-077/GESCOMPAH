@@ -16,6 +16,11 @@ namespace Entity.Infrastructure.Configurations.Base
             // Elimina configuración específica de motor para CreatedAt
             builder.Property(e => e.CreatedAt)
                    .IsRequired(); // Solo requerir, sin tipo ni default SQL
+
+
+            // Índice compuesto para ordenar “lo último primero”
+            builder.HasIndex(e => new { e.CreatedAt, e.Id })
+                   .IsDescending(true, true); // EF Core 7+ soporta índices descendentes
         }
     }
 }

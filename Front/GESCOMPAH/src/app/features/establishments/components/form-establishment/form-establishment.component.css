@@ -1,126 +1,220 @@
-/* Estilos para imágenes compactas */
-.compact-image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 12px;
+/* =========================
+   Layout general del Stepper
+   ========================= */
+.info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+.info span {
+  color: #64748b; /* slate-500 */
+  font-size: 0.95rem;
+}
+
+/* Botonera del paso */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
   margin-top: 16px;
 }
 
-.compact-image-container {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+/* =========================
+   Paso 1: Grid responsivo
+   ========================= */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-grid-2 .col-span-2 {
+  grid-column: 1 / span 2;
 }
 
-.compact-image-container:hover {
-  transform: scale(1.05);
+/* En móviles, todo en una columna */
+@media (max-width: 720px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .form-grid-2 .col-span-2 {
+    grid-column: auto;
+  }
 }
 
-.compact-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Compactar subtexto de los mat-form-field (hints/errores) */
+.mat-mdc-form-field-subscript-wrapper {
+  min-height: 18px;
+}
+.mat-mdc-form-field-hint,
+.mat-mdc-form-field-error {
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: normal; /* permite wrap sin desbordar */
 }
 
-.compact-image-actions {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.compact-image-container:hover .compact-image-actions {
-  opacity: 1;
-}
-
-.compact-image-actions button {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-}
-
-.compact-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  color: red;
-}
-
-.compact-image-label {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  font-size: 10px;
-  text-align: center;
-  padding: 2px;
-}
-
-/* Estilos para el contador */
-.counter-badge {
-  background: #3f51b5;
-  color: white;
-  padding: 4px 8px;
+/* =========================
+   Dropzone (Paso 3)
+   ========================= */
+.dropzone {
+  border: 2px dashed #cbd5e1; /* slate-300 */
   border-radius: 12px;
-  font-size: 12px;
-}
-
-/* Estilos para la zona de drop (mejorados) */
-.drop-zone {
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  padding: 16px;
+  padding: 18px;
   text-align: center;
+  transition: background-color .15s, border-color .15s;
+  background: #f8fafc; /* slate-50 */
   cursor: pointer;
-  transition: all 0.3s;
-  background: #f9f9f9;
 }
-
-.drop-zone.dragover {
-  border-color: #3f51b5;
-  background: rgba(63, 81, 181, 0.05);
+.dropzone.drag-over {
+  border-color: #2563eb;   /* blue-600 */
+  background: #eff6ff;     /* blue-50 */
 }
-
-.drop-zone mat-icon {
-  color: #3f51b5;
+.dropzone--disabled {
+  opacity: .6;
+  pointer-events: none;
+}
+.dropzone mat-icon {
+  color: #2563eb;
   width: 40px;
   height: 40px;
   font-size: 40px;
   margin-bottom: 8px;
 }
-
-.drop-zone p {
-  margin: 8px 0;
+.dropzone p {
+  margin: 8px 0 4px 0;
   font-weight: 500;
 }
-
-.drop-zone small {
-  color: #666;
+.dropzone small {
+  color: #64748b;
   font-size: 12px;
 }
 
-mat-form-field .mat-mdc-form-field-error {
-  margin-top: 2px;
+/* =========================
+   Contador de imágenes
+   ========================= */
+.image-counter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.counter-badge {
+  background: #3f51b5; /* indigo Material */
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
 }
 
+/* =========================
+   Miniaturas (compact grid)
+   ========================= */
+.compact-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
 
-
-
-/* Cursor y elevación al pasar sobre tarjetas clicables */
+/* Usamos aspect-ratio para evitar cortes y mantener proporción */
 .compact-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;       /* 4:3 → miniaturas más útiles */
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  transition: transform .12s ease;
   cursor: zoom-in;
 }
+.compact-image-container:hover { transform: translateY(-1px); }
 
-/* (Opcional) aumenta el z-index del contenedor del diálogo */
-::ng-deep .img-preview-dialog .mdc-dialog__container,
-::ng-deep .img-preview-dialog .mat-mdc-dialog-surface {
+.compact-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Botón eliminar visible al hover */
+.compact-image-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  opacity: 0;
+  transition: opacity .12s ease;
+}
+.compact-image-container:hover .compact-image-actions { opacity: 1; }
+.compact-image-actions button {
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  backdrop-filter: blur(2px);
+  background: rgba(255,255,255,.65);
+  border-radius: 8px;
+}
+.compact-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #dc2626; /* red-600 */
+}
+
+/* Etiqueta inferior (Existente/Nueva) */
+.compact-image-label {
+  position: absolute;
+  inset-inline: 0; /* left+right */
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
+  color: #fff;
+  font-size: 10.5px;
+  text-align: center;
+  padding: 6px 4px 4px 4px;
+  pointer-events: none;
+}
+
+/* =========================
+   Botón con spinner
+   ========================= */
+.btn-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-progress .mat-mdc-progress-spinner {
+  /* Centrado vertical */
+  margin: 0;
+}
+
+/* =========================
+   Ajustes varios Material
+   ========================= */
+/* Evita que los form-field “brinquen” al mostrar error */
+.mdc-text-field--outlined .mdc-notched-outline__notch {
+  max-width: 100%;
+}
+
+/* Mejora legibilidad del label en error */
+.mat-mdc-form-field.mat-mdc-form-field-invalid .mdc-floating-label {
+  color: #b91c1c !important; /* red-700 */
+}
+
+/* =========================
+   (Opcional) Dialog de preview
+   ========================= */
+/* Si usas panelClass: 'image-preview-dialog' para el visor */
+:host ::ng-deep .image-preview-dialog .mat-mdc-dialog-surface {
   background: transparent;
   box-shadow: none;
+  padding: 0;
 }
+:host ::ng-deep .image-preview-dialog .mdc-dialog__container {
+  background: transparent;
+}
+
+/* =========================
+   Helpers menores
+   ========================= */
+.mt-2 { margin-top: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.me-3 { margin-inline-end: 12px; }
+.w-100 { width: 100%; }

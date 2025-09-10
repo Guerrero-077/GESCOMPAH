@@ -10,7 +10,8 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  ViewChild
+  ViewChild,
+  TemplateRef,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +26,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { TableColumn } from '../../models/TableColumn.models';
 import { HasRoleAndPermissionDirective } from '../../../core/Directives/HasRoleAndPermission.directive';
+
+export type RowDetailContext<T> = { $implicit: T; row: T };
 
 @Component({
   selector: 'app-generic-table',
@@ -47,7 +50,10 @@ import { HasRoleAndPermissionDirective } from '../../../core/Directives/HasRoleA
   styleUrls: ['./generic-table.component.css']
 })
 export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  @Input() data: T[] | null = null;
+  // ★ Acepta readonly arrays también
+  @Input() data: readonly T[] | T[] | null = null;
+  // (opcional) podrías hacer también readonly aquí:
+  // @Input() columns: ReadonlyArray<TableColumn<T>> = [];
   @Input() columns: TableColumn<T>[] = [];
 
   @Input() createButtonLabel = '+ Crear';
@@ -67,6 +73,10 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   @Output() delete = new EventEmitter<T>();
   @Output() view = new EventEmitter<T>();
   @Output() create = new EventEmitter<void>();
+
+  @Input() detailTemplate?: TemplateRef<RowDetailContext<T>>;
+  @Input() expandableRows = true;
+  expandedRow: T | null = null;
 
   displayedColumns: string[] = [];
   dataSource = new MatTableDataSource<T>();
@@ -92,15 +102,14 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
 
   ngOnInit() {
     this.updateDisplayedColumns();
-    this.dataSource.data = this.data || [];
+    // ★ Clona para romper readonly y evitar mutaciones del input
+    this.dataSource.data = this.data ? [...this.data] as T[] : [];
 
     this.filterSubject
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(value => {
         this.dataSource.filter = value.trim().toLowerCase();
-        if (this._paginator) {
-          this._paginator.firstPage();
-        }
+        if (this._paginator) this._paginator.firstPage();
       });
   }
 
@@ -110,23 +119,20 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     }
 
     if (changes['data']) {
-      this.dataSource.data = this.data || [];
+      // ★ Siempre clona al asignar
+      this.dataSource.data = this.data ? [...this.data] as T[] : [];
 
       if (this._paginator) {
         const pageSize = this._paginator.pageSize || 5;
         const maxPageIndex = Math.max(0, Math.ceil(this.dataSource.data.length / pageSize) - 1);
-        if (this._paginator.pageIndex > maxPageIndex) {
-          this._paginator.pageIndex = 0;
-        }
+        if (this._paginator.pageIndex > maxPageIndex) this._paginator.pageIndex = 0;
         this._paginator.length = this.dataSource.data.length;
       }
 
       this.connectSort();
       this.connectPaginator();
 
-      try {
-        (this.dataSource as any)._updateChangeSubscription();
-      } catch {}
+      try { (this.dataSource as any)._updateChangeSubscription(); } catch {}
 
       this.cdr.detectChanges();
     }
@@ -139,9 +145,7 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
 
   private updateDisplayedColumns(): void {
     this.displayedColumns = this.columns.map(col => col.key.toString());
-    if (this.showActionsColumn) {
-      this.displayedColumns.push('actions');
-    }
+    if (this.showActionsColumn) this.displayedColumns.push('actions');
   }
 
   private connectPaginator() {
@@ -152,38 +156,28 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   }
 
   private connectSort() {
-    if (this._sort) {
-      this.dataSource.sort = this._sort;
-    }
+    if (this._sort) this.dataSource.sort = this._sort;
   }
 
-  onFilterChange(value: string) {
-    this.filterSubject.next(value);
-  }
+  onFilterChange(value: string) { this.filterSubject.next(value); }
+  onFilterClick() { this.filterClick.emit(this.filterParams); }
 
-  onFilterClick() {
-    this.filterClick.emit(this.filterParams);
-  }
+  get hasData(): boolean { return (this.dataSource?.data?.length || 0) > 0; }
 
-  get hasData(): boolean {
-    return (this.dataSource?.data?.length || 0) > 0;
-  }
-
-  onEdit(row: T) {
-    this.edit.emit(row);
-  }
-
-  onDelete(row: T) {
-    this.delete.emit(row);
-  }
+  onEdit(row: T) { this.edit.emit(row); }
+  onDelete(row: T) { this.delete.emit(row); }
 
   onView(row: T) {
+    if (this.expandableRows && this.detailTemplate) {
+      this.expandedRow = (this.expandedRow === row) ? null : row;
+      return;
+    }
     this.view.emit(row);
   }
 
-  onCreate() {
-    this.create.emit();
-  }
+  onCreate() { this.create.emit(); }
+
+  isExpanded(row: T) { return this.expandedRow === row; }
 
   ngOnDestroy() {
     this.destroy$.next();

@@ -1,46 +1,52 @@
-import { Component, EventEmitter, HostBinding, HostListener, Input, Output } from '@angular/core';
+import {
+  Component, EventEmitter, HostBinding, HostListener,
+  Input, Output, ChangeDetectionStrategy, ChangeDetectorRef
+} from '@angular/core';
 
 @Component({
   selector: 'app-toggle-button-component',
-  imports: [],
   templateUrl: './toggle-button-component.component.html',
-  styleUrl: './toggle-button-component.component.css'
+  styleUrls: ['./toggle-button-component.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToggleButtonComponent {
-  /** Estado actual */
-  @Input() checked = false;
-  /** Deshabilitado */
+  private _checked = false;
+
+  @Input()
+  get checked(): boolean { return this._checked; }
+  set checked(val: boolean) {
+    this._checked = !!val;
+    // 👇 fuerza CD del componente (más robusto que markForCheck aquí)
+    this.cdr.detectChanges();
+  }
+
   @Input() disabled = false;
-
-  /** Tamaño base en px (alto del switch). Ancho = 1.9 * size */
   @Input() size = 22;
+  @Input() onColor = '#388E3C';
+  @Input() offColor = '#9CA3AF';
+  @Input() thumb   = '#ffffff';
 
-  /** Colores */
-  @Input() onColor = '#16a34a';  // verde ON
-  @Input() offColor = '#ef4444';  // rojo OFF
-  @Input() thumb = '#ffffff';  // color de la perilla
+  @Output() changed = new EventEmitter<{ checked: boolean } | boolean>();
 
-  /** Evento cuando cambia */
-  @Output() changed = new EventEmitter<boolean>();
+  constructor(private cdr: ChangeDetectorRef) {}
 
-  /** Accesibilidad */
   @HostBinding('attr.role') role = 'switch';
   @HostBinding('attr.aria-checked') get ariaChecked() { return String(this.checked); }
   @HostBinding('attr.tabindex') tabindex = 0;
-  @HostBinding('class.tb-disabled') get disabledClass() { return this.disabled; }
 
-  /** CSS vars calculadas por tamaño */
-  @HostBinding('style.--tb-h') get h() { return `${this.size}px`; }
-  @HostBinding('style.--tb-w') get w() { return `${Math.round(this.size * 1.9)}px`; }
-  @HostBinding('style.--tb-d') get d() { return `${this.size - 4}px`; }
+  @HostBinding('class.tb-disabled') get disabledClass() { return this.disabled; }
+  @HostBinding('style.--tb-h')     get h() { return `${this.size}px`; }
+  @HostBinding('style.--tb-w')     get w() { return `${Math.round(this.size * 1.9)}px`; }
+  @HostBinding('style.--tb-d')     get d() { return `${this.size - 4}px`; }
   @HostBinding('style.--tb-shift') get shift() { return `${Math.round(this.size * 0.9)}px`; }
   @HostBinding('style.--tb-thumb') get thumbColor() { return this.thumb; }
 
   @HostListener('click')
   onClick() {
     if (this.disabled) return;
-    this.checked = !this.checked;
-    this.changed.emit(this.checked);
+    // ⚠️ no tocar el @Input; solo interno y emitir intención
+    this._checked = !this._checked;
+    this.changed.emit({ checked: this._checked });
   }
 
   @HostListener('keydown', ['$event'])
