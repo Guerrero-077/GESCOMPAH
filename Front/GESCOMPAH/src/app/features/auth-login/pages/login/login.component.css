@@ -1,32 +1,68 @@
 /* =========================
-   Estilos originales
+   Variables (ya deben estar en tu :root)
+========================= */
+/* Ya están definidos los colores verde y amarillo personalizados. */
+
+/* =========================
+   Fondo moderno con curva
 ========================= */
 
-.imagen-logo {
-  height: 8rem;
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, var(--green-100) 0%, var(--green-100) 50%, var(--green-700) 50%, var(--green-700) 100%);
 }
 
-.border-green {
-  border: 1px solid rgb(134 239 172);
+.container-fluid::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--green-600), var(--green-700));
+  /* background-color: var(--green-700); */
+  clip-path: ellipse(90% 100% at 100% 50%);
+  z-index: 0;
 }
 
-.myn-1 {
-  margin-top: -0.2rem;
-  margin-bottom: -0.2rem;
-}
-
-.mbn-1 {
-  margin-bottom: -0.3rem;
-}
-
-.btn-green {
-  background-color: #146530;
-  color: #fff;
+.container-fluid {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  background-color: transparent;
 }
 
 /* =========================
-   Extensiones nuevas
+   Logo e Identidad
 ========================= */
+
+.imagen-logo {
+  max-width: 200px;
+  height: auto;
+}
+
+.text-center {
+  position: relative;
+  z-index: 2;
+  color: #14532d; /* verde fuerte para texto sobre fondo claro */
+}
+
+/* =========================
+   Formulario
+========================= */
+
+.form {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  max-width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
 
 /* Inputs */
 .form-control {
@@ -42,45 +78,12 @@
   outline: none;
 }
 
-/* Estados inválidos */
 .form-control.is-invalid {
   border-color: #dc2626;
-  /* rojo */
   animation: field-pop .12s ease-out;
 }
 
-/* Mensajes de error */
-.invalid-feedback {
-  margin-top: .35rem;
-  color: #dc2626;
-  font-size: .875rem;
-  line-height: 1.2rem;
-}
-
-/* Botón hover / disabled */
-.btn-green {
-  border-radius: 10px;
-  padding: .8rem 1rem;
-  font-weight: 600;
-  transition: transform .06s ease, background-color .2s ease, box-shadow .2s ease;
-  box-shadow: 0 6px 14px rgba(20, 101, 48, .18);
-}
-
-.btn-green:hover {
-  background-color: #166534;
-}
-
-.btn-green:active {
-  transform: translateY(1px);
-}
-
-.btn-green:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* Animación de inputs al marcar error */
+/* Animación de error */
 @keyframes field-pop {
   from {
     transform: scale(1.005);
@@ -91,52 +94,86 @@
   }
 }
 
-
-/* Asegurar que el contenedor principal ocupe toda la altura */
-.container-fluid {
-  min-height: 100vh;
+/* Mensajes de error */
+.invalid-feedback {
+  margin-top: .35rem;
+  color: #dc2626;
+  font-size: .875rem;
+  line-height: 1.2rem;
 }
 
-/* Ajustes para el formulario */
-.form {
-  border-radius: 12px;
-  background: #ffffff;
-  max-width: 100%;
+/* Botón personalizado */
+.btn-green {
+  background-color: var(--green-800);
+  color: #fff;
+  border-radius: 10px;
+  padding: .8rem 1rem;
+  font-weight: 600;
+  transition: transform .06s ease, background-color .2s ease, box-shadow .2s ease;
+  box-shadow: 0 6px 14px rgba(20, 101, 48, .18);
 }
 
-/* Ajustes para la imagen del logo */
-.imagen-logo {
-  max-width: 120px;
-  height: auto;
+.btn-green:hover {
+  background-color: var(--green-700);
 }
 
-/* Responsive breakpoints */
+.btn-green:active {
+  transform: translateY(1px);
+}
+
+.btn-green:disabled {
+  opacity: .7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 @media (max-width: 575.98px) {
+  /* Ocultar la curva para móviles */
+  .container-fluid::before {
+    display: none;
+  }
+
+  /* Centrar todo en columna */
+  .row.justify-content-center {
+    flex-direction: column;
+    align-items: center;
+    min-height: auto;
+  }
+
+  /* Logo más grande y con más margen */
+  .text-center {
+    margin-bottom: 1.5rem;
+  }
+
+  .imagen-logo {
+    max-width: 130px !important;
+    height: auto;
+  }
+
+  /* Formulario con margen para que no quede pegado a los bordes */
   .form {
     margin: 0 15px;
     padding: 20px !important;
   }
   
-  .imagen-logo {
-    max-width: 100px;
-  }
-  
+  /* Ajustar textos para que se vean bien y no tan pequeños */
   h2 {
-    font-size: 1.5rem !important;
+    font-size: 1.8rem !important;
   }
-  
+
   .fs-5 {
-    font-size: 1rem !important;
+    font-size: 1.1rem !important;
   }
 }
+
 
 @media (min-width: 576px) and (max-width: 767.98px) {
   .form {
     margin: 0 20px;
   }
-  
+
   .imagen-logo {
-    max-width: 110px;
+    max-width: 90px;
   }
 }
 
@@ -152,14 +189,23 @@
   }
 }
 
-/* Espaciado vertical mejorado */
 @media (max-width: 991.98px) {
   .mb-4.mb-lg-0 {
     margin-bottom: 2rem !important;
   }
+  /* Ocultar la curva para móviles */
+  .container-fluid::before {
+    display: none;
+  }
+
+  /* Centrar todo en columna */
+  .row.justify-content-center {
+    flex-direction: column;
+    align-items: center;
+    min-height: auto;
+  }
 }
 
-/* Centrado perfecto en todos los tamaños */
 .container-xl {
   max-width: 1200px;
 }

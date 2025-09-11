@@ -13,11 +13,11 @@
       </p>
     </div>
     <div class="row d-flex justify-content-center">
-      <div class="col-sm-12 col-md-2 col-lg-4 d-flex justify-content-center">
-        <a routerLink="/auth/login" class="premises-button col-md-5">Ver locales disponibles</a>
+      <div class="col-sm-12 col-md-3 d-flex justify-content-center">
+        <a routerLink="/auth/login" class="premises-button">Ver locales disponibles</a>
       </div>
-      <div class="col-sm-12 col-md-2 d-flex justify-content-center">
-        <a routerLink="/auth/login" class="login-button col-md-5">Iniciar Sesión</a>
+      <div class="col-sm-12 col-md-3 d-flex justify-content-center">
+        <a routerLink="/auth/login" class="login-button">Iniciar Sesión</a>
       </div>
     </div>
   </div>
@@ -47,8 +47,20 @@
           agricultores y visitantes en un ambiente de tradición, modernidad y oportunidades de negocio.
         </p>
       </div>
-      <div class="col-md-6 d-flex justify-content-center">
-        <img class="imagen-local" src="/404/edificio-destruido.png" alt="">
+      <div class="col-md-6 d-flex justify-content-center pt-5">
+        <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner imagen-local">
+            <div class="carousel-item active">
+              <img src="../../../../../..//public/lugares-turisticos/Megacolegio-Palermo.jpg" class="w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+              <img src="../../../../../..//public/lugares-turisticos/hospital.jpg" class="w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+              <img src="../../../../../..//public/lugares-turisticos/gruta-Santa-Rosalía.jpg" class="w-100" alt="...">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -118,14 +130,6 @@
         <li class="d-flex align-items-center py-2">
           <i class="fa fa-calendar me-2"></i>
           <a routerLink="/citas" class="text-decoration-none">Solicitar Cita</a>
-        </li>
-        <li class="d-flex align-items-center py-2">
-          <i class="fa fa-file-alt me-2"></i>
-          <a routerLink="/portal" class="text-decoration-none">Portal Arrendatario</a>
-        </li>
-        <li class="d-flex align-items-center py-2">
-          <i class="fa fa-user me-2"></i>
-          <a routerLink="/informacion" class="text-decoration-none">Información</a>
         </li>
       </ul>
     </div>

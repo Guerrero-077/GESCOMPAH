@@ -1,0 +1,14 @@
+<div class="card">
+    <h5 class="fw-bold text-success mb-3">
+        {{ title }}
+    </h5>
+    <div class="card-body">
+        <div style="height: 300px;">
+            <canvas baseChart 
+                [data]="{ labels: labels, datasets: datasets }" 
+                [options]="lineChartOptions"
+                [type]="lineChartType">
+            </canvas>
+        </div>
+    </div>
+</div>

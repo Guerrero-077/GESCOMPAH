@@ -19,7 +19,8 @@
 }
 
 .content-wrapper {
-  background: linear-gradient(135deg, var(--green-500), var(--green-700));
+  background: linear-gradient(135deg, var(--green-600), var(--green-700));
+  /* background-color: var(--green-700); */
 }
 
 
@@ -43,7 +44,8 @@
   line-height: 1.5;
   margin-top: -0.6rem;
   margin-bottom: 2rem;         /* menos separación */
-  color: var(--green-900);     /* verde oscuro */
+  /* color: var(--green-900);     verde oscuro */
+  color: #fff;     /* verde oscuro */
   opacity: 0.9;                /* suaviza el tono */
 }
 
@@ -57,7 +59,8 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
-  background-color: var(--green-700);
+  background-color: var(--green-600);
+  /* background-color: var(--green-700); */
   border-radius: 12px;
   text-decoration: none;
   transition: transform 0.2s ease-in-out, background-color 0.3s ease;
@@ -77,27 +80,28 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
-  background-color: var(--green-400);
+  background-color: var(--yellow-400);
   border-radius: 12px;
   text-decoration: none;
   transition: transform 0.2s ease-in-out, background-color 0.3s ease;
 }
 
 .premises-button:hover {
-  background-color: #fbbf24;
+  background-color: var(--yellow-500);
   transform: translateY(-3px);
 }
 
-.imagen-local {
-  max-width: 400px ;
-  max-height: 600px;
-  /* border: 1px #000 solid; */
+.imagen-local img {
+  width: 100%;
+  height: 80vh; 
+  object-fit: cover;
   border-radius: 15px;
   display: block;
+  margin: 0 auto;
 }
 
 .text-green {
-  color: #2E7D32;
+  color: var(--green-600);
 
 }
 .header {
@@ -151,4 +155,12 @@
 .footer .e ul li:hover a,
 .footer .e ul li:hover i {
   color: var(--yellow-300) ;
+}
+
+/* 📱 En móviles: un poco más pequeña, pero mínima de 400px */
+@media (max-width: 768px) {
+  .imagen-local img {
+    height: 50vh;          /* 60% de la pantalla en móviles */
+    min-height: 400px;     /* Nunca menos de 400px */
+  }
 }

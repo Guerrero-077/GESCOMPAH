@@ -1,0 +1,36 @@
+/*================================================
+Estilos Grafica Circular
+==================================================*/
+
+.chart-card {
+  background-color: white;
+  border: 1px solid #a7f3d0; /* Verde claro pastel (#a7f3d0 ≈ Tailwind emerald-200) */
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra todo horizontalmente */
+}
+
+.chart-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.chart-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #166534; /* Verde oscuro (#166534 ≈ Tailwind green-800) */
+  margin-bottom: 16px;
+  align-self: flex-start; /* Opcional: alineado al inicio si quieres como los demás */
+}
+
+.chart-container {
+  position: relative;
+  height: 260px;
+  width: 260px; /* Asegura que el gráfico no se estire de más */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,5 +1,5 @@
 .custom-card {
-    border: 1px solid #d1e7dd; /* Verde muy claro */
+    border: 2px solid var(--green-100); /* Verde muy claro */
     border-radius: 8px;
     padding: 1.5rem;
     text-align: center;
@@ -23,7 +23,7 @@
 .custom-card .card-title {
     font-weight: bold;
     font-size: 1.25rem;
-    color: #146c43; /* Verde oscuro */
+    color: var(--green-600);
     margin-bottom: 0.5rem;
 }
 
