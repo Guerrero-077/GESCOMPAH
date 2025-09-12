@@ -2,7 +2,6 @@
 using Entity.DTOs.Implements.Business.Contract;
 using Microsoft.Playwright;
 using System.Text;
-using System.Text.RegularExpressions;
 using Templates.Templates;
 
 namespace Business.Services.Utilities.PDF
@@ -20,11 +19,8 @@ namespace Business.Services.Utilities.PDF
         private static IPlaywright? _playwright;
         private static IBrowser? _browser;
 
-        // Regex precompilado para el bloque foreach de cláusulas
-        // Reemplaza el bucle Razor por una <ul> construida a mano.
-        private static readonly Regex _foreachRegex = new(
-            @"@foreach\s*\(.*?\)\s*{.*?}",
-            RegexOptions.Singleline | RegexOptions.Compiled);
+        // Marcador simple en plantilla para cláusulas
+        private const string ClausesPlaceholder = "{{CLAUSES}}";
 
         public async Task<byte[]> GeneratePdfAsync(ContractSelectDto contract)
         {
@@ -41,11 +37,25 @@ namespace Business.Services.Utilities.PDF
             {
                 // Viewport null => tamaño "fit to page" para PDF,
                 // no imprescindible, pero ayuda a evitar reflow extraño.
-                ViewportSize = null
+                ViewportSize = null,
+                JavaScriptEnabled = false, // desactiva JS para acelerar si no se usa
+                BypassCSP = true
             });
 
             try
             {
+                // Bloquear solo recursos externos http/https (permitir about:blank, data:)
+                await context.RouteAsync("**/*", route =>
+                {
+                    var url = route.Request.Url;
+                    if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                        url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return route.AbortAsync();
+                    }
+                    return route.ContinueAsync();
+                });
+
                 var page = await context.NewPageAsync();
 
                 // Emular media "print" para respetar estilos de impresión
@@ -57,25 +67,30 @@ namespace Business.Services.Utilities.PDF
                     html,
                     new PageSetContentOptions
                     {
-                        WaitUntil = WaitUntilState.NetworkIdle,
-                        // Ajusta si tu plantilla trae recursos externos
-                        Timeout = 10_000
+                        // Para contenido estático embebido, DOMContentLoaded es suficiente
+                        WaitUntil = WaitUntilState.DOMContentLoaded,
+                        Timeout = 2_000
                     });
 
                 // 5) Exportar PDF
                 var pdfBytes = await page.PdfAsync(new PagePdfOptions
                 {
-                    Format = "A4",
+                    Format = "Letter",
                     PrintBackground = true,
                     PreferCSSPageSize = true, // respeta @page css size si lo defines
+                    DisplayHeaderFooter = true,
+                    HeaderTemplate = "<div></div>", // vacío pero necesario si se activa
+                    FooterTemplate =
+                        "<div style=\"font-size:10px;width:100%;text-align:center;color:#555;\">" +
+                        "Página <span class=\"pageNumber\"></span> de <span class=\"totalPages\"></span>" +
+                        "</div>",
                     Margin = new()
                     {
-                        Top = "40px",
-                        Bottom = "40px",
-                        Left = "40px",
-                        Right = "40px"
-                    },
-                    // Opcional: DisplayHeaderFooter = true, HeaderTemplate = ..., FooterTemplate = ...
+                        Top = "25mm",
+                        Bottom = "25mm",
+                        Left = "25mm",
+                        Right = "25mm"
+                    }
                 });
 
                 return pdfBytes;
@@ -84,6 +99,11 @@ namespace Business.Services.Utilities.PDF
             {
                 await context.CloseAsync();
             }
+        }
+
+        public Task WarmupAsync()
+        {
+            return EnsureBrowserAsync();
         }
 
         /// <summary>
@@ -108,7 +128,10 @@ namespace Business.Services.Utilities.PDF
                     {
                         // Comenta si NO estás en contenedor endurecido
                         "--no-sandbox",
-                        "--disable-dev-shm-usage"
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--disable-extensions",
+                        "--blink-settings=imagesEnabled=false"
                     }
                 };
 
@@ -141,6 +164,19 @@ namespace Business.Services.Utilities.PDF
             sb.Replace("@Model.StartDate.ToString(\"dd/MM/yyyy\")", c.StartDate.ToString("dd/MM/yyyy"));
             sb.Replace("@Model.EndDate.ToString(\"dd/MM/yyyy\")", c.EndDate.ToString("dd/MM/yyyy"));
 
+            // Datos del arrendador con valores por defecto si no vienen en el DTO
+            var landlordEntity = string.IsNullOrWhiteSpace(c.LandlordEntityName) ? "MUNICIPIO DE PALERMO (H)" : c.LandlordEntityName!;
+            var landlordNit = string.IsNullOrWhiteSpace(c.LandlordNIT) ? "891.180.021-9" : c.LandlordNIT!;
+            var landlordRep = string.IsNullOrWhiteSpace(c.LandlordRepName) ? "KLEYVER OVIEDO FARFAN" : c.LandlordRepName!;
+            var landlordRepDoc = string.IsNullOrWhiteSpace(c.LandlordRepDocument) ? "7.717.624" : c.LandlordRepDocument!;
+            var landlordRepTitle = string.IsNullOrWhiteSpace(c.LandlordRepTitle) ? "Alcalde Municipal" : c.LandlordRepTitle!;
+
+            sb.Replace("@Model.LandlordEntityName", HtmlEncode(landlordEntity));
+            sb.Replace("@Model.LandlordNIT", HtmlEncode(landlordNit));
+            sb.Replace("@Model.LandlordRepName", HtmlEncode(landlordRep));
+            sb.Replace("@Model.LandlordRepDocument", HtmlEncode(landlordRepDoc));
+            sb.Replace("@Model.LandlordRepTitle", HtmlEncode(landlordRepTitle));
+
             var p = c.PremisesLeased?.FirstOrDefault();
             if (p != null)
             {
@@ -161,10 +197,9 @@ namespace Business.Services.Utilities.PDF
                 }
             }
 
-            var ul = $"<ul>{clausesHtml}</ul>";
-            var result = _foreachRegex.Replace(sb.ToString(), ul);
-
-            return result;
+            // Reemplazo directo del placeholder
+            sb.Replace(ClausesPlaceholder, clausesHtml.ToString());
+            return sb.ToString();
         }
 
         /// <summary>

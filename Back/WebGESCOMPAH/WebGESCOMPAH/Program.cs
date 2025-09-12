@@ -118,6 +118,19 @@ MigrationManager.MigrateAllDatabases(app.Services, builder.Configuration);
 // SignalR hubs
 app.MapHub<ContractsHub>("/api/hubs/contracts");
 
+// Warmup Playwright/Chromium para evitar arranque en frío en la primera solicitud
+try
+{
+    using var scope = app.Services.CreateScope();
+    var pdfGen = scope.ServiceProvider.GetRequiredService<IContractPdfGeneratorService>();
+    await pdfGen.WarmupAsync();
+}
+catch (Exception ex)
+{
+    // Loguea si tienes logger; no detiene el arranque
+    Console.WriteLine($"[Warmup PDF] Aviso: {ex.Message}");
+}
+
 // --------------------------
 // HANGFIRE Dashboard + Recurring Job
 // --------------------------

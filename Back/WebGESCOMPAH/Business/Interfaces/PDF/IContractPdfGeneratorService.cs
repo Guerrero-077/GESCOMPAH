@@ -10,6 +10,7 @@ namespace Business.Interfaces.PDF
     public interface IContractPdfGeneratorService
     {
         Task<byte[]> GeneratePdfAsync(ContractSelectDto contract);
+        Task WarmupAsync();
     }
 }
     
