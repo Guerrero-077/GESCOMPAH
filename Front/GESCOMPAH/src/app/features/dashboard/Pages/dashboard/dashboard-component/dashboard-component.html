@@ -1,5 +1,5 @@
 <div class="row d-flex justify-content-center gap-2">
-    <div class="row d-flex justify-content-between ">
+    <!-- <div class="row d-flex justify-content-between ">
         <app-card-info class="col-md-6 col-sm-12 col-lg-3 mb-2" title="Total de Plazas" [value]="9" [total]="75">
             <div icon>
                 <i class="fa-solid fa-building card-icon"></i>
@@ -20,60 +20,55 @@
                 <i class="fa-solid fa-user card-icon"></i>
             </div>
         </app-card-info>
+    </div> -->
+    <div class="row d-flex justify-content-between ">
+        <div class="col-md-6 col-sm-12 my-3">
+            <app-circle-chart
+                [title]="'Locales'"
+                [labels]="['Arrendados', 'Disponibles']"
+                [data]="[activeEstablishment(), inactiveEstablishment()]"
+                [colors]="['#f87171','#22c55e']">
+            </app-circle-chart>
+        </div>
+        <div class="col-md-6 col-sm-12 my-3">
+            <app-circle-chart
+                [title]="'Contratos'"
+                [labels]="['Activos', 'Inactivos']"
+                [data]="[activeContract(), inactiveContract()]"
+                [colors]="['#fcd34d', '#0ea5e9']">
+            </app-circle-chart>
+        </div>
     </div>
-    <div class="row d-flex justify-content-between">
-        <div class="col-md-7 col-sm-12 my-3">
-            <app-system-alert>
 
-            </app-system-alert>
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-7 col-sm-12 my-3">
+          <app-line-chart
+              [title]="'Pagos por Mes - Comparación Anual'"
+              [labels]="['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']"
+              [datasets]="[
+                  {
+                  data: [1200, 1350, 1100, 1400, 1600, 1700, 1550, 1800, 1650, 1900, 2000, 2100],
+                  label: '2025',
+                  borderColor: '#2563eb',
+                  backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                  fill: true,
+                  tension: 0.3
+                  },
+                  {
+                  data: [1000, 1150, 950, 1300, 1400, 1450, 1350, 1500, 1450, 1600, 1700, 1750],
+                  label: '2024',
+                  borderColor: '#94a3b8',
+                  backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                  fill: true,
+                  tension: 0.3
+                  }
+              ]">
+          </app-line-chart>
         </div>
         <div class="col-md-5 col-sm-12  my-3">
             <app-quick-action>
 
             </app-quick-action>
         </div>
-    </div>
-    <div class="row d-flex justify-content-between ">
-        <div class="col-md-6 col-sm-12 my-3">
-            <app-circle-chart
-                [title]="'Locales Arrendados vs Disponibles'"
-                [labels]="['Arrendados', 'Disponibles']"
-                [data]="[64, 61]"
-                [colors]="['#22c55e', '#f87171']">
-            </app-circle-chart>
-        </div>
-        <div class="col-md-6 col-sm-12 my-3">
-            <app-circle-chart
-                [title]="'Usuarios en el Sistema'"
-                [labels]="['Activos', 'Inactivos']"
-                [data]="[100, 150]"
-                [colors]="['#0ea5e9', '#d1d5db']">
-            </app-circle-chart>
-        </div>
-    </div>
-    <div class="row d-flex justify-content-center">
-        <app-line-chart
-            [title]="'Pagos por Mes - Comparación Anual'"
-            [labels]="['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']"
-            [datasets]="[
-                {
-                data: [1200, 1350, 1100, 1400, 1600, 1700, 1550, 1800, 1650, 1900, 2000, 2100],
-                label: '2025',
-                borderColor: '#2563eb',
-                backgroundColor: 'rgba(37, 99, 235, 0.2)',
-                fill: true,
-                tension: 0.3
-                },
-                {
-                data: [1000, 1150, 950, 1300, 1400, 1450, 1350, 1500, 1450, 1600, 1700, 1750],
-                label: '2024',
-                borderColor: '#94a3b8',
-                backgroundColor: 'rgba(148, 163, 184, 0.2)',
-                fill: true,
-                tension: 0.3
-                }
-            ]">
-        </app-line-chart>
-
     </div>
 </div>

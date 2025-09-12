@@ -11,5 +11,6 @@ export class QuickActionComponent {
   @Input() actions = [
     { label: 'Nuevo Contrato', style: 'btn-success' },
     { label: 'Nuevo Usuario', style: 'btn-outline-success' },
+    { label: 'Nuevo Establecimiento', style: 'btn-outline-success' },
   ];
 }

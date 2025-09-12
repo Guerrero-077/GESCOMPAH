@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed} from '@angular/core';
 import { CardInfoComponent } from '../../../components/card-info/card-info.component';
 import { QuickActionComponent } from '../../../components/quick-action/quick-action.component';
 import { SystemAlertComponent } from "../../../components/system-alert/system-alert.component";
@@ -8,6 +8,12 @@ import { BaseChartDirective } from 'ng2-charts';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend, ChartOptions} from 'chart.js';
 import { CircleChartComponent } from "../../../../../shared/components/circle-chart/circle-chart.component";
 import { LineChartComponent } from "../../../../../shared/components/line-chart/line-chart.component";
+import { EstablishmentService } from '../../../../establishments/services/establishment/establishment.service';
+import { EstablishmentSelect } from '../../../../establishments/models/establishment.models';
+import { take } from 'rxjs/operators';
+
+import { ContractService } from '../../../../contracts/services/contract/contract.service';
+import { ContractCard } from '../../../../contracts/models/contract.models';
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
@@ -21,37 +27,59 @@ Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 export class DashboardComponent implements OnInit {
 
   private readonly pageHeaderService = inject(PageHeaderService);
+  private readonly establishmentService = inject(EstablishmentService);
+  private readonly contractService = inject(ContractService);
+
+  readonly establishments = signal<readonly EstablishmentSelect[]>([]);
+  readonly contract = signal<readonly ContractCard[]>([]);
+
+  readonly loading = signal<boolean>(false);
+  readonly error = signal<string | null>(null);
+
+  // Derivados como en Establishment-list
+  readonly activeEstablishment = computed(() =>
+    this.establishments().filter(e => e.active).length
+  );
+  readonly inactiveEstablishment  = computed(() =>
+    this.establishments().filter(e => !e.active).length
+  );
+
+  // Derivados como en Establishment-list
+  readonly activeContract = computed(() =>
+    this.contract().filter(e => e.active).length
+  );
+  readonly inactiveContract  = computed(() =>
+    this.contract().filter(e => !e.active).length
+  );
+
 
   ngOnInit(): void {
     this.pageHeaderService.setPageHeader('Inicio', 'Página Principal - GESCOMPAH');
+    this.loadEstablishments();
+    this.loadContract();
   }
 
-  chartType: 'doughnut' = 'doughnut';
+  private loadEstablishments(): void {
+    this.loading.set(true);
+    this.error.set(null);
 
-  chartData = {
-    labels: ['Ocupado', 'Disponible', 'Inhabilitado'],
-    datasets: [{
-      data: [10, 25, 5],  // Ejemplo: 10 ocupados, 25 disponibles, 5 inhabilitados
-      backgroundColor: [
-        '#22c55e',  // verde vibrante (ocupado)
-        '#fbbf24',  // amarillo vibrante (disponible)
-        '#dc2626'   // rojo (inhabilitado)
-      ],
-      hoverOffset: 10
-    }]
-  };
+    this.establishmentService.getAll().pipe(take(1)).subscribe({
+      next: (list) => this.establishments.set(list),
+      error: (err) => this.error.set(err?.message || 'Error al cargar establecimientos'),
+      complete: () => this.loading.set(false),
+    });
+  }
 
-  chartOptions: ChartOptions<'doughnut'> = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          usePointStyle: true,
-          pointStyle: 'circle',
-        }
-      }
-    }
-  };
+  private loadContract(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.contractService.getAll().pipe(take(1)).subscribe({
+      next: (list) => this.contract.set(list),
+      error: (err) => this.error.set(err?.message || 'Error al cargar establecimientos'),
+      complete: () => this.loading.set(false),
+    });
+  }
+
 }
 
