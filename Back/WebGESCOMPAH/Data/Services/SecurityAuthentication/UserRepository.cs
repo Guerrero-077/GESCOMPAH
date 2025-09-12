@@ -95,7 +95,9 @@ namespace Data.Services.SecurityAuthentication
                     Id = u.Id,
                     Email = u.Email,
                     Password = u.Password,
-                    PersonId = u.PersonId
+                    PersonId = u.PersonId,
+                    Active = u.Active,
+                    IsDeleted = u.IsDeleted
                 })
                 .FirstOrDefaultAsync();
         }

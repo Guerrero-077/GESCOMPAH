@@ -27,7 +27,7 @@ namespace Data.Services.Business
             return await _dbSet
                 .Include(c => c.Person).ThenInclude(p => p.User)
                 .Include(c => c.PremisesLeased).ThenInclude(pl => pl.Establishment).ThenInclude(e => e.Plaza)
-                .Include(c => c.ContractClauses)
+                .Include(c => c.ContractClauses).ThenInclude(cc => cc.Clause)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id);
         }

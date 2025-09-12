@@ -9,7 +9,40 @@ export class SweetAlertService {
 
   constructor() { }
 
+  private cssVar(name: string, fallback: string): string {
+    try {
+      const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return v || fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
   public showNotification(title: string, text: string, icon: SweetAlertIcon): void {
+    const fg = this.cssVar('--color-text', '#111827');
+
+    // Selección semántica por tipo de icono
+    let bg = this.cssVar('--color-surface', '#ffffff');
+    let iconColor: string | undefined;
+    switch (icon) {
+      case 'success':
+        bg = this.cssVar('--state-success-bg', this.cssVar('--color-surface', '#ffffff'));
+        iconColor = this.cssVar('--state-success', '#16a34a');
+        break;
+      case 'warning':
+        bg = this.cssVar('--state-warning-bg', this.cssVar('--color-surface', '#ffffff'));
+        iconColor = this.cssVar('--state-warning', '#eab308');
+        break;
+      case 'error':
+        bg = this.cssVar('--state-error-bg', this.cssVar('--color-surface', '#ffffff'));
+        iconColor = this.cssVar('--state-error', '#ef4444');
+        break;
+      case 'info':
+        bg = this.cssVar('--state-info-bg', this.cssVar('--color-surface', '#ffffff'));
+        iconColor = this.cssVar('--state-info', '#3b82f6');
+        break;
+    }
+
     Swal.fire({
       title,
       text,
@@ -19,6 +52,9 @@ export class SweetAlertService {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
+      background: bg,
+      color: fg,
+      iconColor,
     });
   }
 
@@ -26,21 +62,50 @@ export class SweetAlertService {
     title: string,
     text: string,
     confirmButtonText = 'Aceptar',
-    cancelButtonText = 'Cancelar'
+    cancelButtonText = 'Cancelar',
+    icon: SweetAlertIcon = 'warning'
   ): Promise<any> {
+    // Base tokens
+    const fg = this.cssVar('--color-text', '#111827');
+    const bg = this.cssVar('--color-surface', '#ffffff');
+
+    // Colores por icono
+    let confirmColor = this.cssVar('--color-primary', '#16a34a');
+    let cancelColor  = this.cssVar('--gray-400',   '#9ca3af');
+    switch (icon) {
+      case 'success':
+        confirmColor = this.cssVar('--state-success', '#16a34a');
+        break;
+      case 'warning':
+        confirmColor = this.cssVar('--state-warning', '#eab308');
+        break;
+      case 'error':
+        confirmColor = this.cssVar('--state-error', '#ef4444');
+        break;
+      case 'info':
+        confirmColor = this.cssVar('--state-info', '#3b82f6');
+        break;
+    }
+
     return Swal.fire({
       title,
       text,
-      icon: 'warning',
+      icon,
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: confirmColor,
+      cancelButtonColor: cancelColor,
       confirmButtonText,
       cancelButtonText,
+      color: fg,
+      background: bg,
+      reverseButtons: true,
+      focusCancel: true,
     });
   }
 
   public showLoading(title: string, text: string): void {
+    const fg = this.cssVar('--color-text', '#111827');
+    const bg = this.cssVar('--color-surface', '#ffffff');
     Swal.fire({
       title,
       text,
@@ -49,7 +114,9 @@ export class SweetAlertService {
       },
       allowOutsideClick: false,
       allowEscapeKey: false,
-      allowEnterKey: false
+      allowEnterKey: false,
+      color: fg,
+      background: bg,
     });
   }
 

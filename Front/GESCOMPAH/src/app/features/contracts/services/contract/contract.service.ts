@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import {
   ContractCreateModel,
@@ -27,7 +27,9 @@ export class ContractService {
 
   /** Crear contrato. Recomendado: el backend devuelve el `id` creado. */
   create(payload: ContractCreateModel): Observable<number> {
-    return this.http.post<number>(`${this.baseUrl}`, payload);
+    return this.http.post<any>(`${this.baseUrl}`, payload).pipe(
+      map((res: any) => typeof res === 'number' ? res : Number(res?.contractId))
+    );
   }
 
   /** Actualizar contrato (PUT). Devuelve el detalle actualizado. */

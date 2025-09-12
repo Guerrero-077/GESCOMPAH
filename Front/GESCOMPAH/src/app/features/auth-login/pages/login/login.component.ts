@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormGroup } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import Swal from 'sweetalert2';
+// Centraliza alertas en SweetAlertService (ya inyectado abajo)
 import { AuthService } from '../../../../core/service/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
@@ -128,11 +128,7 @@ export class LoginComponent implements OnInit {
     this.auth.GetMe().subscribe({
       next: () => { },
       error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: err?.message ?? 'Error inesperado'
-        });
+        this.sweetAlertService.showNotification('Oops...', err?.message ?? 'Error inesperado', 'error');
       }
     });
   }

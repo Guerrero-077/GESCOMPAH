@@ -120,8 +120,29 @@ namespace WebGESCOMPAH.Controllers.Module.Business
                 return NotFound(new { message = $"No se encontró un contrato con ID {id}" });
             }
 
-            var pdfBytes = await _pdfService.GeneratePdfAsync(contract);
-            return File(pdfBytes, "application/pdf", $"Contrato_{contract.FullName}.pdf");
+            try
+            {
+                var pdfBytes = await _pdfService.GeneratePdfAsync(contract);
+                return File(pdfBytes, "application/pdf", $"Contrato_{contract.FullName}.pdf");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error generando PDF para contrato {Id}", id);
+
+                var debug = HttpContext.Request.Query.TryGetValue("debug", out var dv) && dv.ToString() == "1";
+                if (debug)
+                {
+                    return StatusCode(500, new
+                    {
+                        error = "Error generando PDF",
+                        message = ex.Message,
+                        inner = ex.InnerException?.Message,
+                        stack = ex.StackTrace,
+                    });
+                }
+
+                return StatusCode(500, new { error = "Error interno al generar el PDF." });
+            }
         }
 
         /// <summary>

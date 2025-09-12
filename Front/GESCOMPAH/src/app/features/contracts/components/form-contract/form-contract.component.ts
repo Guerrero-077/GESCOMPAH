@@ -16,7 +16,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatStepperModule } from '@angular/material/stepper';
-import Swal from 'sweetalert2';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 import { Subject, of } from 'rxjs';
 import { distinctUntilChanged, switchMap, tap, catchError, takeUntil, map, finalize } from 'rxjs/operators';
@@ -29,6 +29,8 @@ import { CityService } from '../../../setting/services/city/city.service';
 import { ContractService } from '../../services/contract/contract.service';
 import { ContractCreateModel } from '../../models/contract.models';
 import { SquareService } from '../../../establishments/services/square/square.service';
+import { ClauseService } from '../../services/clause/clause.service';
+import { ClauseSelect } from '../../models/clause.models';
 import { SquareSelectModel } from '../../../establishments/models/squares.models';
 
 import { AppValidators as AV } from '../../../../shared/utils/AppValidators';
@@ -77,10 +79,12 @@ export class FormContractComponent implements OnInit, OnDestroy {
   private readonly contractSvc = inject(ContractService);
   private readonly personSvc = inject(PersonService);
   private readonly squareSvc = inject(SquareService);
+  private readonly clauseSvc = inject(ClauseService);
   private readonly dialogRef = inject(MatDialogRef<FormContractComponent>);
 
   private readonly utils = inject(FormUtilsService);
   private readonly errMsg = inject(ErrorMessageService);
+  private readonly sweet = inject(SweetAlertService);
 
   private readonly destroy$ = new Subject<void>();
 
@@ -92,6 +96,7 @@ export class FormContractComponent implements OnInit, OnDestroy {
   plazas: SquareSelectModel[] = [];
   allEstablishments: EstablishmentSelect[] = [];
   filteredEstablishments: EstablishmentSelect[] = [];
+  clauses: ClauseSelect[] = [];
 
   personaEncontrada = false;
   personId: number | null = null;
@@ -111,6 +116,7 @@ export class FormContractComponent implements OnInit, OnDestroy {
     this.loadCiudades();
     this.loadPlazas();
     this.loadAllEstablishments();
+    this.loadClauses();
     this.setupReactivePersonLookup();
     this.setupPlazaFiltering();
   }
@@ -191,6 +197,15 @@ export class FormContractComponent implements OnInit, OnDestroy {
       });
   }
 
+  private loadClauses(): void {
+    this.clauseSvc.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => (this.clauses = (res ?? []).filter(c => c?.id != null)),
+        error: (err) => console.error('Error al cargar cláusulas', err),
+      });
+  }
+
   /* ===================== Filtros dependientes ===================== */
   private setupPlazaFiltering(): void {
     this.establishmentFormGroup.get('plazaId')!
@@ -224,15 +239,7 @@ export class FormContractComponent implements OnInit, OnDestroy {
           return this.personSvc.getByDocument(doc).pipe(
             catchError((err) => {
               if (err?.status === 404 && typeof err?.error === 'string') {
-                Swal.fire({
-                  toast: true,
-                  position: 'top-end',
-                  icon: 'error',
-                  title: err.error,
-                  showConfirmButton: false,
-                  timer: 3500,
-                  timerProgressBar: true,
-                });
+                this.sweet.showNotification('No encontrado', err.error, 'error');
               }
               return of(null);
             }),

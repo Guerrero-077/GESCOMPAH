@@ -193,12 +193,24 @@ namespace Business.Services.Business
 
                     await _contractRepository.AddAsync(contract);
 
+                    // 5.1) Asociar cláusulas (muchos a muchos) si vienen en el DTO
+                    if (dto.ClauseIds is not null && dto.ClauseIds.Count > 0)
+                    {
+                        var uniqueClauseIds = dto.ClauseIds.Distinct().ToList();
+                        var links = uniqueClauseIds.Select(cid => new ContractClause
+                        {
+                            ContractId = contract.Id,
+                            ClauseId = cid
+                        });
+                        await _context.contractClauses.AddRangeAsync(links);
+                    }
+
                     // 6) Desactivar establecimientos (chequeo de filas afectadas)
                     var rows = await _establishmentsRepository.SetActiveByIdsAsync(targetIds, active: false);
                     if (rows != targetIds.Count)
                         throw new BusinessException("Conflicto de concurrencia al actualizar estados de establecimientos. Verifique disponibilidad.");
 
-                    // 7) Persistencia única
+                    // 7) Persistencia única (incluye vínculos de cláusulas)
                     await _context.SaveChangesAsync();
 
                     if (createdUser is not null) createdUserId = createdUser.Id;

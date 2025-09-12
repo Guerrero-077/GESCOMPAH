@@ -1,10 +1,9 @@
-import { Injectable } from '@angular/core';
-import Swal from 'sweetalert2';
+import { inject, Injectable } from '@angular/core';
+import { SweetAlertService } from './sweet-alert/sweet-alert.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ConfirmDialogService {
+  private readonly sweet = inject(SweetAlertService);
   async confirm(options: {
     title?: string;
     text?: string;
@@ -20,16 +19,7 @@ export class ConfirmDialogService {
       icon = 'warning',
     } = options;
 
-    const result = await Swal.fire({
-      title,
-      text,
-      icon,
-      showCancelButton: true,
-      confirmButtonText,
-      cancelButtonText,
-      reverseButtons: true,
-      focusCancel: true,
-    });
+    const result = await this.sweet.showConfirm(title, text, confirmButtonText, cancelButtonText, icon);
 
     return result.isConfirmed;
   }

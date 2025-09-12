@@ -144,6 +144,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddSingleton<IExceptionHandler, EntityNotFoundExceptionHandler>();
             services.AddSingleton<IExceptionHandler, ForbiddenExceptionHandler>(); 
             services.AddSingleton<IExceptionHandler, UnauthorizedAccessHandler>();
+            services.AddSingleton<IExceptionHandler, SecurityTokenExceptionHandler>();
             services.AddSingleton<IExceptionHandler, DbConcurrencyExceptionHandler>();
             services.AddSingleton<IExceptionHandler, DbUpdateExceptionHandler>();     
             services.AddSingleton<IExceptionHandler, HttpRequestExceptionHandler>();  
