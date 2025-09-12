@@ -72,7 +72,7 @@ export class CityComponent implements OnInit {
       if (!result) return;
       this.store.create(result).pipe(take(1)).subscribe({
         next: () => {
-          this.sweetAlert.showNotification('Éxito', 'Ciudad creada exitosamente', 'success');
+          this.sweetAlert.toast('Éxito', 'Ciudad creada exitosamente', 'success');
           this.cdr.markForCheck();
         }
       });
@@ -89,7 +89,7 @@ export class CityComponent implements OnInit {
       if (!result) return;
       this.store.update(result).pipe(take(1)).subscribe({
         next: () => {
-          this.sweetAlert.showNotification('Éxito', 'Ciudad actualizada exitosamente', 'success');
+          this.sweetAlert.toast('Éxito', 'Ciudad actualizada exitosamente', 'success');
           this.cdr.markForCheck();
         }
       });
@@ -102,7 +102,7 @@ export class CityComponent implements OnInit {
       if (!res.isConfirmed) return;
       this.store.delete(row.id!).pipe(take(1)).subscribe({
         next: () => {
-          this.sweetAlert.showNotification('Éxito', 'Ciudad eliminada exitosamente', 'success');
+          this.sweetAlert.toast('Éxito', 'Ciudad eliminada exitosamente', 'success');
           this.cdr.markForCheck();
         }
       });
@@ -130,7 +130,7 @@ export class CityComponent implements OnInit {
       tap(updated => {
         // Si la API devuelve 204 No Content, updated será undefined
         row.active = updated?.active ?? checked;
-        this.sweetAlert.showNotification(
+        this.sweetAlert.toast(
           'Éxito',
           `Ciudad ${row.active ? 'activada' : 'desactivada'} correctamente.`,
           'success'
@@ -140,7 +140,7 @@ export class CityComponent implements OnInit {
       catchError(err => {
         // revertimos
         row.active = previous;
-        this.sweetAlert.showNotification(
+        this.sweetAlert.toast(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'

@@ -43,7 +43,7 @@ export class ChangePasswordComponent {
   async onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.sweetAlertService.showNotification('Advertencia', 'Por favor, completa todos los campos correctamente.', 'warning');
+      this.sweetAlertService.toast('Advertencia', 'Por favor, completa todos los campos correctamente.', 'warning');
       return;
     }
 

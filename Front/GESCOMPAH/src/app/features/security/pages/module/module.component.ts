@@ -8,7 +8,7 @@ import { ToggleButtonComponent } from '../../../../shared/components/toggle-butt
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
@@ -25,7 +25,8 @@ import { ModuleSelectModel, ModuleUpdateModel } from '../../models/module.models
 export class ModuleComponent implements OnInit {
   // ===== Inyección =====
   private readonly moduleStore = inject(ModuleStore);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAlert    = inject(SweetAlertService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
   constructor(private dialog: MatDialog) {}
@@ -60,10 +61,10 @@ export class ModuleComponent implements OnInit {
     dialogRef.afterClosed().pipe(
       filter(Boolean),
       switchMap(result => this.moduleStore.create(result).pipe(take(1))),
-      tap(() => this.sweetAlertService.showNotification('Creación Exitosa', 'Módulo creado exitosamente.', 'success')),
+      tap(() => this.sweetAlertService.toast('Creación Exitosa', 'Módulo creado exitosamente.', 'success')),
       catchError(err => {
         console.error('Error creando el módulo:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo crear el módulo.', 'error');
+        this.sweetAlertService.toast('Error', 'No se pudo crear el módulo.', 'error');
         return EMPTY;
       })
     ).subscribe();
@@ -80,10 +81,10 @@ export class ModuleComponent implements OnInit {
       filter((result): result is Partial<ModuleUpdateModel> => !!result),
       map(result => ({ id: row.id, ...result } as ModuleUpdateModel)),
       switchMap(dto => this.moduleStore.update(dto.id, dto).pipe(take(1))),
-      tap(() => this.sweetAlertService.showNotification('Actualización Exitosa', 'Módulo actualizado exitosamente.', 'success')),
+      tap(() => this.sweetAlertService.toast('Actualización Exitosa', 'Módulo actualizado exitosamente.', 'success')),
       catchError(err => {
         console.error('Error actualizando el módulo:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el módulo.', 'error');
+        this.sweetAlertService.toast('Error', 'No se pudo actualizar el módulo.', 'error');
         return EMPTY;
       })
     ).subscribe();
@@ -91,7 +92,7 @@ export class ModuleComponent implements OnInit {
 
   // ===== Eliminar (lógico) =====
   async onDelete(row: ModuleSelectModel): Promise<void> {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar módulo',
       text: `¿Deseas eliminar el módulo "${row.name}"?`,
       confirmButtonText: 'Eliminar',
@@ -100,10 +101,10 @@ export class ModuleComponent implements OnInit {
     if (!confirmed) return;
 
     this.moduleStore.deleteLogic(row.id).pipe(take(1)).subscribe({
-      next: () => this.sweetAlertService.showNotification('Eliminación Exitosa', 'Módulo eliminado exitosamente.', 'success'),
+      next: () => this.sweetAlertService.toast('Eliminación Exitosa', 'Módulo eliminado exitosamente.', 'success'),
       error: err => {
         console.error('Error eliminando el módulo:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el módulo.', 'error');
+        this.sweetAlertService.toast('Error', 'No se pudo eliminar el módulo.', 'error');
       }
     });
   }
@@ -132,7 +133,7 @@ export class ModuleComponent implements OnInit {
       tap(updated => {
         // Si la API devuelve 204 No Content, updated puede ser undefined.
         row.active = updated?.active ?? checked;
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Éxito',
           `Módulo ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success'
@@ -141,7 +142,7 @@ export class ModuleComponent implements OnInit {
       catchError(err => {
         console.error('Error cambiando estado:', err);
         row.active = previous; // revertir
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'

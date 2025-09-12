@@ -7,7 +7,7 @@ import { catchError, EMPTY, filter, map, switchMap, take, tap } from 'rxjs';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { AppointmentSelectModel, AppointmentUpdateModel } from '../../models/appointment.models';
 import { AppointmentStore } from '../../services/appointment/appointment.store';
@@ -23,7 +23,7 @@ export class AppointmentListComponent implements OnInit {
 
   // Dependencias inyectadas
   private readonly appointmentStore = inject(AppointmentStore);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
 
@@ -69,7 +69,7 @@ export class AppointmentListComponent implements OnInit {
 
       this.appointmentStore.create(result).pipe(take(1)).subscribe({
         next: () => {
-          this.sweetAlertService.showNotification(
+          this.sweetAlertService.toast(
             'Creación Exitosa',
             'Formulario creado exitosamente.',
             'success'
@@ -77,7 +77,7 @@ export class AppointmentListComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error creando el formulario:', err);
-          this.sweetAlertService.showNotification(
+          this.sweetAlertService.toast(
             'Error',
             'No se pudo crear el formulario.',
             'error'
@@ -102,7 +102,7 @@ export class AppointmentListComponent implements OnInit {
       take(1),
 
       tap(() => {
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Actualización Exitosa',
           'Formulario actualizado exitosamente.',
           'success'
@@ -111,7 +111,7 @@ export class AppointmentListComponent implements OnInit {
 
       catchError(err => {
         console.error('Error actualizando el formulario:', err);
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           'No se pudo actualizar el formulario.',
           'error'
@@ -123,7 +123,7 @@ export class AppointmentListComponent implements OnInit {
 
 
   async onDelete(row: AppointmentSelectModel) {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlertService.confirm({
       title: 'Eliminar form',
       text: `¿Deseas eliminar el form "${row.fullName}"?`,
       confirmButtonText: 'Eliminar',
@@ -133,11 +133,11 @@ export class AppointmentListComponent implements OnInit {
     if (confirmed) {
       this.appointmentStore.deleteLogic(row.id).subscribe({
         next: () => {
-          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Formulario eliminado exitosamente.', 'success');
+          this.sweetAlertService.toast('Eliminación Exitosa', 'Formulario eliminado exitosamente.', 'success');
         },
         error: err => {
           console.error('Error eliminando el formulario:', err);
-          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el formulario.', 'error');
+          this.sweetAlertService.toast('Error', 'No se pudo eliminar el formulario.', 'error');
         }
       });
     }
@@ -157,7 +157,7 @@ export class AppointmentListComponent implements OnInit {
       next: (updated) => {
         // sincronizar con lo que devuelve el backend
         row.active = updated.active ?? row.active;
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Éxito',
           `Formulario ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success'
@@ -166,7 +166,7 @@ export class AppointmentListComponent implements OnInit {
       error: (err) => {
         // revertir si falla
         row.active = previous;
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'

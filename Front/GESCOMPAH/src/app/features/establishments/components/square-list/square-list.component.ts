@@ -9,7 +9,7 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { SquareSelectModel, SquareUpdateModel } from '../../models/squares.models';
 import { SquareStore } from '../../services/square/square.store';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
@@ -24,7 +24,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 export class SquareListComponent implements OnInit {
   // Servicios
   private readonly squaresStore = inject(SquareStore);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlert = inject(SweetAlertService);
   private readonly sharedEvents = inject(SharedEventsServiceService);
   private readonly dialog = inject(MatDialog);
@@ -65,9 +65,9 @@ export class SquareListComponent implements OnInit {
       if (!result) return;
       try {
         await this.squaresStore.create(result);
-        this.sweetAlert.showNotification('Creación Exitosa', 'Plaza creada exitosamente.', 'success');
+        this.sweetAlert.toast('Creación Exitosa', 'Plaza creada exitosamente.', 'success');
       } catch (err) {
-        this.sweetAlert.showNotification('Error', 'No se pudo crear la plaza.', 'error');
+        this.sweetAlert.toast('Error', 'No se pudo crear la plaza.', 'error');
       }
     });
   }
@@ -86,16 +86,16 @@ export class SquareListComponent implements OnInit {
 
       try {
         await this.squaresStore.update(dto.id, dto);
-        this.sweetAlert.showNotification('Actualización Exitosa', 'Plaza actualizada exitosamente.', 'success');
+        this.sweetAlert.toast('Actualización Exitosa', 'Plaza actualizada exitosamente.', 'success');
       } catch (err) {
-        this.sweetAlert.showNotification('Error', 'No se pudo actualizar la plaza.', 'error');
+        this.sweetAlert.toast('Error', 'No se pudo actualizar la plaza.', 'error');
       }
     });
   }
 
 
   async onDelete(row: SquareSelectModel): Promise<void> {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar plaza',
       text: `¿Deseas eliminar la plaza "${row.name}"?`,
       confirmButtonText: 'Eliminar',
@@ -105,9 +105,9 @@ export class SquareListComponent implements OnInit {
 
     try {
       await this.squaresStore.deleteLogic(row.id);
-      this.sweetAlert.showNotification('Eliminación exitosa', 'Plaza eliminada correctamente.', 'success');
+      this.sweetAlert.toast('Eliminación exitosa', 'Plaza eliminada correctamente.', 'success');
     } catch (err) {
-      this.sweetAlert.showNotification('Error', 'No se pudo eliminar la plaza.', 'error');
+      this.sweetAlert.toast('Error', 'No se pudo eliminar la plaza.', 'error');
     }
   }
 
@@ -117,7 +117,7 @@ export class SquareListComponent implements OnInit {
     e: { checked: boolean } | boolean | null | undefined
   ): Promise<void> {
     if (id == null) {
-      this.sweetAlert.showNotification('Sin plaza', 'No se pudo obtener el ID de la plaza.', 'warning');
+      this.sweetAlert.toast('Sin plaza', 'No se pudo obtener el ID de la plaza.', 'warning');
       return;
     }
 
@@ -126,9 +126,9 @@ export class SquareListComponent implements OnInit {
     try {
       await this.squaresStore.changeActiveStatusRemote(id, checked);
       this.sharedEvents.notifyPlazaStateChanged(id);
-      this.sweetAlert.showNotification('Éxito', `Plaza ${checked ? 'activada' : 'desactivada'} correctamente.`, 'success');
+      this.sweetAlert.toast('Éxito', `Plaza ${checked ? 'activada' : 'desactivada'} correctamente.`, 'success');
     } catch (err: any) {
-      this.sweetAlert.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
+      this.sweetAlert.toast('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
     }
   }
 

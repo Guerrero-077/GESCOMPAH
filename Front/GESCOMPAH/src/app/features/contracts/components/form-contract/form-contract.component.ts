@@ -16,7 +16,6 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatStepperModule } from '@angular/material/stepper';
-import Swal from 'sweetalert2';
 
 import { Subject, of } from 'rxjs';
 import { distinctUntilChanged, switchMap, tap, catchError, takeUntil, map, finalize } from 'rxjs/operators';
@@ -34,6 +33,7 @@ import { SquareSelectModel } from '../../../establishments/models/squares.models
 import { AppValidators as AV } from '../../../../shared/utils/AppValidators';
 import { buildEmailValidators, FormUtilsService } from '../../../../shared/Services/forms/form-utils.service';
 import { ErrorMessageService } from '../../../../shared/Services/forms/error-message.service';
+import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 /* ========== Validadores auxiliares ========== */
 function endAfterOrEqualStartValidator(startCtrlName: string, endCtrlName: string): ValidatorFn {
@@ -81,6 +81,7 @@ export class FormContractComponent implements OnInit, OnDestroy {
 
   private readonly utils = inject(FormUtilsService);
   private readonly errMsg = inject(ErrorMessageService);
+  private readonly sweetAlertService = inject(SweetAlertService);
 
   private readonly destroy$ = new Subject<void>();
 
@@ -224,15 +225,7 @@ export class FormContractComponent implements OnInit, OnDestroy {
           return this.personSvc.getByDocument(doc).pipe(
             catchError((err) => {
               if (err?.status === 404 && typeof err?.error === 'string') {
-                Swal.fire({
-                  toast: true,
-                  position: 'top-end',
-                  icon: 'error',
-                  title: err.error,
-                  showConfirmButton: false,
-                  timer: 3500,
-                  timerProgressBar: true,
-                });
+                this.sweetAlertService.toast(err.error, '', 'error');
               }
               return of(null);
             }),

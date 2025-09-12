@@ -7,7 +7,7 @@ import { FormDialogComponent } from '../../../../shared/components/form-dialog/f
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { FormSelectModel, FormUpdateModel } from '../../models/form.models';
 import { FormStore } from '../../services/form/form.store';
@@ -24,7 +24,8 @@ export class FormComponent implements OnInit {
 
   // ===== Inyección de dependencias =====
   private readonly formStore = inject(FormStore);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAlert    = inject(SweetAlertService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
   constructor(private dialog: MatDialog) {}
@@ -63,7 +64,7 @@ export class FormComponent implements OnInit {
       filter(Boolean),
       switchMap(result => this.formStore.create(result).pipe(take(1))),
       tap(() => {
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Creación Exitosa',
           'Formulario creado exitosamente.',
           'success'
@@ -71,7 +72,7 @@ export class FormComponent implements OnInit {
       }),
       catchError(err => {
         console.error('Error creando el formulario:', err);
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           'No se pudo crear el formulario.',
           'error'
@@ -93,7 +94,7 @@ export class FormComponent implements OnInit {
       map(result => ({ id: row.id, ...result } as FormUpdateModel)),
       switchMap(dto => this.formStore.update(dto.id, dto).pipe(take(1))),
       tap(() => {
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Actualización Exitosa',
           'Formulario actualizado exitosamente.',
           'success'
@@ -101,7 +102,7 @@ export class FormComponent implements OnInit {
       }),
       catchError(err => {
         console.error('Error actualizando el formulario:', err);
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           'No se pudo actualizar el formulario.',
           'error'
@@ -113,7 +114,7 @@ export class FormComponent implements OnInit {
 
   // ===== Eliminar (lógico) =====
   async onDelete(row: FormSelectModel): Promise<void> {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar form',
       text: `¿Deseas eliminar el form "${row.name}"?`,
       confirmButtonText: 'Eliminar',
@@ -124,7 +125,7 @@ export class FormComponent implements OnInit {
 
     this.formStore.deleteLogic(row.id).pipe(take(1)).subscribe({
       next: () => {
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Eliminación Exitosa',
           'Formulario eliminado exitosamente.',
           'success'
@@ -132,7 +133,7 @@ export class FormComponent implements OnInit {
       },
       error: err => {
         console.error('Error eliminando el formulario:', err);
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           'No se pudo eliminar el formulario.',
           'error'
@@ -167,7 +168,7 @@ export class FormComponent implements OnInit {
         // Asegura sincronizar el estado visible.
         row.active = updated?.active ?? checked;
 
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Éxito',
           `Formulario ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success'
@@ -178,7 +179,7 @@ export class FormComponent implements OnInit {
         // Revertir estado si falla
         row.active = previous;
 
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'

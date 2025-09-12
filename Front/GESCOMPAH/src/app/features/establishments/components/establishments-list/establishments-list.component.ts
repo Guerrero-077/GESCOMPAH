@@ -86,9 +86,9 @@ export class EstablishmentsListComponent implements OnInit {
 
     try {
       await this.store.delete(id);
-      this.sweetAlert.showNotification('Éxito', 'Local eliminado exitosamente', 'success');
+      this.sweetAlert.toast('Éxito', 'Local eliminado exitosamente', 'success');
     } catch (err: any) {
-      this.sweetAlert.showNotification('Error', err?.message || 'No se pudo eliminar', 'error');
+      this.sweetAlert.toast('Error', err?.message || 'No se pudo eliminar', 'error');
     }
   }
 
@@ -104,7 +104,7 @@ export class EstablishmentsListComponent implements OnInit {
         data: row
       });
     } else {
-      this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error');
+      this.sweetAlert.toast('Error', 'Establecimiento no encontrado', 'error');
     }
   }
 }

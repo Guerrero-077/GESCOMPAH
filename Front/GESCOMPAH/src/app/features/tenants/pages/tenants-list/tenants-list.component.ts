@@ -7,7 +7,7 @@ import { GenericTableComponent } from '../../../../shared/components/generic-tab
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
@@ -37,7 +37,7 @@ import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRo
 export class TenantsListComponent implements OnInit {
   // Services / stores
   private readonly store = inject(TenantStore);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlert = inject(SweetAlertService);
   private readonly dialog = inject(MatDialog);
   private readonly pageHeader = inject(PageHeaderService);
@@ -83,9 +83,9 @@ export class TenantsListComponent implements OnInit {
       if (!payload) return;
       try {
         await this.store.create(payload);
-        this.sweetAlert.showNotification('Éxito', 'Usuario creado exitosamente.', 'success');
+        this.sweetAlert.toast('Éxito', 'Usuario creado exitosamente.', 'success');
       } catch {
-        this.sweetAlert.showNotification('Error', 'No se pudo crear el usuario.', 'error');
+        this.sweetAlert.toast('Error', 'No se pudo crear el usuario.', 'error');
       }
     });
   }
@@ -99,7 +99,7 @@ export class TenantsListComponent implements OnInit {
 
       const dto = this.toUpdateDto(row, partial);
       if (!dto) {
-        this.sweetAlert.showNotification(
+        this.sweetAlert.toast(
           'Datos incompletos',
           'Faltan datos obligatorios para actualizar el usuario.',
           'warning'
@@ -109,15 +109,15 @@ export class TenantsListComponent implements OnInit {
 
       try {
         await this.store.update(dto.id, dto);
-        this.sweetAlert.showNotification('Éxito', 'Usuario actualizado exitosamente.', 'success');
+        this.sweetAlert.toast('Éxito', 'Usuario actualizado exitosamente.', 'success');
       } catch {
-        this.sweetAlert.showNotification('Error', 'No se pudo actualizar el usuario.', 'error');
+        this.sweetAlert.toast('Error', 'No se pudo actualizar el usuario.', 'error');
       }
     });
   }
 
   async onDelete(row: TenantsSelectModel): Promise<void> {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       text: `¿Deseas eliminar el Usuario "${row.personName}"?`,
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
@@ -126,9 +126,9 @@ export class TenantsListComponent implements OnInit {
 
     try {
       await this.store.delete(row.id); // si tu back es lógico: this.store.deleteLogic(row.id)
-      this.sweetAlert.showNotification('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
+      this.sweetAlert.toast('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
     } catch {
-      this.sweetAlert.showNotification('Error', 'No se pudo eliminar al Usuario.', 'error');
+      this.sweetAlert.toast('Error', 'No se pudo eliminar al Usuario.', 'error');
     }
   }
 
@@ -142,7 +142,7 @@ export class TenantsListComponent implements OnInit {
     e: { checked: boolean } | boolean | null | undefined
   ): Promise<void> {
     if (id == null) {
-      this.sweetAlert.showNotification('Sin usuario', 'No se pudo obtener el ID del usuario.', 'warning');
+      this.sweetAlert.toast('Sin usuario', 'No se pudo obtener el ID del usuario.', 'warning');
       return;
     }
 
@@ -150,13 +150,13 @@ export class TenantsListComponent implements OnInit {
 
     try {
       await this.store.changeActiveStatusRemote(id, checked);
-      this.sweetAlert.showNotification(
+      this.sweetAlert.toast(
         'Éxito',
         `Usuario ${checked ? 'activado' : 'desactivado'} correctamente.`,
         'success'
       );
     } catch (err: any) {
-      this.sweetAlert.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
+      this.sweetAlert.toast('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
     }
   }
 

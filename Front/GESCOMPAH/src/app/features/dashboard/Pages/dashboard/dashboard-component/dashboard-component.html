@@ -23,8 +23,8 @@
     </div> -->
     <div class="row d-flex justify-content-between ">
         <div class="col-md-6 col-sm-12 my-3">
-            <app-circle-chart [title]="'Locales'" [labels]="['Arrendados', 'Disponibles']"
-                [data]="[activeEstablishment(), inactiveEstablishment()]" [colors]="['#f87171','#22c55e']">
+            <app-circle-chart [title]="'Locales'" [labels]="[ 'Disponibles','Arrendados']"
+                [data]="[activeEstablishment(), inactiveEstablishment()]" [colors]="['#22c55e','#f87171']">
             </app-circle-chart>
         </div>
         <div class="col-md-6 col-sm-12 my-3">
@@ -64,6 +64,4 @@
             </app-quick-action>
         </div>
     </div>
-    <app-price-chart [labels]="labels" [prices]="prices" [min]="min" [max]="max" [title]="'Valores base de contratos'">
-    </app-price-chart>
 </div>

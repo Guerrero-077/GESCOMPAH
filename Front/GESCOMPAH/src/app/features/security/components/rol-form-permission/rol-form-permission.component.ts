@@ -6,7 +6,7 @@ import { catchError, finalize, filter, map, switchMap, take, tap } from 'rxjs/op
 
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 import {
@@ -44,7 +44,8 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   private readonly formStore = inject(FormStore);
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAlert    = inject(SweetAlertService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
   // ===== Estado =====
@@ -106,10 +107,10 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           }) as RolFormPermissionCreateModel),
           switchMap(payload =>
             this.rolFormPermissionStore.create(payload).pipe(
-              tap(() => this.sweetAlertService.showNotification('Creado', 'Relación creada con éxito.', 'success')),
+              tap(() => this.sweetAlertService.toast('Creado', 'Relación creada con éxito.', 'success')),
               catchError(err => {
                 console.error('Error creando:', err);
-                this.sweetAlertService.showNotification('Error', 'No se pudo crear.', 'error');
+                this.sweetAlertService.toast('Error', 'No se pudo crear.', 'error');
                 return EMPTY;
               })
             )
@@ -155,10 +156,10 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           }) as RolFormPermissionUpdateModel),
           switchMap(payload =>
             this.rolFormPermissionStore.update(payload).pipe(
-              tap(() => this.sweetAlertService.showNotification('Actualizado', 'Relación actualizada con éxito.', 'success')),
+              tap(() => this.sweetAlertService.toast('Actualizado', 'Relación actualizada con éxito.', 'success')),
               catchError(err => {
                 console.error('Error actualizando:', err);
-                this.sweetAlertService.showNotification('Error', 'No se pudo actualizar.', 'error');
+                this.sweetAlertService.toast('Error', 'No se pudo actualizar.', 'error');
                 return EMPTY;
               })
             )
@@ -169,7 +170,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
 
   // ===== Eliminar (grupo) =====
   async onDelete(row: RolFormPermissionGroupedModel): Promise<void> {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar Grupo de Permisos',
       text: `¿Eliminar todos los permisos del rol "${row.rolName}" para el formulario "${row.formName}"?`,
       confirmButtonText: 'Eliminar',
@@ -178,10 +179,10 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
     if (!confirmed) return;
 
     this.rolFormPermissionStore.deleteByGroup(row.rolId, row.formId).pipe(take(1)).subscribe({
-      next: () => this.sweetAlertService.showNotification('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success'),
+      next: () => this.sweetAlertService.toast('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success'),
       error: err => {
         console.error('Error eliminando:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el grupo.', 'error');
+        this.sweetAlertService.toast('Error', 'No se pudo eliminar el grupo.', 'error');
       }
     });
   }
@@ -212,7 +213,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       tap(updated => {
         // Si la API devuelve 204, updated puede venir undefined
         row.active = updated?.active ?? checked;
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Éxito',
           `Permisos del grupo ${row.active ? 'activados' : 'desactivados'} correctamente.`,
           'success'
@@ -221,7 +222,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       catchError(err => {
         console.error('Error cambiando estado:', err);
         row.active = previous; // revertir
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'

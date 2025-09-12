@@ -22,7 +22,9 @@ export class ContractService {
 
   /** Detalle puntual (ver/editar). */
   getById(id: number): Observable<ContractSelectModel> {
-    return this.http.get<ContractSelectModel>(`${this.baseUrl}/${id}`);
+    // Evita respuestas cacheadas y mantiene sesión si aplica
+    return this.http.get<ContractSelectModel>(`${this.baseUrl}/${id}`,
+      { withCredentials: true, params: { _ts: Date.now() } as any });
   }
 
   /** Crear contrato. Recomendado: el backend devuelve el `id` creado. */
@@ -32,17 +34,17 @@ export class ContractService {
 
   /** Actualizar contrato (PUT). Devuelve el detalle actualizado. */
   update(id: number, payload: Partial<ContractCreateModel>): Observable<ContractSelectModel> {
-    return this.http.put<ContractSelectModel>(`${this.baseUrl}/${id}`, payload);
+    return this.http.put<ContractSelectModel>(`${this.baseUrl}/${id}`, payload, { withCredentials: true });
   }
 
   /** Cambiar estado (PATCH /{id}/estado). Devuelve la entidad (o al menos `active`). */
   changeActiveStatus(id: number, active: boolean): Observable<void> {
-    return this.http.patch<void>(`${this.baseUrl}/${id}/estado`, { active });
+    return this.http.patch<void>(`${this.baseUrl}/${id}/estado`, { active }, { withCredentials: true });
   }
 
   /** Borrado físico. */
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
   /**
@@ -56,7 +58,7 @@ export class ContractService {
 
   /** Descargar PDF. */
   downloadContractPdf(id: number): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/${id}/pdf`, { responseType: 'blob' });
+    return this.http.get(`${this.baseUrl}/${id}/pdf`, { responseType: 'blob', withCredentials: true, params: { _ts: Date.now() } as any });
   }
 
   /**
@@ -64,6 +66,8 @@ export class ContractService {
    * Ajusta el endpoint si tu backend usa otra ruta.
    */
   getMonthlyObligations(contractId: number): Observable<MonthlyObligation[]> {
-    return this.http.get<MonthlyObligation[]>(`${this.baseUrl}/${contractId}/obligations`);
+    // Evita cache y alinea credenciales con el resto de llamadas
+    return this.http.get<MonthlyObligation[]>(`${this.baseUrl}/${contractId}/obligations`,
+      { withCredentials: true, params: { _ts: Date.now() } as any });
   }
 }

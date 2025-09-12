@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 import { ContractCard } from '../../models/contract.models';
 import { ContractStore } from '../../services/contract/contract.store';
 import { ContractService } from '../../services/contract/contract.service';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
@@ -48,7 +48,7 @@ export class ContractsListComponent implements OnInit, OnDestroy {
   private readonly store = inject(ContractStore);
   private readonly svc = inject(ContractService);
   private readonly dialog = inject(MatDialog);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly toast = inject(SweetAlertService);
   private readonly pageHeader = inject(PageHeaderService);
   private readonly realtime = inject(ContractsRealtimeService);
@@ -104,7 +104,7 @@ export class ContractsListComponent implements OnInit, OnDestroy {
 
     ref.afterClosed().pipe(take(1)).subscribe(async (created: boolean) => {
       if (!created) return;
-      this.toast.showNotification('Éxito', 'Contrato creado correctamente.', 'success');
+      this.toast.toast('Éxito', 'Contrato creado correctamente.', 'success');
       await this.store.loadAll({ force: true });
     });
   }
@@ -121,7 +121,7 @@ export class ContractsListComponent implements OnInit, OnDestroy {
 
   onDownload(row: ContractCard): void {
     if (this.isDownloadingPdf) {
-      this.toast.showNotification('Información', 'Ya hay una descarga en curso.', 'info');
+      this.toast.toast('Información', 'Ya hay una descarga en curso.', 'info');
       return;
     }
     this.isDownloadingPdf = true;
@@ -146,10 +146,10 @@ export class ContractsListComponent implements OnInit, OnDestroy {
       ),
       finalize(() => (this.isDownloadingPdf = false))
     ).subscribe({
-      next: () => this.toast.showNotification('Éxito', 'La descarga del contrato ha comenzado.', 'success'),
+      next: () => this.toast.toast('Éxito', 'La descarga del contrato ha comenzado.', 'success'),
       error: (err) => {
         console.error('Error downloading PDF:', err);
-        this.toast.showNotification('Error', 'No se pudo descargar el contrato.', 'error');
+        this.toast.toast('Error', 'No se pudo descargar el contrato.', 'error');
       },
     });
   }
@@ -158,14 +158,14 @@ export class ContractsListComponent implements OnInit, OnDestroy {
     const next = typeof e === 'boolean' ? e : !!e?.checked;
     try {
       await this.store.changeActiveStatusRemote(row.id, next);
-      this.toast.showNotification('Éxito', `Contrato ${next ? 'activado' : 'desactivado'} correctamente.`, 'success');
+      this.toast.toast('Éxito', `Contrato ${next ? 'activado' : 'desactivado'} correctamente.`, 'success');
     } catch (err: any) {
-      this.toast.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
+      this.toast.toast('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
     }
   }
 
   async onDelete(row: ContractCard): Promise<void> {
-    const ok = await this.confirmDialog.confirm({
+    const ok = await this.toast.confirm({
       title: 'Eliminar contrato',
       text: `¿Deseas eliminar el contrato de "${row.personFullName}"?`,
       confirmButtonText: 'Eliminar',
@@ -175,9 +175,9 @@ export class ContractsListComponent implements OnInit, OnDestroy {
 
     try {
       await this.store.delete(row.id);
-      this.toast.showNotification('Eliminación Exitosa', 'Contrato eliminado correctamente.', 'success');
+      this.toast.toast('Eliminación Exitosa', 'Contrato eliminado correctamente.', 'success');
     } catch {
-      this.toast.showNotification('Error', 'No se pudo eliminar el contrato.', 'error');
+      this.toast.toast('Error', 'No se pudo eliminar el contrato.', 'error');
     }
   }
 

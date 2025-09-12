@@ -20,7 +20,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: LayoutComponent,
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 

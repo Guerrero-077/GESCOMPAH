@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormGroup } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import Swal from 'sweetalert2';
 import { AuthService } from '../../../../core/service/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
@@ -128,11 +127,10 @@ export class LoginComponent implements OnInit {
     this.auth.GetMe().subscribe({
       next: () => { },
       error: (err) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: err?.message ?? 'Error inesperado'
-        });
+        this.sweetAlertService.error(
+          err?.message ?? 'Error inesperado',
+          'Oops...'
+        );
       }
     });
   }
@@ -174,7 +172,7 @@ export class LoginComponent implements OnInit {
       },
       error: (err) => {
         this.sweetAlertService.hideLoading();
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Oops...',
           err?.error?.message ?? 'Credenciales inválidas',
           'error'

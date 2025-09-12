@@ -60,7 +60,7 @@ export class SidebarComponent {
           .pipe(finalize(() => this.sweetAlertService.hideLoading()))
           .subscribe({
             error: (err) =>
-              this.sweetAlertService.showNotification(
+              this.sweetAlertService.toast(
                 'Error',
                 err?.error?.message ?? 'Ocurrió un error al cerrar la sesión.',
                 'error'

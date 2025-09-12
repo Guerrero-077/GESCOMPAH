@@ -8,7 +8,7 @@ import { ToggleButtonComponent } from '../../../../shared/components/toggle-butt
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 import { CityService } from '../../../setting/services/city/city.service';
@@ -28,7 +28,8 @@ export class PersonComponent implements OnInit {
 
   // ===== Inyección =====
   private readonly personStore       = inject(PersonStore);
-  private readonly confirmDialog     = inject(ConfirmDialogService);
+  // private readonly confirmDialog     = inject(ConfirmDialogService);
+  private readonly sweetAlert        = inject(SweetAlertService);
   private readonly dialog            = inject(MatDialog);
   private readonly cityService       = inject(CityService);
   private readonly sweetAlertService = inject(SweetAlertService);
@@ -57,10 +58,10 @@ export class PersonComponent implements OnInit {
   // ===== Utils UI =====
   trackById = (_: number, it: PersonSelectModel) => it.id;
   private notifySuccess(title: string, msg: string) {
-    this.sweetAlertService.showNotification(title, msg, 'success');
+    this.sweetAlertService.toast(title, msg, 'success');
   }
   private notifyError(msg: string) {
-    this.sweetAlertService.showNotification('Error', msg, 'error');
+    this.sweetAlertService.toast('Error', msg, 'error');
   }
 
   // ===== Helpers =====
@@ -126,7 +127,7 @@ export class PersonComponent implements OnInit {
 
   // ===== Eliminar =====
   async onDelete(row: PersonSelectModel) {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar Persona',
       text: `¿Deseas eliminar a "${row.firstName} ${row.lastName}"?`,
       confirmButtonText: 'Eliminar',

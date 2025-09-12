@@ -8,7 +8,7 @@ import { ToggleButtonComponent } from '../../../../shared/components/toggle-butt
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
@@ -28,7 +28,8 @@ export class RoleComponent implements OnInit {
   // ====== Inyección estilo Angular moderno ======
   private readonly dialog            = inject(MatDialog);
   private readonly roleStore         = inject(RoleStore);
-  private readonly confirmDialog     = inject(ConfirmDialogService);
+  // private readonly confirmDialog     = inject(ConfirmDialogService);
+  private readonly sweetAlert        = inject(SweetAlertService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
 
@@ -63,10 +64,10 @@ export class RoleComponent implements OnInit {
   trackById = (_: number, it: RoleSelectModel) => it.id;
 
   private notifySuccess(title: string, message: string) {
-    this.sweetAlertService.showNotification(title, message, 'success');
+    this.sweetAlertService.toast(title, message, 'success');
   }
   private notifyError(message: string) {
-    this.sweetAlertService.showNotification('Error', message, 'error');
+    this.sweetAlertService.toast('Error', message, 'error');
   }
 
   // ====== CRUD: Crear ======
@@ -118,7 +119,7 @@ export class RoleComponent implements OnInit {
 
   // ====== CRUD: Eliminar (borrado lógico) ======
   async onDelete(row: RoleSelectModel): Promise<void> {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar rol',
       text: `¿Deseas eliminar el rol "${row.name}"?`,
       confirmButtonText: 'Eliminar',

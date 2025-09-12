@@ -9,6 +9,7 @@ import { forkJoin } from 'rxjs';
 
 import { ContractSelectModel, MonthlyObligation } from '../../models/contract.models';
 import { ContractService } from '../../services/contract/contract.service';
+import { ContractStore } from '../../services/contract/contract.store';
 
 @Component({
   selector: 'app-contract-detail-dialog',
@@ -25,6 +26,7 @@ import { ContractService } from '../../services/contract/contract.service';
 })
 export class ContractDetailDialogComponent implements OnInit {
   private readonly svc = inject(ContractService);
+  private readonly store = inject(ContractStore);
 
   contract: ContractSelectModel | null = null;
   obligations: MonthlyObligation[] = [];
@@ -79,7 +81,9 @@ export class ContractDetailDialogComponent implements OnInit {
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: ({ contract, obligations }) => {
-          this.contract = contract;
+          // Sincroniza estado activo con la grilla si hubiese cambio reciente
+          const current = this.store.getById(contract.id);
+          this.contract = current ? { ...contract, active: current.active } : contract;
           this.obligations = (obligations || []).sort((a, b) => {
             // sort por año desc y mes desc
             if (a.year !== b.year) return b.year - a.year;

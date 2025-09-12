@@ -65,7 +65,7 @@ export class DepartmentComponent implements OnInit {
     dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
       if (!result) return;
       this.store.create(result).pipe(take(1)).subscribe({
-        next: () => this.sweetAlert.showNotification('Éxito', 'Departamento creado exitosamente', 'success')
+        next: () => this.sweetAlert.toast('Éxito', 'Departamento creado exitosamente', 'success')
       });
     });
   }
@@ -79,7 +79,7 @@ export class DepartmentComponent implements OnInit {
     dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
       if (!result) return;
       this.store.update(result).pipe(take(1)).subscribe({
-        next: () => this.sweetAlert.showNotification('Éxito', 'Departamento actualizado exitosamente', 'success')
+        next: () => this.sweetAlert.toast('Éxito', 'Departamento actualizado exitosamente', 'success')
       });
     });
   }
@@ -89,7 +89,7 @@ export class DepartmentComponent implements OnInit {
     this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(res => {
       if (!res.isConfirmed) return;
       this.store.delete(row.id!).pipe(take(1)).subscribe({
-        next: () => this.sweetAlert.showNotification('Éxito', 'Departamento eliminado exitosamente', 'success')
+        next: () => this.sweetAlert.toast('Éxito', 'Departamento eliminado exitosamente', 'success')
       });
     });
   }
@@ -107,14 +107,14 @@ export class DepartmentComponent implements OnInit {
       next: updated => {
         // Si la API devuelve 204, mantenemos el valor; si devuelve DTO, sincronizamos
         row.active = updated?.active ?? checked;
-        this.sweetAlert.showNotification('Éxito',
+        this.sweetAlert.toast('Éxito',
           `Departamento ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success');
       },
       error: err => {
         // Rollback
         row.active = prev;
-        this.sweetAlert.showNotification('Error',
+        this.sweetAlert.toast('Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error');
       }

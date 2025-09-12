@@ -7,7 +7,7 @@ import { catchError, map } from 'rxjs/operators';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { RolUserService } from '../../services/rol-user/rol-user.service';
 import { UserService } from '../../services/user/user.service';
 import { RoleService } from '../../services/role/role.service';
@@ -23,7 +23,8 @@ import { RolUserCreateModel, RolUserSelectModel } from '../../models/rol-user.mo
 export class RolUserComponent implements OnInit {
   private readonly rolUserService = inject(RolUserService);
   private readonly userService = inject(UserService);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly sweetAlert    = inject(SweetAlertService);
 
   
   private readonly dialog = inject(MatDialog);
@@ -110,11 +111,11 @@ export class RolUserComponent implements OnInit {
         this.rolUserService.create(payload).subscribe({
           next: () => {
             this.load()
-            this.sweetAlertService.showNotification('Creación Exitosa', 'Rol-Usuario creado exitosamente.', 'success');
+            this.sweetAlertService.toast('Creación Exitosa', 'Rol-Usuario creado exitosamente.', 'success');
           },
           error: err => {
             console.error('Error creando RolUser:', err)
-            this.sweetAlertService.showNotification('Error', 'No se pudo crear la asignación Rol-Usuario.', 'error');
+            this.sweetAlertService.toast('Error', 'No se pudo crear la asignación Rol-Usuario.', 'error');
           }
         });
       });
@@ -179,11 +180,11 @@ export class RolUserComponent implements OnInit {
           this.rolUserService.update(id, payload).subscribe({
             next: () => {
               this.load()
-              this.sweetAlertService.showNotification('Actualización Exitosa', 'Rol-Usuario actualizado exitosamente.', 'success');
+              this.sweetAlertService.toast('Actualización Exitosa', 'Rol-Usuario actualizado exitosamente.', 'success');
             },
             error: err => {
               console.error('Error actualizando RolUser:', err)
-              this.sweetAlertService.showNotification('Error', 'No se pudo actualizar la asignación Rol-Usuario.', 'error');
+              this.sweetAlertService.toast('Error', 'No se pudo actualizar la asignación Rol-Usuario.', 'error');
             }
           });
         });
@@ -196,7 +197,7 @@ export class RolUserComponent implements OnInit {
 
   // DELETE
   async onDelete(row: RolUserSelectModel) {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar Asignación Rol-Usuario',
       text: `¿Deseas eliminar el rol "${row.rolName}" del usuario "${row.userEmail}"?`,
       confirmButtonText: 'Eliminar',
@@ -207,11 +208,11 @@ export class RolUserComponent implements OnInit {
       this.rolUserService.deleteLogic(row.id).subscribe({
         next: () => {
           this.load()
-          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Asignación Rol-Usuario eliminada exitosamente.', 'success');
+          this.sweetAlertService.toast('Eliminación Exitosa', 'Asignación Rol-Usuario eliminada exitosamente.', 'success');
         },
         error: err => {
           console.error('Error eliminando RolUser:', err)
-          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar la asignación Rol-Usuario.', 'error');
+          this.sweetAlertService.toast('Error', 'No se pudo eliminar la asignación Rol-Usuario.', 'error');
         }
       });
     }

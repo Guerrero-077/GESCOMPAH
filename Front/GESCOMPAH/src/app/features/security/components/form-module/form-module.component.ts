@@ -8,7 +8,7 @@ import { ToggleButtonComponent } from '../../../../shared/components/toggle-butt
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
@@ -38,7 +38,8 @@ export class FormModuleComponent implements OnInit {
   private readonly moduleService      = inject(ModuleService);
   private readonly formModuleService  = inject(FormModuleService);
   private readonly dialog             = inject(MatDialog);
-  private readonly confirmDialog      = inject(ConfirmDialogService);
+  // private readonly confirmDialog      = inject(ConfirmDialogService);
+  private readonly sweetAlert         = inject(SweetAlertService);
   private readonly sweetAlertService  = inject(SweetAlertService);
 
   // ===== Estado =====
@@ -64,13 +65,13 @@ export class FormModuleComponent implements OnInit {
 
   // ===== Utilidades UI =====
   private notifySuccess(title: string, msg: string) {
-    this.sweetAlertService.showNotification(title, msg, 'success');
+    this.sweetAlertService.toast(title, msg, 'success');
   }
   private notifyError(msg: string) {
-    this.sweetAlertService.showNotification('Error', msg, 'error');
+    this.sweetAlertService.toast('Error', msg, 'error');
   }
   private notifyWarn(msg: string) {
-    this.sweetAlertService.showNotification('Advertencia', msg, 'warning');
+    this.sweetAlertService.toast('Advertencia', msg, 'warning');
   }
 
   // ===== Data =====
@@ -226,7 +227,7 @@ export class FormModuleComponent implements OnInit {
 
   // ===== DELETE =====
   async onDelete(row: FormModuleSelectModel): Promise<void> {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar relación Form–Module',
       text: `¿Eliminar el formulario "${row.formName}" del módulo "${row.moduleName}"?`,
       confirmButtonText: 'Eliminar',

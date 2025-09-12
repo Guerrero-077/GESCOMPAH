@@ -33,7 +33,7 @@ export const errorInterceptor: HttpInterceptorFn = (
 
       if (error.status === 403) {
         if (!suppress) {
-          sweetAlert.showNotification('Acceso denegado', 'No tienes permisos para realizar esta acción.', 'warning');
+          sweetAlert.toast('Acceso denegado', 'No tienes permisos para realizar esta acción.', 'warning');
         }
         return throwError(() => error);
       }
@@ -54,7 +54,7 @@ export const errorInterceptor: HttpInterceptorFn = (
           : `Error Código: ${error.status}, Mensaje: ${error.message}`;
       }
 
-      sweetAlert.showNotification('Error', errorMessage, 'error');
+      sweetAlert.toast('Error', errorMessage, 'error');
 
       return throwError(() => error);
     })

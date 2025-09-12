@@ -123,7 +123,7 @@ export class ProfileFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading profile', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo cargar el perfil. Asegúrate de que tu usuario tenga una persona asociada.', 'error');
+        this.sweetAlertService.toast('Error', 'No se pudo cargar el perfil. Asegúrate de que tu usuario tenga una persona asociada.', 'error');
         this.isLoading = false;
       }
     });
@@ -136,7 +136,7 @@ export class ProfileFormComponent implements OnInit {
     }
 
     if (!this.profile) {
-      this.sweetAlertService.showNotification('Error', 'No hay un perfil para actualizar.', 'error');
+      this.sweetAlertService.toast('Error', 'No hay un perfil para actualizar.', 'error');
       return;
     }
 
@@ -153,12 +153,12 @@ export class ProfileFormComponent implements OnInit {
 
     this.personService.update(this.profile.id, updateDto).subscribe({
       next: () => {
-        this.sweetAlertService.showNotification('Éxito', 'Perfil actualizado correctamente.', 'success');
+        this.sweetAlertService.toast('Éxito', 'Perfil actualizado correctamente.', 'success');
         this.isSaving = false;
       },
       error: (err) => {
         console.error('Error updating profile', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el perfil.', 'error');
+        this.sweetAlertService.toast('Error', 'No se pudo actualizar el perfil.', 'error');
         this.isSaving = false;
       }
     });

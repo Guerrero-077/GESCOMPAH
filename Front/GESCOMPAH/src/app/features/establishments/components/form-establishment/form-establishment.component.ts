@@ -255,7 +255,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
   onFilesAdded(files: File[]) {
     const remaining = this.MAX_IMAGES - (this.selectedFiles.length + this.existingImagesFull.length);
     if (remaining <= 0) {
-      this.sweetAlert.showNotification('Límite de imágenes', `Máximo ${this.MAX_IMAGES} imágenes permitidas`, 'warning');
+      this.sweetAlert.toast('Límite de imágenes', `Máximo ${this.MAX_IMAGES} imágenes permitidas`, 'warning');
       return;
     }
 
@@ -266,7 +266,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
       { remaining, maxSizeBytes: this.MAX_FILE_SIZE_BYTES, acceptImagesOnly: true }
     );
 
-    if (errors.length) this.sweetAlert.showNotification('Error en archivos', errors.join('\n'), 'error');
+    if (errors.length) this.sweetAlert.toast('Error en archivos', errors.join('\n'), 'error');
 
     // Actualiza colecciones de preview y caché de URLs para su posterior revoke
     this.imagesPreview.push(...objectUrls);
@@ -325,7 +325,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
     if (this.generalGroup.invalid || this.ubicacionGroup.invalid) {
       this.generalGroup.markAllAsTouched();
       this.ubicacionGroup.markAllAsTouched();
-      this.sweetAlert.showNotification('Campos incompletos', 'Completa todos los campos requeridos', 'warning');
+      this.sweetAlert.toast('Campos incompletos', 'Completa todos los campos requeridos', 'warning');
       return;
     }
 
@@ -338,7 +338,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
       await this.uploadNewImagesIfAny(establishmentId);
       this.dialogRef.close(true);
     } catch (err: any) {
-      this.sweetAlert.showNotification('Error', err?.error?.detail || 'No se pudo guardar el establecimiento.', 'error');
+      this.sweetAlert.toast('Error', err?.error?.detail || 'No se pudo guardar el establecimiento.', 'error');
     } finally {
       this.isBusy = false;
       this.dialogRef.disableClose = false;

@@ -10,7 +10,7 @@ import { catchError, map } from 'rxjs/operators';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
-import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+// import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
 import { UserCreateModel, UserSelectModel, UserUpdateModel } from '../../models/user.models';
@@ -28,7 +28,7 @@ import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-h
 export class UserComponent implements OnInit {
   private readonly userStore = inject(UserStore);
   private readonly personService = inject(PersonService);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
@@ -64,7 +64,7 @@ export class UserComponent implements OnInit {
       next: (updated) => {
         // sincronizar con lo que devuelve el backend
         row.active = updated.active ?? row.active;
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Éxito',
           `Usuario ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success'
@@ -73,7 +73,7 @@ export class UserComponent implements OnInit {
       error: (err) => {
         // revertir si falla
         row.active = previous;
-        this.sweetAlertService.showNotification(
+        this.sweetAlertService.toast(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'
@@ -103,7 +103,7 @@ export class UserComponent implements OnInit {
       };
       this.userStore.update(id, payload).subscribe({
         next: () => {
-          this.sweetAlertService.showNotification(
+          this.sweetAlertService.toast(
             'Actualización Exitosa',
             'Usuario actualizado exitosamente.',
             'success'
@@ -148,7 +148,7 @@ export class UserComponent implements OnInit {
         };
         this.userStore.create(payload).subscribe({
           next: () => {
-            this.sweetAlertService.showNotification(
+            this.sweetAlertService.toast(
               'Creación Exitosa',
               'Usuario creado exitosamente.',
               'success'
@@ -164,7 +164,7 @@ export class UserComponent implements OnInit {
 
   // ----- DELETE (soft delete) -----
   async onDelete(row: UserSelectModel) {
-    const confirmed = await this.confirmDialog.confirm({
+    const confirmed = await this.sweetAlertService.confirm({
       title: 'Eliminar Usuario',
       text: `¿Deseas eliminar al usuario "${row.personName}"?`,
       confirmButtonText: 'Eliminar',
@@ -174,7 +174,7 @@ export class UserComponent implements OnInit {
     if (confirmed) {
       this.userStore.deleteLogic(row.id).subscribe({
         next: () => {
-          this.sweetAlertService.showNotification(
+          this.sweetAlertService.toast(
             'Eliminación Exitosa',
             'Usuario eliminado exitosamente.',
             'success'
@@ -182,7 +182,7 @@ export class UserComponent implements OnInit {
         },
         error: err => {
           console.error('Error eliminando el usuario:', err);
-          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el usuario.', 'error');
+          this.sweetAlertService.toast('Error', 'No se pudo eliminar el usuario.', 'error');
         }
       });
     }
