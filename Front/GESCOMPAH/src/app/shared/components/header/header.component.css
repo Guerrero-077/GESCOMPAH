@@ -1,5 +1,5 @@
-/* ========================================
- * OPCIÓN 1: HEADER GRADIENTE PRINCIPAL (RECOMENDADA)
+﻿/* ========================================
+ * OPCIÃ“N 1: HEADER GRADIENTE PRINCIPAL (RECOMENDADA)
  * ======================================== */
 .header-container {
   display: flex;
@@ -120,7 +120,7 @@
 }
 
 /* ========================================
- * OPCIÓN 2: HEADER CON ACENTO AMARILLO
+ * OPCIÃ“N 2: HEADER CON ACENTO AMARILLO
  * ======================================== */
 .header-container-accent {
   display: flex;
@@ -149,7 +149,7 @@
 }
 
 /* ========================================
- * OPCIÓN 3: HEADER GLASSMORPHISM
+ * OPCIÃ“N 3: HEADER GLASSMORPHISM
  * ======================================== */
 .header-container-glass {
   display: flex;
@@ -168,7 +168,7 @@
 }
 
 /* ========================================
- * OPCIÓN 4: HEADER MINIMALISTA ELEGANTE
+ * OPCIÃ“N 4: HEADER MINIMALISTA ELEGANTE
  * ======================================== */
 .header-container-minimal {
   display: flex;
@@ -214,7 +214,7 @@
 }
 
 /* ========================================
- * OPCIÓN 5: HEADER DINÁMICO CON PATRONES
+ * OPCIÃ“N 5: HEADER DINÃMICO CON PATRONES
  * ======================================== */
 .header-container-pattern {
   display: flex;
@@ -234,7 +234,7 @@
  * MEJORAS GENERALES PARA TODOS LOS ESTILOS
  * ======================================== */
 
-/* Animación de entrada del header */
+/* AnimaciÃ³n de entrada del header */
 @keyframes slideInDown {
   from {
     transform: translateY(-100%);
@@ -254,7 +254,7 @@
   animation: slideInDown 0.5s ease-out;
 }
 
-/* Efecto hover en el título */
+/* Efecto hover en el tÃ­tulo */
 .title {
   cursor: pointer;
   transition: all 0.3s ease;
@@ -265,7 +265,7 @@
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* Badge de notificación para el usuario */
+/* Badge de notificaciÃ³n para el usuario */
 .user-section {
   position: relative;
   display: flex;
@@ -309,9 +309,7 @@
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-/* ========================================
- * RESPONSIVE
- * ======================================== */
+/* Responsive */
 @media (max-width: 768px) {
   .header-container,
   .header-container-accent,
@@ -347,7 +345,7 @@
 
 @media (max-width: 480px) {
   .right-content {
-    display: none; /* Ocultar en pantallas muy pequeñas */
+    display: none; /* Ocultar en pantallas muy pequeÃ±as */
   }
 
   .header-text {
@@ -362,9 +360,7 @@
   }
 }
 
-/* ========================================
- * MODO OSCURO (OPCIONAL)
- * ======================================== */
+/* Modo oscuro (opcional) */
 @media (prefers-color-scheme: dark) {
   .header-container-minimal {
     background: var(--gray-900);
@@ -380,3 +376,4 @@
     color: var(--green-400);
   }
 }
+
