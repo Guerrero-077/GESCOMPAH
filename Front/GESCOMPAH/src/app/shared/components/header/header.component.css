@@ -5,10 +5,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #16a34a !important; /* color sólido exacto */
-  background-image: none !important;
+  background-color: var(--color-primary);
   color: var(--white);
-  height: 80px; /* altura un poco mayor */
+  height: 72px; /* altura estándar previa */
   padding: 0 24px; /* sin padding vertical para igualar altura */
   box-shadow:
     0 4px 16px rgba(22, 163, 74, 0.15),
@@ -20,7 +19,7 @@
 }
 
 /* Shimmer deshabilitado (sin degradado) */
-.header-container::before { content: none !important; display: none !important; }
+.header-container::before { content: none; display: none; }
 
 @keyframes headerShimmer {
   0% { left: -100%; }
