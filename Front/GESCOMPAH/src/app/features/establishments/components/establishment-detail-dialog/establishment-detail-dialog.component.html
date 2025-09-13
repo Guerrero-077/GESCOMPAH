@@ -11,7 +11,7 @@
         <div class="col-lg-6 col-md-12 mb-4">
           <div *ngIf="data.images?.length > 0" class="carousel-container">
             <div class="carousel-wrapper">
-              <img [src]="data.images[currentImageIndex]?.filePath" [alt]="'Imagen de ' + data.name"
+              <img [src]="data.images[currentImageIndex]?.filePath" [alt]="'Imagen de ' + data.name" loading="lazy" decoding="async"
                 class="carousel-image" (click)="viewImage(data.images[currentImageIndex].filePath)" tabindex="0"
                 (keydown.enter)="viewImage(data.images[currentImageIndex].filePath)" role="button"
                 [attr.aria-label]="'Ver imagen de ' + data.name" />

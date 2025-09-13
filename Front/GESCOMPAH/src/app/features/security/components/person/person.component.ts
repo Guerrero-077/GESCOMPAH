@@ -5,7 +5,6 @@ import { catchError, map, of, take } from 'rxjs';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
@@ -77,7 +76,8 @@ export class PersonComponent implements OnInit {
   // Editar
   onEdit(row: PersonSelectModel) {
     this.getCityOptions$().subscribe((cityOptions) => {
-      const dialogRef = this.dialog.open(FormDialogComponent, {
+      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
         width: '600px',
         data: {
           entity: { ...row }, // ideal: incluir cityId en tu SelectDto para preselección
@@ -96,13 +96,15 @@ export class PersonComponent implements OnInit {
           }
         });
       });
+      });
     });
   }
 
   // Crear
   onCreateNew() {
     this.getCityOptions$().subscribe((cityOptions) => {
-      const dialogRef = this.dialog.open(FormDialogComponent, {
+      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
         width: '600px',
         data: {
           entity: {} as PersonSelectModel,
@@ -120,6 +122,7 @@ export class PersonComponent implements OnInit {
             this.notifyError(err?.error?.detail || 'No se pudo crear la persona.');
           }
         });
+      });
       });
     });
   }

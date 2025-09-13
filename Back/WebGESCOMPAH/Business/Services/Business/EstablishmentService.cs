@@ -123,6 +123,37 @@ namespace Business.Services.Business
                          .AsReadOnly();
         }
 
+        // Lista liviana para grid/cards (sin Includes pesados)
+        public async Task<IReadOnlyList<EstablishmentCardLiteDto>> GetCardsAnyAsync()
+        {
+            var list = await _repo.GetCardsAsync(ActivityFilter.Any);
+            return list.Select(e => new EstablishmentCardLiteDto(
+                e.Id,
+                e.Name,
+                e.Description,
+                e.Address,
+                e.AreaM2,
+                e.RentValueBase,
+                e.Active,
+                e.PrimaryImagePath
+            )).ToList().AsReadOnly();
+        }
+
+        public async Task<IReadOnlyList<EstablishmentCardLiteDto>> GetCardsActiveAsync()
+        {
+            var list = await _repo.GetCardsAsync(ActivityFilter.ActiveOnly);
+            return list.Select(e => new EstablishmentCardLiteDto(
+                e.Id,
+                e.Name,
+                e.Description,
+                e.Address,
+                e.AreaM2,
+                e.RentValueBase,
+                e.Active,
+                e.PrimaryImagePath
+            )).ToList().AsReadOnly();
+        }
+
         // ========= VALIDACIONES =========
 
         private static void Validate(EstablishmentCreateDto dto)

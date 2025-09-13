@@ -4,7 +4,8 @@ import {
   EstablishmentSelect,
   EstablishmentCreate,
   EstablishmentUpdate,
-  ImageSelectDto
+  ImageSelectDto,
+  EstablishmentCard
 } from '../../models/establishment.models';
 import { EstablishmentService } from './establishment.service';
 
@@ -18,6 +19,11 @@ export class EstablishmentStore {
   private readonly _loading = signal(false);
   private readonly _error = signal<string | null>(null);
 
+  // Estado para cards livianos
+  private readonly _cards = signal<EstablishmentCard[]>([]);
+  private readonly _cardsLoading = signal(false);
+  private readonly _cardsError = signal<string | null>(null);
+
   /** true = la vista sólo mostrará activos (filtro de UI, no del backend) */
   private readonly _activeOnlyView = signal(false);
 
@@ -26,6 +32,11 @@ export class EstablishmentStore {
   readonly loading = computed(() => this._loading());
   readonly error = computed(() => this._error());
   readonly count = computed(() => this._items().length);
+
+  // Cards (livianos)
+  readonly cards = computed(() => this._cards());
+  readonly cardsLoading = computed(() => this._cardsLoading());
+  readonly cardsError = computed(() => this._cardsError());
 
   /** Vista filtrada según activeOnlyView (para usar en tablas) */
   readonly view = computed(() => {
@@ -41,6 +52,10 @@ export class EstablishmentStore {
   // Operaciones de colección (UI)
   setAll(list: EstablishmentSelect[]): void {
     this._items.set(list ?? []);
+  }
+
+  setCards(list: EstablishmentCard[]): void {
+    this._cards.set(list ?? []);
   }
 
   upsertMany(list: EstablishmentSelect[]): void {
@@ -67,6 +82,9 @@ export class EstablishmentStore {
     this._items.set([]);
     this._error.set(null);
     this._loading.set(false);
+    this._cards.set([]);
+    this._cardsError.set(null);
+    this._cardsLoading.set(false);
   }
 
   changeActiveStatus(id: number, active: boolean): void {
@@ -112,6 +130,21 @@ export class EstablishmentStore {
       this._error.set(String(e?.message ?? e));
     } finally {
       this._loading.set(false);
+    }
+  }
+
+  /** Carga cards livianos desde /Establishments/cards */
+  async loadCardsAll(activeOnly = false): Promise<void> {
+    this._cardsLoading.set(true);
+    this._cardsError.set(null);
+    try {
+      const obs = activeOnly ? this.svc.getCardsActive() : this.svc.getCardsAny();
+      const data = await firstValueFrom(obs);
+      this.setCards(data ?? []);
+    } catch (e: any) {
+      this._cardsError.set(String(e?.message ?? e));
+    } finally {
+      this._cardsLoading.set(false);
     }
   }
 

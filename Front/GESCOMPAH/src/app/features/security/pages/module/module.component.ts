@@ -5,7 +5,6 @@ import { filter, switchMap, take, tap, catchError, EMPTY, finalize, map } from '
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
@@ -52,12 +51,13 @@ export class ModuleComponent implements OnInit {
 
   // Crear
   onCreateNew(): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: {}, formType: 'Module' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: {}, formType: 'Module' }
+      });
 
-    dialogRef.afterClosed().pipe(
+      dialogRef.afterClosed().pipe(
       filter(Boolean),
       switchMap(result => this.moduleStore.create(result).pipe(take(1))),
       tap(() => this.sweetAlertService.showNotification('Creación Exitosa', 'Módulo creado exitosamente.', 'success')),
@@ -67,16 +67,18 @@ export class ModuleComponent implements OnInit {
         return EMPTY;
       })
     ).subscribe();
+    });
   }
 
   // Editar
   onEdit(row: ModuleUpdateModel): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: row, formType: 'Module' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: row, formType: 'Module' }
+      });
 
-    dialogRef.afterClosed().pipe(
+      dialogRef.afterClosed().pipe(
       filter((result): result is Partial<ModuleUpdateModel> => !!result),
       map(result => ({ id: row.id, ...result } as ModuleUpdateModel)),
       switchMap(dto => this.moduleStore.update(dto.id, dto).pipe(take(1))),
@@ -87,6 +89,7 @@ export class ModuleComponent implements OnInit {
         return EMPTY;
       })
     ).subscribe();
+    });
   }
 
   // Eliminar (lógico)

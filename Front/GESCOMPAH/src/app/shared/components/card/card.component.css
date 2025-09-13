@@ -2,7 +2,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  width: 300px;
+  width: 260px; /* más compacta */
   /* height: 350px; */
   /* Removed fixed height */
   display: flex;
@@ -15,7 +15,7 @@
 }
 
 .image-container {
-  height: 150px;
+  height: 130px; /* más baja para reducir altura total */
   overflow: hidden;
   padding: 0.25rem;
   /* Reduced padding */
@@ -56,12 +56,12 @@
 }
 
 .card-content {
-  padding: 0.75rem;
+  padding: 0.5rem; /* reduce padding interno */
   /* Reduced padding */
 }
 
 .local-name {
-  font-size: 1.15rem;
+  font-size: 1rem; /* más pequeño */
   /* Slightly reduced font size */
   font-weight: 600;
   color: #1a1a1a;
@@ -71,24 +71,23 @@
 }
 
 .description {
-  font-size: 0.8rem;
-  /* Slightly reduced font size */
+  font-size: 0.78rem; /* un toque más pequeño */
   color: #555;
-  margin-bottom: 0.75rem;
-  /* Reduced margin */
+  margin-bottom: 0.5rem;
   line-height: 1.4;
-  height: 3em;
-  /* Limit description to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* limita a 1 línea para ahorrar altura */
+  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-height: 1.4em; /* reserva espacio para 1 línea */
 }
 
 .info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  /* Reduced gap */
-  margin-bottom: 0.75rem;
+  gap: 0.5rem; /* reduce separación */
+  margin-bottom: 0.5rem; /* menos espacio bajo la grilla */
   /* Reduced margin */
 }
 
@@ -104,7 +103,7 @@
 }
 
 .info-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   /* Slightly reduced font size */
   color: #666;
   font-weight: 600;
@@ -115,7 +114,7 @@
 }
 
 .info-value {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   /* Slightly reduced font size */
   color: #1a1a1a;
   font-weight: 500;
@@ -147,7 +146,7 @@
 }
 
 .rent-price {
-  font-size: 1.2rem;
+  font-size: 1rem; /* más compacto */
   /* Slightly reduced font size */
   font-weight: 700;
   color: var(--accent-color);
@@ -160,7 +159,7 @@
 }
 
 .footer {
-  margin-top: 0.75rem;
+  margin-top: 0.4rem; /* aún menos espacio arriba del footer */
   /* Reduced margin */
 }
 

@@ -5,7 +5,8 @@ import { environment } from '../../../../../environments/environment.development
 import {
   EstablishmentSelect,
   EstablishmentCreate,
-  EstablishmentUpdate
+  EstablishmentUpdate,
+  EstablishmentCard
 } from '../../models/establishment.models';
 
 export interface GetAllOptions {
@@ -30,6 +31,16 @@ export class EstablishmentService {
     if (options?.activeOnly) params = params.set('activeOnly', 'true');
     return this.http.get<EstablishmentSelect[]>(this.baseUrl, { params });
   }
+
+  /** Listado liviano para cards/grids */
+  getCards(options?: GetAllOptions): Observable<EstablishmentCard[]> {
+    let params = new HttpParams();
+    if (options?.activeOnly) params = params.set('activeOnly', 'true');
+    return this.http.get<EstablishmentCard[]>(`${this.baseUrl}/cards`, { params });
+  }
+
+  getCardsAny(): Observable<EstablishmentCard[]> { return this.getCards(); }
+  getCardsActive(): Observable<EstablishmentCard[]> { return this.getCards({ activeOnly: true }); }
 
   /** Conveniencias explícitas (opcionales) */
   getAllAny(): Observable<EstablishmentSelect[]> {

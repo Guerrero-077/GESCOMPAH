@@ -1,6 +1,7 @@
 
 import { Injectable } from '@angular/core';
-import Swal, { SweetAlertIcon } from 'sweetalert2';
+import type SwalNS from 'sweetalert2';
+import type { SweetAlertIcon } from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,8 @@ export class SweetAlertService {
     }
   }
 
-  public showNotification(title: string, text: string, icon: SweetAlertIcon): void {
+  public async showNotification(title: string, text: string, icon: SweetAlertIcon): Promise<void> {
+    const { default: Swal } = await import('sweetalert2');
     const fg = this.cssVar('--color-text', '#111827');
 
     // Selección semántica por tipo de icono
@@ -58,13 +60,14 @@ export class SweetAlertService {
     });
   }
 
-  public showConfirm(
+  public async showConfirm(
     title: string,
     text: string,
     confirmButtonText = 'Aceptar',
     cancelButtonText = 'Cancelar',
     icon: SweetAlertIcon = 'warning'
   ): Promise<any> {
+    const { default: Swal } = await import('sweetalert2');
     // Base tokens
     const fg = this.cssVar('--color-text', '#111827');
     const bg = this.cssVar('--color-surface', '#ffffff');
@@ -103,7 +106,8 @@ export class SweetAlertService {
     });
   }
 
-  public showLoading(title: string, text: string): void {
+  public async showLoading(title: string, text: string): Promise<void> {
+    const { default: Swal } = await import('sweetalert2');
     const fg = this.cssVar('--color-text', '#111827');
     const bg = this.cssVar('--color-surface', '#ffffff');
     Swal.fire({
@@ -120,15 +124,16 @@ export class SweetAlertService {
     });
   }
 
-  public hideLoading(): void {
+  public async hideLoading(): Promise<void> {
+    const { default: Swal } = await import('sweetalert2');
     Swal.close();
   }
 
-  public success(message: string, title: string = 'Éxito'): void {
-    this.showNotification(title, message, 'success');
+  public async success(message: string, title: string = 'Éxito'): Promise<void> {
+    await this.showNotification(title, message, 'success');
   }
 
-  public error(message: string, title: string = 'Error'): void {
-    this.showNotification(title, message, 'error');
+  public async error(message: string, title: string = 'Error'): Promise<void> {
+    await this.showNotification(title, message, 'error');
   }
 }

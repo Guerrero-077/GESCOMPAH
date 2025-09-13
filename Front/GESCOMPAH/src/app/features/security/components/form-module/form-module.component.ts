@@ -5,7 +5,6 @@ import { BehaviorSubject, catchError, forkJoin, map, of, take } from 'rxjs';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
@@ -117,7 +116,8 @@ export class FormModuleComponent implements OnInit {
         return;
       }
 
-      const dialogRef = this.dialog.open(FormDialogComponent, {
+      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
         width: '600px',
         data: {
           entity: {
@@ -151,6 +151,7 @@ export class FormModuleComponent implements OnInit {
             this.notifyError('No se pudo crear la relación Form–Module.');
           }
         });
+      });
       });
     });
   }
@@ -189,7 +190,8 @@ export class FormModuleComponent implements OnInit {
         return;
       }
 
-      const dialogRef = this.dialog.open(FormDialogComponent, {
+      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
         width: '600px',
         data: {
           entity: initial,
@@ -220,6 +222,7 @@ export class FormModuleComponent implements OnInit {
             this.notifyError('No se pudo actualizar la relación Form–Module.');
           }
         });
+      });
       });
     });
   }

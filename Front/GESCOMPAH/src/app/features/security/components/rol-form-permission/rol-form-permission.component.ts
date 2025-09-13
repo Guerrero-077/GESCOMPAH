@@ -4,7 +4,6 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { combineLatest, EMPTY } from 'rxjs';
 import { catchError, finalize, filter, map, switchMap, take, tap } from 'rxjs/operators';
 
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
@@ -83,7 +82,8 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
     combineLatest([this.roleStore.roles$, this.formStore.forms$, this.permissionStore.permissions$])
       .pipe(take(1))
       .subscribe(([roles, forms, permissions]) => {
-        const dialogRef = this.dialog.open(FormDialogComponent, {
+        import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+        const dialogRef = this.dialog.open(m.FormDialogComponent, {
           width: '600px',
           data: {
             entity: { active: true },
@@ -115,6 +115,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
             )
           )
         ).subscribe();
+        });
       });
   }
 
@@ -130,7 +131,8 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           permissionIds: row.permissions.map(p => p.permissionId)
         };
 
-        const dialogRef = this.dialog.open(FormDialogComponent, {
+        import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+        const dialogRef = this.dialog.open(m.FormDialogComponent, {
           width: '600px',
           data: {
             entity: entityForDialog,
@@ -164,6 +166,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
             )
           )
         ).subscribe();
+        });
       });
   }
 

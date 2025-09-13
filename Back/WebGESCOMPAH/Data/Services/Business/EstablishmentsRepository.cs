@@ -51,6 +51,35 @@ namespace Data.Services.Business
                 .ToListAsync();
         }
 
+        // Lista liviana para tarjetas
+        public async Task<IReadOnlyList<EstablishmentCard>> GetCardsAsync(ActivityFilter filter)
+        {
+            var q = _dbSet.AsNoTracking()
+                .Where(e => !e.IsDeleted && e.Plaza != null && e.Plaza.Active && !e.Plaza.IsDeleted);
+
+            if (filter == ActivityFilter.ActiveOnly)
+                q = q.Where(e => e.Active);
+
+            return await q
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
+                .Select(e => new EstablishmentCard(
+                    e.Id,
+                    e.Name,
+                    e.Description,
+                    e.Address,
+                    e.AreaM2,
+                    e.RentValueBase,
+                    e.Active,
+                    e.Images
+                        .Where(img => img.Active && !img.IsDeleted)
+                        .OrderBy(img => img.Id)
+                        .Select(img => img.FilePath)
+                        .FirstOrDefault()
+                ))
+                .ToListAsync();
+        }
+
         // Validación
         public async Task<IReadOnlyList<int>> GetInactiveIdsAsync(IReadOnlyCollection<int> ids) =>
             ids.Count == 0

@@ -13,6 +13,18 @@ export interface EstablishmentSelect {
   active: boolean;
 }
 
+// DTO liviano para listados (API /Establishments/cards)
+export interface EstablishmentCard {
+  id: number;
+  name: string;
+  address: string;
+  areaM2: number;
+  rentValueBase: number;
+  active: boolean;
+  primaryImagePath?: string | null;
+  description?: string; // opcional en UI; no viene en cards
+}
+
 export interface EstablishmentCreate {
   name: string;
   description: string;

@@ -27,7 +27,6 @@ import { ImageService } from '../../services/image/image.service';
 import { SquareService } from '../../services/square/square.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { SquareSelectModel } from '../../models/squares.models';
-import { ImagePreviewDialogComponent } from '../image-preview-dialog-component/image-preview-dialog-component.component';
 
 
 // Soporte Drag & Drop aislado en directiva y servicio
@@ -404,12 +403,14 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
 
   /** Abre el visor genérico con lista completa y posición inicial. */
   private openPreview(title: string, startIndex: number): void {
-    this.dialog.open(ImagePreviewDialogComponent, {
-      data: { title, imageList: this.getAllPreviewSources(), startIndex },
-      panelClass: 'image-preview-dialog',
-      maxWidth: '95vw',
-      width: 'auto',
-      autoFocus: false
+    import('../image-preview-dialog-component/image-preview-dialog-component.component').then(m => {
+      this.dialog.open(m.ImagePreviewDialogComponent, {
+        data: { title, imageList: this.getAllPreviewSources(), startIndex },
+        panelClass: 'image-preview-dialog',
+        maxWidth: '95vw',
+        width: 'auto',
+        autoFocus: false
+      });
     });
   }
 

@@ -5,7 +5,6 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { RolUserService } from '../../services/rol-user/rol-user.service';
@@ -86,7 +85,8 @@ export class RolUserComponent implements OnInit {
         active: true
       };
 
-      const dialogRef = this.dialog.open(FormDialogComponent, {
+      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
         width: '600px',
         data: {
           entity: initial,
@@ -117,6 +117,7 @@ export class RolUserComponent implements OnInit {
             this.sweetAlertService.showNotification('Error', 'No se pudo crear la asignación Rol-Usuario.', 'error');
           }
         });
+      });
       });
     });
   }
@@ -156,7 +157,8 @@ export class RolUserComponent implements OnInit {
           return;
         }
 
-        const dialogRef = this.dialog.open(FormDialogComponent, {
+        import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+        const dialogRef = this.dialog.open(m.FormDialogComponent, {
           width: '600px',
           data: {
             entity: initial,              // <- ahora seguro trae userId/rolId
@@ -186,6 +188,7 @@ export class RolUserComponent implements OnInit {
               this.sweetAlertService.showNotification('Error', 'No se pudo actualizar la asignación Rol-Usuario.', 'error');
             }
           });
+        });
         });
 
       });

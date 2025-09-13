@@ -13,7 +13,6 @@ import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-h
 
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { FormContractComponent } from '../../components/form-contract/form-contract.component';
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,7 +21,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
 import { ContractsRealtimeService } from '../../../../core/service/realtime/contracts-realtime.service';
-import { ContractDetailDialogComponent } from '../../components/contract-detail-dialog/contract-detail-dialog.component';
 
 @Component({
   selector: 'app-contracts-list',
@@ -95,27 +93,31 @@ export class ContractsListComponent implements OnInit, OnDestroy {
   }
 
   onCreate(): void {
-    const ref = this.dialog.open(FormContractComponent, {
-      width: '800px',
-      disableClose: true,
-      autoFocus: true,
-      data: null,
-    });
+    import('../../components/form-contract/form-contract.component').then(m => {
+      const ref = this.dialog.open(m.FormContractComponent, {
+        width: '800px',
+        disableClose: true,
+        autoFocus: true,
+        data: null,
+      });
 
-    ref.afterClosed().pipe(take(1)).subscribe(async (created: boolean) => {
-      if (!created) return;
-      this.toast.showNotification('Éxito', 'Contrato creado correctamente.', 'success');
-      await this.store.loadAll({ force: true });
+      ref.afterClosed().pipe(take(1)).subscribe(async (created: boolean) => {
+        if (!created) return;
+        this.toast.showNotification('Éxito', 'Contrato creado correctamente.', 'success');
+        await this.store.loadAll({ force: true });
+      });
     });
   }
 
   onView(row: ContractCard): void {
-    this.dialog.open(ContractDetailDialogComponent, {
-      width: '900px',
-      maxWidth: '95vw',
-      data: { id: row.id },
-      autoFocus: false,
-      disableClose: false,
+    import('../../components/contract-detail-dialog/contract-detail-dialog.component').then(m => {
+      this.dialog.open(m.ContractDetailDialogComponent, {
+        width: '900px',
+        maxWidth: '95vw',
+        data: { id: row.id },
+        autoFocus: false,
+        disableClose: false,
+      });
     });
   }
 

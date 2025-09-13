@@ -12,10 +12,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { CardComponent } from '../../../../shared/components/card/card.component';
 import { EstablishmentSelect } from '../../models/establishment.models';
+import { EstablishmentService } from '../../services/establishment/establishment.service';
 import { EstablishmentStore } from '../../services/establishment/establishment.store';
-import { FormEstablishmentComponent } from '../form-establishment/form-establishment.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
-import { EstablishmentDetailDialogComponent } from '../establishment-detail-dialog/establishment-detail-dialog.component';
 import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 
@@ -41,18 +40,20 @@ import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRo
 export class EstablishmentsListComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly store = inject(EstablishmentStore);
+  private readonly estSvc = inject(EstablishmentService);
   private readonly sweetAlert = inject(SweetAlertService);
   private readonly sharedEvents = inject(SharedEventsServiceService);
   private readonly destroyRef = inject(DestroyRef);
 
   // Señales listas para plantilla/ts
-  readonly establishments = this.store.view;     // lista según activeOnlyView
-  readonly loading = this.store.loading;
-  readonly error = this.store.error;
+  // Cards livianos desde backend
+  readonly cards = this.store.cards;
+  readonly loadingCards = this.store.cardsLoading;
+  readonly errorCards = this.store.cardsError;
 
   async ngOnInit(): Promise<void> {
-    // Carga inicial sin subscribes colgantes
-    await this.store.loadAll();
+    // Carga inicial de cards livianos
+    await this.store.loadCardsAll();
 
     // Si otro módulo notifica cambios, refresca
     this.sharedEvents.plazaStateChanged$
@@ -61,22 +62,31 @@ export class EstablishmentsListComponent implements OnInit {
   }
 
   openCreateDialog(): void {
-    const ref = this.dialog.open(FormEstablishmentComponent, {
-      width: '600px',
-      data: null
-    });
-    ref.afterClosed().subscribe(async ok => {
-      if (ok) await this.store.loadAll();
+    import('../form-establishment/form-establishment.component').then(m => {
+      const ref = this.dialog.open(m.FormEstablishmentComponent, {
+        width: '600px',
+        data: null
+      });
+      ref.afterClosed().subscribe(async ok => {
+        if (ok) await this.store.loadAll();
+      });
     });
   }
 
-  openEditDialog(est: EstablishmentSelect): void {
-    const ref = this.dialog.open(FormEstablishmentComponent, {
-      width: '600px',
-      data: est
-    });
-    ref.afterClosed().subscribe(async ok => {
-      if (ok) await this.store.loadAll();
+  openEditDialogById(id: number): void {
+    this.estSvc.getById(id).subscribe({
+      next: row => {
+        import('../form-establishment/form-establishment.component').then(m => {
+          const ref = this.dialog.open(m.FormEstablishmentComponent, {
+            width: '600px',
+            data: row
+          });
+          ref.afterClosed().subscribe(async ok => {
+            if (ok) await this.store.loadCardsAll();
+          });
+        });
+      },
+      error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
     });
   }
 
@@ -87,24 +97,28 @@ export class EstablishmentsListComponent implements OnInit {
     try {
       await this.store.delete(id);
       this.sweetAlert.showNotification('Éxito', 'Local eliminado exitosamente', 'success');
+      await this.store.loadCardsAll();
     } catch (err: any) {
       this.sweetAlert.showNotification('Error', err?.message || 'No se pudo eliminar', 'error');
     }
   }
 
-  onCardUpdated(): void {
-    void this.store.loadAll();
-  }
+  onCardUpdated(): void { void this.store.loadCardsAll(); }
 
   onView(id: number): void {
-    const row = this.establishments().find(e => e.id === id);
-    if (row) {
-      this.dialog.open(EstablishmentDetailDialogComponent, {
-        width: '900px',
-        data: row
+    import('../../services/establishment/establishment.service').then(({ EstablishmentService }) => {
+      const service = (this as any).store['svc'] as EstablishmentService; // usa el servicio del store
+      service.getById(id).subscribe({
+        next: row => {
+          import('../establishment-detail-dialog/establishment-detail-dialog.component').then(m => {
+            this.dialog.open(m.EstablishmentDetailDialogComponent, {
+              width: '900px',
+              data: row
+            });
+          });
+        },
+        error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
       });
-    } else {
-      this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error');
-    }
+    });
   }
 }

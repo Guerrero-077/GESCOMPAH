@@ -10,7 +10,6 @@ import { SquareSelectModel, SquareUpdateModel } from '../../models/squares.model
 import { SquareStore } from '../../services/square/square.store';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -55,40 +54,44 @@ export class SquareListComponent implements OnInit {
   }
 
   onCreate(): void {
-    const ref = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: {}, formType: 'Plaza' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const ref = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: {}, formType: 'Plaza' }
+      });
 
-    ref.afterClosed().subscribe(async result => {
-      if (!result) return;
-      try {
-        await this.squaresStore.create(result);
-        this.sweetAlert.showNotification('Creación Exitosa', 'Plaza creada exitosamente.', 'success');
-      } catch (err) {
-        this.sweetAlert.showNotification('Error', 'No se pudo crear la plaza.', 'error');
-      }
+      ref.afterClosed().subscribe(async result => {
+        if (!result) return;
+        try {
+          await this.squaresStore.create(result);
+          this.sweetAlert.showNotification('Creación Exitosa', 'Plaza creada exitosamente.', 'success');
+        } catch (err) {
+          this.sweetAlert.showNotification('Error', 'No se pudo crear la plaza.', 'error');
+        }
+      });
     });
   }
 
   onEdit(row: SquareUpdateModel): void {
-    const ref = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: row, formType: 'Plaza' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const ref = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: row, formType: 'Plaza' }
+      });
 
-    ref.afterClosed().subscribe(async (partial: Partial<SquareUpdateModel> | undefined) => {
-      if (!partial) return;
+      ref.afterClosed().subscribe(async (partial: Partial<SquareUpdateModel> | undefined) => {
+        if (!partial) return;
 
-      // ✅ Merge: todos los campos requeridos quedan definidos
-      const dto: SquareUpdateModel = { ...row, ...partial, id: row.id };
+        // ✅ Merge: todos los campos requeridos quedan definidos
+        const dto: SquareUpdateModel = { ...row, ...partial, id: row.id };
 
-      try {
-        await this.squaresStore.update(dto.id, dto);
-        this.sweetAlert.showNotification('Actualización Exitosa', 'Plaza actualizada exitosamente.', 'success');
-      } catch (err) {
-        this.sweetAlert.showNotification('Error', 'No se pudo actualizar la plaza.', 'error');
-      }
+        try {
+          await this.squaresStore.update(dto.id, dto);
+          this.sweetAlert.showNotification('Actualización Exitosa', 'Plaza actualizada exitosamente.', 'success');
+        } catch (err) {
+          this.sweetAlert.showNotification('Error', 'No se pudo actualizar la plaza.', 'error');
+        }
+      });
     });
   }
 

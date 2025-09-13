@@ -5,7 +5,6 @@ import { take } from 'rxjs';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
@@ -71,41 +70,47 @@ export class RoleComponent implements OnInit {
 
   // Crear
   onCreateNew(): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
+    const open = (m: any) => this.dialog.open(m.FormDialogComponent, {
       width: '600px',
       data: {
         entity: {},
         formType: 'Rol'
       }
     });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = open(m);
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
-      if (!result) return;
-      this.roleStore.create(result).pipe(take(1)).subscribe({
-        next: () => this.notifySuccess('Creación Exitosa', 'Rol creado exitosamente.'),
-        error: (err) => this.notifyError(err?.error?.detail || 'No se pudo crear el rol.')
+      dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
+        if (!result) return;
+        this.roleStore.create(result).pipe(take(1)).subscribe({
+          next: () => this.notifySuccess('Creación Exitosa', 'Rol creado exitosamente.'),
+          error: (err) => this.notifyError(err?.error?.detail || 'No se pudo crear el rol.')
+        });
       });
     });
   }
 
   // Editar
   onEdit(row: RoleSelectModel): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
+    const open = (m: any) => this.dialog.open(m.FormDialogComponent, {
       width: '600px',
       data: {
         entity: row,
         formType: 'Rol'
       }
     });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = open(m);
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe((result: Partial<RoleUpdateModel> | undefined) => {
-      if (!result) return;
+      dialogRef.afterClosed().pipe(take(1)).subscribe((result: Partial<RoleUpdateModel> | undefined) => {
+        if (!result) return;
 
-      const payload: RoleUpdateModel = { ...result, id: row.id } as RoleUpdateModel;
+        const payload: RoleUpdateModel = { ...result, id: row.id } as RoleUpdateModel;
 
-      this.roleStore.update(payload).pipe(take(1)).subscribe({
-        next: () => this.notifySuccess('Actualización Exitosa', 'Rol actualizado exitosamente.'),
-        error: (err) => this.notifyError(err?.error?.detail || 'No se pudo actualizar el rol.')
+        this.roleStore.update(payload).pipe(take(1)).subscribe({
+          next: () => this.notifySuccess('Actualización Exitosa', 'Rol actualizado exitosamente.'),
+          error: (err) => this.notifyError(err?.error?.detail || 'No se pudo actualizar el rol.')
+        });
       });
     });
   }

@@ -9,7 +9,6 @@ import { catchError, finalize, take, tap } from 'rxjs/operators';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { CityStore } from '../../services/city/city.store';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { CitySelectModel } from '../../models/city.models';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
@@ -63,35 +62,39 @@ export class CityComponent implements OnInit {
   }
 
   openCreateDialog(): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '400px',
-      data: { entity: {}, formType: 'City' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '400px',
+        data: { entity: {}, formType: 'City' }
+      });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) return;
-      this.store.create(result).pipe(take(1)).subscribe({
-        next: () => {
-          this.sweetAlert.showNotification('Éxito', 'Ciudad creada exitosamente', 'success');
-          this.cdr.markForCheck();
-        }
+      dialogRef.afterClosed().subscribe(result => {
+        if (!result) return;
+        this.store.create(result).pipe(take(1)).subscribe({
+          next: () => {
+            this.sweetAlert.showNotification('Éxito', 'Ciudad creada exitosamente', 'success');
+            this.cdr.markForCheck();
+          }
+        });
       });
     });
   }
 
   openEditDialog(row: CitySelectModel): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '400px',
-      data: { entity: row, formType: 'City' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '400px',
+        data: { entity: row, formType: 'City' }
+      });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) return;
-      this.store.update(result).pipe(take(1)).subscribe({
-        next: () => {
-          this.sweetAlert.showNotification('Éxito', 'Ciudad actualizada exitosamente', 'success');
-          this.cdr.markForCheck();
-        }
+      dialogRef.afterClosed().subscribe(result => {
+        if (!result) return;
+        this.store.update(result).pipe(take(1)).subscribe({
+          next: () => {
+            this.sweetAlert.showNotification('Éxito', 'Ciudad actualizada exitosamente', 'success');
+            this.cdr.markForCheck();
+          }
+        });
       });
     });
   }
