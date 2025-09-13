@@ -33,6 +33,31 @@ get primaryImage(): string {
   return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wwAAn8B9oZ1VwAAAABJRU5ErkJggg==';
 }
 
+// Cloudinary helpers para usar el loader integrado (requiere rutas relativas)
+private readonly cloudinaryBase = 'https://res.cloudinary.com/dmbndpjlh/';
+
+get isCloudinary(): boolean {
+  const src = this.primaryImage;
+  return typeof src === 'string' && src.startsWith(this.cloudinaryBase) && src.includes('/image/upload/');
+}
+
+// Devuelve una ruta relativa (sin dominio) con transformación 2:1 para cards
+get cloudinaryPath(): string {
+  const src = this.primaryImage;
+  const width = 260; const height = 130;
+  if (!this.isCloudinary) return '';
+  // quitar dominio base
+  const relative = src.substring(this.cloudinaryBase.length); // e.g. image/upload/v123/...
+  const marker = 'image/upload/';
+  const idx = relative.indexOf(marker);
+  if (idx >= 0) {
+    const rest = relative.substring(idx + marker.length);
+    const params = `c_fill,ar_2:1/`;
+    return params + rest; // relativo requerido por el loader (sin 'image/upload/')
+  }
+  return relative;
+}
+
 
   get formattedRent(): string {
     return new Intl.NumberFormat('es-CO', {

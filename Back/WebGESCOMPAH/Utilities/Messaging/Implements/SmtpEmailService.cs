@@ -180,6 +180,82 @@ namespace Utilities.Messaging.Implements
             var html = WrapEmail("Tu cuenta fue creada", content);
             await SendEmailAsync(email, "GESCOMPAH – Tu cuenta fue creada", html);
         }
+
+        public async Task SendContractWithPdfAsync(string email, string fullName, string contractNumber, byte[] pdfBytes)
+        {
+            EnsureValidEmail(email, nameof(email));
+            
+            if (pdfBytes == null || pdfBytes.Length == 0)
+                throw new ArgumentException("El PDF del contrato no puede ser nulo o vacío.", nameof(pdfBytes));
+
+            var content = $@"
+                    <p>Estimado/a <strong>{(fullName ?? "usuario")}</strong>,</p>
+                    <p>Nos complace informarle que su <strong>contrato de arrendamiento #{contractNumber}</strong> ha sido generado exitosamente.</p>
+                    <p>Adjunto a este correo encontrará el documento PDF con todos los términos y condiciones acordados.</p>
+                    <div style='background:#f8f9fa; border-left:4px solid {BrandPrimary}; padding:16px; margin:16px 0; border-radius:6px;'>
+                        <p style='margin:0; font-weight:600; color:{BrandText};'>📄 Contrato #{contractNumber}</p>
+                        <p style='margin:4px 0 0 0; color:{BrandMuted}; font-size:14px;'>Documento adjunto en formato PDF</p>
+                    </div>
+                    <p>Le recomendamos revisar cuidadosamente el documento y conservar una copia para sus registros.</p>
+                    <p>Si tiene alguna pregunta o requiere aclaraciones, no dude en contactarnos.</p>";
+
+            var html = WrapEmail("Contrato de Arrendamiento Generado", content);
+            await SendEmailWithAttachmentAsync(email, "GESCOMPAH – Contrato de Arrendamiento", html, pdfBytes, $"Contrato_{contractNumber}.pdf");
+        }
+
+        private async Task SendEmailWithAttachmentAsync(string to, string subject, string htmlBody, byte[] attachmentBytes, string attachmentName)
+        {
+            EnsureValidEmail(to, nameof(to));
+            if (string.IsNullOrWhiteSpace(subject))
+                throw new ArgumentException("El asunto no puede ser nulo o vacío.", nameof(subject));
+            if (string.IsNullOrWhiteSpace(htmlBody))
+                throw new ArgumentException("El cuerpo del correo no puede ser nulo o vacío.", nameof(htmlBody));
+
+            var (fromEmail, password, host, port, enableSsl) = LoadSmtpConfig();
+
+            using var smtpCliente = new SmtpClient(host, port)
+            {
+                EnableSsl = enableSsl,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromEmail, password)
+            };
+
+            var displayName = $"{BrandName} • Contratos";
+            var from = new MailAddress(fromEmail, displayName, Encoding.UTF8);
+            var toAddr = new MailAddress(to);
+
+            using var mensaje = new MailMessage(from, toAddr)
+            {
+                Subject = subject,
+                Body = htmlBody,
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
+            };
+
+            // Agregar el PDF como adjunto
+            if (attachmentBytes != null && attachmentBytes.Length > 0)
+            {
+                var attachment = new Attachment(new MemoryStream(attachmentBytes), attachmentName, "application/pdf");
+                mensaje.Attachments.Add(attachment);
+            }
+
+            try
+            {
+                await smtpCliente.SendMailAsync(mensaje);
+                _logger?.LogInformation("Email con adjunto PDF enviado a {To} con asunto {Subject}", to, subject);
+            }
+            catch (SmtpException ex)
+            {
+                _logger?.LogError(ex, "SMTP error enviando correo con adjunto a {To} (host {Host}:{Port})", to, host, port);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error general enviando correo con adjunto a {To}", to);
+                throw;
+            }
+        }
     }
 }
 

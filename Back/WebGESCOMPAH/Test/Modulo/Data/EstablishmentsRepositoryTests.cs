@@ -30,10 +30,10 @@ public class EstablishmentsRepositoryTests
         );
         await ctx.SaveChangesAsync();
 
-        var all = await repo.GetAllAsync(global::Data.Interfaz.IDataImplement.Business.ActivityFilter.Any);
+        var all = await repo.GetAllAsync(global::Entity.Enum.ActivityFilter.Any);
         all.Should().HaveCount(2);
 
-        var active = await repo.GetAllAsync(global::Data.Interfaz.IDataImplement.Business.ActivityFilter.ActiveOnly);
+        var active = await repo.GetAllAsync(global::Entity.Enum.ActivityFilter.ActiveOnly);
         active.Should().HaveCount(1);
         active.First().Id.Should().Be(1);
     }

@@ -113,7 +113,21 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
 
   /* ===== Estado UI simple ===== */
   isEdit = false;
-  isBusy = false;
+  private _isBusy = false;
+  get isBusy(): boolean { return this._isBusy; }
+  set isBusy(v: boolean) {
+    this._isBusy = v;
+    // Deshabilita/habilita los formularios vía API de Reactive Forms
+    // para evitar warnings de Angular sobre [disabled] en plantillas.
+    const opts = { emitEvent: false } as const;
+    if (v) {
+      this.generalGroup.disable(opts);
+      this.ubicacionGroup.disable(opts);
+    } else {
+      this.generalGroup.enable(opts);
+      this.ubicacionGroup.enable(opts);
+    }
+  }
   isDeletingImage = false;
 
   /* ===== Formularios tipados ===== */

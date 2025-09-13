@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Utilities.Messaging.Factories;
 using Utilities.Messaging.Interfaces;
 
@@ -29,6 +29,11 @@ namespace Utilities.Messaging.Implements
         public Task SendTemporaryPasswordAsync(string email, string fullName, string tempPassword)
         {
             return _inner.SendTemporaryPasswordAsync(email, fullName, tempPassword);
+        }
+
+        public Task SendContractWithPdfAsync(string email, string fullName, string contractNumber, byte[] pdfBytes)
+        {
+            return _inner.SendContractWithPdfAsync(email, fullName, contractNumber, pdfBytes);
         }
     }
 }

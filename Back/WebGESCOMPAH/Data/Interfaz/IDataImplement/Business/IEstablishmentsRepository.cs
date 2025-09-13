@@ -2,23 +2,11 @@
 using System.Threading.Tasks;
 using Data.Interfaz.DataBasic;
 using Entity.Domain.Models.Implements.Business;
+using Entity.DTOs.Implements.Business.EstablishmentDto;
+using Entity.Enum;
 
 namespace Data.Interfaz.IDataImplement.Business
 {
-    public enum ActivityFilter { Any, ActiveOnly }
-
-    public sealed record EstablishmentBasics(int Id, decimal RentValueBase, decimal UvtQty);
-    public sealed record EstablishmentCard(
-        int Id,
-        string Name,
-        string Description,
-        string Address,
-        decimal AreaM2,
-        decimal RentValueBase,
-        bool Active,
-        string? PrimaryImagePath
-    );
-
     public interface IEstablishmentsRepository : IDataGeneric<Establishment>
     {
 
@@ -30,10 +18,10 @@ namespace Data.Interfaz.IDataImplement.Business
         Task<Establishment?> GetByIdActiveAsync(int id);
 
         // Proyección liviana
-        Task<IReadOnlyList<EstablishmentBasics>> GetBasicsByIdsAsync(IReadOnlyCollection<int> ids);
+        Task<IReadOnlyList<EstablishmentBasicsDto>> GetBasicsByIdsAsync(IReadOnlyCollection<int> ids);
 
         // Proyección para listados (tarjetas)
-        Task<IReadOnlyList<EstablishmentCard>> GetCardsAsync(ActivityFilter filter);
+        Task<IReadOnlyList<EstablishmentCardDto>> GetCardsAsync(ActivityFilter filter);
 
         // Validación / comandos
         Task<IReadOnlyList<int>> GetInactiveIdsAsync(IReadOnlyCollection<int> ids);

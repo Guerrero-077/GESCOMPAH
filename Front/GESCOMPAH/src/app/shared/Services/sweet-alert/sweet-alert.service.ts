@@ -1,6 +1,4 @@
-
 import { Injectable } from '@angular/core';
-import type SwalNS from 'sweetalert2';
 import type { SweetAlertIcon } from 'sweetalert2';
 
 @Injectable({
@@ -118,7 +116,9 @@ export class SweetAlertService {
       },
       allowOutsideClick: false,
       allowEscapeKey: false,
-      allowEnterKey: false,
+      showConfirmButton: false,
+      showCancelButton: false,
+      focusConfirm: false,
       color: fg,
       background: bg,
     });

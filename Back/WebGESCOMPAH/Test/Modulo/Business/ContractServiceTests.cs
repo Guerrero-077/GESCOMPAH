@@ -1,9 +1,12 @@
 using Business.Interfaces.Implements.Business;
+using Entity.DTOs.Implements.Business.Contract;
 using Business.Services.Business;
 using Data.Interfaz.IDataImplement.Business;
 using Business.Interfaces.Implements.Persons;
 using Business.CustomJWT;
 using Business.Interfaces.Implements.SecurityAuthentication;
+using Business.Interfaces;
+using Business.Interfaces.PDF;
 using Data.Interfaz.IDataImplement.Persons;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Business;
@@ -14,6 +17,7 @@ using Entity.Infrastructure.Context;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Utilities.Exceptions;
 using Utilities.Messaging.Interfaces;
@@ -37,6 +41,9 @@ public class ContractServiceTests
     private readonly Mock<IMapper> _mapper = new();
     private readonly Mock<ICurrentUser> _currentUser = new();
     private readonly Mock<IUserContextService> _userCtx = new();
+    private readonly Mock<IContractPdfGeneratorService> _contractPdfService = new();
+    private readonly Mock<IUnitOfWork> _uow = new();
+    private readonly Mock<ILogger<ContractService>> _logger = new();
     private readonly ApplicationDbContext _ctx;
     private readonly ContractService _service;
 
@@ -61,7 +68,10 @@ public class ContractServiceTests
             _currentUser.Object,
             _obligationRepo.Object,
             _obligationSvc.Object,
-            _userCtx.Object
+            _userCtx.Object,
+            _contractPdfService.Object,
+            _uow.Object,
+            _logger.Object
         );
     }
 
@@ -69,12 +79,11 @@ public class ContractServiceTests
     public async Task GetMine_Admin_ReturnsMappedCards()
     {
         _currentUser.SetupGet(u => u.EsAdministrador).Returns(true);
-        var cards = new List<global::Data.Interfaz.IDataImplement.Business.ContractCard>
+        var cards = new List<ContractCardDto>
         {
             new(1, 10, "P", "D", "PH", null, DateTime.Today, DateTime.Today, 1, 1, true)
         };
-        _contracts.Setup(r => r.GetCardsAllAsync()).ReturnsAsync((IReadOnlyList<global::Data.Interfaz.IDataImplement.Business.ContractCard>)cards);
-        _mapper.Setup(m => m.Map<List<ContractCardDto>>(cards)).Returns(new List<ContractCardDto>{ new(1,10,"P","D","PH",null,DateTime.Today,DateTime.Today,1,1,true)});
+        _contracts.Setup(r => r.GetCardsAllAsync()).ReturnsAsync((IReadOnlyList<ContractCardDto>)cards);
 
         var result = await _service.GetMineAsync();
         Assert.Single(result);
@@ -93,12 +102,11 @@ public class ContractServiceTests
     {
         _currentUser.SetupGet(u => u.EsAdministrador).Returns(false);
         _currentUser.SetupGet(u => u.PersonId).Returns(99);
-        var cards = new List<global::Data.Interfaz.IDataImplement.Business.ContractCard>
+        var cards = new List<ContractCardDto>
         {
             new(2, 99, "Z", "D", "PH", null, DateTime.Today, DateTime.Today, 1, 1, false)
         };
-        _contracts.Setup(r => r.GetCardsByPersonAsync(99)).ReturnsAsync((IReadOnlyList<global::Data.Interfaz.IDataImplement.Business.ContractCard>)cards);
-        _mapper.Setup(m => m.Map<List<ContractCardDto>>(cards)).Returns(new List<ContractCardDto>{ new(2,99,"Z","D","PH",null,DateTime.Today,DateTime.Today,1,1,false)});
+        _contracts.Setup(r => r.GetCardsByPersonAsync(99)).ReturnsAsync((IReadOnlyList<ContractCardDto>)cards);
 
         var result = await _service.GetMineAsync();
         Assert.Single(result);

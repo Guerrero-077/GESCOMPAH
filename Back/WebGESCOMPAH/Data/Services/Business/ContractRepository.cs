@@ -3,6 +3,7 @@ using Data.Repository;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using Entity.DTOs.Implements.Business.Contract;
 
 namespace Data.Services.Business
 {
@@ -34,12 +35,12 @@ namespace Data.Services.Business
 
         // ============== PROYECCIONES PARA GRID (sin Include) ==============
 
-        public async Task<IReadOnlyList<ContractCard>> GetCardsByPersonAsync(int personId) =>
+        public async Task<IReadOnlyList<ContractCardDto>> GetCardsByPersonAsync(int personId) =>
             await _dbSet.AsNoTracking()
                 .Where(c => !c.IsDeleted && c.PersonId == personId)
                 .OrderByDescending(e => e.CreatedAt)
                 .ThenByDescending(e => e.Id)
-                .Select(c => new ContractCard(
+                .Select(c => new ContractCardDto(
                     c.Id,
                     c.PersonId,
                     (c.Person.FirstName + " " + c.Person.LastName).Trim(),
@@ -54,11 +55,11 @@ namespace Data.Services.Business
                 ))
                 .ToListAsync();
 
-        public async Task<IReadOnlyList<ContractCard>> GetCardsAllAsync() =>
+        public async Task<IReadOnlyList<ContractCardDto>> GetCardsAllAsync() =>
             await _dbSet.AsNoTracking()
                 .Where(c => !c.IsDeleted)
                 .OrderByDescending(c => c.Id)
-                .Select(c => new ContractCard(
+                .Select(c => new ContractCardDto(
                     c.Id,
                     c.PersonId,
                     (c.Person.FirstName + " " + c.Person.LastName).Trim(),

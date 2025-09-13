@@ -3,6 +3,8 @@ using Data.Repository;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using Entity.DTOs.Implements.Business.EstablishmentDto;
+using Entity.Enum;
 
 namespace Data.Services.Business
 {
@@ -42,17 +44,22 @@ namespace Data.Services.Business
             BaseQuery().Where(e => e.Active).FirstOrDefaultAsync(e => e.Id == id);
 
         // Proyección
-        public async Task<IReadOnlyList<EstablishmentBasics>> GetBasicsByIdsAsync(IReadOnlyCollection<int> ids)
+        public async Task<IReadOnlyList<EstablishmentBasicsDto>> GetBasicsByIdsAsync(IReadOnlyCollection<int> ids)
         {
-            if (ids.Count == 0) return Array.Empty<EstablishmentBasics>();
+            if (ids.Count == 0) return Array.Empty<EstablishmentBasicsDto>();
             return await _dbSet.AsNoTracking()
                 .Where(e => ids.Contains(e.Id) && e.Active && !e.IsDeleted)
-                .Select(e => new EstablishmentBasics(e.Id, e.RentValueBase, e.UvtQty))
+                .Select(e => new EstablishmentBasicsDto
+                {
+                    Id = e.Id,
+                    RentValueBase = e.RentValueBase,
+                    UvtQty = e.UvtQty
+                })
                 .ToListAsync();
         }
 
         // Lista liviana para tarjetas
-        public async Task<IReadOnlyList<EstablishmentCard>> GetCardsAsync(ActivityFilter filter)
+        public async Task<IReadOnlyList<EstablishmentCardDto>> GetCardsAsync(ActivityFilter filter)
         {
             var q = _dbSet.AsNoTracking()
                 .Where(e => !e.IsDeleted && e.Plaza != null && e.Plaza.Active && !e.Plaza.IsDeleted);
@@ -63,20 +70,21 @@ namespace Data.Services.Business
             return await q
                 .OrderByDescending(e => e.CreatedAt)
                 .ThenByDescending(e => e.Id)
-                .Select(e => new EstablishmentCard(
-                    e.Id,
-                    e.Name,
-                    e.Description,
-                    e.Address,
-                    e.AreaM2,
-                    e.RentValueBase,
-                    e.Active,
-                    e.Images
+                .Select(e => new EstablishmentCardDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Description = e.Description,
+                    Address = e.Address,
+                    AreaM2 = e.AreaM2,
+                    RentValueBase = e.RentValueBase,
+                    Active = e.Active,
+                    PrimaryImagePath = e.Images
                         .Where(img => img.Active && !img.IsDeleted)
                         .OrderBy(img => img.Id)
                         .Select(img => img.FilePath)
                         .FirstOrDefault()
-                ))
+                })
                 .ToListAsync();
         }
 

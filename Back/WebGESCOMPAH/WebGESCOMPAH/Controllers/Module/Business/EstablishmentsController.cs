@@ -37,7 +37,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         /// Listado liviano para tarjetas/grillas. Incluye PrimaryImagePath pero no la colección completa de imágenes.
         /// </summary>
         [HttpGet("cards")]
-        [ProducesResponseType(typeof(IEnumerable<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<EstablishmentCardDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCards([FromQuery] bool activeOnly = false)
         {
             var result = activeOnly

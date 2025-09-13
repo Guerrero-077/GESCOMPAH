@@ -68,7 +68,7 @@ export class EstablishmentsListComponent implements OnInit {
         data: null
       });
       ref.afterClosed().subscribe(async ok => {
-        if (ok) await this.store.loadAll();
+        if (ok) await this.store.loadCardsAll();
       });
     });
   }

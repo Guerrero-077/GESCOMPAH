@@ -181,3 +181,7 @@
     font-size: 1.1rem;
   }
 }
+
+/* Overrides for NgOptimizedImage fill usage */
+.image-container { position: relative; height: auto; aspect-ratio: 2 / 1; }
+

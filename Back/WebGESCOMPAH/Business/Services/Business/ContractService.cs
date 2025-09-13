@@ -1,8 +1,10 @@
-﻿using Business.CustomJWT;
+using Business.CustomJWT;
 using Business.Interfaces.Implements.Business;
 using Business.Interfaces.Implements.Persons;
 using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Repository;
+using Business.Interfaces;
+using Business.Interfaces.PDF;
 using Data.Interfaz.IDataImplement.Business;
 using Data.Interfaz.IDataImplement.Persons;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
@@ -16,6 +18,7 @@ using Entity.Infrastructure.Context;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Net.Mail;
 using Utilities.Exceptions;
 using Utilities.Helpers.GeneratePassword;
@@ -41,10 +44,13 @@ namespace Business.Services.Business
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ISendCode _emailService;
         private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _uow;
         private readonly ICurrentUser _user;
         private readonly IObligationMonthRepository _obligationRepository;
         private readonly IObligationMonthService _obligationMonthSvc;
         private readonly IUserContextService _userContextService;
+        private readonly IContractPdfGeneratorService _contractPdfService;
+        private readonly ILogger<ContractService> _logger;
 
         public ContractService(
             IContractRepository contracts,
@@ -62,7 +68,10 @@ namespace Business.Services.Business
             ICurrentUser currentUser,
             IObligationMonthRepository obligationRepository,
             IObligationMonthService obligationMonthSvc,
-            IUserContextService userContextService
+            IUserContextService userContextService,
+            IContractPdfGeneratorService contractPdfService,
+            IUnitOfWork uow,
+            ILogger<ContractService> logger
         ) : base(contracts, mapper)
         {
             _contractRepository = contracts;
@@ -80,6 +89,9 @@ namespace Business.Services.Business
             _obligationRepository = obligationRepository;
             _obligationMonthSvc = obligationMonthSvc;
             _userContextService = userContextService;
+            _contractPdfService = contractPdfService;
+            _uow = uow;
+            _logger = logger;
         }
 
         public async Task<IReadOnlyList<ContractCardDto>> GetMineAsync()
@@ -90,9 +102,7 @@ namespace Business.Services.Business
                     _user.PersonId ?? throw new BusinessException("Usuario sin persona asociada.")
                   );
 
-            // Mapster en vez de constructor manual
-            var result = _mapper.Map<List<ContractCardDto>>(list);
-            return result.AsReadOnly();
+            return list.ToList().AsReadOnly();
         }
 
         private static bool IsValidEmail(string? email)
@@ -104,6 +114,7 @@ namespace Business.Services.Business
 
         public async Task<int> CreateContractWithPersonHandlingAsync(ContractCreateDto dto)
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             if (dto.EstablishmentIds is null || dto.EstablishmentIds.Count == 0)
                 throw new BusinessException("Debe seleccionar al menos un establecimiento.");
 
@@ -113,24 +124,19 @@ namespace Business.Services.Business
             if (wantsUser && !IsValidEmail(dto.Email))
                 throw new BusinessException("El correo proporcionado no es válido.");
 
-            var strategy = _context.Database.CreateExecutionStrategy();
-
             // Variables para side-effects post-commit
             string? emailToNotify = null;
             string? fullNameToNotify = null;
             string? tempPassToNotify = null;
-            int? createdUserId = null;
-
-            var contractId = await strategy.ExecuteAsync(async () =>
+            var userWasCreated = false;
+            var personIdLocal = 0;
+            
+            var contractId = await _uow.ExecuteAsync<int>(async ct =>
             {
-                await using var tx = await _context.Database.BeginTransactionAsync();
-
-                try
-                {
-                    // 1) Chequeo de disponibilidad
-                    var alreadyInactive = await _establishmentsRepository.GetInactiveIdsAsync(targetIds);
-                    if (alreadyInactive.Count > 0)
-                        throw new BusinessException($"Los establecimientos {string.Join(", ", alreadyInactive)} no están disponibles (Active = false).");
+                // 1) Chequeo de disponibilidad
+                var alreadyInactive = await _establishmentsRepository.GetInactiveIdsAsync(targetIds);
+                if (alreadyInactive.Count > 0)
+                    throw new BusinessException($"Los establecimientos {string.Join(", ", alreadyInactive)} no están disponibles (Active = false).");
 
                     // 2) Persona (reutiliza PersonService). Si no existe, crear usando Mapster (dto -> PersonDto)
                     Person personEntity;
@@ -174,6 +180,24 @@ namespace Business.Services.Business
                             tempPassToNotify = tempPass;
                             emailToNotify = createdUser.Email;
                             fullNameToNotify = $"{personEntity.FirstName} {personEntity.LastName}".Trim();
+
+                            // Post-commit: enviar contraseña temporal (no debe romper transacción)
+                            _uow.RegisterPostCommit(async ct =>
+                            {
+                                if (!string.IsNullOrWhiteSpace(emailToNotify) &&
+                                    !string.IsNullOrWhiteSpace(fullNameToNotify) &&
+                                    !string.IsNullOrWhiteSpace(tempPassToNotify))
+                                {
+                                    try { await _emailService.SendTemporaryPasswordAsync(emailToNotify!, fullNameToNotify!, tempPassToNotify!); }
+                                    catch (Exception ex) 
+                                    {
+                                        _logger.LogError(ex, "Error enviando contraseña temporal a {Email} para usuario {FullName}", emailToNotify, fullNameToNotify);
+                                        // Continuar sin fallar la transacción
+                                    }
+                                }
+                            });
+
+                            userWasCreated = true;
                         }
                     }
 
@@ -213,41 +237,79 @@ namespace Business.Services.Business
                     // 7) Persistencia única (incluye vínculos de cláusulas)
                     await _context.SaveChangesAsync();
 
-                    if (createdUser is not null) createdUserId = createdUser.Id;
+                    // Post-commit: invalidar caché si se creó usuario
+                    _uow.RegisterPostCommit(_ =>
+                    {
+                        if (createdUser is not null && createdUser.Id > 0)
+                        {
+                            try { _userContextService.InvalidateCache(createdUser.Id); }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error invalidando caché para usuario {UserId}", createdUser.Id);
+                                // Continuar sin fallar
+                            }
+                        }
+                        return Task.CompletedTask;
+                    });
 
-                    await tx.CommitAsync();
-                    return contract.Id;
-                }
-                catch
-                {
-                    await tx.RollbackAsync();
-                    throw;
-                }
+                    // Post-commit: generar obligación del mes actual (idempotente en tu servicio)
+                    _uow.RegisterPostCommit(async ct =>
+                    {
+                        var tz = TimeZoneConverter.TZConvert.GetTimeZoneInfo("America/Bogota");
+                        var nowLocal = TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
+                        try { await _obligationMonthSvc.GenerateForContractMonthAsync(contract.Id, nowLocal.Year, nowLocal.Month); }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error generando obligación mensual para contrato {ContractId} en {Year}/{Month}", contract.Id, nowLocal.Year, nowLocal.Month);
+                            // Continuar sin fallar la transacción principal
+                        }
+                    });
+
+                    // Post-commit: enviar correo con PDF del contrato en segundo plano (siempre que haya email)
+                    if (!string.IsNullOrWhiteSpace(dto.Email))
+                    {
+                        _uow.RegisterPostCommit(ct =>
+                        {
+                            // Ejecutar en segundo plano sin bloquear la respuesta
+                            _ = Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    // Obtener el contrato completo como DTO para el PDF
+                                    var contractForPdf = await GetByIdAsync(contract.Id);
+                                    if (contractForPdf != null)
+                                    {
+                                        // Generar PDF del contrato
+                                        var pdfBytes = await _contractPdfService.GeneratePdfAsync(contractForPdf);
+                                        
+                                        // Enviar correo con PDF adjunto
+                                        var contractNumber = contract.Id.ToString("D6"); // Formato: 000001, 000002, etc.
+                                        var fullName = $"{personEntity.FirstName} {personEntity.LastName}".Trim();
+                                        
+                                        await _emailService.SendContractWithPdfAsync(dto.Email!, fullName, contractNumber, pdfBytes);
+                                        
+                                        _logger.LogInformation("Correo con PDF del contrato enviado a {Email} para contrato {ContractId}", dto.Email, contract.Id);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "Error enviando correo con PDF del contrato {ContractId} a {Email}", contract.Id, dto.Email);
+                                    // Error en background no afecta la operación principal
+                                }
+                            }, CancellationToken.None);
+                            
+                            return Task.CompletedTask;
+                        });
+                    }
+
+                    personIdLocal = personEntity.Id;
+
+                return contract.Id;
             });
 
-            // === POST-COMMIT ===
-
-            // (A) Email con contraseña temporal
-            if (!string.IsNullOrWhiteSpace(emailToNotify) &&
-                !string.IsNullOrWhiteSpace(fullNameToNotify) &&
-                !string.IsNullOrWhiteSpace(tempPassToNotify))
-            {
-                try { await _emailService.SendTemporaryPasswordAsync(emailToNotify!, fullNameToNotify!, tempPassToNotify!); }
-                catch { /* log y continuar */ }
-            }
-
-            // (B) Generar obligación del mes actual (idempotente en tu servicio)
-            var tz = TimeZoneConverter.TZConvert.GetTimeZoneInfo("America/Bogota");
-            var nowLocal = TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
-            await _obligationMonthSvc.GenerateForContractMonthAsync(contractId, nowLocal.Year, nowLocal.Month);
-
-            // (C) Invalidar caché del contexto de usuario si se creó
-            if (createdUserId.HasValue)
-            {
-                try { _userContextService.InvalidateCache(createdUserId.Value); }
-                catch { /* log y continuar */ }
-            }
-
+            sw.Stop();
+            _logger.LogInformation("Contract {ContractId} created in {ElapsedMs} ms for person {PersonId} with {Count} establishments. UserCreated={UserCreated}",
+                contractId, sw.ElapsedMilliseconds, personIdLocal, targetIds.Count, userWasCreated);
             return contractId;
         }
 
@@ -255,6 +317,7 @@ namespace Business.Services.Business
         {
             var now = DateTime.UtcNow;
             var strategy = _context.Database.CreateExecutionStrategy();
+            var sw = System.Diagnostics.Stopwatch.StartNew();
 
             return await strategy.ExecuteAsync(async () =>
             {
@@ -265,6 +328,9 @@ namespace Business.Services.Business
                     var reactivated = await _contractRepository.ReleaseEstablishmentsForExpiredAsync(now);
 
                     await tx.CommitAsync(ct);
+                    sw.Stop();
+                    _logger.LogInformation("Expiration sweep deactivated {Count} contracts and reactivated {Establishments} establishments in {ElapsedMs} ms",
+                        deactivatedIds.Count, reactivated, sw.ElapsedMilliseconds);
                     return new ExpirationSweepResult(deactivatedIds, reactivated);
                 }
                 catch

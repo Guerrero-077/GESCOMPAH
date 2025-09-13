@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,6 @@ namespace Utilities.Messaging.Interfaces
     {
         Task SendRecoveryCodeEmail(string emailReceptor, string recoveryCode);
         Task SendTemporaryPasswordAsync(string email, string fullName, string tempPassword);
-
+        Task SendContractWithPdfAsync(string email, string fullName, string contractNumber, byte[] pdfBytes);
     }
 }

@@ -2,7 +2,13 @@
   <!-- Contenedor de imagen -->
 
   <div class="image-container w-100 position-relative">
-    <img [ngSrc]="primaryImage" width="260" height="130" [alt]="local.name" class="local-image" loading="lazy">
+    <img *ngIf="isCloudinary; else plainImg"
+         [ngSrc]="cloudinaryPath"
+         width="260" height="130" [alt]="local.name"
+         class="local-image" loading="lazy">
+    <ng-template #plainImg>
+      <img [src]="primaryImage" width="260" height="130" [alt]="local.name" class="local-image" loading="lazy">
+    </ng-template>
 
     <!-- Tag de disponibilidad -->
     <div *ngIf="showAvailableTag && local.active" class="availability-tag">
