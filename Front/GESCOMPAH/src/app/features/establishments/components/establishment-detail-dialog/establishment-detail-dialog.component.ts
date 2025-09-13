@@ -3,11 +3,12 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 @Component({
   selector: 'app-establishment-detail-dialog',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, StandardButtonComponent],
   templateUrl: './establishment-detail-dialog.component.html',
   styleUrls: ['./establishment-detail-dialog.component.css']
 })

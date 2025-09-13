@@ -2,11 +2,15 @@
   <!-- Botón para abrir el formulario en un modal -->
   <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
     <div class="d-flex justify-content-end mb-4">
-      <button mat-raised-button color="primary"
-              (click)="openCreateDialog()"
-              [disabled]="loadingCards()">
-        Nuevo establecimiento
-      </button>
+      <app-standard-button
+        text="Nuevo establecimiento"
+        variant="raised"
+        color="primary"
+        icon="add"
+        iconPosition="left"
+        (clicked)="openCreateDialog()"
+        [disabled]="loadingCards()">
+      </app-standard-button>
     </div>
   </ng-container>
 

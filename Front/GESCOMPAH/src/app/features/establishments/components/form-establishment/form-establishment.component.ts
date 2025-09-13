@@ -35,6 +35,7 @@ import { FilePickerService } from '../../../../shared/Services/Picker/file-picke
 import { GeneralForm, UbicacionForm } from '../../shapes/Formularios';
 
 import { AppValidators } from '../../../../shared/utils/AppValidators';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 
 /* Mensajes de error:
@@ -92,7 +93,8 @@ export const ERRORS = {
     CommonModule, ReactiveFormsModule, MatDialogModule, MatInputModule, MatButtonModule,
     MatSelectModule, MatIconModule, MatProgressSpinnerModule, MatTooltipModule,
     MatStepperModule,
-    FileDropDirective // directiva para manejar drag&drop de archivos
+    FileDropDirective, // directiva para manejar drag&drop de archivos
+    StandardButtonComponent
   ],
   templateUrl: './form-establishment.component.html',
   styleUrls: ['./form-establishment.component.css'],

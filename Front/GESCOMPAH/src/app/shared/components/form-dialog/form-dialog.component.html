@@ -5,7 +5,17 @@
     [selectOptions]="data.selectOptions || {}" (formSubmit)="close($event)"></app-dymanic-forms>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-stroked-button (click)="close(null)">Cancelar</button>
-  <button mat-raised-button color="primary" (click)="dynamicForm.onSubmit()">Guardar</button>
+<mat-dialog-actions align="end" class="form-actions">
+  <app-standard-button 
+    text="Cancelar" 
+    variant="stroked" 
+    (clicked)="close(null)">
+  </app-standard-button>
+  <app-standard-button 
+    text="Guardar" 
+    variant="raised" 
+    color="primary" 
+    icon="save"
+    (clicked)="dynamicForm.onSubmit()">
+  </app-standard-button>
 </mat-dialog-actions>

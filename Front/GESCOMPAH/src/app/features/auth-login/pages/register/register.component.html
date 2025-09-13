@@ -1,13 +1,12 @@
 <div class="container">
-  <mat-horizontal-stepper class="card shadow p-4" [linear]="true">
+  <mat-horizontal-stepper #stepper class="form-stepper" [linear]="true">
 
     <!-- PASO 1: UBICACIÓN -->
     <mat-step [stepControl]="locationGroup">
-      <form [formGroup]="locationGroup">
+      <form [formGroup]="locationGroup" class="form-step">
         <ng-template matStepLabel>Ubicación</ng-template>
-        <div class="info">
+        <div class="section-header">
           <h3>Ubicación</h3>
-          <span>Selecciona tu departamento y ciudad.</span>
         </div>
 
         <!-- Departamento -->
@@ -19,8 +18,9 @@
             </mat-option>
           </mat-select>
           <mat-error *ngIf="locationGroup.get('departmentId')?.hasError('required')">
-            Selecciona un departamento
+            Por favor seleccione el departamento de residencia
           </mat-error>
+          <mat-hint>Seleccione el departamento donde reside</mat-hint>
         </mat-form-field>
 
         <!-- Ciudad encadenado -->
@@ -56,17 +56,23 @@
           </mat-hint>
 
           <mat-error *ngIf="locationGroup.get('cityId')?.hasError('required')">
-            Selecciona una ciudad
+            Por favor seleccione la ciudad donde reside el usuario
           </mat-error>
           <mat-error *ngIf="locationGroup.get('cityId')?.hasError('min')">
-            Selecciona una ciudad válida
+            Debe seleccionar una ciudad válida de la lista
           </mat-error>
         </mat-form-field>
 
-        <div class="step-actions">
-          <button mat-raised-button color="primary" matStepperNext [disabled]="locationGroup.invalid">
-            Siguiente
-          </button>
+        <div class="form-actions">
+          <app-standard-button 
+            text="Siguiente" 
+            variant="raised" 
+            color="primary" 
+            icon="arrow_forward"
+            iconPosition="right"
+            [disabled]="locationGroup.invalid"
+            (clicked)="stepper.next()">
+          </app-standard-button>
         </div>
       </form>
 
@@ -80,95 +86,134 @@
 
     <!-- PASO 2: PERSONA -->
     <mat-step [stepControl]="personGroup">
-      <form [formGroup]="personGroup">
+      <form [formGroup]="personGroup" class="form-step">
         <ng-template matStepLabel>Datos personales</ng-template>
-        <div class="info">
-          <h3>Datos personales</h3>
-          <span>Ingresa tu información personal.</span>
+        <div class="section-header">
+          <h3>Datos Personales</h3>
         </div>
 
-        <div class="grid">
+        <div class="form-grid two-cols">
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Nombres</mat-label>
-            <input matInput formControlName="firstName" required />
-            <mat-error *ngIf="personGroup.get('firstName')?.hasError('required')">Requerido</mat-error>
+            <input matInput formControlName="firstName" required placeholder="Carlos Alberto" />
+            <mat-error *ngIf="personGroup.get('firstName')?.hasError('required')">Por favor ingrese los nombres del usuario</mat-error>
+            <mat-error *ngIf="personGroup.get('firstName')?.hasError('alphaHuman')">Los nombres solo pueden contener letras y espacios</mat-error>
+            <mat-error *ngIf="personGroup.get('firstName')?.hasError('onlySpaces')">Los nombres no pueden estar vacíos o contener solo espacios</mat-error>
+            <mat-error *ngIf="personGroup.get('firstName')?.hasError('maxlength')">Los nombres no pueden exceder 50 caracteres</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Apellidos</mat-label>
-            <input matInput formControlName="lastName" required />
-            <mat-error *ngIf="personGroup.get('lastName')?.hasError('required')">Requerido</mat-error>
+            <input matInput formControlName="lastName" required placeholder="García Rodríguez" />
+            <mat-error *ngIf="personGroup.get('lastName')?.hasError('required')">Por favor ingrese los apellidos del usuario</mat-error>
+            <mat-error *ngIf="personGroup.get('lastName')?.hasError('alphaHuman')">Los apellidos solo pueden contener letras y espacios</mat-error>
+            <mat-error *ngIf="personGroup.get('lastName')?.hasError('onlySpaces')">Los apellidos no pueden estar vacíos o contener solo espacios</mat-error>
+            <mat-error *ngIf="personGroup.get('lastName')?.hasError('maxlength')">Los apellidos no pueden exceder 50 caracteres</mat-error>
           </mat-form-field>
         </div>
 
-        <div class="grid">
+        <div class="form-grid three-cols">
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Documento</mat-label>
-            <input matInput formControlName="document" required />
-            <mat-error *ngIf="personGroup.get('document')?.hasError('required')">Requerido</mat-error>
+            <input matInput formControlName="document" required placeholder="12345678" />
+            <mat-error *ngIf="personGroup.get('document')?.hasError('required')">Por favor ingrese el número de documento de identidad</mat-error>
+            <mat-error *ngIf="personGroup.get('document')?.hasError('colombianDocument')">El documento debe tener entre 7 y 10 dígitos numéricos</mat-error>
+            <mat-hint>Número de cédula de ciudadanía (7 a 10 dígitos)</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="phone" required />
-            <mat-error *ngIf="personGroup.get('phone')?.hasError('required')">Requerido</mat-error>
+            <input matInput formControlName="phone" required placeholder="3012345678" />
+            <mat-error *ngIf="personGroup.get('phone')?.hasError('required')">Por favor ingrese el número de teléfono celular</mat-error>
+            <mat-error *ngIf="personGroup.get('phone')?.hasError('colombianPhone')">Ingrese un número celular válido (debe empezar en 3 y tener 10 dígitos)</mat-error>
+            <mat-hint>Número celular colombiano de 10 dígitos</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Dirección</mat-label>
-            <input matInput formControlName="address" required />
-            <mat-error *ngIf="personGroup.get('address')?.hasError('required')">Requerido</mat-error>
+            <input matInput formControlName="address" required placeholder="Calle 26 # 47 - 15 Apto 302" />
+            <mat-error *ngIf="personGroup.get('address')?.hasError('required')">Por favor ingrese la dirección completa de residencia</mat-error>
+            <mat-error *ngIf="personGroup.get('address')?.hasError('onlySpaces')">La dirección no puede estar vacía o contener solo espacios</mat-error>
+            <mat-error *ngIf="personGroup.get('address')?.hasError('maxlength')">La dirección no puede exceder 100 caracteres</mat-error>
+            <mat-hint>Dirección completa donde reside actualmente</mat-hint>
           </mat-form-field>
         </div>
 
-        <div class="step-actions">
-          <button mat-button matStepperPrevious>Volver</button>
-          <button mat-raised-button color="primary" matStepperNext [disabled]="personGroup.invalid">
-            Siguiente
-          </button>
+        <div class="form-actions space-between">
+          <app-standard-button 
+            text="Volver" 
+            variant="flat" 
+            icon="arrow_back"
+            (clicked)="stepper.previous()">
+          </app-standard-button>
+          <app-standard-button 
+            text="Siguiente" 
+            variant="raised" 
+            color="primary" 
+            icon="arrow_forward"
+            iconPosition="right"
+            [disabled]="personGroup.invalid"
+            (clicked)="stepper.next()">
+          </app-standard-button>
         </div>
       </form>
     </mat-step>
 
     <!-- PASO 3: CUENTA -->
     <mat-step [stepControl]="accountGroup">
-      <form [formGroup]="accountGroup">
+      <form [formGroup]="accountGroup" class="form-step">
         <ng-template matStepLabel>Cuenta</ng-template>
-        <div class="info">
-          <h3>Cuenta</h3>
-          <span>Crea tu cuenta de usuario.</span>
+        <div class="section-header">
+          <h3>Información de Acceso</h3>
         </div>
 
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Correo</mat-label>
-          <input matInput type="email" formControlName="email" required />
-          <mat-error *ngIf="accountGroup.get('email')?.hasError('email')">Correo inválido</mat-error>
-          <mat-error *ngIf="accountGroup.get('email')?.hasError('required')">Requerido</mat-error>
+          <input matInput type="email" formControlName="email" required placeholder="carlos.garcia@gmail.com" />
+          <mat-error *ngIf="accountGroup.get('email')?.hasError('required')">Por favor ingrese el correo electrónico</mat-error>
+          <mat-error *ngIf="accountGroup.get('email')?.hasError('email')">Por favor ingrese un correo electrónico válido</mat-error>
+          <mat-error *ngIf="accountGroup.get('email')?.hasError('domainMissing')">El correo debe incluir un dominio (ej: &#64;gmail.com)</mat-error>
+          <mat-error *ngIf="accountGroup.get('email')?.hasError('tldMissing')">El dominio debe incluir una extensión válida (.com, .co, etc.)</mat-error>
+          <mat-hint>Se usará para el acceso al sistema y notificaciones</mat-hint>
         </mat-form-field>
 
-        <div class="grid">
+        <div class="form-grid two-cols">
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Contraseña</mat-label>
-            <input matInput type="password" formControlName="password" required />
-            <mat-hint>Mín. 8 + mayús/minús/número/símbolo</mat-hint>
+            <input matInput type="password" formControlName="password" required placeholder="••••••••" />
+            <mat-error *ngIf="accountGroup.get('password')?.hasError('required')">Por favor ingrese la contraseña</mat-error>
+            <mat-error *ngIf="accountGroup.get('password')?.hasError('minlength')">La contraseña debe tener al menos 8 caracteres</mat-error>
+            <mat-error *ngIf="accountGroup.get('password')?.hasError('pattern')">La contraseña debe contener al menos una letra mayúscula, una minúscula y un número</mat-error>
+            <mat-hint>Mínimo 8 caracteres, incluya mayúsculas, minúsculas y números</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Confirmar contraseña</mat-label>
-            <input matInput type="password" formControlName="confirmPassword" required />
-            <mat-error *ngIf="accountGroup.hasError('passwordsMismatch')">
-              Las contraseñas no coinciden
-            </mat-error>
+            <input matInput type="password" formControlName="confirmPassword" required placeholder="••••••••" />
+            <mat-error *ngIf="accountGroup.get('confirmPassword')?.hasError('required')">Por favor confirme la nueva contraseña</mat-error>
+            <mat-error *ngIf="accountGroup.hasError('passwordsMismatch')">Las contraseñas no coinciden</mat-error>
           </mat-form-field>
         </div>
 
         <div class="text-danger" *ngIf="submitError()">{{ submitError() }}</div>
 
-        <div class="step-actions">
-          <button mat-button matStepperPrevious>Volver</button>
-          <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || submitting()">
-            {{ submitting() ? 'Creando...' : 'Crear cuenta' }}
-          </button>
+        <div class="form-actions space-between">
+          <app-standard-button 
+            text="Volver" 
+            variant="flat" 
+            icon="arrow_back"
+            (clicked)="stepper.previous()">
+          </app-standard-button>
+          <app-standard-button 
+            [text]="submitting() ? 'Creando...' : 'Crear cuenta'"
+            variant="raised" 
+            color="primary" 
+            icon="person_add"
+            [disabled]="form.invalid || submitting()"
+            [loading]="submitting()"
+            loadingText="Creando..."
+            (clicked)="submit()">
+          </app-standard-button>
         </div>
       </form>
     </mat-step>

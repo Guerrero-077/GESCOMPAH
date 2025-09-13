@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 import { BehaviorSubject, catchError, distinctUntilChanged, finalize, of, switchMap, tap, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -34,7 +35,8 @@ import { DepartmentStore } from '../../../setting/services/department/department
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    StandardButtonComponent
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']

@@ -1,91 +1,147 @@
-﻿/***********************************************************
- * 1) PALETA GLOBAL MEJORADA (mÃ¡s vibrante y moderna)
- *    â€” Verdes mÃ¡s vivos y amarillos mÃ¡s brillantes
+/* Import form error styles */
+@import './styles/form-errors.css';
+/* Import standardized form styles */
+@import './styles/standardized-forms.css';
+/* Import modal-specific form styles */
+@import './styles/modal-forms.css';
+/* Import standardized error messages */
+@import './styles/form-error-messages.css';
+
+/***********************************************************
+ * 1) PALETA GLOBAL MEJORADA (más vibrante y moderna)
+ *    — Verdes más vivos y amarillos más brillantes
  ***********************************************************/
 :root {
-  /* ======= Brand (Verde) - MÃS VIBRANTE ======= */
-  --green-50: #f0fdf4;    /* fondo mÃ¡s fresco */
-  --green-100: #dcfce7;   /* mÃ¡s luminoso */
-  --green-200: #bbf7d0;   /* mÃ¡s saturado */
-  --green-300: #86efac;   /* mÃ¡s brillante */
-  --green-400: #4ade80;   /* mÃ¡s moderno */
-  --green-500: #22c55e;   /* primario mÃ¡s vibrante */
-  --green-600: #16a34a;   /* hover mÃ¡s definido */
-  --green-700: #15803d;   /* institucional corregido */
-  --green-800: #166534;   /* PRIMARIO mÃ¡s fuerte */
-  --green-900: #14532d;   /* Ã©nfasis mÃ¡s profundo */
+  /* ======= Brand (Verde) - MÁS VIBRANTE ======= */
+  --green-50: #f0fdf4;
+  /* fondo más fresco */
+  --green-100: #dcfce7;
+  /* mÃ¡s luminoso */
+  --green-200: #bbf7d0;
+  /* mÃ¡s saturado */
+  --green-300: #86efac;
+  /* mÃ¡s brillante */
+  --green-400: #4ade80;
+  /* mÃ¡s moderno */
+  --green-500: #22c55e;
+  /* primario mÃ¡s vibrante */
+  --green-600: #16a34a;
+  /* hover mÃ¡s definido */
+  --green-700: #15803d;
+  /* institucional corregido */
+  --green-800: #166534;
+  /* PRIMARIO mÃ¡s fuerte */
+  --green-900: #14532d;
+  /* Ã©nfasis mÃ¡s profundo */
 
   /* ======= Accent (Amarillo) - MÃS BRILLANTE ======= */
-  --yellow-50: #fefce8;   /* fondo mÃ¡s cÃ¡lido */
-  --yellow-100: #fef3c7;  /* mÃ¡s dorado */
-  --yellow-200: #fde68a;  /* mÃ¡s luminoso */
-  --yellow-300: #fcd34d;  /* mÃ¡s saturado */
-  --yellow-400: #fbbf24;  /* mÃ¡s vibrante */
-  --yellow-500: #f59e0b;  /* mÃ¡s intenso */
-  --yellow-600: #eab308;  /* acento principal mejorado */
-  --yellow-700: #d97706;  /* hover mÃ¡s definido */
-  --yellow-800: #b45309;  /* badges mÃ¡s contrastados */
+  --yellow-50: #fefce8;
+  /* fondo mÃ¡s cÃ¡lido */
+  --yellow-100: #fef3c7;
+  /* mÃ¡s dorado */
+  --yellow-200: #fde68a;
+  /* mÃ¡s luminoso */
+  --yellow-300: #fcd34d;
+  /* mÃ¡s saturado */
+  --yellow-400: #fbbf24;
+  /* mÃ¡s vibrante */
+  --yellow-500: #f59e0b;
+  /* mÃ¡s intenso */
+  --yellow-600: #eab308;
+  /* acento principal mejorado */
+  --yellow-700: #d97706;
+  /* hover mÃ¡s definido */
+  --yellow-800: #b45309;
+  /* badges mÃ¡s contrastados */
 
   /* ======= Neutros MEJORADOS / Texto / Bordes ======= */
   --white: #ffffff;
-  --gray-50: #f8fafc;     /* fondo mÃ¡s suave */
-  --gray-100: #f1f5f9;    /* superficies mejoradas */
-  --gray-200: #e2e8f0;    /* bordes mÃ¡s definidos */
-  --gray-300: #cbd5e1;    /* divisores mÃ¡s visibles */
-  --gray-400: #94a3b8;    /* textos secundarios */
-  --gray-500: #64748b;    /* mejorado */
-  --gray-600: #475569;    /* mÃ¡s legible */
-  --gray-700: #334155;    /* texto principal fuerte */
-  --gray-800: #1e293b;    /* tÃ­tulos */
-  --gray-900: #0f172a;    /* mÃ¡ximo contraste */
+  --gray-50: #f8fafc;
+  /* fondo mÃ¡s suave */
+  --gray-100: #f1f5f9;
+  /* superficies mejoradas */
+  --gray-200: #e2e8f0;
+  /* bordes mÃ¡s definidos */
+  --gray-300: #cbd5e1;
+  /* divisores mÃ¡s visibles */
+  --gray-400: #94a3b8;
+  /* textos secundarios */
+  --gray-500: #64748b;
+  /* mejorado */
+  --gray-600: #475569;
+  /* mÃ¡s legible */
+  --gray-700: #334155;
+  /* texto principal fuerte */
+  --gray-800: #1e293b;
+  /* tÃ­tulos */
+  --gray-900: #0f172a;
+  /* mÃ¡ximo contraste */
 
   /* ======= Tokens semÃ¡nticos CORREGIDOS ======= */
   --color-bg: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%);
   --color-surface: var(--white);
-  --color-surface-muted: var(--gray-50);  /* mÃ¡s sutil */
+  --color-surface-muted: var(--gray-50);
+  /* mÃ¡s sutil */
 
-  --color-border: var(--gray-200);        /* mÃ¡s visible */
-  --color-text: var(--gray-800);          /* mÃ¡s contrastado */
-  --color-text-muted: var(--gray-600);    /* legible AA */
+  --color-border: var(--gray-200);
+  /* mÃ¡s visible */
+  --color-text: var(--gray-800);
+  /* mÃ¡s contrastado */
+  --color-text-muted: var(--gray-600);
+  /* legible AA */
 
   /* Marca / Acciones MEJORADAS */
-  --color-primary: var(--green-600);      /* mÃ¡s vibrante que 800 */
+  --color-primary: var(--green-600);
+  /* mÃ¡s vibrante que 800 */
   --color-primary-contrast: var(--white);
-  --color-primary-hover: var(--green-500); /* mÃ¡s brillante en hover */
+  --color-primary-hover: var(--green-500);
+  /* mÃ¡s brillante en hover */
   --color-primary-soft: var(--green-50);
 
   /* Acentos CORREGIDOS */
-  --color-accent: var(--yellow-500);      /* mÃ¡s vibrante */
+  --color-accent: var(--yellow-500);
+  /* mÃ¡s vibrante */
   --color-accent-hover: var(--yellow-600);
   --color-accent-soft: var(--yellow-50);
-  --color-accent-contrast: var(--gray-900); /* mejor contraste */
+  --color-accent-contrast: var(--gray-900);
+  /* mejor contraste */
 
   /* Estados MEJORADOS */
-  --state-success: var(--green-600);      /* mÃ¡s visible */
-  --state-success-bg: var(--green-100);   /* fondo mÃ¡s presente */
+  --state-success: var(--green-600);
+  /* mÃ¡s visible */
+  --state-success-bg: var(--green-100);
+  /* fondo mÃ¡s presente */
   --state-warning: var(--yellow-600);
   --state-warning-bg: var(--yellow-100);
 
   /* Componentes ACTUALIZADOS */
   --sidebar-bg: linear-gradient(135deg, var(--green-700) 0%, var(--green-600) 100%);
   --sidebar-text: var(--white);
-  --sidebar-hover: var(--green-500);      /* mÃ¡s brillante */
-  --sidebar-active: var(--green-400);     /* muy visible */
+  --sidebar-hover: var(--green-500);
+  /* mÃ¡s brillante */
+  --sidebar-active: var(--green-400);
+  /* muy visible */
 
   --table-row-alt: var(--gray-50);
-  --chip-active-bg: var(--green-100);     /* mÃ¡s presente */
+  --chip-active-bg: var(--green-100);
+  /* mÃ¡s presente */
   --chip-active-text: var(--green-800);
 
   /* Accesibilidad MEJORADA */
-  --focus-ring: var(--yellow-500);        /* mÃ¡s vibrante */
+  --focus-ring: var(--yellow-500);
+  /* mÃ¡s vibrante */
   --focus-ring-offset: 2px;
   --focus-ring-width: 3px;
 
   /* Sombras COLOREADAS */
-  --shadow-1: 0 1px 3px rgba(22, 163, 74, 0.08);        /* sombra verde sutil */
-  --shadow-2: 0 4px 16px rgba(22, 163, 74, 0.12);       /* sombra verde media */
-  --shadow-3: 0 8px 32px rgba(22, 163, 74, 0.16);       /* sombra verde fuerte */
-  --shadow-accent: 0 4px 16px rgba(245, 158, 11, 0.2);   /* sombra amarilla */
+  --shadow-1: 0 1px 3px rgba(22, 163, 74, 0.08);
+  /* sombra verde sutil */
+  --shadow-2: 0 4px 16px rgba(22, 163, 74, 0.12);
+  /* sombra verde media */
+  --shadow-3: 0 8px 32px rgba(22, 163, 74, 0.16);
+  /* sombra verde fuerte */
+  --shadow-accent: 0 4px 16px rgba(245, 158, 11, 0.2);
+  /* sombra amarilla */
 }
 
 /***********************************************************
@@ -130,7 +186,12 @@ body {
 }
 
 /* Mejoras tipogrÃ¡ficas */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--gray-800);
   font-weight: 600;
   line-height: 1.2;
@@ -197,7 +258,7 @@ p {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s;
 }
 
@@ -403,13 +464,18 @@ p {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   animation: shimmer 2s infinite;
 }
 
 @keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
 }
 
 /* Sin ink-bar tradicional */
@@ -453,6 +519,7 @@ p {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -460,8 +527,15 @@ p {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 /* Aplicar animaciones suaves */
@@ -568,8 +642,13 @@ p {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 
@@ -577,22 +656,54 @@ p {
  * 6) UTILIDADES (clases globales cortas)
  ***********************************************************/
 /* Colores de texto */
-.text-primary { color: var(--color-primary) !important; }
-.text-muted   { color: var(--color-text-muted) !important; }
-.text-accent  { color: var(--color-accent) !important; }
+.text-primary {
+  color: var(--color-primary) !important;
+}
+
+.text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+.text-accent {
+  color: var(--color-accent) !important;
+}
 
 /* Fondos */
-.bg-surface       { background: var(--color-surface) !important; }
-.bg-surface-muted { background: var(--color-surface-muted) !important; }
-.bg-primary       { background: var(--gradient-primary) !important; color: var(--color-primary-contrast) !important; }
+.bg-surface {
+  background: var(--color-surface) !important;
+}
+
+.bg-surface-muted {
+  background: var(--color-surface-muted) !important;
+}
+
+.bg-primary {
+  background: var(--gradient-primary) !important;
+  color: var(--color-primary-contrast) !important;
+}
 
 /* Bordes y radios */
-.border-default { border: 1px solid var(--color-border) !important; }
-.border-accent  { border: 1px solid var(--color-accent) !important; }
-.rounded        { border-radius: 8px !important; }
+.border-default {
+  border: 1px solid var(--color-border) !important;
+}
+
+.border-accent {
+  border: 1px solid var(--color-accent) !important;
+}
+
+.rounded {
+  border-radius: 8px !important;
+}
 
 /* Sombras */
-.shadow-1 { box-shadow: var(--shadow-1) !important; }
-.shadow-2 { box-shadow: var(--shadow-2) !important; }
-.shadow-3 { box-shadow: var(--shadow-3) !important; }
+.shadow-1 {
+  box-shadow: var(--shadow-1) !important;
+}
 
+.shadow-2 {
+  box-shadow: var(--shadow-2) !important;
+}
+
+.shadow-3 {
+  box-shadow: var(--shadow-3) !important;
+}

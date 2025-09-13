@@ -64,6 +64,10 @@
   </div>
 
   <div mat-dialog-actions class="text-end">
-    <button mat-button (click)="onClose()">Cerrar</button>
+    <app-standard-button
+      text="Cerrar"
+      variant="flat"
+      (clicked)="onClose()">
+    </app-standard-button>
   </div>
 </div>

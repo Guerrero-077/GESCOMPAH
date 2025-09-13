@@ -7,9 +7,12 @@
       </ng-container>
     </div>
 
-    <button mat-icon-button (click)="close()" aria-label="Cerrar">
-      <mat-icon>close</mat-icon>
-    </button>
+    <app-standard-button
+      variant="icon"
+      icon="close"
+      (clicked)="close()"
+      ariaLabel="Cerrar">
+    </app-standard-button>
   </div>
 
   <div class="preview-body" *ngIf="total > 0; else empty">

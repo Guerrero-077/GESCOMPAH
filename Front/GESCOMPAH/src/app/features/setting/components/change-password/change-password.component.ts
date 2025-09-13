@@ -4,11 +4,16 @@ import { AuthService } from '../../../../core/service/auth/auth.service';
 import { UserStore } from '../../../../core/service/permission/User.Store';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { CommonModule } from '@angular/common';
+import { MatInputModule } from "@angular/material/input";
+import { MatIconModule } from "@angular/material/icon";
+import { MatButtonModule } from "@angular/material/button";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 @Component({
   selector: 'app-change-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatIconModule, MatButtonModule, MatFormFieldModule, StandardButtonComponent],
   templateUrl: './change-password.component.html',
   styleUrl: './change-password.component.css'
 })

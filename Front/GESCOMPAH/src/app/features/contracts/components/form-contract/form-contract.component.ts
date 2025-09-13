@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatStepperModule } from '@angular/material/stepper';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 import { Subject, of } from 'rxjs';
 import { distinctUntilChanged, switchMap, tap, catchError, takeUntil, map, finalize } from 'rxjs/operators';
@@ -68,6 +69,7 @@ function toDateOnly(d: Date): string {
     MatProgressSpinnerModule,
     MatIconModule,
     MatStepperModule,
+    StandardButtonComponent,
   ],
   templateUrl: './form-contract.component.html',
   styleUrls: ['./form-contract.component.css'],

@@ -17,6 +17,7 @@ import { EstablishmentStore } from '../../services/establishment/establishment.s
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 @Component({
   selector: 'app-establishments-list',
@@ -31,7 +32,8 @@ import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRo
     MatStepperModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    HasRoleAndPermissionDirective
+    HasRoleAndPermissionDirective,
+    StandardButtonComponent
   ],
   templateUrl: './establishments-list.component.html',
   styleUrls: ['./establishments-list.component.css'],

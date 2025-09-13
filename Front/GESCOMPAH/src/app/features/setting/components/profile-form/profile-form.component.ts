@@ -13,6 +13,7 @@ import { CitySelectModel } from '../../models/city.models';
 import { DepartmentSelectModel } from '../../models/department.models';
 import { AppValidators } from '../../../../shared/utils/AppValidators';
 import { UserStore } from '../../../../core/service/permission/User.Store';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -34,7 +35,8 @@ import { MatCardModule } from '@angular/material/card';
     MatSelectModule,
     MatButtonModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    StandardButtonComponent
   ],
   templateUrl: './profile-form.component.html',
   styleUrls: ['./profile-form.component.css']
