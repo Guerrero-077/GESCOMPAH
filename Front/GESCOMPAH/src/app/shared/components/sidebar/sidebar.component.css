@@ -17,13 +17,7 @@
 }
 
 /* Header */
-.sidebar .header {
-  background-color: var(--color-primary);
-  color: var(--color-primary-contrast);
-  text-align: center;
-  padding: 1.5rem 1rem 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,.12);
-}
+ param($m) $block=$m.Groups[1].Value; if($block -notmatch 'border-radius'){ return ".sidebar .header {`n$block`n  border-radius: 0;`n}" } else { return $m.Value } 
 .sidebar .header h3 { margin: 0; font-size: 1.25rem; font-weight: 700; }
 .sidebar .header p  { margin: 0; font-size: .85rem; opacity: .95; }
 
@@ -185,4 +179,5 @@
   .sidebar .header p  { font-size: .8rem; }
   .sidebar .link-content { padding: 0 .75rem; }
 }
+
 
