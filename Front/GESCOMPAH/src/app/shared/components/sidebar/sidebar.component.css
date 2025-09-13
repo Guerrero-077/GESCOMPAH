@@ -24,7 +24,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  height: 72px;        /* altura un poco mayor (igual header app) */
+  height: 80px;        /* altura un poco mayor (igual header app) */
   padding: 0 24px;     /* sin padding vertical */
   box-shadow:
     0 4px 16px rgba(22, 163, 74, 0.15),

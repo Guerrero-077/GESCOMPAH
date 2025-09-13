@@ -7,7 +7,7 @@
   align-items: center;
   background-color: var(--color-primary);
   color: var(--white);
-  height: 72px; /* altura un poco mayor */
+  height: 80px; /* altura un poco mayor */
   padding: 0 24px; /* sin padding vertical para igualar altura */
   box-shadow:
     0 4px 16px rgba(22, 163, 74, 0.15),
