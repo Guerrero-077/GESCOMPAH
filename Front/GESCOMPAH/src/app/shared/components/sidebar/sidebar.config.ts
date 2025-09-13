@@ -16,7 +16,7 @@ export interface BackendMenuItem {
   forms: BackendSubMenuItem[];
 }
 
-// ===== Modelos internos del sidebar (árbol ya armado)
+// Modelos internos del sidebar (árbol ya armado)
 export interface SidebarNode {
   id: number;
   label: string;

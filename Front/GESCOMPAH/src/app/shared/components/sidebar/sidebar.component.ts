@@ -69,9 +69,7 @@ export class SidebarComponent {
       });
   }
 
-  // =========================================================
   // Menú: transforma módulo -> árbol (hasta 3 niveles)
-  // =========================================================
   private transformMenu(backendMenu: readonly BackendMenuItem[] | null): SidebarItem[] {
     if (!backendMenu) return [];
 
@@ -126,7 +124,7 @@ export class SidebarComponent {
       }];
     });
 
-    // --- helpers locales ---
+    // Helpers locales
     function dedupeByRoute(arr: BackendSubMenuItem[]): BackendSubMenuItem[] {
       const seen = new Set<string>();
       return arr.filter(x => {
@@ -137,8 +135,7 @@ export class SidebarComponent {
       });
     }
 
-    // si un nodo "root" no tiene route pero tiene hijos, no pasa nada:
-    // el template lo pintará como título de subgrupo (no clickeable)
+    // Nodo root sin route: el template lo muestra como título (no clickeable)
     function normalizeRoutes(n: SidebarNode): SidebarNode {
       return {
         ...n,
@@ -147,7 +144,7 @@ export class SidebarComponent {
     }
   }
 
-  // ============== Active states ==================
+  // Active states
   isGroupActive(item: SidebarItem): boolean {
     // activo si alguno de sus hijos (o subhijos) está activo
     return (item.children ?? []).some(c => this.isNodeActive(c));
@@ -162,7 +159,7 @@ export class SidebarComponent {
     return !!item.route && this.router.isActive(item.route, this.exactMatch);
   }
 
-  // ============== trackBys ==================
+  // trackBys
   trackByItem = (_: number, item: SidebarItem) => item.label;
   trackByChild = (_: number, child: SidebarNode) => String(child.id ?? child.label);
   trackByGrand = (_: number, child: SidebarNode) => String(child.id ?? child.label);

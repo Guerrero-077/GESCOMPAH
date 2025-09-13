@@ -20,7 +20,7 @@ type UpsertMode = 'append' | 'prepend';
 export class ContractStore {
   private readonly svc = inject(ContractService);
 
-  // ===== Estado base =====
+  // Estado base
   private readonly _items = signal<ReadonlyArray<ContractCard>>([]);
   private readonly _index = signal<ReadonlyMap<number, number>>(new Map());
   private readonly _loading = signal(false);
@@ -30,7 +30,7 @@ export class ContractStore {
   // Para cancelar/ignorar respuestas viejas
   private _lastRequestId = 0;
 
-  // ===== Selectores =====
+  // Selectores
   readonly items = computed(() => this._items());
   readonly loading = computed(() => this._loading());
   readonly error = computed(() => this._error());
@@ -49,7 +49,7 @@ export class ContractStore {
     return i !== undefined ? this._items()[i] : undefined;
   }
 
-  // ===== Helpers colección =====
+  // Helpers de colección
   private rebuildIndex(list: ReadonlyArray<ContractCard>): void {
     const map = new Map<number, number>();
     for (let i = 0; i < list.length; i++) map.set(list[i].id, i);
@@ -157,7 +157,7 @@ export class ContractStore {
     this.patchOne(id, { active } as Partial<ContractCard>);
   }
 
-  // ===== Internos =====
+  // Internos
   private markBusy(id: number, val: boolean): void {
     this._busyIds.update(curr => {
       const next = new Set(curr);
@@ -176,7 +176,7 @@ export class ContractStore {
     this._error.set({ status, code, message: String(m) });
   }
 
-  // ===== I/O =====
+  // I/O
   async loadAll(options: { force?: boolean } = {}): Promise<void> {
     const requestId = ++this._lastRequestId;
     this._loading.set(true);
@@ -235,10 +235,7 @@ export class ContractStore {
     }
   }
 
-  /**
-   * Toggle remoto con estrategia optimista + rollback.
-   * Conserva busyIds por fila y revierte ante error.
-   */
+  /** Toggle remoto (optimista + rollback + busy por fila). */
   async changeActiveStatusRemote(id: number, active: boolean): Promise<void> {
     if (this.isBusy(id)) return;
     const prev = this.getById(id)?.active;

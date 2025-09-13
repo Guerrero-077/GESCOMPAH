@@ -23,14 +23,14 @@ import { ModuleSelectModel, ModuleUpdateModel } from '../../models/module.models
   styleUrls: ['./module.component.css']
 })
 export class ModuleComponent implements OnInit {
-  // ===== Inyección =====
+  // Inyección de dependencias
   private readonly moduleStore = inject(ModuleStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
   constructor(private dialog: MatDialog) {}
 
-  // ===== Estado =====
+  // Estado
   modules$ = this.moduleStore.modules$;
   columns: TableColumn<ModuleSelectModel>[] = [];
   private busyIds = new Set<number>();
@@ -50,7 +50,7 @@ export class ModuleComponent implements OnInit {
     ];
   }
 
-  // ===== Crear =====
+  // Crear
   onCreateNew(): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -69,7 +69,7 @@ export class ModuleComponent implements OnInit {
     ).subscribe();
   }
 
-  // ===== Editar =====
+  // Editar
   onEdit(row: ModuleUpdateModel): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -89,7 +89,7 @@ export class ModuleComponent implements OnInit {
     ).subscribe();
   }
 
-  // ===== Eliminar (lógico) =====
+  // Eliminar (lógico)
   async onDelete(row: ModuleSelectModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar módulo',
@@ -109,14 +109,9 @@ export class ModuleComponent implements OnInit {
   }
 
   onView(row: ModuleSelectModel): void {
-    console.log('Ver:', row);
   }
 
-  // ===== Toggle Activo/Inactivo =====
-  /**
-   * Acepta boolean o {checked:boolean} para evitar perder feedback según el componente emisor.
-   * En el HTML: (toggleChange)="onToggleActive(row, $event)"
-   */
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: ModuleSelectModel, e: boolean | { checked: boolean }): void {
     if (this.isBusy(row.id)) return;
 

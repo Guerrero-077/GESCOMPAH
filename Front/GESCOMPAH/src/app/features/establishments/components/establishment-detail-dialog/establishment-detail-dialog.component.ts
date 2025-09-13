@@ -66,7 +66,6 @@ export class EstablishmentDetailDialogComponent implements OnInit {
   // Método para abrir modal de imagen en tamaño completo
   viewImage(imagePath: string): void {
     // Implementar modal de imagen o lightbox
-    console.log('Abrir imagen:', imagePath);
     window.open(imagePath, '_blank');
   }
 }

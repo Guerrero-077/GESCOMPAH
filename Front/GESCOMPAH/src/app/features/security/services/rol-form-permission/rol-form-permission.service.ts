@@ -9,8 +9,7 @@ import { RolFormPermissionCreateModel, RolFormPermissionGroupedModel, RolFormPer
 export class RolFormPermissionService  extends GenericService<RolFormPermissionGroupedModel, RolFormPermissionCreateModel, RolFormPermissionUpdateModel >{
   protected override resource = 'rolformpermission';
 
-
-  // --- NUEVOS MÉTODOS ---
+  // Métodos específicos
   override getAll(): Observable<RolFormPermissionGroupedModel[]> {
     return this.http.get<RolFormPermissionGroupedModel[]>(this.url('grouped'));
   }

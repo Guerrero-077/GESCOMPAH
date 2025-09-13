@@ -18,7 +18,7 @@ export class EstablishmentService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiURL}/Establishments`;
 
-  // ----------------------------- QUERIES -----------------------------
+  // Consultas
 
   /**
    * Obtener establecimientos:
@@ -47,7 +47,7 @@ export class EstablishmentService {
     return this.http.get<EstablishmentSelect>(`${this.baseUrl}/${id}`, { params });
   }
 
-  // ------------------------------ CRUD ------------------------------
+  // CRUD
 
   create(dto: EstablishmentCreate): Observable<EstablishmentSelect> {
     // Limpia campos locales (archivos/imagenes) si viajan desde el formulario

@@ -40,7 +40,7 @@ export class CityComponent implements OnInit {
     { key: 'departmentName', header: 'Departamento' }
   ];
 
-  // ---- Lock por ítem (evita doble clic durante la llamada)
+  // Lock por ítem (evita doble clic)
   private busyIds = new Set<number>();
   isBusy = (id: number) => this.busyIds.has(id);
 
@@ -109,11 +109,7 @@ export class CityComponent implements OnInit {
     });
   }
 
-  // ===== Toggle Activo/Inactivo =====
-  /**
-   * Acepta boolean o {checked:boolean}. Con OnPush, marcamos la vista tras cambios.
-   * En el HTML: (toggleChange)="onToggleActive(row, $event)"  [disabled]="isBusy(row.id)"
-   */
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: CitySelectModel, e: boolean | { checked: boolean }) {
     if (this.isBusy(row.id)) return;
 

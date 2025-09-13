@@ -11,15 +11,15 @@ import { SquareService } from './square.service';
 export class SquareStore {
   private readonly svc = inject(SquareService);
 
-  // ===== Estado base (UI) =====
+  // Estado base (UI)
   private readonly _items   = signal<SquareSelectModel[]>([]);
   private readonly _loading = signal(false);
   private readonly _error   = signal<string | null>(null);
 
-  // Control de concurrencia por ítem (p. ej., toggle estado)
+  // Concurrencia por ítem (p. ej., toggle)
   private readonly _busyIds = signal<Set<number>>(new Set());
 
-  // ===== Selectores =====
+  // Selectores
   readonly items   = computed(() => this._items());
   readonly loading = computed(() => this._loading());
   readonly error   = computed(() => this._error());
@@ -30,7 +30,7 @@ export class SquareStore {
     return this._busyIds().has(id);
   }
 
-  // ===== Helpers de colección =====
+  // Helpers de colección
   setAll(list: SquareSelectModel[]): void {
     this._items.set(list ?? []);
   }
@@ -94,7 +94,7 @@ export class SquareStore {
     this._error.set(String((e as any)?.message ?? e ?? 'Error'));
   }
 
-  // ===== I/O =====
+  // I/O
   async loadAll(): Promise<void> {
     this._loading.set(true);
     this._error.set(null);
@@ -151,10 +151,7 @@ export class SquareStore {
     }
   }
 
-  /**
-   * Toggle remoto con estrategia optimista y rollback.
-   * Si tu API devuelve la entidad actualizada, se sincroniza; si devuelve void, no hace falta.
-   */
+  /** Toggle remoto (optimista + rollback). */
   async changeActiveStatusRemote(id: number, active: boolean): Promise<void> {
     if (this.isBusy(id)) return; // evita doble clic
     const prev = this.getById(id)?.active; // true/false/undefined

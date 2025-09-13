@@ -65,12 +65,7 @@ namespace Business.Repository
             }
         }
 
-        // ------------------------------------------------------------------------------------
-        // 🔑 Punto de extensión de unicidad:
-        //     - Devuelve la query filtrada por la “clave única” en base a 'candidate'.
-        //     - Si devuelves null, se asume que NO hay regla de unicidad genérica a validar.
-        //     - Úsalo en servicios concretos para definir Name único, claves compuestas, etc.
-        // ------------------------------------------------------------------------------------
+        // Punto de extensión: aplica filtro de unicidad para detectar duplicados.
         protected virtual IQueryable<TEntity>? ApplyUniquenessFilter(IQueryable<TEntity> query, TEntity candidate)
             => null;
 
@@ -87,36 +82,35 @@ namespace Business.Repository
                 BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
                 var candidate = _mapper.Map<TEntity>(dto);
 
-                // 1) Buscar duplicado (incluye inactivos porque GetAllQueryable no filtra IsDeleted)
+                // Buscar duplicado (incluye inactivos; GetAllQueryable no filtra IsDeleted)
                 var query = ApplyUniquenessFilter(Data.GetAllQueryable(), candidate);
                 if (query is not null)
                 {
-                    // Importante: FirstOrDefaultAsync ejecuta en BD sin trackeo (consulta segura)
                     var existing = query.FirstOrDefault();
                     if (existing is not null)
                     {
                         if (!existing.IsDeleted)
                         {
-                            // Duplicado activo ⇒ negocio decide fallar
+                            // Duplicado activo ⇒ falla
                             throw new BusinessException("Ya existe un registro con los mismos datos.");
                         }
 
-                        // 2) Duplicado inactivo ⇒ reactivar y actualizar campos desde el DTO
+                        // Duplicado inactivo ⇒ reactivar y actualizar
                         existing.IsDeleted = false;
-                        _mapper.Map(dto, existing); // aplica cambios del DTO sobre la entidad “reactivada”
-                        var updated = await Data.UpdateAsync(existing); // Data.UpdateAsync realiza el SaveChanges
+                        _mapper.Map(dto, existing);
+                        var updated = await Data.UpdateAsync(existing);
                         return _mapper.Map<TDtoGet>(updated);
                     }
                 }
 
-                // 3) No existe duplicado ⇒ crear
-                candidate.InitializeLogicalState(); // asegura IsDeleted = false (estado lógico inicial)
+                // No existe duplicado ⇒ crear
+                candidate.InitializeLogicalState();
                 var created = await Data.AddAsync(candidate);
                 return _mapper.Map<TDtoGet>(created);
             }
             catch (DbUpdateException dbx)
             {
-                // Si hay un índice único en BD, traducimos a excepción de negocio más clara
+                // Índice único en BD ⇒ mensaje de negocio claro
                 throw new BusinessException("Violación de unicidad al crear el registro. Revisa valores únicos.", dbx);
             }
             catch (Exception ex)
@@ -181,20 +175,7 @@ namespace Business.Repository
             }
         }
 
-        //public override async Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active)
-        //{
-        //    var entity = await Data.GetByIdAsync(id);
-        //    if (entity == null)
-        //        throw new KeyNotFoundException($"No se encontró la plaza con ID {id}");
-
-        //    if (entity.Active != active)
-        //    {
-        //        entity.Active = active;
-        //        await Data.UpdateAsync(entity);
-        //    }
-
-        //    return _mapper.Map<TDtoGet>(entity);
-        //}
+        
 
 
         public override async Task UpdateActiveStatusAsync(int id, bool active)

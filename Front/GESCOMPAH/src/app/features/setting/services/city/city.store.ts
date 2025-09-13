@@ -23,6 +23,7 @@ export class CityStore {
     this._cities.next(val);
   }
 
+  // Carga inicial
   loadAll() {
     this.cityService.getAll().pipe(
       tap(data => this.cities = data),
@@ -32,6 +33,7 @@ export class CityStore {
       })
     ).subscribe();
   }
+  // Cargar por departamento
   loadByDepartment(departmentId: number) {
     this.cityService.getCitiesByDepartment(departmentId).pipe(
       tap(data => this.cities = data),
@@ -44,17 +46,13 @@ export class CityStore {
 
   create(city: CityCreate): Observable<CitySelectModel> {
     return this.cityService.create(city).pipe(
-      tap(() => {
-        this.loadAll(); // Force refresh
-      })
+      tap(() => this.loadAll())
     );
   }
 
   update(updateDto: CityUpdate): Observable<CitySelectModel> {
     return this.cityService.update(updateDto.id, updateDto).pipe(
-      tap(() => {
-        this.loadAll(); // Force refresh
-      })
+      tap(() => this.loadAll())
     );
   }
 

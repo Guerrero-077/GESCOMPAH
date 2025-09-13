@@ -25,23 +25,23 @@ import { IsActive } from '../../../../core/models/IsAcitve.models';
 })
 export class RoleComponent implements OnInit {
 
-  // ====== Inyección estilo Angular moderno ======
+  // Inyección de dependencias
   private readonly dialog            = inject(MatDialog);
   private readonly roleStore         = inject(RoleStore);
   private readonly confirmDialog     = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
 
-  // ====== Estado de datos ======
+  // Estado de datos
   readonly roles$ = this.roleStore.roles$;
 
-  // ====== Columnas de la GenericTable ======
+  // Columnas de la tabla
   columns: TableColumn<RoleSelectModel>[] = [];
 
   // Template para el toggle de estado
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
-  // ====== Ciclo de vida ======
+  // Ciclo de vida
   ngOnInit(): void {
     this.pageHeaderService.setPageHeader('Roles', 'Gestión de Roles');
 
@@ -59,7 +59,7 @@ export class RoleComponent implements OnInit {
     ];
   }
 
-  // ====== Helpers ======
+  // Helpers
   trackById = (_: number, it: RoleSelectModel) => it.id;
 
   private notifySuccess(title: string, message: string) {
@@ -69,7 +69,7 @@ export class RoleComponent implements OnInit {
     this.sweetAlertService.showNotification('Error', message, 'error');
   }
 
-  // ====== CRUD: Crear ======
+  // Crear
   onCreateNew(): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -88,7 +88,7 @@ export class RoleComponent implements OnInit {
     });
   }
 
-  // ====== CRUD: Editar ======
+  // Editar
   onEdit(row: RoleSelectModel): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -110,13 +110,12 @@ export class RoleComponent implements OnInit {
     });
   }
 
-  // ====== CRUD: Ver ======
+  // Ver
   onView(row: RoleSelectModel): void {
-    // Punto de extensión: puedes abrir un dialogo de detalle o navegar.
-    console.log('Ver:', row);
+    // Ver detalle (diálogo o navegación)
   }
 
-  // ====== CRUD: Eliminar (borrado lógico) ======
+  // Eliminar (borrado lógico)
   async onDelete(row: RoleSelectModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar rol',
@@ -133,12 +132,7 @@ export class RoleComponent implements OnInit {
     });
   }
 
-  // ====== Toggle Activo/Inactivo (UI optimista + rollback) ======
-  // En el HTML del template del toggle:
-  // <app-toggle-button-component
-  //   [checked]="row.active"
-  //   (toggleChange)="onToggleActive(row, $event)">
-  // </app-toggle-button-component>
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: IsActive, e: boolean | { checked: boolean }): void {
     const checked = typeof e === 'boolean' ? e : !!e?.checked;
     const prev = row.active;

@@ -59,7 +59,7 @@ export class RegisterComponent implements OnInit {
   submitError = signal<string | null>(null);
   loadingCities = signal(false);
 
-  // ====== FORM ROOT ======
+  // Formulario raíz
   form: FormGroup = this.fb.group({
     // Paso 1: Ubicación
     location: this.fb.group({

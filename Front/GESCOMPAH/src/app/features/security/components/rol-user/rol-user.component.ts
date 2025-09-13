@@ -49,7 +49,7 @@ export class RolUserComponent implements OnInit {
     });
   }
 
-  // -- helpers para selects --
+  // Helpers para selects
   private getUserOptions$() {
     return this.userService.getAll().pipe(
       catchError(() => of([])),
@@ -69,7 +69,7 @@ export class RolUserComponent implements OnInit {
     );
   }
 
-  // CREATE
+  // Crear
   onCreateNew() {
     forkJoin({
       userOpts: this.getUserOptions$(),
@@ -218,6 +218,5 @@ export class RolUserComponent implements OnInit {
   }
 
   onView(row: RolUserSelectModel) {
-    console.log('Ver RolUser:', row);
   }
 }

@@ -26,7 +26,6 @@ namespace Business.Services.SecurityAuthentication
         IMapper mapper,
         ISendCode emailService,
         IPasswordResetCodeRepository passwordResetRepo,
-        //IValidatorService validator,
         IUserContextService userContextService,
         IPersonRepository personRepository
     ) : IAuthService
@@ -38,7 +37,6 @@ namespace Business.Services.SecurityAuthentication
         private readonly IMapper _mapper = mapper;
         private readonly ISendCode _emailService = emailService;
         private readonly IPasswordResetCodeRepository _passwordResetRepo = passwordResetRepo;
-        //private readonly IValidatorService _validator = validator;
         private readonly IUserContextService _userContext = userContextService;
         private readonly IPersonRepository _personRepository = personRepository;
 
@@ -97,48 +95,9 @@ namespace Business.Services.SecurityAuthentication
             await _userRepository.UpdateAsync(user);
         }
 
-        // ✅ Ahora delega completamente en UserContextService:
+        //  Sedelega UserContextService:
         public Task<UserMeDto> BuildUserContextAsync(int userId)
             => _userContext.BuildUserContextAsync(userId);
-
-
-        //public async Task<UserDto> RegisterAsync(RegisterDto dto)
-        //{
-        //    try
-        //    {
-        //        //await _validator.ValidateAsync(dto);
-
-        //        if (await _userRepository.ExistsByEmailAsync(dto.Email))
-        //            throw new BusinessException("El correo ya está registrado.");
-
-        //        if (await _personRepository.ExistsByDocumentAsync(dto.Document))
-        //            throw new BusinessException("Ya existe una persona con este número de documento.");
-
-        //        var person = _mapper.Map<Person>(dto);
-        //        var user = _mapper.Map<User>(dto);
-
-        //        var hasher = new PasswordHasher<User>();
-        //        user.Password = hasher.HashPassword(user, dto.Password);
-        //        user.Person = person;
-
-        //        await _userRepository.AddAsync(user);
-        //        await _rolUserData.AsignateRolDefault(user);
-
-        //        var createdUser = await _userRepository.GetByIdAsync(user.Id)
-        //            ?? throw new BusinessException("Error interno: no se pudo recuperar el usuario tras registrarlo.");
-
-        //        // ⚠️ Importante: invalidar cache del contexto
-        //        _userContext.InvalidateCache(user.Id);
-
-        //        return _mapper.Map<UserDto>(createdUser);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new BusinessException($"Error en el registro del usuario: {ex.Message}", ex);
-        //    }
-        //}
-
-
-
+        
     }
 }

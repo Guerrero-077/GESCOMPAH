@@ -23,14 +23,14 @@ import { PermissionSelectModel, PermissionUpdateModel } from '../../models/permi
   styleUrls: ['./permission.component.css']
 })
 export class PermissionComponent implements OnInit {
-  // ===== Inyección =====
+  // Inyección de dependencias
   private readonly permissionStore = inject(PermissionStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
   constructor(private dialog: MatDialog) {}
 
-  // ===== Estado =====
+  // Estado
   permissions$ = this.permissionStore.permissions$;
   columns: TableColumn<PermissionSelectModel>[] = [];
   private busyIds = new Set<number>();
@@ -48,7 +48,7 @@ export class PermissionComponent implements OnInit {
     ];
   }
 
-  // ===== Crear =====
+  // Crear
   onCreateNew(): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -67,7 +67,7 @@ export class PermissionComponent implements OnInit {
     ).subscribe();
   }
 
-  // ===== Editar =====
+  // Editar
   onEdit(row: PermissionSelectModel): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -87,7 +87,7 @@ export class PermissionComponent implements OnInit {
     ).subscribe();
   }
 
-  // ===== Eliminar (lógico) =====
+  // Eliminar (lógico)
   async onDelete(row: PermissionSelectModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar permiso',
@@ -107,14 +107,9 @@ export class PermissionComponent implements OnInit {
   }
 
   onView(row: PermissionSelectModel): void {
-    console.log('Ver:', row);
   }
 
-  // ===== Toggle Activo/Inactivo =====
-  /**
-   * Acepta boolean o {checked:boolean} porque distintos toggles emiten distinto payload.
-   * En el HTML: (toggleChange)="onToggleActive(row, $event)"
-   */
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: PermissionSelectModel, e: boolean | { checked: boolean }): void {
     if (this.isBusy(row.id)) return;
 

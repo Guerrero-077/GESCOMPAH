@@ -11,15 +11,15 @@ import {
 export class TenantStore {
   private readonly svc = inject(TenantsService);
 
-  // ===== Estado base =====
+  // Estado base
   private readonly _items   = signal<TenantsSelectModel[]>([]);
   private readonly _loading = signal(false);
   private readonly _error   = signal<string | null>(null);
 
-  // Control de concurrencia por ítem (p. ej., toggle estado)
+  // Concurrencia por ítem (p. ej., toggle)
   private readonly _busyIds = signal<Set<number>>(new Set());
 
-  // ===== Selectores =====
+  // Selectores
   readonly items   = computed(() => this._items());
   readonly loading = computed(() => this._loading());
   readonly error   = computed(() => this._error());
@@ -30,12 +30,12 @@ export class TenantStore {
     return this._busyIds().has(id);
   }
 
-  // ===== Helpers colección =====
+  // Helpers de colección
   setAll(list: TenantsSelectModel[]): void {
     this._items.set(list ?? []);
   }
 
-  /** Inserta/actualiza preservando orden actual (no reordena todo el array). */
+  /** Inserta/actualiza sin reordenar el array. */
   upsertMany(list: TenantsSelectModel[]): void {
     if (!list?.length) return;
     const byId = new Map(list.map(it => [it.id, it]));
@@ -94,7 +94,7 @@ export class TenantStore {
     this._error.set(String((e as any)?.message ?? e ?? 'Error'));
   }
 
-  // ===== I/O =====
+  // I/O
   async loadAll(): Promise<void> {
     this._loading.set(true);
     this._error.set(null);
@@ -138,8 +138,7 @@ export class TenantStore {
     }
   }
 
-  // Si tu API hace borrado lógico y no quieres mantenerlo visible, removemos localmente.
-  // Si prefieres mostrarlo "inactivo", cambia por: this.changeActiveStatus(id, false)
+  // Borrado lógico: eliminar de la vista. Si prefieres mantenerlo, usar changeActiveStatus(..., false).
   async deleteLogic(id: number): Promise<void> {
     try {
       await firstValueFrom(this.svc.deleteLogic(id));
@@ -150,10 +149,7 @@ export class TenantStore {
     }
   }
 
-  /**
-   * Cambia el estado remoto con estrategia optimista, rollback y “busy por id”.
-   * Si el API devuelve la entidad actualizada, la sincroniza; si devuelve void, no hace falta.
-   */
+  /** Cambia estado remoto (optimista + rollback + busy por id). */
   async changeActiveStatusRemote(id: number, active: boolean): Promise<void> {
     if (this.isBusy(id)) return; // evita doble clic
     const prev = this.getById(id)?.active; // true/false/undefined

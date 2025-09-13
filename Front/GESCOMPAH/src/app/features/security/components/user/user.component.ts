@@ -53,7 +53,7 @@ export class UserComponent implements OnInit {
     ];
   }
 
-  // ----- Toggle estado (activo/inactivo) -----
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: UserSelectModel, e: MatSlideToggleChange) {
     const previous = row.active;
     row.active = e.checked; // Optimistic UI
@@ -82,7 +82,7 @@ export class UserComponent implements OnInit {
     });
   }
 
-  // ----- EDIT -----
+  // Editar
   onEdit(row: UserSelectModel) {
     const id = row.id;
     const initial = { email: row.email, password: '' };
@@ -116,7 +116,7 @@ export class UserComponent implements OnInit {
     });
   }
 
-  // ----- CREATE -----
+  // Crear
   onCreateNew() {
     this.personService.getAll().pipe(
       catchError(() => of([])),
@@ -189,6 +189,5 @@ export class UserComponent implements OnInit {
   }
 
   onView(row: UserSelectModel) {
-    console.log('Ver usuario:', row);
   }
 }

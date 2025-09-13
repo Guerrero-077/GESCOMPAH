@@ -52,7 +52,6 @@ export class SquareListComponent implements OnInit {
   }
 
   onView(row: SquareSelectModel) {
-    console.log('Ver:', row);
   }
 
   onCreate(): void {

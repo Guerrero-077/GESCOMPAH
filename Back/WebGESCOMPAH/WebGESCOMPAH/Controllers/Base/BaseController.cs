@@ -75,11 +75,6 @@ namespace WebGESCOMPAH.Controllers.Base
             return NoContent();
         }
 
-        //public virtual async Task<ActionResult<TGet>> ChangeActiveStatus(
-        //    int id, [FromBody] ChangeActiveStatusDto body)
-        //{
-        //    var updated = await Service.UpdateActiveStatusAsync(id, body.Active );
-        //    return updated is null ? NotFound() : Ok(updated);
-        //}
+        
     }
 }

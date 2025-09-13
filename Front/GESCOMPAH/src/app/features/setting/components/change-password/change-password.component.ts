@@ -89,7 +89,7 @@ export class ChangePasswordComponent {
   }
 }
 
-// ===== Validadores reutilizables =====
+// Validadores reutilizables
 function matchPasswords(passKey: string, confirmKey: string) {
   return (group: AbstractControl): ValidationErrors | null => {
     const pass = group.get(passKey)?.value;

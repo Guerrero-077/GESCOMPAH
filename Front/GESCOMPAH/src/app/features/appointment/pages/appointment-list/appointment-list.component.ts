@@ -144,12 +144,11 @@ export class AppointmentListComponent implements OnInit {
   }
 
   onView(row: AppointmentSelectModel) {
-    console.log('Ver:', row);
   }
 
 
 
-  // ----- Toggle estado (activo/inactivo) -----
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: AppointmentSelectModel, e: { checked: boolean }) {
     const previous = row.active;
     row.active = e.checked;

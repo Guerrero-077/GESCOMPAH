@@ -33,7 +33,7 @@ type SelectOption<T = number> = { value: T; label: string };
 })
 export class FormModuleComponent implements OnInit {
 
-  // ===== Inyección =====
+  // Inyección de dependencias
   private readonly formService        = inject(FormService);
   private readonly moduleService      = inject(ModuleService);
   private readonly formModuleService  = inject(FormModuleService);
@@ -41,17 +41,17 @@ export class FormModuleComponent implements OnInit {
   private readonly confirmDialog      = inject(ConfirmDialogService);
   private readonly sweetAlertService  = inject(SweetAlertService);
 
-  // ===== Estado =====
+  // Estado
   private readonly formModulesSubject = new BehaviorSubject<FormModuleSelectModel[]>([]);
   readonly formModules$               = this.formModulesSubject.asObservable();
   private readonly busyToggleIds      = new Set<number>(); // evita dobles clics en toggle
 
-  // ===== Tabla =====
+  // Tabla
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
   columns!: TableColumn<FormModuleSelectModel>[];
   trackById = (_: number, it: FormModuleSelectModel) => it.id;
 
-  // ===== Ciclo de vida =====
+  // Ciclo de vida
   ngOnInit(): void {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
@@ -62,7 +62,7 @@ export class FormModuleComponent implements OnInit {
     this.loadFormModules();
   }
 
-  // ===== Utilidades UI =====
+  // Utilidades UI
   private notifySuccess(title: string, msg: string) {
     this.sweetAlertService.showNotification(title, msg, 'success');
   }
@@ -73,7 +73,7 @@ export class FormModuleComponent implements OnInit {
     this.sweetAlertService.showNotification('Advertencia', msg, 'warning');
   }
 
-  // ===== Data =====
+  // Datos
   private loadFormModules(): void {
     this.formModuleService.getAll().pipe(take(1)).subscribe({
       next: (data) => this.formModulesSubject.next(data as FormModuleSelectModel[]),
@@ -84,7 +84,7 @@ export class FormModuleComponent implements OnInit {
     });
   }
 
-  // --- helpers para selects ---
+  // Helpers para selects
   private getFormOptions$() {
     return this.formService.getAll().pipe(
       take(1),
@@ -105,7 +105,7 @@ export class FormModuleComponent implements OnInit {
     );
   }
 
-  // ===== CREATE =====
+  // Crear
   onCreateNew(): void {
     forkJoin({
       formOpts: this.getFormOptions$(),
@@ -224,7 +224,7 @@ export class FormModuleComponent implements OnInit {
     });
   }
 
-  // ===== DELETE =====
+  // Eliminar
   async onDelete(row: FormModuleSelectModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar relación Form–Module',
@@ -247,16 +247,10 @@ export class FormModuleComponent implements OnInit {
   }
 
   onView(row: FormModuleSelectModel): void {
-    // Punto de extensión: dialog de detalle, navegación, etc.
-    console.log('Detalle FormModule:', row);
+    // Ver detalle (diálogo o navegación)
   }
 
-  // ===== Toggle activo/inactivo (optimista + rollback + guarda de concurrencia) =====
-  // En el template del toggle:
-  // <app-toggle-button-component
-  //   [checked]="row.active"
-  //   (toggleChange)="onToggleActive(row, $event)">
-  // </app-toggle-button-component>
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: FormModuleSelectModel, e: { checked: boolean } | boolean): void {
     const nextValue = typeof e === 'boolean' ? e : !!e?.checked;
 

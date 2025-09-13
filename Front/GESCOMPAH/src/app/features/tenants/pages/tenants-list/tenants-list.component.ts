@@ -74,7 +74,7 @@ export class TenantsListComponent implements OnInit {
     await this.store.loadAll();
   }
 
-  // -------- CRUD --------
+  // CRUD
   onCreate(): void {
     const data: TenantFormData = { mode: 'create' };
     const ref = this.dialog.open(TenantsFormDialogComponent, { width: '720px', data });
@@ -136,7 +136,7 @@ export class TenantsListComponent implements OnInit {
     // (opcional) ver detalle
   }
 
-  // Toggle estado → usa store (optimista + rollback si falla)
+  // Toggle estado (store: optimista + rollback)
   async onToggleActive(
     id: number | null | undefined,
     e: { checked: boolean } | boolean | null | undefined
@@ -160,7 +160,7 @@ export class TenantsListComponent implements OnInit {
     }
   }
 
-  // -------- Helpers --------
+  // Helpers
   private toUpdateDto(
     row: TenantsSelectModel,
     partial: Partial<TenantsUpdateModel>

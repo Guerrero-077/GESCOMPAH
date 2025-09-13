@@ -13,7 +13,7 @@ export class EstablishmentStore {
   // Servicio de datos
   private readonly svc = inject(EstablishmentService);
 
-  // ===== Estado base (UI) =====
+  // Estado base (UI)
   private readonly _items = signal<EstablishmentSelect[]>([]);
   private readonly _loading = signal(false);
   private readonly _error = signal<string | null>(null);
@@ -21,7 +21,7 @@ export class EstablishmentStore {
   /** true = la vista sólo mostrará activos (filtro de UI, no del backend) */
   private readonly _activeOnlyView = signal(false);
 
-  // ===== Selectores (derivados) =====
+  // Selectores (derivados)
   readonly items = computed(() => this._items());               // todos
   readonly loading = computed(() => this._loading());
   readonly error = computed(() => this._error());
@@ -33,12 +33,12 @@ export class EstablishmentStore {
     return this._items().filter(e => (onlyActive ? e.active : true));
   });
 
-  // ===== Configuración de vista =====
+  // Configuración de vista
   setActiveOnlyView(flag: boolean): void {
     this._activeOnlyView.set(!!flag);
   }
 
-  // ===== Operaciones de colección (UI) =====
+  // Operaciones de colección (UI)
   setAll(list: EstablishmentSelect[]): void {
     this._items.set(list ?? []);
   }
@@ -96,7 +96,7 @@ export class EstablishmentStore {
     this.changeActiveStatus(id, active);
   }
 
-  // ===== I/O (async, sin subscribe; el servicio hace HTTP) =====
+  // I/O (async; el servicio hace HTTP)
   /** Carga inicial; si quieres filtrar en el backend, ajusta aquí. */
   async loadAll(): Promise<void> {
     this._loading.set(true);

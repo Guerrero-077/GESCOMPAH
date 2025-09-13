@@ -22,14 +22,14 @@ import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-h
 })
 export class FormComponent implements OnInit {
 
-  // ===== Inyección de dependencias =====
+  // Inyección de dependencias
   private readonly formStore = inject(FormStore);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
   constructor(private dialog: MatDialog) {}
 
-  // ===== Estado / datos =====
+  // Estado / datos
   forms$ = this.formStore.forms$;
   selectedForm: FormSelectModel | null = null;
   columns: TableColumn<FormSelectModel>[] = [];
@@ -52,7 +52,7 @@ export class FormComponent implements OnInit {
     ];
   }
 
-  // ===== Crear =====
+  // Crear
   onCreateNew(): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -81,7 +81,7 @@ export class FormComponent implements OnInit {
     ).subscribe();
   }
 
-  // ===== Editar =====
+  // Editar
   onEdit(row: FormUpdateModel): void {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -111,7 +111,7 @@ export class FormComponent implements OnInit {
     ).subscribe();
   }
 
-  // ===== Eliminar (lógico) =====
+  // Eliminar (lógico)
   async onDelete(row: FormSelectModel): Promise<void> {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar form',
@@ -142,14 +142,9 @@ export class FormComponent implements OnInit {
   }
 
   onView(row: FormSelectModel): void {
-    console.log('Ver:', row);
   }
 
-  // ===== Toggle Activo/Inactivo =====
-  /**
-   * NOTA: algunos toggles emiten boolean (true/false) y otros emiten {checked:boolean}.
-   * Este handler acepta ambos para evitar “no ver feedback”.
-   */
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: FormSelectModel, e: boolean | { checked: boolean }): void {
     if (this.isBusy(row.id)) return;
 

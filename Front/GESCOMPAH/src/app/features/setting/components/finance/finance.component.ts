@@ -105,8 +105,7 @@ export class FinanceComponent {
   }
 
 
-  // ===== Toggle Activo/Inactivo (optimista + rollback sencillo) =====
-  // En el HTML: (toggleChange)="onToggleActive(row, $event)"
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: IsActive, e: boolean | { checked: boolean }) {
     const checked = typeof e === 'boolean' ? e : !!e?.checked;
     const prev = row.active;

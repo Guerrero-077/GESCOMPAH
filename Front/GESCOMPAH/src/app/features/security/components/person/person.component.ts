@@ -26,21 +26,21 @@ type SelectOption<T = number> = { value: T; label: string };
 })
 export class PersonComponent implements OnInit {
 
-  // ===== Inyección =====
+  // Inyección de dependencias
   private readonly personStore       = inject(PersonStore);
   private readonly confirmDialog     = inject(ConfirmDialogService);
   private readonly dialog            = inject(MatDialog);
   private readonly cityService       = inject(CityService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  // ===== Estado =====
+  // Estado
   readonly persons$ = this.personStore.persons$;
   columns: TableColumn<PersonSelectModel>[] = [];
   private readonly busyToggleIds = new Set<number>(); // evita dobles clics en toggle
 
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
-  // ===== Ciclo de vida =====
+  // Ciclo de vida
   ngOnInit(): void {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
@@ -54,7 +54,7 @@ export class PersonComponent implements OnInit {
     ];
   }
 
-  // ===== Utils UI =====
+  // Utilidades UI
   trackById = (_: number, it: PersonSelectModel) => it.id;
   private notifySuccess(title: string, msg: string) {
     this.sweetAlertService.showNotification(title, msg, 'success');
@@ -63,7 +63,7 @@ export class PersonComponent implements OnInit {
     this.sweetAlertService.showNotification('Error', msg, 'error');
   }
 
-  // ===== Helpers =====
+  // Helpers
   private getCityOptions$() {
     return this.cityService.getAll().pipe(
       take(1),
@@ -74,7 +74,7 @@ export class PersonComponent implements OnInit {
     );
   }
 
-  // ===== Editar =====
+  // Editar
   onEdit(row: PersonSelectModel) {
     this.getCityOptions$().subscribe((cityOptions) => {
       const dialogRef = this.dialog.open(FormDialogComponent, {
@@ -99,7 +99,7 @@ export class PersonComponent implements OnInit {
     });
   }
 
-  // ===== Crear =====
+  // Crear
   onCreateNew() {
     this.getCityOptions$().subscribe((cityOptions) => {
       const dialogRef = this.dialog.open(FormDialogComponent, {
@@ -124,7 +124,7 @@ export class PersonComponent implements OnInit {
     });
   }
 
-  // ===== Eliminar =====
+  // Eliminar
   async onDelete(row: PersonSelectModel) {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar Persona',
@@ -144,16 +144,10 @@ export class PersonComponent implements OnInit {
   }
 
   onView(row: PersonSelectModel) {
-    // Punto de extensión: diálogo de detalle, navegación, etc.
-    console.log('Ver persona:', row);
+    // Ver detalle (diálogo o navegación)
   }
 
-  // ===== Toggle activo/inactivo (optimista + rollback + guarda de concurrencia) =====
-  // En el template del toggle:
-  // <app-toggle-button-component
-  //   [checked]="row.active"
-  //   (toggleChange)="onToggleActive(row, $event)">
-  // </app-toggle-button-component>
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: PersonSelectModel, e: { checked: boolean } | boolean) {
     const nextValue = typeof e === 'boolean' ? e : !!e?.checked;
 
