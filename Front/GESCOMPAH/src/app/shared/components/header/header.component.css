@@ -5,7 +5,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--color-primary);
+  background: var(--gradient-primary);
   color: var(--white);
   height: 80px; /* altura unificada */
   padding: 0 24px; /* sin padding vertical para igualar altura */
@@ -18,8 +18,17 @@
   backdrop-filter: blur(10px);
 }
 
-/* Shimmer deshabilitado (sin degradado) */
-.header-container::before { content: none; display: none; }
+/* Efecto shimmer sutil en el header */
+.header-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: headerShimmer 4s infinite;
+}
 
 @keyframes headerShimmer {
   0% { left: -100%; }
