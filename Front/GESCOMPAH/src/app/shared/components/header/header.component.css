@@ -7,8 +7,8 @@
   align-items: center;
   background-color: var(--color-primary);
   color: var(--white);
-  padding: 16px 24px;
-  min-height: 64px; /* alinear sidebar/header */
+  height: 64px; /* altura estándar */
+  padding: 0 24px; /* sin padding vertical para igualar altura */
   box-shadow:
     0 4px 16px rgba(22, 163, 74, 0.15),
     0 2px 8px rgba(22, 163, 74, 0.1);

@@ -24,12 +24,14 @@
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  padding: 16px 24px; /* igual que header principal */
-  min-height: 64px;   /* altura alineada con header principal */
+  height: 64px;        /* altura estándar (igual header app) */
+  padding: 0 24px;     /* sin padding vertical */
   box-shadow:
     0 4px 16px rgba(22, 163, 74, 0.15),
     0 2px 8px rgba(22, 163, 74, 0.1);
-  border-radius: 0; /* sin esquinas redondeadas */
+  border-radius: 0;    /* sin esquinas redondeadas */
+  border: none;        /* sin bordes */
+  margin: 0;           /* sin márgenes */
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
