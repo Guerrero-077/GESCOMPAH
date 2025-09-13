@@ -5,7 +5,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--color-primary);
+  background: #16a34a !important; /* color sólido exacto */
+  background-image: none !important;
   color: var(--white);
   height: 80px; /* altura un poco mayor */
   padding: 0 24px; /* sin padding vertical para igualar altura */
@@ -19,7 +20,7 @@
 }
 
 /* Shimmer deshabilitado (sin degradado) */
-.header-container::before { content: none; display: none; }
+.header-container::before { content: none !important; display: none !important; }
 
 @keyframes headerShimmer {
   0% { left: -100%; }

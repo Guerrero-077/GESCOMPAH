@@ -18,7 +18,8 @@
 
 /* Header */
 .sidebar .header {
-  background-color: var(--color-primary);
+  background: #16a34a !important; /* color sólido exacto (igual header app) */
+  background-image: none !important;
   color: var(--color-primary-contrast);
   display: flex;
   flex-direction: column;
@@ -41,7 +42,7 @@
 
 /* Efecto shimmer igual al header principal */
 /* Shimmer deshabilitado (sin degradado) */
-.sidebar .header::before { content: none; display: none; }
+.sidebar .header::before { content: none !important; display: none !important; }
 
 /* Contenedor menÃº */
 .sidebar .menu {
