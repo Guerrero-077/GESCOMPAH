@@ -17,9 +17,23 @@
 }
 
 /* Header */
- param($m) $block=$m.Groups[1].Value; if($block -notmatch 'border-radius'){ return ".sidebar .header {`n$block`n  border-radius: 0;`n}" } else { return $m.Value } 
-.sidebar .header h3 { margin: 0; font-size: 1.25rem; font-weight: 700; }
-.sidebar .header p  { margin: 0; font-size: .85rem; opacity: .95; }
+.sidebar .header {
+  background: var(--gradient-primary);
+  color: var(--color-primary-contrast);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 16px 24px; /* igual que header principal */
+  min-height: 64px;   /* altura alineada con header principal */
+  box-shadow:
+    0 4px 16px rgba(22, 163, 74, 0.15),
+    0 2px 8px rgba(22, 163, 74, 0.1);
+  border-radius: 0; /* sin esquinas redondeadas */
+  backdrop-filter: blur(10px);
+}
+.sidebar .header h3 { margin: 0; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; }
+.sidebar .header p  { margin: 0; font-size: .9rem; opacity: .9; }
 
 /* Contenedor menÃº */
 .sidebar .menu {
