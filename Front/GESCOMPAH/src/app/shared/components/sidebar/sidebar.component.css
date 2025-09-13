@@ -24,7 +24,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  height: 64px;        /* altura estándar (igual header app) */
+  height: 72px;        /* altura un poco mayor (igual header app) */
   padding: 0 24px;     /* sin padding vertical */
   box-shadow:
     0 4px 16px rgba(22, 163, 74, 0.15),
@@ -40,16 +40,8 @@
 .sidebar .header p  { margin: 0; font-size: .9rem; opacity: .9; }
 
 /* Efecto shimmer igual al header principal */
-.sidebar .header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  animation: headerShimmer 4s infinite;
-}
+/* Shimmer deshabilitado (sin degradado) */
+.sidebar .header::before { content: none; display: none; }
 
 /* Contenedor menÃº */
 .sidebar .menu {
