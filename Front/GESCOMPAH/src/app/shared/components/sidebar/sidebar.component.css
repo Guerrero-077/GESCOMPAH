@@ -18,7 +18,7 @@
 
 /* Header */
 .sidebar .header {
-  background: var(--gradient-primary);
+  background-color: var(--color-primary);
   color: var(--color-primary-contrast);
   display: flex;
   flex-direction: column;
