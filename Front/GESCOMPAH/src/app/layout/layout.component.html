@@ -1,6 +1,6 @@
 <mat-drawer-container class="layout-container" autosize>
   <!-- SIDEBAR -->
-  <mat-drawer #drawer class="layout-sidebar border-default" [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)">
+  <mat-drawer #drawer class="layout-sidebar" [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="!(isHandset$ | async)">
     <app-sidebar (closeSidebar)="drawer.toggle()"></app-sidebar>
   </mat-drawer>
 

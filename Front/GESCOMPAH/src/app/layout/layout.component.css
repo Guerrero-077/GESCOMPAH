@@ -14,7 +14,7 @@
 .layout-sidebar {
   width: 250px;
   border-radius: 0;
-  border-right: 1px solid var(--color-border);
+  border-right: none;
   box-shadow: 2px 0 8px rgba(22, 163, 74, 0.08); /* Sombra verde sutil */
 }
 
@@ -55,7 +55,7 @@
 .layout-sidebar-enhanced {
   width: 250px;
   border-radius: 0;
-  border-right: 1px solid var(--color-border);
+  border-right: none;
   box-shadow:
     2px 0 16px rgba(22, 163, 74, 0.08),
     0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -127,7 +127,7 @@
 .layout-sidebar-final {
   width: 250px;
   border-radius: 0;
-  border-right: 1px solid var(--color-border);
+  border-right: none;
   box-shadow: var(--sidebar-shadow);
   background: var(--sidebar-bg);
   position: relative;
@@ -166,4 +166,5 @@
     border-color: rgba(255, 255, 255, 0.1);
   }
 }
+
 
