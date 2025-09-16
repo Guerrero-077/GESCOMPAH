@@ -60,7 +60,7 @@ export class EstablishmentsListComponent implements OnInit {
     // Si otro módulo notifica cambios, refresca
     this.sharedEvents.plazaStateChanged$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => { void this.store.loadAll(); });
+      .subscribe(() => { void this.store.loadCardsAll(); });
   }
 
   openCreateDialog(): void {
@@ -124,3 +124,4 @@ export class EstablishmentsListComponent implements OnInit {
     });
   }
 }
+

@@ -1,44 +1,27 @@
 <div class="row d-flex justify-content-center gap-2">
-    <!-- <div class="row d-flex justify-content-between ">
-        <app-card-info class="col-md-6 col-sm-12 col-lg-3 mb-2" title="Total de Plazas" [value]="9" [total]="75">
-            <div icon>
-                <i class="fa-solid fa-building card-icon"></i>
-            </div>
-        </app-card-info>
-        <app-card-info class="col-md-6 col-sm-12 col-lg-3 mb-2" title="Total de Locales" [value]="64" [total]="125">
-            <div icon>
-                <i class="fa-solid fa-store card-icon"></i>
-            </div>
-        </app-card-info>
-        <app-card-info class="col-md-6 col-sm-12 col-lg-3 mb-2" title="Contratos Activos" [value]="23" [total]="75">
-            <div icon>
-                <i class="fa-solid fa-file card-icon"></i>
-            </div>
-        </app-card-info>
-        <app-card-info class="col-md-6 col-sm-12 col-lg-3 mb-2" title="Usuarios" [value]="100" [total]="250">
-            <div icon>
-                <i class="fa-solid fa-user card-icon"></i>
-            </div>
-        </app-card-info>
-    </div> -->
-    <div class="row d-flex justify-content-between ">
-        <div class="col-md-6 col-sm-12 my-3">
-            <app-circle-chart [title]="'Locales'" [labels]="[ 'Disponibles','Arrendados']"
-                [data]="[activeEstablishment(), inactiveEstablishment()]" [colors]="['#22c55e','#f87171']">
-            </app-circle-chart>
-        </div>
-        <div class="col-md-6 col-sm-12 my-3">
-            <app-circle-chart [title]="'Contratos'" [labels]="['Activos', 'Inactivos']"
-                [data]="[activeContract(), inactiveContract()]" [colors]="['#fcd34d', '#0ea5e9']">
-            </app-circle-chart>
-        </div>
+  <div class="row d-flex justify-content-between ">
+      <app-card-info class="col-md-6 col-sm-12 col-lg-6 mb-2" title="Total de ingresos mensuales" [value]="23">
+      </app-card-info>
+      <app-card-info class="col-md-6 col-sm-12 col-lg-6 mb-2" title="Total de ingresos anuales" [value]="23">
+      </app-card-info>
+  </div>
+  <div class="row d-flex justify-content-between ">
+    <div class="col-md-6 col-sm-12 my-3">
+      <app-circle-chart [title]="'Locales'" [labels]="[ 'Disponibles','Arrendados']"
+        [data]="[activeEstablishment(), inactiveEstablishment()]" [colors]="['#22c55e','#f87171']">
+      </app-circle-chart>
     </div>
+    <div class="col-md-6 col-sm-12  my-3">
+      <app-quick-action>
 
-    <div class="row d-flex justify-content-center">
-        <div class="col-md-7 col-sm-12 my-3">
-            <app-line-chart [title]="'Pagos por Mes - Comparación Anual'"
-                [labels]="['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']"
-                [datasets]="[
+      </app-quick-action>
+    </div>
+  </div>
+
+  <div class="row d-flex justify-content-center">
+    <div class="col-md-7 col-sm-12 my-3">
+      <app-line-chart [title]="'Pagos por Mes - Comparación Anual'"
+        [labels]="['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']" [datasets]="[
                 {
                     data: [1200, 1350, 1100, 1400, 1600, 1700, 1550, 1800, 1650, 1900, 2000, 2100],
                     label: '2025',
@@ -56,12 +39,12 @@
                     tension: 0.3
                 }
             ]">
-            </app-line-chart>
-        </div>
-        <div class="col-md-5 col-sm-12  my-3">
-            <app-quick-action>
-
-            </app-quick-action>
-        </div>
+      </app-line-chart>
     </div>
+    <div class="col-md-5 col-sm-12 my-3">
+      <app-circle-chart [title]="'Contratos'" [labels]="['Activos', 'Inactivos']"
+        [data]="[activeContract(), inactiveContract()]" [colors]="['#fcd34d', '#0ea5e9']">
+      </app-circle-chart>
+    </div>
+  </div>
 </div>

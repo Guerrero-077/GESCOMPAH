@@ -158,5 +158,17 @@ namespace Data.Services.Business
                 .Where(e => estToActivate.Contains(e.Id) && !e.Active)
                 .ExecuteUpdateAsync(s => s.SetProperty(e => e.Active, true));
         }
+
+        /// <summary>
+        /// Indica si existen contratos activos (no eliminados) que tengan locales de la plaza indicada.
+        /// </summary>
+        public async Task<bool> AnyActiveByPlazaAsync(int plazaId)
+        {
+            // Busca contratos activos relacionados a establecimientos de la plaza
+            return await _dbSet.AsNoTracking()
+                .Where(c => !c.IsDeleted && c.Active)
+                .AnyAsync(c => c.PremisesLeased.Any(pl => !pl.IsDeleted &&
+                    _context.Set<Establishment>().Any(e => e.Id == pl.EstablishmentId && !e.IsDeleted && e.PlazaId == plazaId)));
+        }
     }
 }

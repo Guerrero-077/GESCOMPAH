@@ -37,7 +37,7 @@ namespace Business.Services.SecurityAuthentication
             var roles = user.RolUsers?
                 .Select(ru => ru.Rol)
                 .Where(r => r != null && r.Active && !r.IsDeleted)
-                .DistinctBy(r => r!.Id) // LINQ DistinctBy (>= .NET 6)
+                .DistinctBy(r => r!.Id)
                 .Cast<Rol>()
                 .ToList() ?? new();
 
@@ -88,7 +88,7 @@ namespace Business.Services.SecurityAuthentication
                 })
                 .ToList();
 
-            // ⚠️ Asigna también PersonId
+            // Asigna PersonId
             var dto = new UserMeDto
             {
                 Id = user.Id,

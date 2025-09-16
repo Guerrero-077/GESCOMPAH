@@ -39,8 +39,6 @@ namespace Business.Services.Business
 
         public override async Task<AppointmentSelectDto> CreateAsync(AppointmentCreateDto dto) 
         {
-            Person person;
-
             try
             {
                 BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
@@ -70,30 +68,11 @@ namespace Business.Services.Business
                     return _mapper.Map<AppointmentSelectDto>(existingAppointmentCreated);
                 }
 
-                person = new Person
-                {
-                    FirstName = dto.FirstName,
-                    LastName = dto.LastName,
-                    Document = dto.Document,
-                    Address = dto.Address,
-                    Phone = dto.Phone,
-                    CityId = dto.cityId
-                };
+                var personCreate = await _dataPerson.AddAsync(_mapper.Map<Person>(dto));
 
-                var personCreate = await _dataPerson.AddAsync(person);
+                var newAppointment = await _data.AddAsync(_mapper.Map<Appointment>(dto));
 
-                var newAppointment = new Appointment
-                {
-                    Description = dto.Description,
-                    RequestDate = dto.RequestDate,
-                    DateTimeAssigned = dto.DateTimeAssigned,
-                    EstablishmentId = dto.EstablishmentId,
-                    PersonId = personCreate.Id
-                };
-
-                var newAppointmentCreated = await _data.AddAsync(newAppointment);
-
-                return _mapper.Map<AppointmentSelectDto>(newAppointmentCreated);
+                return _mapper.Map<AppointmentSelectDto>(newAppointment);
             }
             catch (DbUpdateException dbx)
             {

@@ -13,6 +13,9 @@ namespace Data.Interfaz.IDataImplement.Business
         // Operaciones por expiración
         Task<IReadOnlyList<int>> DeactivateExpiredAsync(DateTime utcNow);
         Task<int> ReleaseEstablishmentsForExpiredAsync(DateTime utcNow);
+
+        // Validación de negocio: ¿existen contratos activos asociados a una plaza?
+        Task<bool> AnyActiveByPlazaAsync(int plazaId);
     }
 }
 

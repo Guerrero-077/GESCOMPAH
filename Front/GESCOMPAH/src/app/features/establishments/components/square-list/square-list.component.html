@@ -45,7 +45,7 @@
       <app-toggle-button-component
         class="align-middle"
         [checked]="!!row?.active"
-        [disabled]="loading()"
+        [disabled]="loading() || isBusy(row?.id)"
         (changed)="onToggleActive(row?.id, $event)"
         [size]="20"
         [onColor]="'#388E3C'"
@@ -55,4 +55,5 @@
     </div>
   </div>
 </ng-template>
+
 

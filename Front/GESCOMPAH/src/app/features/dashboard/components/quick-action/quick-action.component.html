@@ -5,7 +5,7 @@
     </h5>
 
     <div class="row d-flex flex-column gap-3 mx-1">
-        <button *ngFor="let action of actions" class="btn w-100" [ngClass]="action.style">
+        <button *ngFor="let action of actions" class="btn w-100" [ngClass]="action.style" [routerLink]="action.RouterLink">
             {{ action.label }}
         </button>
     </div>

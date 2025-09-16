@@ -104,5 +104,11 @@ namespace Data.Services.Business
                 : await _dbSet
                     .Where(e => ids.Contains(e.Id) && !e.IsDeleted && e.Active != active)
                     .ExecuteUpdateAsync(up => up.SetProperty(e => e.Active, _ => active));
+
+        // Actualización masiva por PlazaId
+        public async Task<int> SetActiveByPlazaIdAsync(int plazaId, bool active) =>
+            await _dbSet
+                .Where(e => e.PlazaId == plazaId && !e.IsDeleted && e.Active != active)
+                .ExecuteUpdateAsync(up => up.SetProperty(e => e.Active, _ => active));
     }
 }

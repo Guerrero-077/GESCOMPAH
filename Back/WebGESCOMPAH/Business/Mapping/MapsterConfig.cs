@@ -62,6 +62,23 @@ namespace Business.Mapping
                     .Map(dest => dest.EstablishmentName, src => src.Establishment.Name)
                     .Map(dest => dest.PersonName, src => src.Person.FirstName);
 
+            config.NewConfig<Person, AppointmentCreateDto>()
+                .Ignore(dest => dest.Description)
+                .Ignore(dest => dest.RequestDate)
+                .Ignore(dest => dest.DateTimeAssigned)
+                .Ignore(dest => dest.EstablishmentId);
+
+            config.NewConfig<Appointment ,AppointmentCreateDto>()
+                .Ignore(dest => dest.FirstName)
+                .Ignore(dest => dest.LastName)
+                .Ignore(dest => dest.Document)
+                .Ignore(dest => dest.Address)
+                .Ignore(dest => dest.Phone)
+                .Ignore(dest => dest.cityId);
+
+            
+
+
             // Establishment -> Select
             config.NewConfig<Establishment, EstablishmentSelectDto>()
                   .Map(dest => dest.Images, src => src.Images.Adapt<List<ImageSelectDto>>());

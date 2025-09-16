@@ -21,7 +21,7 @@ Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 @Component({
   selector: 'app-dashboard-component',
   standalone: true,
-  imports: [CommonModule, CardInfoComponent, SystemAlertComponent, QuickActionComponent, BaseChartDirective, CircleChartComponent, LineChartComponent, PriceChartComponent],
+  imports: [CommonModule, CardInfoComponent, SystemAlertComponent, QuickActionComponent, BaseChartDirective, CircleChartComponent, LineChartComponent],
   templateUrl: './dashboard-component.html',
   styleUrl: './dashboard-component.css'
 })
@@ -53,7 +53,6 @@ export class DashboardComponent implements OnInit {
   readonly inactiveContract  = computed(() =>
     this.contract().filter(e => !e.active).length
   );
-
 
   ngOnInit(): void {
     this.pageHeaderService.setPageHeader('Inicio', 'Página Principal - GESCOMPAH');

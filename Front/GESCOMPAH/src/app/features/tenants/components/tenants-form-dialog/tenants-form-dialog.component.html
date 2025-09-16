@@ -10,7 +10,7 @@
             <h3>Información Geográfica</h3>
           </div>
 
-          <div class="form-grid">
+          <div class="form-grid" formGroupName="location">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Departamento</mat-label>
               <mat-select formControlName="departmentId" required [compareWith]="compareById">

@@ -26,5 +26,8 @@ namespace Data.Interfaz.IDataImplement.Business
         // Validación / comandos
         Task<IReadOnlyList<int>> GetInactiveIdsAsync(IReadOnlyCollection<int> ids);
         Task<int> SetActiveByIdsAsync(IReadOnlyCollection<int> ids, bool active);
+
+        // Actualización masiva por Plaza
+        Task<int> SetActiveByPlazaIdAsync(int plazaId, bool active);
     }
 }

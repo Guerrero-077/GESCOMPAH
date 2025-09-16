@@ -3,7 +3,6 @@ import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { LocationSettingsComponent } from '../location-settings/location-settings.component';
 import { FinanceComponent } from "../../components/finance/finance.component";
-import { CompanyComponent } from "../../components/company/company.component";
 import { ChangePasswordComponent } from "../../components/change-password/change-password.component";
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';

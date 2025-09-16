@@ -170,7 +170,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
         AppValidators.decimal({ decimals: 2 })
       ]
     }),
-  }, { updateOn: 'blur' });
+  }, { updateOn: 'change' });
 
   readonly ubicacionGroup = this.fb.group<UbicacionForm>({
     plazaId: this.fb.control(0, {
@@ -182,7 +182,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
         AppValidators.address()
       ]
     }),
-  }, { updateOn: 'blur' });
+  }, { updateOn: 'change' });
 
 
   /* ===== Config de imágenes (UX + límites alineados con backend/Cloudinary) ===== */

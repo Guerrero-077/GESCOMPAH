@@ -151,28 +151,35 @@ export class SquareStore {
     }
   }
 
-    /** Toggle remoto (optimista + rollback). */
+  /** Toggle remoto (optimista + rollback). */
   async changeActiveStatusRemote(id: number, active: boolean): Promise<{ ok: boolean; message?: string }> {
-    if (this.isBusy(id)) return { ok: false, message: 'Operación en curso' };
+    if (this.isBusy(id)) return; // evita doble clic
     const prev = this.getById(id)?.active; // true/false/undefined
     this.markBusy(id, true);
     this.changeActiveStatus(id, active); // optimista
 
     try {
       const updated: any = await firstValueFrom(this.svc.changeActiveStatus(id, active));
-      // Envelope controlado desde backend (200 OK)
-      if (updated && typeof updated === 'object' && (updated as any).success === false) {
+      // Si backend devolviÃ³ un envelope de error controlado (200 OK)
+      if (updated && typeof updated === 'object' && updated.success === false) {
+        // rollback y lanza error para que el UI lo maneje como alerta
         if (prev !== undefined) this.changeActiveStatus(id, prev);
-        return { ok: false, message: (updated as any).message || 'No se pudo cambiar el estado.' };
+        return { ok: false, message: updated.message || 'No se pudo cambiar el estado.' };
       }
       if (updated) this.upsertOne(updated as any);
-      return { ok: true };
-    } catch (err: any) {
-      if (prev !== undefined) this.changeActiveStatus(id, prev);
-      const msg = err?.error?.detail || err?.error?.message || err?.message;
+    } catch (err) {
+      if (prev !== undefined) this.changeActiveStatus(id, prev); // rollback
+      const msg = (err as any)?.error?.detail || (err as any)?.error?.message || (err as any)?.message;
       return { ok: false, message: msg || 'No se pudo cambiar el estado.' };
     } finally {
       this.markBusy(id, false);
     }
   }
+  }
 }
+
+
+
+
+
+

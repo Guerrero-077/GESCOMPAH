@@ -145,7 +145,7 @@
         color="primary"
         icon="arrow_forward"
         iconPosition="right"
-        matStepperNext
+        (clicked)="stepper.next()"
         [disabled]="generalGroup.invalid || isBusy">
       </app-standard-button>
     </div>
@@ -205,7 +205,7 @@
             variant="flat"
             icon="arrow_back"
             iconPosition="left"
-            matStepperPrevious
+            (clicked)="stepper.previous()"
             [disabled]="isBusy"
             class="ms-2">
           </app-standard-button>
@@ -216,7 +216,7 @@
           color="primary"
           icon="arrow_forward"
           iconPosition="right"
-          matStepperNext
+          (clicked)="stepper.next()"
           [disabled]="ubicacionGroup.invalid || isBusy">
         </app-standard-button>
       </div>
@@ -323,7 +323,7 @@
           variant="flat"
           icon="arrow_back"
           iconPosition="left"
-          matStepperPrevious
+          (clicked)="stepper.previous()"
           [disabled]="isBusy"
           class="ms-2">
         </app-standard-button>
