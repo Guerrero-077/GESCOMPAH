@@ -1,5 +1,5 @@
-/* ========================================
- * OPCIÓN 4: MODERNO CON TEXTURA
+﻿/* ========================================
+ * OPCIÃ“N 4: MODERNO CON TEXTURA
  * ======================================== */
 .body-textured {
   background:
@@ -14,12 +14,12 @@
 .layout-sidebar {
   width: 250px;
   border-radius: 0;
-  border-right: 1px solid var(--color-border);
+  border-right: none;
   box-shadow: 2px 0 8px rgba(22, 163, 74, 0.08); /* Sombra verde sutil */
 }
 
 .layout-content {
-  padding: 24px; /* Más espacioso */
+  padding: 24px; /* MÃ¡s espacioso */
   height: calc(100vh - 90px);
   overflow-y: auto;
   background: transparent; /* Deja que se vea el gradiente del body */
@@ -51,13 +51,11 @@
   margin: -8px;
 }
 
-/* ========================================
- * MEJORAS PARA EL SIDEBAR
- * ======================================== */
+/* Sidebar (mejoras) */
 .layout-sidebar-enhanced {
   width: 250px;
   border-radius: 0;
-  border-right: 1px solid var(--color-border);
+  border-right: none;
   box-shadow:
     2px 0 16px rgba(22, 163, 74, 0.08),
     0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -82,16 +80,14 @@
   pointer-events: none;
 }
 
-/* ========================================
- * RESPONSIVE PARA FONDOS
- * ======================================== */
+/* Responsive (fondos) */
 @media (max-width: 768px) {
   .body,
   .body-pattern,
   .body-minimal,
   .body-textured,
   .body-glass {
-    background-attachment: scroll; /* Evita problemas en móvil */
+    background-attachment: scroll; /* Evita problemas en mÃ³vil */
   }
 
   .layout-content,
@@ -101,7 +97,7 @@
 }
 
 /* ========================================
- * VARIABLES PARA PERSONALIZACIÓN FÁCIL
+ * VARIABLES PARA PERSONALIZACIÃ“N FÃCIL
  * ======================================== */
 :root {
   /* Fondos personalizables */
@@ -116,7 +112,7 @@
 }
 
 /* ========================================
- * IMPLEMENTACIÓN FINAL RECOMENDADA
+ * IMPLEMENTACIÃ“N FINAL RECOMENDADA
  * ======================================== */
 .body-final {
   background: var(--bg-main);
@@ -131,7 +127,7 @@
 .layout-sidebar-final {
   width: 250px;
   border-radius: 0;
-  border-right: 1px solid var(--color-border);
+  border-right: none;
   box-shadow: var(--sidebar-shadow);
   background: var(--sidebar-bg);
   position: relative;
@@ -155,9 +151,7 @@
   border-radius: 16px;
 }
 
-/* ========================================
- * MODO OSCURO (OPCIONAL FUTURO)
- * ======================================== */
+/* Modo oscuro (opcional) */
 @media (prefers-color-scheme: dark) {
   .body-dark {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 75%, #1e293b 100%);
@@ -172,3 +166,5 @@
     border-color: rgba(255, 255, 255, 0.1);
   }
 }
+
+

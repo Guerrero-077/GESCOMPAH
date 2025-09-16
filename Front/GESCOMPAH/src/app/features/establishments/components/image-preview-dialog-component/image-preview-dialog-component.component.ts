@@ -3,6 +3,7 @@ import { Component, HostListener, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 export interface ImagePreviewData {
   /** Título opcional del visor */
@@ -18,7 +19,7 @@ export interface ImagePreviewData {
 @Component({
   selector: 'app-image-preview-dialog',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, StandardButtonComponent],
   templateUrl: './image-preview-dialog-component.component.html',
   styleUrls: ['./image-preview-dialog-component.component.css'],
 })

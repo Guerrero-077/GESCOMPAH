@@ -9,7 +9,7 @@ namespace Entity.DTOs.Implements.Business.PremisesLeased
 
         public string EstablishmentName { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public double AreaM2 { get; set; }
+        public decimal AreaM2 { get; set; }
         public decimal RentValueBase { get; set; }
         public string Address { get; set; } = null!;
         public string PlazaName { get; set; } = null!;

@@ -1,70 +1,71 @@
 <mat-stepper linear #stepper>
   <!-- Step 1: Person Information -->
   <mat-step [stepControl]="personFormGroup">
-    <form [formGroup]="personFormGroup">
+    <form [formGroup]="personFormGroup" class="form">
       <ng-template matStepLabel>
         {{ stepper.selectedIndex === 0 ? 'Información del Arrendatario' : 'Información...' }}
       </ng-template>
 
+      <div class="section-header">
+        <h3>Datos de Identificación</h3>
+      </div>
+
       <!-- Documento -->
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Documento</mat-label>
-        <input matInput formControlName="document"
-          (keydown.enter)="personFormGroup.get('document')!.markAsTouched(); personFormGroup.get('document')!.updateValueAndValidity();">
+      <div class="row">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Documento de Identidad</mat-label>
+          <input matInput formControlName="document" placeholder="12345678"
+            (keydown.enter)="personFormGroup.get('document')!.markAsTouched(); personFormGroup.get('document')!.updateValueAndValidity();">
 
-        <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
-        <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">Requerido</mat-error>
-        <mat-error *ngIf="personFormGroup.get('document')?.hasError('colombianDocument')">
-          Debe tener entre 7 y 10 dígitos.
-        </mat-error>
-      </mat-form-field>
-
-      <!-- Aviso persona encontrada -->
-      <div *ngIf="personaEncontrada" class="info-ok">
-        Persona encontrada (ID {{ personId }}). Se cargaron: nombre, apellidos, teléfono, email, dirección y ciudad.
+          <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
+          <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">Por favor ingrese el número de documento de identidad</mat-error>
+          <mat-error *ngIf="personFormGroup.get('document')?.hasError('colombianDocument')">
+            El documento debe tener entre 7 y 10 dígitos numéricos
+          </mat-error>
+        </mat-form-field>
       </div>
 
       <!-- Datos persona -->
       <div class="row two-cols">
-
-
         <!-- Nombres -->
         <mat-form-field appearance="outline" class="field no-dim">
           <mat-label>Nombres</mat-label>
-          <input matInput formControlName="firstName" />
-          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('required')">Requerido</mat-error>
-          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('onlySpaces')">No puede contener solo
-            espacios</mat-error>
-          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('alphaHuman')">Nombre inválido</mat-error>
+          <input matInput formControlName="firstName" placeholder="Carlos Alberto" />
+          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('required')">Por favor ingrese los nombres del arrendatario</mat-error>
+          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('onlySpaces')">Los nombres no pueden estar vacíos o contener solo espacios</mat-error>
+          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('alphaHuman')">Los nombres solo pueden contener letras y espacios</mat-error>
         </mat-form-field>
 
         <!-- Apellidos  -->
         <mat-form-field appearance="outline" class="field no-dim">
           <mat-label>Apellidos</mat-label>
-          <input matInput formControlName="lastName" />
-          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('required')">Requerido</mat-error>
-          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('onlySpaces')">No puede contener solo
-            espacios</mat-error>
-          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('alphaHuman')">Apellido inválido</mat-error>
+          <input matInput formControlName="lastName" placeholder="García Rodríguez" />
+          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('required')">Por favor ingrese los apellidos del arrendatario</mat-error>
+          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('onlySpaces')">Los apellidos no pueden estar vacíos o contener solo espacios</mat-error>
+          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('alphaHuman')">Los apellidos solo pueden contener letras y espacios</mat-error>
         </mat-form-field>
+      </div>
+
+      <div class="section-header">
+        <h3>Información de Contacto</h3>
       </div>
 
       <div class="row two-cols">
         <!-- Teléfono -->
         <mat-form-field appearance="outline" class="field no-dim">
-          <mat-label>Teléfono</mat-label>
-          <input matInput formControlName="phone" />
-          <mat-error *ngIf="personFormGroup.get('phone')?.hasError('required')">Requerido</mat-error>
-          <mat-error *ngIf="personFormGroup.get('phone')?.hasError('colombianPhone')">Debe ser un número celular válido
-            (empieza en 3 y tiene 10 dígitos)</mat-error>
+          <mat-label>Teléfono Celular</mat-label>
+          <input matInput formControlName="phone" placeholder="3012345678" />
+          <mat-hint>Número celular colombiano de 10 dígitos</mat-hint>
+          <mat-error *ngIf="personFormGroup.get('phone')?.hasError('required')">Por favor ingrese el número de teléfono celular</mat-error>
+          <mat-error *ngIf="personFormGroup.get('phone')?.hasError('colombianPhone')">Ingrese un número celular válido (debe empezar en 3 y tener 10 dígitos)</mat-error>
         </mat-form-field>
-
 
         <!-- Email -->
         <mat-form-field appearance="outline" class="field no-dim">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" required placeholder="usuario@example.com"
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput type="email" formControlName="email" required placeholder="carlos.garcia@gmail.com"
             (blur)="fixEmail()" />
+          <mat-hint>Se enviará el contrato a este correo</mat-hint>
           <mat-error *ngIf="personFormGroup.get('email')?.errors as errs">
             {{
             getFirstError(personFormGroup.get('email'),
@@ -72,127 +73,200 @@
             )
             }}
           </mat-error>
-          <mat-error *ngIf="personFormGroup.get('email')?.hasError('required')">Requerida</mat-error>
-          <mat-error *ngIf="personFormGroup.get('email')?.hasError('email')">Formato inválido</mat-error>
-          <mat-error *ngIf="personFormGroup.get('email')?.hasError('domainMissing')">Falta el dominio</mat-error>
-          <mat-error *ngIf="personFormGroup.get('email')?.hasError('domainInvalid')">Dominio inválido</mat-error>
-          <mat-error *ngIf="personFormGroup.get('email')?.hasError('tldMissing')">Falta el TLD (como .com)</mat-error>
-          <mat-error *ngIf="personFormGroup.get('email')?.hasError('tldInvalid')">TLD inválido (mín 2
-            letras)</mat-error>
         </mat-form-field>
       </div>
 
       <div class="actions">
-        <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
-        <button mat-raised-button color="primary" matStepperNext>Siguiente</button>
+        <app-standard-button 
+          text="Cancelar" 
+          variant="stroked" 
+          (clicked)="cancel()">
+        </app-standard-button>
+        <app-standard-button 
+          text="Siguiente" 
+          variant="raised" 
+          color="primary" 
+          icon="arrow_forward"
+          iconPosition="right"
+          (clicked)="stepper.next()">
+        </app-standard-button>
       </div>
     </form>
   </mat-step>
 
   <!-- Step 2: Contract Details -->
   <mat-step [stepControl]="contractFormGroup">
-    <form [formGroup]="contractFormGroup">
+    <form [formGroup]="contractFormGroup" class="form">
       <ng-template matStepLabel>
         {{ stepper.selectedIndex === 1 ? 'Detalles del Contrato' : 'Detalles...' }}
       </ng-template>
+
+      <div class="section-header">
+        <h3>Información de Residencia</h3>
+      </div>
 
       <!-- Ubicación -->
       <div class="row two-cols">
         <!-- Dirección -->
         <mat-form-field appearance="outline" class="field no-dim">
-          <mat-label>Dirección</mat-label>
-          <input matInput formControlName="address" />
-          <mat-error *ngIf="contractFormGroup.get('address')?.hasError('required')">Requerida</mat-error>
+          <mat-label>Dirección de Residencia</mat-label>
+          <input matInput formControlName="address" placeholder="Calle 26 # 47 - 15 Apto 302" />
+          <mat-hint>Dirección completa donde reside el arrendatario</mat-hint>
+          <mat-error *ngIf="contractFormGroup.get('address')?.hasError('required')">Por favor ingrese la dirección completa de residencia</mat-error>
           <mat-error *ngIf="contractFormGroup.get('address')?.hasError('addressInvalid')">
-            Usa solo letras, números, espacios y # - , .
+            La dirección solo puede contener letras, números, espacios y los símbolos # - , .
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="field no-dim">
-          <mat-label>Ciudad</mat-label>
+          <mat-label>Ciudad de Residencia</mat-label>
           <mat-select formControlName="cityId">
             <mat-option *ngFor="let c of ciudades" [value]="c.id">{{ c.name }}</mat-option>
           </mat-select>
-          <mat-hint *ngIf="personaEncontrada && foundCityName">{{ foundCityName }}</mat-hint>
-          <mat-error *ngIf="contractFormGroup.get('cityId')?.hasError('required')">Requerida</mat-error>
+          <mat-hint *ngIf="personaEncontrada && foundCityName">Ciudad encontrada: {{ foundCityName }}</mat-hint>
+          <mat-error *ngIf="contractFormGroup.get('cityId')?.hasError('required')">Por favor seleccione la ciudad donde reside el arrendatario</mat-error>
         </mat-form-field>
       </div>
 
-      <!-- Fechas -->
+      <div class="section-header">
+        <h3>Período del Contrato</h3>
+      </div>
+
+      <!-- Fechas del Contrato -->
       <div class="row two-cols">
         <mat-form-field appearance="outline" class="field no-dim">
-          <mat-label>Fecha de Inicio</mat-label>
-          <!-- Corregido: sin [max], usa solo [min]="startMinDate" -->
+          <mat-label>Fecha de Inicio del Contrato</mat-label>
           <input matInput [matDatepicker]="pickerStart" formControlName="startDate" [min]="startMinDate" readonly />
           <button mat-icon-button matSuffix type="button" (click)="pickerStart.open()"
             aria-label="Abrir calendario de inicio">
             <mat-icon>event</mat-icon>
           </button>
           <mat-datepicker #pickerStart></mat-datepicker>
-          <mat-error *ngIf="contractFormGroup.get('startDate')?.hasError('required')">Requerida</mat-error>
+          <mat-hint>Fecha en que inicia la vigencia del contrato</mat-hint>
+          <mat-error *ngIf="contractFormGroup.get('startDate')?.hasError('required')">Por favor seleccione la fecha de inicio del contrato de arrendamiento</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="field">
-          <mat-label>Fecha de Fin</mat-label>
+          <mat-label>Fecha de Finalización del Contrato</mat-label>
           <input matInput [matDatepicker]="pickerEnd" formControlName="endDate" [min]="minEndDate" />
           <button mat-icon-button matSuffix type="button" (click)="pickerEnd.open()"
             aria-label="Abrir calendario de fin">
             <mat-icon>event</mat-icon>
           </button>
           <mat-datepicker #pickerEnd></mat-datepicker>
+          <mat-hint>Fecha en que termina la vigencia del contrato</mat-hint>
           <mat-error *ngIf="contractFormGroup.hasError('endBeforeStart')">
-            La fecha de fin no puede ser menor que la fecha de inicio.
+            La fecha de finalización debe ser posterior a la fecha de inicio
           </mat-error>
-          <mat-error *ngIf="contractFormGroup.get('endDate')?.hasError('required')">Requerida.</mat-error>
+          <mat-error *ngIf="contractFormGroup.get('endDate')?.hasError('required')">Por favor seleccione la fecha de finalización del contrato de arrendamiento</mat-error>
         </mat-form-field>
       </div>
 
       <div class="actions">
-        <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
-        <button mat-button matStepperPrevious>Atrás</button>
-        <button mat-raised-button color="primary" matStepperNext>Siguiente</button>
+        <app-standard-button 
+          text="Cancelar" 
+          variant="stroked" 
+          (clicked)="cancel()">
+        </app-standard-button>
+        <app-standard-button 
+          text="Atrás" 
+          variant="flat" 
+          icon="arrow_back"
+          (clicked)="stepper.previous()">
+        </app-standard-button>
+        <app-standard-button 
+          text="Siguiente" 
+          variant="raised" 
+          color="primary" 
+          icon="arrow_forward"
+          iconPosition="right"
+          (clicked)="stepper.next()">
+        </app-standard-button>
       </div>
     </form>
   </mat-step>
 
   <!-- Step 3: Establishments -->
   <mat-step [stepControl]="establishmentFormGroup">
-    <form [formGroup]="establishmentFormGroup">
+    <form [formGroup]="establishmentFormGroup" class="form">
       <ng-template matStepLabel>
         {{ stepper.selectedIndex === 2 ? 'Establecimientos' : 'Establec...' }}
       </ng-template>
 
+      <div class="section-header">
+        <h3>Selección de Locales Comerciales</h3>
+      </div>
+
       <!-- Plaza -->
       <div class="row">
         <mat-form-field appearance="outline" class="field">
-          <mat-label>Plaza</mat-label>
+          <mat-label>Plaza de Mercado</mat-label>
           <mat-select formControlName="plazaId">
             <mat-option *ngFor="let p of plazas" [value]="p.id">{{ p.name }}</mat-option>
           </mat-select>
-          <mat-error *ngIf="establishmentFormGroup.get('plazaId')?.hasError('required')">Requerida</mat-error>
+          <mat-hint>Seleccione la plaza donde se encuentran los locales a arrendar</mat-hint>
+          <mat-error *ngIf="establishmentFormGroup.get('plazaId')?.hasError('required')">Por favor seleccione la plaza de mercado donde se ubicarán los locales comerciales</mat-error>
         </mat-form-field>
       </div>
 
       <!-- Establecimientos -->
       <div class="row">
         <mat-form-field appearance="outline" class="field">
-          <mat-label>Locales (establecimientos)</mat-label>
+          <mat-label>Locales Comerciales</mat-label>
           <mat-select formControlName="establishmentIds" multiple>
-            <mat-option *ngFor="let e of filteredEstablishments" [value]="e.id">{{ e.name }}</mat-option>
+            <mat-option *ngFor="let e of filteredEstablishments" [value]="e.id">
+              {{ e.name }}
+              <span class="establishment-details" *ngIf="e.areaM2 || e.rentValueBase">
+                ({{ e.areaM2 ? e.areaM2 + ' m²' : '' }}{{ e.areaM2 && e.rentValueBase ? ' - ' : '' }}{{ e.rentValueBase ? '$' + e.rentValueBase : '' }})
+              </span>
+            </mat-option>
           </mat-select>
+          <mat-hint *ngIf="!establishmentFormGroup.get('plazaId')?.value">Primero seleccione una plaza de mercado</mat-hint>
+          <mat-hint *ngIf="establishmentFormGroup.get('plazaId')?.value && filteredEstablishments.length === 0">No hay locales disponibles en la plaza seleccionada</mat-hint>
+          <mat-hint *ngIf="filteredEstablishments.length > 0">Puede seleccionar múltiples locales para el mismo contrato</mat-hint>
           <mat-error *ngIf="establishmentFormGroup.get('establishmentIds')?.hasError('required')">
-            Seleccione al menos uno.
+            Por favor seleccione al menos un local comercial para incluir en el contrato de arrendamiento
           </mat-error>
         </mat-form-field>
       </div>
 
+      <div class="section-header">
+        <h3>Cláusulas Adicionales</h3>
+      </div>
+
+      <!-- Cláusulas -->
+      <div class="row">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Cláusulas Especiales (Opcional)</mat-label>
+          <mat-select formControlName="clauseIds" multiple>
+            <mat-option *ngFor="let c of clauses" [value]="c.id">{{ c.description }}</mat-option>
+          </mat-select>
+          <mat-hint>Seleccione las cláusulas especiales que desea incluir en el contrato</mat-hint>
+        </mat-form-field>
+      </div>
+
       <div class="actions">
-        <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
-        <button mat-button matStepperPrevious>Atrás</button>
-        <button mat-raised-button color="primary" (click)="submit()"
-          [disabled]="personFormGroup.invalid || contractFormGroup.invalid || establishmentFormGroup.invalid || saving">
-          {{ saving ? 'Creando…' : 'Crear contrato' }}
-        </button>
+        <app-standard-button 
+          text="Cancelar" 
+          variant="stroked" 
+          (clicked)="cancel()">
+        </app-standard-button>
+        <app-standard-button 
+          text="Atrás" 
+          variant="flat" 
+          icon="arrow_back"
+          (clicked)="stepper.previous()">
+        </app-standard-button>
+        <app-standard-button 
+          [text]="saving ? 'Creando…' : 'Crear contrato'" 
+          variant="raised" 
+          color="primary" 
+          icon="save"
+          [disabled]="personFormGroup.invalid || contractFormGroup.invalid || establishmentFormGroup.invalid || saving"
+          [loading]="saving"
+          loadingText="Creando…"
+          (clicked)="submit()">
+        </app-standard-button>
       </div>
     </form>
   </mat-step>

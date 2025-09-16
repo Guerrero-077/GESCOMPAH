@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card class="form-card">
   <mat-card-header>
     <mat-card-title>Tu Información Personal</mat-card-title>
     <mat-card-subtitle>Actualiza tus datos personales.</mat-card-subtitle>
@@ -8,53 +8,78 @@
       <mat-spinner></mat-spinner>
     </div>
 
-    <form [formGroup]="form" *ngIf="!isLoading">
-      <div class="form-row">
+    <form [formGroup]="form" *ngIf="!isLoading" class="form-container">
+      
+      <div class="section-header">
+        <h4>Información Personal</h4>
+      </div>
+      
+      <div class="form-grid two-cols">
         <mat-form-field class="form-field" appearance="outline">
           <mat-label>Nombres</mat-label>
-          <input matInput formControlName="firstName">
-          <mat-error *ngIf="form.get('firstName')?.hasError('required')">El nombre es requerido.</mat-error>
-          <mat-error *ngIf="form.get('firstName')?.hasError('alphaHuman')">El nombre solo debe contener letras.</mat-error>
+          <input matInput formControlName="firstName" placeholder="Carlos Alberto">
+          <mat-error *ngIf="form.get('firstName')?.hasError('required')">Por favor ingrese los nombres del usuario</mat-error>
+          <mat-error *ngIf="form.get('firstName')?.hasError('alphaHuman')">Los nombres solo pueden contener letras y espacios</mat-error>
+          <mat-error *ngIf="form.get('firstName')?.hasError('onlySpaces')">Los nombres no pueden estar vacíos o contener solo espacios</mat-error>
+          <mat-error *ngIf="form.get('firstName')?.hasError('maxlength')">Los nombres no pueden exceder 50 caracteres</mat-error>
         </mat-form-field>
 
         <mat-form-field class="form-field" appearance="outline">
           <mat-label>Apellidos</mat-label>
-          <input matInput formControlName="lastName">
-          <mat-error *ngIf="form.get('lastName')?.hasError('required')">El apellido es requerido.</mat-error>
-          <mat-error *ngIf="form.get('lastName')?.hasError('alphaHuman')">El apellido solo debe contener letras.</mat-error>
+          <input matInput formControlName="lastName" placeholder="García Rodríguez">
+          <mat-error *ngIf="form.get('lastName')?.hasError('required')">Por favor ingrese los apellidos del usuario</mat-error>
+          <mat-error *ngIf="form.get('lastName')?.hasError('alphaHuman')">Los apellidos solo pueden contener letras y espacios</mat-error>
+          <mat-error *ngIf="form.get('lastName')?.hasError('onlySpaces')">Los apellidos no pueden estar vacíos o contener solo espacios</mat-error>
+          <mat-error *ngIf="form.get('lastName')?.hasError('maxlength')">Los apellidos no pueden exceder 50 caracteres</mat-error>
         </mat-form-field>
       </div>
 
-      <div class="form-row">
+      <div class="form-grid two-cols">
         <mat-form-field class="form-field" appearance="outline">
           <mat-label>Documento</mat-label>
-          <input matInput formControlName="document" readonly>
-          <mat-error *ngIf="form.get('document')?.hasError('required')">El documento es requerido.</mat-error>
-          <mat-error *ngIf="form.get('document')?.hasError('colombianDocument')">El documento no es válido.</mat-error>
+          <input matInput formControlName="document" readonly placeholder="12345678">
+          <mat-error *ngIf="form.get('document')?.hasError('required')">Por favor ingrese el número de documento de identidad</mat-error>
+          <mat-error *ngIf="form.get('document')?.hasError('colombianDocument')">El documento debe tener entre 7 y 10 dígitos numéricos</mat-error>
+          <mat-hint>Número de cédula de ciudadanía (7 a 10 dígitos)</mat-hint>
         </mat-form-field>
 
         <mat-form-field class="form-field" appearance="outline">
           <mat-label>Teléfono</mat-label>
-          <input matInput formControlName="phone">
-          <mat-error *ngIf="form.get('phone')?.hasError('required')">El teléfono es requerido.</mat-error>
-          <mat-error *ngIf="form.get('phone')?.hasError('colombianPhone')">El teléfono no es válido.</mat-error>
+          <input matInput formControlName="phone" placeholder="3012345678">
+          <mat-error *ngIf="form.get('phone')?.hasError('required')">Por favor ingrese el número de teléfono celular</mat-error>
+          <mat-error *ngIf="form.get('phone')?.hasError('colombianPhone')">Ingrese un número celular válido (debe empezar en 3 y tener 10 dígitos)</mat-error>
+          <mat-hint>Número celular colombiano de 10 dígitos</mat-hint>
         </mat-form-field>
       </div>
 
-      <mat-form-field class="full-width" appearance="outline">
+      <div class="section-header">
+        <h4>Información de Contacto</h4>
+      </div>
+      
+      <mat-form-field class="w-full" appearance="outline">
         <mat-label>Email</mat-label>
-        <input matInput formControlName="email" readonly>
-        <mat-error *ngIf="form.get('email')?.hasError('required')">El email es requerido.</mat-error>
-        <mat-error *ngIf="form.get('email')?.hasError('email')">El email no es válido.</mat-error>
+        <input matInput formControlName="email" readonly placeholder="carlos.garcia@gmail.com">
+        <mat-error *ngIf="form.get('email')?.hasError('required')">Por favor ingrese el correo electrónico</mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('email')">Por favor ingrese un correo electrónico válido</mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('domainMissing')">El correo debe incluir un dominio (ej: &#64;gmail.com)</mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('tldMissing')">El dominio debe incluir una extensión válida (.com, .co, etc.)</mat-error>
+        <mat-hint>Se usará para el acceso al sistema y notificaciones</mat-hint>
       </mat-form-field>
 
-      <mat-form-field class="full-width" appearance="outline">
+      <mat-form-field class="w-full" appearance="outline">
         <mat-label>Dirección</mat-label>
-        <input matInput formControlName="address">
-        <mat-error *ngIf="form.get('address')?.hasError('required')">La dirección es requerida.</mat-error>
+        <input matInput formControlName="address" placeholder="Calle 26 # 47 - 15 Apto 302">
+        <mat-error *ngIf="form.get('address')?.hasError('required')">Por favor ingrese la dirección completa de residencia</mat-error>
+        <mat-error *ngIf="form.get('address')?.hasError('onlySpaces')">La dirección no puede estar vacía o contener solo espacios</mat-error>
+        <mat-error *ngIf="form.get('address')?.hasError('maxlength')">La dirección no puede exceder 100 caracteres</mat-error>
+        <mat-hint>Dirección completa donde reside actualmente</mat-hint>
       </mat-form-field>
 
-      <div class="form-row">
+      <div class="section-header">
+        <h4>Información Geográfica</h4>
+      </div>
+      
+      <div class="form-grid two-cols">
         <mat-form-field class="form-field" appearance="outline">
           <mat-label>Departamento</mat-label>
           <mat-select formControlName="departmentId">
@@ -62,7 +87,8 @@
               {{ dept.name }}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="form.get('departmentId')?.hasError('required')">El departamento es requerido.</mat-error>
+          <mat-error *ngIf="form.get('departmentId')?.hasError('required')">Por favor seleccione el departamento de residencia</mat-error>
+          <mat-hint>Seleccione el departamento donde reside</mat-hint>
         </mat-form-field>
 
         <mat-form-field class="form-field" appearance="outline">
@@ -72,16 +98,25 @@
               {{ city.name }}
             </mat-option>
           </mat-select>
-          <mat-error *ngIf="form.get('cityId')?.hasError('required')">La ciudad es requerida.</mat-error>
+          <mat-error *ngIf="form.get('cityId')?.hasError('required')">Por favor seleccione la ciudad donde reside el usuario</mat-error>
+          <mat-error *ngIf="form.get('cityId')?.hasError('min')">Debe seleccionar una ciudad válida de la lista</mat-error>
+          <mat-hint>Seleccione la ciudad de residencia</mat-hint>
         </mat-form-field>
       </div>
 
     </form>
   </mat-card-content>
-  <mat-card-actions>
-    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || isSaving">
-      <span *ngIf="!isSaving">Guardar Cambios</span>
-      <mat-spinner *ngIf="isSaving" diameter="20"></mat-spinner>
-    </button>
+  <mat-card-actions class="form-actions">
+    <app-standard-button
+      text="Guardar Cambios"
+      variant="raised"
+      color="primary"
+      icon="save"
+      iconPosition="left"
+      [loading]="isSaving"
+      loadingText="Guardando..."
+      (clicked)="onSubmit()"
+      [disabled]="form.invalid || isSaving">
+    </app-standard-button>
   </mat-card-actions>
 </mat-card>

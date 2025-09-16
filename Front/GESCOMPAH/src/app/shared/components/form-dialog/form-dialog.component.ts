@@ -4,11 +4,12 @@ import { DymanicFormsComponent } from '../dymanic-forms/dymanic-forms.component'
 import { MatButtonModule } from '@angular/material/button';
 import { FormType } from '../dymanic-forms/dymanic-forms.config';
 import { CommonModule } from '@angular/common';
+import { StandardButtonComponent } from '../standard-button/standard-button.component';
 
 @Component({
   selector: 'app-form-dialog',
   standalone: true,
-  imports: [DymanicFormsComponent, MatDialogTitle, MatDialogActions, MatDialogModule, MatButtonModule, CommonModule],
+  imports: [DymanicFormsComponent, MatDialogTitle, MatDialogActions, MatDialogModule, MatButtonModule, CommonModule, StandardButtonComponent],
   templateUrl: './form-dialog.component.html',
   styleUrls: ['./form-dialog.component.css']
 })

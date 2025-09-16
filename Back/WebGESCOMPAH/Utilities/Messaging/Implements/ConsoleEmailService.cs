@@ -26,6 +26,13 @@ namespace Utilities.Messaging.Implements
             _logger.LogInformation("[ConsoleEmail] TempPassword -> {Email} ({Name}): {Password}", email, fullName, tempPassword);
             return Task.CompletedTask;
         }
+
+        public Task SendContractWithPdfAsync(string email, string fullName, string contractNumber, byte[] pdfBytes)
+        {
+            _logger.LogInformation("[ConsoleEmail] ContractPDF -> {Email} ({Name}): Contrato #{ContractNumber}, PDF Size: {PdfSize} bytes", 
+                email, fullName, contractNumber, pdfBytes?.Length ?? 0);
+            return Task.CompletedTask;
+        }
     }
 }
 

@@ -8,9 +8,12 @@
         Detalle del Contrato
       </h2>
     </div>
-    <button mat-icon-button (click)="close()" aria-label="Cerrar diálogo">
-      <mat-icon>close</mat-icon>
-    </button>
+    <app-standard-button
+      variant="icon"
+      icon="close"
+      (clicked)="close()"
+      ariaLabel="Cerrar diálogo">
+    </app-standard-button>
   </div>
 
   <!-- Contenido -->
@@ -159,6 +162,11 @@
 
   <!-- Actions -->
   <mat-dialog-actions align="end" class="dialog-actions" *ngIf="!loading && !error">
-    <button mat-stroked-button color="primary" (click)="close()">Cerrar</button>
+    <app-standard-button
+      text="Cerrar"
+      variant="stroked"
+      color="primary"
+      (clicked)="close()">
+    </app-standard-button>
   </mat-dialog-actions>
 </div>

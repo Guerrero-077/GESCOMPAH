@@ -4,7 +4,6 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { combineLatest, EMPTY } from 'rxjs';
 import { catchError, finalize, filter, map, switchMap, take, tap } from 'rxjs/operators';
 
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
@@ -38,7 +37,7 @@ import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRo
   ]
 })
 export class RolFormPermissionComponent implements OnInit, AfterViewInit {
-  // ===== Inyección =====
+  // Inyección de dependencias
   private readonly rolFormPermissionStore = inject(RolFormPermissionStore);
   private readonly roleStore = inject(RoleStore);
   private readonly formStore = inject(FormStore);
@@ -48,7 +47,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   private readonly sweetAlert    = inject(SweetAlertService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
-  // ===== Estado =====
+  // Estado
   items$ = this.rolFormPermissionStore.rolFormPermissions$;
   columns!: TableColumn<RolFormPermissionGroupedModel>[];
 
@@ -79,12 +78,13 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
     this.cdr.detectChanges();
   }
 
-  // ===== Crear =====
+  // Crear
   onCreateNew(): void {
     combineLatest([this.roleStore.roles$, this.formStore.forms$, this.permissionStore.permissions$])
       .pipe(take(1))
       .subscribe(([roles, forms, permissions]) => {
-        const dialogRef = this.dialog.open(FormDialogComponent, {
+        import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+        const dialogRef = this.dialog.open(m.FormDialogComponent, {
           width: '600px',
           data: {
             entity: { active: true },
@@ -116,10 +116,11 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
             )
           )
         ).subscribe();
+        });
       });
   }
 
-  // ===== Editar =====
+  // Editar
   onEdit(row: RolFormPermissionGroupedModel): void {
     combineLatest([this.roleStore.roles$, this.formStore.forms$, this.permissionStore.permissions$])
       .pipe(take(1))
@@ -131,7 +132,8 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           permissionIds: row.permissions.map(p => p.permissionId)
         };
 
-        const dialogRef = this.dialog.open(FormDialogComponent, {
+        import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+        const dialogRef = this.dialog.open(m.FormDialogComponent, {
           width: '600px',
           data: {
             entity: entityForDialog,
@@ -165,10 +167,11 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
             )
           )
         ).subscribe();
+        });
       });
   }
 
-  // ===== Eliminar (grupo) =====
+  // Eliminar (grupo)
   async onDelete(row: RolFormPermissionGroupedModel): Promise<void> {
     const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar Grupo de Permisos',
@@ -188,14 +191,9 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   }
 
   onView(row: RolFormPermissionGroupedModel): void {
-    console.log('Vista detalle:', row);
   }
 
-  // ===== Toggle Activo/Inactivo =====
-  /**
-   * Acepta boolean o {checked:boolean}. Evita perder feedback si el toggle emite boolean puro.
-   * HTML: (toggleChange)="onToggleActive(row, $event)"
-   */
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: RolFormPermissionGroupedModel, e: boolean | { checked: boolean }): void {
     if (this.isBusy(row.id)) return;
 
@@ -206,8 +204,6 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
     this.busyIds.add(row.id);
     row.active = checked;
 
-    // Nota: si tu backend expone cambio por grupo, usa:
-    // this.rolFormPermissionStore.changeActiveStatusByGroup(row.rolId, row.formId, checked)
     this.rolFormPermissionStore.changeActiveStatus(row.id, checked).pipe(
       take(1),
       tap(updated => {

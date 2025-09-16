@@ -15,7 +15,10 @@ namespace WebGESCOMPAH.Middleware.Handlers
             {
                 Status = statusCode,
                 Title = "Acceso no autorizado.",
-                Detail = "No tienes permisos para acceder a este recurso.",
+                // Superficialmente genérico, pero detallamos la causa con el mensaje de la excepción
+                Detail = string.IsNullOrWhiteSpace(exception.Message)
+                    ? "No tienes permisos para acceder a este recurso."
+                    : exception.Message,
                 Type = "https://tools.ietf.org/html/rfc7235#section-3.1",
                 Instance = http.Request.Path
             };

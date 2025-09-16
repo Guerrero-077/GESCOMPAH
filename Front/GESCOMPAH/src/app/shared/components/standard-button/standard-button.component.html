@@ -1,0 +1,121 @@
+<ng-container [ngSwitch]="variant">
+  <!-- Raised Button -->
+  <button 
+    *ngSwitchCase="'raised'"
+    mat-raised-button
+    [color]="color"
+    [disabled]="disabled || loading"
+    [type]="type"
+    [class]="buttonClasses"
+    [attr.aria-label]="effectiveAriaLabel"
+    [title]="title"
+    (click)="onClick()">
+    
+    <mat-spinner *ngIf="loading" diameter="16" class="button-spinner"></mat-spinner>
+    <mat-icon *ngIf="!loading && icon && iconPosition === 'left'" class="button-icon left">{{ icon }}</mat-icon>
+    <span class="button-text" [class.with-icon]="icon && !loading">{{ displayText }}</span>
+    <mat-icon *ngIf="!loading && icon && iconPosition === 'right'" class="button-icon right">{{ icon }}</mat-icon>
+  </button>
+
+  <!-- Stroked Button -->
+  <button 
+    *ngSwitchCase="'stroked'"
+    mat-stroked-button
+    [color]="color"
+    [disabled]="disabled || loading"
+    [type]="type"
+    [class]="buttonClasses"
+    [attr.aria-label]="effectiveAriaLabel"
+    [title]="title"
+    (click)="onClick()">
+    
+    <mat-spinner *ngIf="loading" diameter="16" class="button-spinner"></mat-spinner>
+    <mat-icon *ngIf="!loading && icon && iconPosition === 'left'" class="button-icon left">{{ icon }}</mat-icon>
+    <span class="button-text" [class.with-icon]="icon && !loading">{{ displayText }}</span>
+    <mat-icon *ngIf="!loading && icon && iconPosition === 'right'" class="button-icon right">{{ icon }}</mat-icon>
+  </button>
+
+  <!-- Cancel Button -->
+  <button 
+    *ngSwitchCase="'cancel'"
+    mat-stroked-button
+    [color]="color"
+    [disabled]="disabled || loading"
+    [type]="type"
+    [class]="buttonClasses"
+    [attr.aria-label]="effectiveAriaLabel"
+    [title]="title"
+    (click)="onClick()">
+    
+    <mat-spinner *ngIf="loading" diameter="16" class="button-spinner"></mat-spinner>
+    <mat-icon *ngIf="!loading && icon && iconPosition === 'left'" class="button-icon left">{{ icon }}</mat-icon>
+    <span class="button-text" [class.with-icon]="icon && !loading">{{ displayText }}</span>
+    <mat-icon *ngIf="!loading && icon && iconPosition === 'right'" class="button-icon right">{{ icon }}</mat-icon>
+  </button>
+
+  <!-- Flat Button -->
+  <button 
+    *ngSwitchCase="'flat'"
+    mat-button
+    [color]="color"
+    [disabled]="disabled || loading"
+    [type]="type"
+    [class]="buttonClasses"
+    [attr.aria-label]="effectiveAriaLabel"
+    [title]="title"
+    (click)="onClick()">
+    
+    <mat-spinner *ngIf="loading" diameter="16" class="button-spinner"></mat-spinner>
+    <mat-icon *ngIf="!loading && icon && iconPosition === 'left'" class="button-icon left">{{ icon }}</mat-icon>
+    <span class="button-text" [class.with-icon]="icon && !loading">{{ displayText }}</span>
+    <mat-icon *ngIf="!loading && icon && iconPosition === 'right'" class="button-icon right">{{ icon }}</mat-icon>
+  </button>
+
+  <!-- Icon Button -->
+  <button 
+    *ngSwitchCase="'icon'"
+    mat-icon-button
+    [color]="color"
+    [disabled]="disabled || loading"
+    [type]="type"
+    [class]="buttonClasses"
+    [attr.aria-label]="effectiveAriaLabel"
+    [title]="title"
+    (click)="onClick()">
+    
+    <mat-spinner *ngIf="loading" diameter="16"></mat-spinner>
+    <mat-icon *ngIf="!loading && icon">{{ icon }}</mat-icon>
+  </button>
+
+  <!-- FAB Button -->
+  <button 
+    *ngSwitchCase="'fab'"
+    mat-fab
+    [color]="color"
+    [disabled]="disabled || loading"
+    [type]="type"
+    [class]="buttonClasses"
+    [attr.aria-label]="effectiveAriaLabel"
+    [title]="title"
+    (click)="onClick()">
+    
+    <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+    <mat-icon *ngIf="!loading && icon">{{ icon }}</mat-icon>
+  </button>
+
+  <!-- Mini FAB Button -->
+  <button 
+    *ngSwitchCase="'mini-fab'"
+    mat-mini-fab
+    [color]="color"
+    [disabled]="disabled || loading"
+    [type]="type"
+    [class]="buttonClasses"
+    [attr.aria-label]="effectiveAriaLabel"
+    [title]="title"
+    (click)="onClick()">
+    
+    <mat-spinner *ngIf="loading" diameter="16"></mat-spinner>
+    <mat-icon *ngIf="!loading && icon">{{ icon }}</mat-icon>
+  </button>
+</ng-container>

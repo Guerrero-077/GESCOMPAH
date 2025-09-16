@@ -84,14 +84,13 @@ namespace Tests.Business.SecurityAuthentication
         }
 
         [Fact]
-        public async Task GetByIdAsync_ShouldThrowBusinessException_WhenEntityNotFound()
+        public async Task GetByIdAsync_ReturnsNull_WhenEntityNotFound()
         {
             _rolRepoMock.Setup(r => r.GetByIdAsync(10)).ReturnsAsync((Rol?)null);
 
-            var ex = await Assert.ThrowsAsync<BusinessException>(() => _rolService.GetByIdAsync(10));
+            var result = await _rolService.GetByIdAsync(10);
 
-            Assert.Contains("Error al obtener el registro con ID 10", ex.Message);
-            Assert.IsType<KeyNotFoundException>(ex.InnerException);
+            Assert.Null(result);
         }
 
         [Fact]
@@ -205,10 +204,7 @@ namespace Tests.Business.SecurityAuthentication
         public async Task UpdateAsync()
         {
             var dto = new RolUpdateDto { Id = 1, Name = "Updated" };
-            var entity = new Rol { Id = 1, Name = "Admin" };
-
-            _rolRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(entity);
-            _mapperMock.Setup(m => m.Map(dto, entity)).Returns(new Rol { Id = 1, Name = "Updated" });
+            _mapperMock.Setup(m => m.Map<Rol>(dto)).Returns(new Rol { Id = 1, Name = "Updated" });
 
             await _rolService.UpdateAsync(dto);
 

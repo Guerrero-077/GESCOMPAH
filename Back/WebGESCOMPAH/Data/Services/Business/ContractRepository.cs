@@ -1,6 +1,10 @@
 ﻿using Data.Interfaz.IDataImplement.Business;
 using Data.Repository;
 using Entity.Domain.Models.Implements.Business;
+using Entity.Domain.Models.Implements.Utilities;
+using Entity.DTOs.Implements.Business.Clause;
+using Entity.DTOs.Implements.Business.Contract;
+using Entity.DTOs.Implements.Business.PremisesLeased;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,36 +14,53 @@ namespace Data.Services.Business
     {
         public ContractRepository(ApplicationDbContext context) : base(context) { }
 
-        // ⚠️ Mantén este override para casos de detalle/export (no para grillas masivas)
-        public override async Task<IEnumerable<Contract>> GetAllAsync()
-        {
-            return await _dbSet
-                .OrderByDescending(e => e.CreatedAt)
-                .ThenByDescending(e => e.Id)
-                .Include(c => c.Person).ThenInclude(p => p.User)
-                .Include(c => c.PremisesLeased).ThenInclude(pl => pl.Establishment).ThenInclude(e => e.Plaza)
-                .AsNoTracking()
-                .ToListAsync();
-        }
 
         public override async Task<Contract?> GetByIdAsync(int id)
         {
             return await _dbSet
                 .Include(c => c.Person).ThenInclude(p => p.User)
                 .Include(c => c.PremisesLeased).ThenInclude(pl => pl.Establishment).ThenInclude(e => e.Plaza)
-                .Include(c => c.ContractClauses)
+                .Include(c => c.ContractClauses).ThenInclude(cc => cc.Clause)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
+        //public async Task<ContractSelectDto?> GetBasicByIdAsync(int id)
+        //{
+        //    return await _dbSet.AsNoTracking()
+        //        .Where(c => !c.IsDeleted && c.Id == id)
+        //        .Select(c => new ContractSelectDto
+        //        {
+        //            Id = c.Id,
+        //            StartDate = c.StartDate,
+        //            EndDate = c.EndDate,
+        //            Active = c.Active,
+
+        //            PersonId = c.PersonId,
+        //            FullName = c.Person != null ? (c.Person.FirstName + " " + c.Person.LastName) : "",
+        //            Document = c.Person != null ? c.Person.Document : "",
+        //            Phone = c.Person != null ? c.Person.Phone : "",
+        //            Email = c.Person != null && c.Person.User != null ? c.Person.User.Email : null,
+
+        //            TotalBaseRentAgreed = c.TotalBaseRentAgreed,
+        //            TotalUvtQtyAgreed = c.TotalUvtQtyAgreed,
+
+        //            PremisesLeased = new List<PremisesLeasedSelectDto>(),
+        //            Clauses = new List<ClauseSelectDto>()
+        //        })
+        //        .FirstOrDefaultAsync();
+        //}
+
+
+
         // ============== PROYECCIONES PARA GRID (sin Include) ==============
 
-        public async Task<IReadOnlyList<ContractCard>> GetCardsByPersonAsync(int personId) =>
+        public async Task<IReadOnlyList<ContractCardDto>> GetCardsByPersonAsync(int personId) =>
             await _dbSet.AsNoTracking()
                 .Where(c => !c.IsDeleted && c.PersonId == personId)
                 .OrderByDescending(e => e.CreatedAt)
                 .ThenByDescending(e => e.Id)
-                .Select(c => new ContractCard(
+                .Select(c => new ContractCardDto(
                     c.Id,
                     c.PersonId,
                     (c.Person.FirstName + " " + c.Person.LastName).Trim(),
@@ -54,11 +75,11 @@ namespace Data.Services.Business
                 ))
                 .ToListAsync();
 
-        public async Task<IReadOnlyList<ContractCard>> GetCardsAllAsync() =>
+        public async Task<IReadOnlyList<ContractCardDto>> GetCardsAllAsync() =>
             await _dbSet.AsNoTracking()
                 .Where(c => !c.IsDeleted)
                 .OrderByDescending(c => c.Id)
-                .Select(c => new ContractCard(
+                .Select(c => new ContractCardDto(
                     c.Id,
                     c.PersonId,
                     (c.Person.FirstName + " " + c.Person.LastName).Trim(),

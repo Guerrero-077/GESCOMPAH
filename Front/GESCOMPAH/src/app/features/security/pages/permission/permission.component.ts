@@ -5,7 +5,6 @@ import { filter, switchMap, take, tap, catchError, EMPTY, finalize, map } from '
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
@@ -23,7 +22,7 @@ import { PermissionSelectModel, PermissionUpdateModel } from '../../models/permi
   styleUrls: ['./permission.component.css']
 })
 export class PermissionComponent implements OnInit {
-  // ===== Inyección =====
+  // Inyección de dependencias
   private readonly permissionStore = inject(PermissionStore);
   // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlert    = inject(SweetAlertService);
@@ -31,7 +30,7 @@ export class PermissionComponent implements OnInit {
   private readonly pageHeaderService = inject(PageHeaderService);
   constructor(private dialog: MatDialog) {}
 
-  // ===== Estado =====
+  // Estado
   permissions$ = this.permissionStore.permissions$;
   columns: TableColumn<PermissionSelectModel>[] = [];
   private busyIds = new Set<number>();
@@ -49,14 +48,15 @@ export class PermissionComponent implements OnInit {
     ];
   }
 
-  // ===== Crear =====
+  // Crear
   onCreateNew(): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: {}, formType: 'Permission' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: {}, formType: 'Permission' }
+      });
 
-    dialogRef.afterClosed().pipe(
+      dialogRef.afterClosed().pipe(
       filter(Boolean),
       switchMap(result => this.permissionStore.create(result).pipe(take(1))),
       tap(() => this.sweetAlertService.toast('Creación Exitosa', 'Permiso creado exitosamente.', 'success')),
@@ -66,16 +66,18 @@ export class PermissionComponent implements OnInit {
         return EMPTY;
       })
     ).subscribe();
+    });
   }
 
-  // ===== Editar =====
+  // Editar
   onEdit(row: PermissionSelectModel): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: row, formType: 'Permission' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: row, formType: 'Permission' }
+      });
 
-    dialogRef.afterClosed().pipe(
+      dialogRef.afterClosed().pipe(
       filter((result): result is Partial<PermissionUpdateModel> => !!result),
       map(result => ({ id: row.id, ...result } as PermissionUpdateModel)),
       switchMap(dto => this.permissionStore.update(dto).pipe(take(1))),
@@ -86,9 +88,10 @@ export class PermissionComponent implements OnInit {
         return EMPTY;
       })
     ).subscribe();
+    });
   }
 
-  // ===== Eliminar (lógico) =====
+  // Eliminar (lógico)
   async onDelete(row: PermissionSelectModel): Promise<void> {
     const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar permiso',
@@ -108,14 +111,9 @@ export class PermissionComponent implements OnInit {
   }
 
   onView(row: PermissionSelectModel): void {
-    console.log('Ver:', row);
   }
 
-  // ===== Toggle Activo/Inactivo =====
-  /**
-   * Acepta boolean o {checked:boolean} porque distintos toggles emiten distinto payload.
-   * En el HTML: (toggleChange)="onToggleActive(row, $event)"
-   */
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: PermissionSelectModel, e: boolean | { checked: boolean }): void {
     if (this.isBusy(row.id)) return;
 

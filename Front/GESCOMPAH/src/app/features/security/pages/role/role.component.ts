@@ -5,7 +5,6 @@ import { take } from 'rxjs';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
@@ -25,7 +24,7 @@ import { IsActive } from '../../../../core/models/IsAcitve.models';
 })
 export class RoleComponent implements OnInit {
 
-  // ====== Inyección estilo Angular moderno ======
+  // Inyección de dependencias
   private readonly dialog            = inject(MatDialog);
   private readonly roleStore         = inject(RoleStore);
   // private readonly confirmDialog     = inject(ConfirmDialogService);
@@ -33,16 +32,16 @@ export class RoleComponent implements OnInit {
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
 
-  // ====== Estado de datos ======
+  // Estado de datos
   readonly roles$ = this.roleStore.roles$;
 
-  // ====== Columnas de la GenericTable ======
+  // Columnas de la tabla
   columns: TableColumn<RoleSelectModel>[] = [];
 
   // Template para el toggle de estado
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
 
-  // ====== Ciclo de vida ======
+  // Ciclo de vida
   ngOnInit(): void {
     this.pageHeaderService.setPageHeader('Roles', 'Gestión de Roles');
 
@@ -60,7 +59,7 @@ export class RoleComponent implements OnInit {
     ];
   }
 
-  // ====== Helpers ======
+  // Helpers
   trackById = (_: number, it: RoleSelectModel) => it.id;
 
   private notifySuccess(title: string, message: string) {
@@ -70,54 +69,59 @@ export class RoleComponent implements OnInit {
     this.sweetAlertService.toast('Error', message, 'error');
   }
 
-  // ====== CRUD: Crear ======
+  // Crear
   onCreateNew(): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
+    const open = (m: any) => this.dialog.open(m.FormDialogComponent, {
       width: '600px',
       data: {
         entity: {},
         formType: 'Rol'
       }
     });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = open(m);
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
-      if (!result) return;
-      this.roleStore.create(result).pipe(take(1)).subscribe({
-        next: () => this.notifySuccess('Creación Exitosa', 'Rol creado exitosamente.'),
-        error: (err) => this.notifyError(err?.error?.detail || 'No se pudo crear el rol.')
+      dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
+        if (!result) return;
+        this.roleStore.create(result).pipe(take(1)).subscribe({
+          next: () => this.notifySuccess('Creación Exitosa', 'Rol creado exitosamente.'),
+          error: (err) => this.notifyError(err?.error?.detail || 'No se pudo crear el rol.')
+        });
       });
     });
   }
 
-  // ====== CRUD: Editar ======
+  // Editar
   onEdit(row: RoleSelectModel): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
+    const open = (m: any) => this.dialog.open(m.FormDialogComponent, {
       width: '600px',
       data: {
         entity: row,
         formType: 'Rol'
       }
     });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = open(m);
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe((result: Partial<RoleUpdateModel> | undefined) => {
-      if (!result) return;
+      dialogRef.afterClosed().pipe(take(1)).subscribe((result: Partial<RoleUpdateModel> | undefined) => {
+        if (!result) return;
 
-      const payload: RoleUpdateModel = { ...result, id: row.id } as RoleUpdateModel;
+        const payload: RoleUpdateModel = { ...result, id: row.id } as RoleUpdateModel;
 
-      this.roleStore.update(payload).pipe(take(1)).subscribe({
-        next: () => this.notifySuccess('Actualización Exitosa', 'Rol actualizado exitosamente.'),
-        error: (err) => this.notifyError(err?.error?.detail || 'No se pudo actualizar el rol.')
+        this.roleStore.update(payload).pipe(take(1)).subscribe({
+          next: () => this.notifySuccess('Actualización Exitosa', 'Rol actualizado exitosamente.'),
+          error: (err) => this.notifyError(err?.error?.detail || 'No se pudo actualizar el rol.')
+        });
       });
     });
   }
 
-  // ====== CRUD: Ver ======
+  // Ver
   onView(row: RoleSelectModel): void {
-    // Punto de extensión: puedes abrir un dialogo de detalle o navegar.
-    console.log('Ver:', row);
+    // Ver detalle (diálogo o navegación)
   }
 
-  // ====== CRUD: Eliminar (borrado lógico) ======
+  // Eliminar (borrado lógico)
   async onDelete(row: RoleSelectModel): Promise<void> {
     const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar rol',
@@ -134,12 +138,7 @@ export class RoleComponent implements OnInit {
     });
   }
 
-  // ====== Toggle Activo/Inactivo (UI optimista + rollback) ======
-  // En el HTML del template del toggle:
-  // <app-toggle-button-component
-  //   [checked]="row.active"
-  //   (toggleChange)="onToggleActive(row, $event)">
-  // </app-toggle-button-component>
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: IsActive, e: boolean | { checked: boolean }): void {
     const checked = typeof e === 'boolean' ? e : !!e?.checked;
     const prev = row.active;

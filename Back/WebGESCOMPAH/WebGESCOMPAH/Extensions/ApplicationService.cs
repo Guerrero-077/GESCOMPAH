@@ -9,6 +9,7 @@ using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Interfaces.Implements.Utilities;
 using Business.Mapping;
 using Business.Repository;
+using Microsoft.Extensions.DependencyInjection;
 using Business.Services.AdministrationSystem;
 using Business.Services.Business;
 using Business.Services.Location;
@@ -129,6 +130,7 @@ namespace WebGESCOMPAH.Extensions
 
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
 
@@ -144,6 +146,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddSingleton<IExceptionHandler, EntityNotFoundExceptionHandler>();
             services.AddSingleton<IExceptionHandler, ForbiddenExceptionHandler>(); 
             services.AddSingleton<IExceptionHandler, UnauthorizedAccessHandler>();
+            services.AddSingleton<IExceptionHandler, SecurityTokenExceptionHandler>();
             services.AddSingleton<IExceptionHandler, DbConcurrencyExceptionHandler>();
             services.AddSingleton<IExceptionHandler, DbUpdateExceptionHandler>();     
             services.AddSingleton<IExceptionHandler, HttpRequestExceptionHandler>();  

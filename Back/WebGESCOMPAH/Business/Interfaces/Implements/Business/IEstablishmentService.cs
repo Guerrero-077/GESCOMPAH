@@ -9,7 +9,6 @@ namespace Business.Interfaces.Implements.Business
     /// Contrato de servicio para Establecimientos.
     /// CRUD + consultas por disponibilidad y proyección liviana para cálculos.
     /// </summary>
-    public sealed record EstablishmentBasicsDto(int Id, decimal RentValueBase, decimal UvtQty);
 
     public interface IEstablishmentService
         : IBusiness<EstablishmentSelectDto, EstablishmentCreateDto, EstablishmentUpdateDto>
@@ -37,5 +36,9 @@ namespace Business.Interfaces.Implements.Business
         /// Evita materializar entidades completas y mejora rendimiento en cálculos.
         /// </summary>
         Task<IReadOnlyList<EstablishmentBasicsDto>> GetBasicsByIdsAsync(IEnumerable<int> ids);
+
+        // === LISTA LIVIANA PARA GRID/CARDS ===
+        Task<IReadOnlyList<EstablishmentCardDto>> GetCardsAnyAsync();
+        Task<IReadOnlyList<EstablishmentCardDto>> GetCardsActiveAsync();
     }
 }

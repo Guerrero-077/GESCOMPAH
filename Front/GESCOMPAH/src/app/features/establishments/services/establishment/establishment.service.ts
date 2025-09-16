@@ -5,7 +5,8 @@ import { environment } from '../../../../../environments/environment.development
 import {
   EstablishmentSelect,
   EstablishmentCreate,
-  EstablishmentUpdate
+  EstablishmentUpdate,
+  EstablishmentCard
 } from '../../models/establishment.models';
 
 export interface GetAllOptions {
@@ -18,7 +19,7 @@ export class EstablishmentService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiURL}/Establishments`;
 
-  // ----------------------------- QUERIES -----------------------------
+  // Consultas
 
   /**
    * Obtener establecimientos:
@@ -30,6 +31,16 @@ export class EstablishmentService {
     if (options?.activeOnly) params = params.set('activeOnly', 'true');
     return this.http.get<EstablishmentSelect[]>(this.baseUrl, { params });
   }
+
+  /** Listado liviano para cards/grids */
+  getCards(options?: GetAllOptions): Observable<EstablishmentCard[]> {
+    let params = new HttpParams();
+    if (options?.activeOnly) params = params.set('activeOnly', 'true');
+    return this.http.get<EstablishmentCard[]>(`${this.baseUrl}/cards`, { params });
+  }
+
+  getCardsAny(): Observable<EstablishmentCard[]> { return this.getCards(); }
+  getCardsActive(): Observable<EstablishmentCard[]> { return this.getCards({ activeOnly: true }); }
 
   /** Conveniencias explícitas (opcionales) */
   getAllAny(): Observable<EstablishmentSelect[]> {
@@ -47,7 +58,7 @@ export class EstablishmentService {
     return this.http.get<EstablishmentSelect>(`${this.baseUrl}/${id}`, { params });
   }
 
-  // ------------------------------ CRUD ------------------------------
+  // CRUD
 
   create(dto: EstablishmentCreate): Observable<EstablishmentSelect> {
     // Limpia campos locales (archivos/imagenes) si viajan desde el formulario

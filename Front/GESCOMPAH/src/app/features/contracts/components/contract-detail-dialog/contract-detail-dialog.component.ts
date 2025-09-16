@@ -9,7 +9,7 @@ import { forkJoin } from 'rxjs';
 
 import { ContractSelectModel, MonthlyObligation } from '../../models/contract.models';
 import { ContractService } from '../../services/contract/contract.service';
-import { ContractStore } from '../../services/contract/contract.store';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 @Component({
   selector: 'app-contract-detail-dialog',
@@ -20,6 +20,7 @@ import { ContractStore } from '../../services/contract/contract.store';
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    StandardButtonComponent,
   ],
   templateUrl: './contract-detail-dialog.component.html',
   styleUrls: ['./contract-detail-dialog.component.css'],

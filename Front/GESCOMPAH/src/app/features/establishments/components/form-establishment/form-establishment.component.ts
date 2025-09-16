@@ -27,7 +27,6 @@ import { ImageService } from '../../services/image/image.service';
 import { SquareService } from '../../services/square/square.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { SquareSelectModel } from '../../models/squares.models';
-import { ImagePreviewDialogComponent } from '../image-preview-dialog-component/image-preview-dialog-component.component';
 
 
 // Soporte Drag & Drop aislado en directiva y servicio
@@ -36,6 +35,7 @@ import { FilePickerService } from '../../../../shared/Services/Picker/file-picke
 import { GeneralForm, UbicacionForm } from '../../shapes/Formularios';
 
 import { AppValidators } from '../../../../shared/utils/AppValidators';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 
 /* Mensajes de error:
@@ -93,7 +93,8 @@ export const ERRORS = {
     CommonModule, ReactiveFormsModule, MatDialogModule, MatInputModule, MatButtonModule,
     MatSelectModule, MatIconModule, MatProgressSpinnerModule, MatTooltipModule,
     MatStepperModule,
-    FileDropDirective // directiva para manejar drag&drop de archivos
+    FileDropDirective, // directiva para manejar drag&drop de archivos
+    StandardButtonComponent
   ],
   templateUrl: './form-establishment.component.html',
   styleUrls: ['./form-establishment.component.css'],
@@ -114,7 +115,21 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
 
   /* ===== Estado UI simple ===== */
   isEdit = false;
-  isBusy = false;
+  private _isBusy = false;
+  get isBusy(): boolean { return this._isBusy; }
+  set isBusy(v: boolean) {
+    this._isBusy = v;
+    // Deshabilita/habilita los formularios vía API de Reactive Forms
+    // para evitar warnings de Angular sobre [disabled] en plantillas.
+    const opts = { emitEvent: false } as const;
+    if (v) {
+      this.generalGroup.disable(opts);
+      this.ubicacionGroup.disable(opts);
+    } else {
+      this.generalGroup.enable(opts);
+      this.ubicacionGroup.enable(opts);
+    }
+  }
   isDeletingImage = false;
 
   /* ===== Formularios tipados ===== */
@@ -404,12 +419,14 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
 
   /** Abre el visor genérico con lista completa y posición inicial. */
   private openPreview(title: string, startIndex: number): void {
-    this.dialog.open(ImagePreviewDialogComponent, {
-      data: { title, imageList: this.getAllPreviewSources(), startIndex },
-      panelClass: 'image-preview-dialog',
-      maxWidth: '95vw',
-      width: 'auto',
-      autoFocus: false
+    import('../image-preview-dialog-component/image-preview-dialog-component.component').then(m => {
+      this.dialog.open(m.ImagePreviewDialogComponent, {
+        data: { title, imageList: this.getAllPreviewSources(), startIndex },
+        panelClass: 'image-preview-dialog',
+        maxWidth: '95vw',
+        width: 'auto',
+        autoFocus: false
+      });
     });
   }
 

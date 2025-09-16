@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { Observable, EMPTY } from 'rxjs';
 import { take } from 'rxjs/operators';
 
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
@@ -57,29 +56,33 @@ export class DepartmentComponent implements OnInit {
   }
 
   openCreateDialog(): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '400px',
-      data: { entity: {}, formType: 'Department' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '400px',
+        data: { entity: {}, formType: 'Department' }
+      });
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
-      if (!result) return;
-      this.store.create(result).pipe(take(1)).subscribe({
-        next: () => this.sweetAlert.toast('Éxito', 'Departamento creado exitosamente', 'success')
+      dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
+        if (!result) return;
+        this.store.create(result).pipe(take(1)).subscribe({
+          next: () => this.sweetAlert.showNotification('Éxito', 'Departamento creado exitosamente', 'success')
+        });
       });
     });
   }
 
   openEditDialog(row: DepartmentSelectModel): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '400px',
-      data: { entity: row, formType: 'Department' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '400px',
+        data: { entity: row, formType: 'Department' }
+      });
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
-      if (!result) return;
-      this.store.update(result).pipe(take(1)).subscribe({
-        next: () => this.sweetAlert.toast('Éxito', 'Departamento actualizado exitosamente', 'success')
+      dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
+        if (!result) return;
+        this.store.update(result).pipe(take(1)).subscribe({
+          next: () => this.sweetAlert.showNotification('Éxito', 'Departamento actualizado exitosamente', 'success')
+        });
       });
     });
   }
@@ -94,8 +97,7 @@ export class DepartmentComponent implements OnInit {
     });
   }
 
-  // ===== Toggle Activo/Inactivo (optimista + rollback sencillo) =====
-  // En el HTML: (toggleChange)="onToggleActive(row, $event)"
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: IsActive, e: boolean | { checked: boolean }) {
     const checked = typeof e === 'boolean' ? e : !!e?.checked;
     const prev = row.active;

@@ -8,6 +8,7 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Utilities.Exceptions;
+using Entity.Enum;
 
 namespace Business.Services.Business
 {
@@ -118,9 +119,20 @@ namespace Business.Services.Business
             if (distinct.Count == 0) return Array.Empty<EstablishmentBasicsDto>();
 
             var basics = await _repo.GetBasicsByIdsAsync(distinct);
-            return basics.Select(b => new EstablishmentBasicsDto(b.Id, b.RentValueBase, b.UvtQty))
-                         .ToList()
-                         .AsReadOnly();
+            return basics.ToList().AsReadOnly();
+        }
+
+        // Lista liviana para grid/cards (sin Includes pesados)
+        public async Task<IReadOnlyList<EstablishmentCardDto>> GetCardsAnyAsync()
+        {
+            var list = await _repo.GetCardsAsync(ActivityFilter.Any);
+            return list.ToList().AsReadOnly();
+        }
+
+        public async Task<IReadOnlyList<EstablishmentCardDto>> GetCardsActiveAsync()
+        {
+            var list = await _repo.GetCardsAsync(ActivityFilter.ActiveOnly);
+            return list.ToList().AsReadOnly();
         }
 
         // ========= VALIDACIONES =========

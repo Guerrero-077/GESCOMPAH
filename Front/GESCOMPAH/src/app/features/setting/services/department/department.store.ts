@@ -23,6 +23,7 @@ export class DepartmentStore {
     this._departments.next(val);
   }
 
+  // Carga inicial
   loadAll() {
     this.departmentService.getAll().pipe(
       tap(data => this.departments = data),
@@ -35,17 +36,13 @@ export class DepartmentStore {
 
   create(department: DepartmentCreate): Observable<DepartmentSelectModel> {
     return this.departmentService.create(department as DepartmentSelectModel).pipe(
-      tap(() => {
-        this.loadAll(); // Force refresh
-      })
+      tap(() => this.loadAll())
     );
   }
 
   update(updateDto: DepartmentUpdate): Observable<DepartmentSelectModel> {
     return this.departmentService.update(updateDto.id, updateDto).pipe(
-      tap(() => {
-        this.loadAll(); // Force refresh
-      })
+      tap(() => this.loadAll())
     );
   }
 

@@ -6,7 +6,7 @@
       <div class="col-12 col-lg-6 d-flex justify-content-center mb-4 mb-lg-0">
         <div class="text-center">
           <div class="mb-3">
-            <img src="../../../../../..//public/Escudo-palermo.png" alt="Logo" class="imagen-logo">
+            <img src="../../../../../..//public/Escudo-palermo.png" alt="Logo" class="imagen-logo" decoding="async">
           </div>
           <div>
             <h2 class="text-green fw-bolder mb-2">GESCOMPAH</h2>
@@ -32,7 +32,7 @@
             <div class="mb-3">
               <label for="email" class="form-label texto fw-medium text-green">Correo Electrónico</label>
               <input type="email" id="email" class="form-control border-green" formControlName="email"
-                placeholder="Correo Electrónico" (blur)="onEmailBlur()"
+                placeholder="carlos.garcia@gmail.com" (blur)="onEmailBlur()"
                 [class.is-invalid]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched"
                 [attr.aria-invalid]="formLogin.get('email')?.invalid ? 'true' : null" autocomplete="username" />
 
@@ -52,7 +52,7 @@
               <label for="password" class="form-label texto fw-medium text-green">Contraseña</label>
               <div class="input-group">
                 <input [type]="passwordVisible ? 'text' : 'password'" id="password" class="form-control border-green"
-                  formControlName="password" placeholder="Contraseña"
+                  formControlName="password" placeholder="••••••••"
                   [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched"
                   [attr.aria-invalid]="formLogin.get('password')?.invalid ? 'true' : null" autocomplete="current-password" />
                 <button class="btn btn-outline-secondary" type="button" (click)="togglePasswordVisibility()">

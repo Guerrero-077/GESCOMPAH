@@ -5,7 +5,6 @@ import { filter, switchMap, take, tap, catchError, EMPTY, finalize, map } from '
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
@@ -23,7 +22,7 @@ import { ModuleSelectModel, ModuleUpdateModel } from '../../models/module.models
   styleUrls: ['./module.component.css']
 })
 export class ModuleComponent implements OnInit {
-  // ===== Inyección =====
+  // Inyección de dependencias
   private readonly moduleStore = inject(ModuleStore);
   // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlert    = inject(SweetAlertService);
@@ -31,7 +30,7 @@ export class ModuleComponent implements OnInit {
   private readonly pageHeaderService = inject(PageHeaderService);
   constructor(private dialog: MatDialog) {}
 
-  // ===== Estado =====
+  // Estado
   modules$ = this.moduleStore.modules$;
   columns: TableColumn<ModuleSelectModel>[] = [];
   private busyIds = new Set<number>();
@@ -51,14 +50,15 @@ export class ModuleComponent implements OnInit {
     ];
   }
 
-  // ===== Crear =====
+  // Crear
   onCreateNew(): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: {}, formType: 'Module' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: {}, formType: 'Module' }
+      });
 
-    dialogRef.afterClosed().pipe(
+      dialogRef.afterClosed().pipe(
       filter(Boolean),
       switchMap(result => this.moduleStore.create(result).pipe(take(1))),
       tap(() => this.sweetAlertService.toast('Creación Exitosa', 'Módulo creado exitosamente.', 'success')),
@@ -68,16 +68,18 @@ export class ModuleComponent implements OnInit {
         return EMPTY;
       })
     ).subscribe();
+    });
   }
 
-  // ===== Editar =====
+  // Editar
   onEdit(row: ModuleUpdateModel): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: row, formType: 'Module' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: row, formType: 'Module' }
+      });
 
-    dialogRef.afterClosed().pipe(
+      dialogRef.afterClosed().pipe(
       filter((result): result is Partial<ModuleUpdateModel> => !!result),
       map(result => ({ id: row.id, ...result } as ModuleUpdateModel)),
       switchMap(dto => this.moduleStore.update(dto.id, dto).pipe(take(1))),
@@ -88,9 +90,10 @@ export class ModuleComponent implements OnInit {
         return EMPTY;
       })
     ).subscribe();
+    });
   }
 
-  // ===== Eliminar (lógico) =====
+  // Eliminar (lógico)
   async onDelete(row: ModuleSelectModel): Promise<void> {
     const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar módulo',
@@ -110,14 +113,9 @@ export class ModuleComponent implements OnInit {
   }
 
   onView(row: ModuleSelectModel): void {
-    console.log('Ver:', row);
   }
 
-  // ===== Toggle Activo/Inactivo =====
-  /**
-   * Acepta boolean o {checked:boolean} para evitar perder feedback según el componente emisor.
-   * En el HTML: (toggleChange)="onToggleActive(row, $event)"
-   */
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: ModuleSelectModel, e: boolean | { checked: boolean }): void {
     if (this.isBusy(row.id)) return;
 

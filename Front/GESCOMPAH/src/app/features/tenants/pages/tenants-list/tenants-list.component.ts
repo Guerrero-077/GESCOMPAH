@@ -11,7 +11,6 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
-import { TenantsFormDialogComponent } from '../../components/tenants-form-dialog/tenants-form-dialog.component';
 import {
   TenantFormData,
   TenantsSelectModel,
@@ -74,45 +73,49 @@ export class TenantsListComponent implements OnInit {
     await this.store.loadAll();
   }
 
-  // -------- CRUD --------
+  // CRUD
   onCreate(): void {
     const data: TenantFormData = { mode: 'create' };
-    const ref = this.dialog.open(TenantsFormDialogComponent, { width: '720px', data });
+    import('../../components/tenants-form-dialog/tenants-form-dialog.component').then(m => {
+      const ref = this.dialog.open(m.TenantsFormDialogComponent, { width: '720px', data });
 
-    ref.afterClosed().subscribe(async (payload?: TenantsCreateModel) => {
-      if (!payload) return;
-      try {
-        await this.store.create(payload);
-        this.sweetAlert.toast('Éxito', 'Usuario creado exitosamente.', 'success');
-      } catch {
-        this.sweetAlert.toast('Error', 'No se pudo crear el usuario.', 'error');
-      }
+      ref.afterClosed().subscribe(async (payload?: TenantsCreateModel) => {
+        if (!payload) return;
+        try {
+          await this.store.create(payload);
+          this.sweetAlert.showNotification('Éxito', 'Usuario creado exitosamente.', 'success');
+        } catch {
+          this.sweetAlert.showNotification('Error', 'No se pudo crear el usuario.', 'error');
+        }
+      });
     });
   }
 
   onEdit(row: TenantsSelectModel): void {
     const data: TenantFormData = { mode: 'edit', tenant: row };
-    const ref = this.dialog.open(TenantsFormDialogComponent, { width: '720px', data });
+    import('../../components/tenants-form-dialog/tenants-form-dialog.component').then(m => {
+      const ref = this.dialog.open(m.TenantsFormDialogComponent, { width: '720px', data });
 
-    ref.afterClosed().subscribe(async (partial?: Partial<TenantsUpdateModel>) => {
-      if (!partial) return;
+      ref.afterClosed().subscribe(async (partial?: Partial<TenantsUpdateModel>) => {
+        if (!partial) return;
 
-      const dto = this.toUpdateDto(row, partial);
-      if (!dto) {
-        this.sweetAlert.toast(
-          'Datos incompletos',
-          'Faltan datos obligatorios para actualizar el usuario.',
-          'warning'
-        );
-        return;
-      }
+        const dto = this.toUpdateDto(row, partial);
+        if (!dto) {
+          this.sweetAlert.showNotification(
+            'Datos incompletos',
+            'Faltan datos obligatorios para actualizar el usuario.',
+            'warning'
+          );
+          return;
+        }
 
-      try {
-        await this.store.update(dto.id, dto);
-        this.sweetAlert.toast('Éxito', 'Usuario actualizado exitosamente.', 'success');
-      } catch {
-        this.sweetAlert.toast('Error', 'No se pudo actualizar el usuario.', 'error');
-      }
+        try {
+          await this.store.update(dto.id, dto);
+          this.sweetAlert.showNotification('Éxito', 'Usuario actualizado exitosamente.', 'success');
+        } catch {
+          this.sweetAlert.showNotification('Error', 'No se pudo actualizar el usuario.', 'error');
+        }
+      });
     });
   }
 
@@ -136,7 +139,7 @@ export class TenantsListComponent implements OnInit {
     // (opcional) ver detalle
   }
 
-  // Toggle estado → usa store (optimista + rollback si falla)
+  // Toggle estado (store: optimista + rollback)
   async onToggleActive(
     id: number | null | undefined,
     e: { checked: boolean } | boolean | null | undefined
@@ -160,7 +163,7 @@ export class TenantsListComponent implements OnInit {
     }
   }
 
-  // -------- Helpers --------
+  // Helpers
   private toUpdateDto(
     row: TenantsSelectModel,
     partial: Partial<TenantsUpdateModel>

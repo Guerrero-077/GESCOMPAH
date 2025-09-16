@@ -29,7 +29,7 @@ namespace Data.Services.SecurityAuthentication
             // Trae usuario + persona + roles + rol->rolFormPermissions -> form -> formmodule -> module -> permission
             return await _context.Users
                 .AsNoTracking()
-                .Where(u => u.Id == userId)
+                .Where(u => u.Id == userId && !u.IsDeleted && u.Active)
                 .Include(u => u.Person)
                 .Include(u => u.RolUsers)
                     .ThenInclude(ru => ru.Rol)

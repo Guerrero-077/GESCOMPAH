@@ -45,8 +45,7 @@ export class ToggleButtonComponent {
   onClick() {
     if (this.disabled) return;
     // ⚠️ no tocar el @Input; solo interno y emitir intención
-    this._checked = !this._checked;
-    this.changed.emit({ checked: this._checked });
+    this.changed.emit({ checked: !this._checked });
   }
 
   @HostListener('keydown', ['$event'])

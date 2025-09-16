@@ -59,6 +59,12 @@ namespace Business.CustomJWT
                 throw new UnauthorizedAccessException("Usuario o contraseña inválida.");
             // if (pwdResult == PasswordVerificationResult.SuccessRehashNeeded) { /* rehash opcional */ }
 
+            // Denegar login si usuario está inactivo o eliminado lógicamente
+            if (user.IsDeleted)
+                throw new UnauthorizedAccessException("La cuenta está eliminada o bloqueada.");
+            if (!user.Active)
+                throw new UnauthorizedAccessException("La cuenta está inactiva. Contacta al administrador.");
+
             // 2) Generar access token con roles
             var roles = await _rolUserRepository.GetRoleNamesByUserIdAsync(user.Id);
             var accessToken = BuildAccessToken(user, roles);
@@ -122,6 +128,15 @@ namespace Business.CustomJWT
             // Obtener usuario y roles
             var user = await _userRepository.GetByIdAsync(record.UserId)
                 ?? throw new SecurityTokenException("Usuario no encontrado");
+
+            // Si el usuario fue desactivado o eliminado, revocar tokens y negar refresh
+            if (user.IsDeleted || !user.Active)
+            {
+                var validTokens2 = await _refreshRepo.GetValidTokensByUserAsync(user.Id);
+                foreach (var t in validTokens2)
+                    await _refreshRepo.RevokeAsync(t);
+                throw new SecurityTokenException("La cuenta está inactiva o eliminada.");
+            }
 
             var roles = await _rolUserRepository.GetRoleNamesByUserIdAsync(user.Id);
 

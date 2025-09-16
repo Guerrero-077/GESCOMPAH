@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, switchMap, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { LoginModel } from '../../../features/auth-login/models/login.models';
 import { RegisterModel } from '../../../features/auth-login/models/register.models';
@@ -26,7 +26,14 @@ export class AuthService {
 
   Login(obj: LoginModel): Observable<User> {
     return this.http.post<any>(this.urlBase + 'login', obj, { withCredentials: true }).pipe(
-      switchMap(() => this.GetMe())
+      switchMap(() => this.GetMe()),
+      catchError((error) => {
+        const detail = error?.error?.detail;
+        if (detail) {
+          error.error = { ...error.error, message: detail };
+        }
+        return throwError(() => error);
+      })
     );
   }
 

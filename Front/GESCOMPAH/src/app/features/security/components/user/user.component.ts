@@ -8,7 +8,6 @@ import { of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
@@ -53,7 +52,7 @@ export class UserComponent implements OnInit {
     ];
   }
 
-  // ----- Toggle estado (activo/inactivo) -----
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: UserSelectModel, e: MatSlideToggleChange) {
     const previous = row.active;
     row.active = e.checked; // Optimistic UI
@@ -82,12 +81,13 @@ export class UserComponent implements OnInit {
     });
   }
 
-  // ----- EDIT -----
+  // Editar
   onEdit(row: UserSelectModel) {
     const id = row.id;
     const initial = { email: row.email, password: '' };
 
-    const dialogRef = this.dialog.open(FormDialogComponent, {
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+    const dialogRef = this.dialog.open(m.FormDialogComponent, {
       width: '600px',
       data: {
         entity: initial,
@@ -114,9 +114,10 @@ export class UserComponent implements OnInit {
         }
       });
     });
+    });
   }
 
-  // ----- CREATE -----
+  // Crear
   onCreateNew() {
     this.personService.getAll().pipe(
       catchError(() => of([])),
@@ -130,7 +131,8 @@ export class UserComponent implements OnInit {
         personId: people[0].value
       };
 
-      const dialogRef = this.dialog.open(FormDialogComponent, {
+      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
         width: '600px',
         data: {
           entity: initial,
@@ -158,6 +160,7 @@ export class UserComponent implements OnInit {
             console.error('Error al crear el usuario:', err);
           }
         });
+      });
       });
     });
   }
@@ -189,6 +192,5 @@ export class UserComponent implements OnInit {
   }
 
   onView(row: UserSelectModel) {
-    console.log('Ver usuario:', row);
   }
 }

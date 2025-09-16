@@ -1,17 +1,16 @@
-<mat-horizontal-stepper [linear]="true" #stepper>
+<mat-horizontal-stepper [linear]="true" #stepper class="form-stepper">
 
 <!-- Paso 1: Datos del establecimiento -->
 <mat-step [stepControl]="generalGroup">
-  <form [formGroup]="generalGroup" autocomplete="off" spellcheck="false">
+  <form [formGroup]="generalGroup" autocomplete="off" spellcheck="false" class="form-step">
     <ng-template matStepLabel>Datos del Local</ng-template>
 
-    <div class="info mb-4">
+    <div class="section-header">
       <h3>Información Básica del Local</h3>
-      <span>Ingrese la información básica del local</span>
     </div>
 
     <!-- Grid responsivo 2 columnas -->
-    <div class="form-grid-2">
+    <div class="form-grid two-cols">
       <!-- Nombre (ancho completo) -->
       <mat-form-field appearance="outline" class="col-span-2">
         <mat-label>Nombre</mat-label>
@@ -19,14 +18,14 @@
           matInput
           formControlName="name"
           required
+          placeholder="Local 15 - Carnicería El Buen Sabor"
           (blur)="onTrim(generalGroup.get('name'))"
-          [disabled]="isBusy"
           autocomplete="off"
         />
         <mat-error *ngIf="generalGroup.get('name')?.touched && generalGroup.get('name')?.errors as e">
-          <ng-container *ngIf="e['required']">{{ errors.name.required }}</ng-container>
-          <ng-container *ngIf="e['maxlength']">{{ errors.name.maxlength }}</ng-container>
-          <ng-container *ngIf="e['onlySpaces']">{{ errors.name.onlySpaces }}</ng-container>
+          <ng-container *ngIf="e['required']">Por favor ingrese el nombre del establecimiento</ng-container>
+          <ng-container *ngIf="e['maxlength']">El nombre no puede exceder 100 caracteres</ng-container>
+          <ng-container *ngIf="e['onlySpaces']">El nombre no puede estar vacío o contener solo espacios</ng-container>
         </mat-error>
       </mat-form-field>
 
@@ -42,18 +41,18 @@
           min="1"
           formControlName="areaM2"
           required
+          placeholder="25.50"
           (blur)="onNumberBlur(generalGroup.get('areaM2'))"
-          [disabled]="isBusy"
           autocomplete="off"
         />
         <mat-hint align="end">Máx. 2 decimales</mat-hint>
         <mat-error *ngIf="generalGroup.get('areaM2')?.touched && generalGroup.get('areaM2')?.errors as e">
-          <ng-container *ngIf="e['required']">{{ errors.areaM2.required }}</ng-container>
-          <ng-container *ngIf="e['NaN']">{{ errors.areaM2.NaN }}</ng-container>
-          <ng-container *ngIf="e['invalidNotation']">{{ errors.areaM2.invalidNotation }}</ng-container>
-          <ng-container *ngIf="e['min']">{{ errors.areaM2.min }}</ng-container>
-          <ng-container *ngIf="e['max']">{{ errors.areaM2.max }}</ng-container>
-          <ng-container *ngIf="e['decimalScale']">{{ errors.areaM2.decimalScale }}</ng-container>
+          <ng-container *ngIf="e['required']">Por favor ingrese el área en metros cuadrados</ng-container>
+          <ng-container *ngIf="e['NaN']">El área debe ser un número válido</ng-container>
+          <ng-container *ngIf="e['invalidNotation']">Ingrese un número válido sin notación científica</ng-container>
+          <ng-container *ngIf="e['min']">El área debe ser mayor a 0 metros cuadrados</ng-container>
+          <ng-container *ngIf="e['max']">El área no puede exceder 10,000 metros cuadrados</ng-container>
+          <ng-container *ngIf="e['decimalScale']">El área puede tener máximo 2 decimales</ng-container>
         </mat-error>
       </mat-form-field>
 
@@ -71,18 +70,18 @@
           min="1"
           formControlName="rentValueBase"
           required
+          placeholder="850000"
           (blur)="onNumberBlur(generalGroup.get('rentValueBase'))"
-          [disabled]="isBusy"
           autocomplete="off"
         />
         <mat-hint align="end">Máx. 2 decimales</mat-hint>
         <mat-error *ngIf="generalGroup.get('rentValueBase')?.touched && generalGroup.get('rentValueBase')?.errors as e">
-          <ng-container *ngIf="e['required']">{{ errors.rentValueBase.required }}</ng-container>
-          <ng-container *ngIf="e['NaN']">{{ errors.rentValueBase.NaN }}</ng-container>
-          <ng-container *ngIf="e['invalidNotation']">{{ errors.rentValueBase.invalidNotation }}</ng-container>
-          <ng-container *ngIf="e['min']">{{ errors.rentValueBase.min }}</ng-container>
-          <ng-container *ngIf="e['max']">{{ errors.rentValueBase.max }}</ng-container>
-          <ng-container *ngIf="e['decimalScale']">{{ errors.rentValueBase.decimalScale }}</ng-container>
+          <ng-container *ngIf="e['required']">Por favor ingrese el valor base del arriendo</ng-container>
+          <ng-container *ngIf="e['NaN']">El valor debe ser un número válido</ng-container>
+          <ng-container *ngIf="e['invalidNotation']">Ingrese un número válido sin notación científica</ng-container>
+          <ng-container *ngIf="e['min']">El valor base debe ser mayor a $0</ng-container>
+          <ng-container *ngIf="e['max']">El valor base no puede exceder $999,999,999</ng-container>
+          <ng-container *ngIf="e['decimalScale']">El valor puede tener máximo 2 decimales</ng-container>
         </mat-error>
       </mat-form-field>
 
@@ -98,18 +97,18 @@
           min="1"
           formControlName="uvtQty"
           required
+          placeholder="2.5"
           (blur)="onNumberBlur(generalGroup.get('uvtQty'))"
-          [disabled]="isBusy"
           autocomplete="off"
         />
         <mat-hint align="end">Máx. 2 decimales</mat-hint>
         <mat-error *ngIf="generalGroup.get('uvtQty')?.touched && generalGroup.get('uvtQty')?.errors as e">
-          <ng-container *ngIf="e['required']">{{ errors.uvtQty.required }}</ng-container>
-          <ng-container *ngIf="e['NaN']">{{ errors.uvtQty.NaN }}</ng-container>
-          <ng-container *ngIf="e['invalidNotation']">{{ errors.uvtQty.invalidNotation }}</ng-container>
-          <ng-container *ngIf="e['min']">{{ errors.uvtQty.min }}</ng-container>
-          <ng-container *ngIf="e['max']">{{ errors.uvtQty.max }}</ng-container>
-          <ng-container *ngIf="e['decimalScale']">{{ errors.uvtQty.decimalScale }}</ng-container>
+          <ng-container *ngIf="e['required']">Por favor ingrese la cantidad de UVT</ng-container>
+          <ng-container *ngIf="e['NaN']">La cantidad de UVT debe ser un número válido</ng-container>
+          <ng-container *ngIf="e['invalidNotation']">Ingrese un número válido sin notación científica</ng-container>
+          <ng-container *ngIf="e['min']">La cantidad de UVT debe ser mayor a 0</ng-container>
+          <ng-container *ngIf="e['max']">La cantidad de UVT no puede exceder 999</ng-container>
+          <ng-container *ngIf="e['decimalScale']">La cantidad de UVT puede tener máximo 2 decimales</ng-container>
         </mat-error>
       </mat-form-field>
     </div>
@@ -122,22 +121,33 @@
         rows="3"
         formControlName="description"
         required
+        placeholder="Local comercial ubicado en el primer piso, ideal para carnicería o venta de alimentos. Cuenta con mesón en acero inoxidable y sistema de refrigeración."
         (blur)="onTrim(generalGroup.get('description'))"
-        [disabled]="isBusy"
       ></textarea>
       <mat-hint align="start">{{ generalGroup.get('description')?.value?.length || 0 }}/500</mat-hint>
       <mat-error *ngIf="generalGroup.get('description')?.touched && generalGroup.get('description')?.errors as e">
-        <ng-container *ngIf="e['required']">{{ errors.description.required }}</ng-container>
-        <ng-container *ngIf="e['maxlength']">{{ errors.description.maxlength }}</ng-container>
-        <ng-container *ngIf="e['onlySpaces']">{{ errors.description.onlySpaces }}</ng-container>
+        <ng-container *ngIf="e['required']">Por favor ingrese una descripción del establecimiento</ng-container>
+        <ng-container *ngIf="e['maxlength']">La descripción no puede exceder 500 caracteres</ng-container>
+        <ng-container *ngIf="e['onlySpaces']">La descripción no puede estar vacía o contener solo espacios</ng-container>
       </mat-error>
     </mat-form-field>
 
-    <div class="actions">
-      <button mat-stroked-button type="button" (click)="cancel()" [disabled]="isBusy">Cancelar</button>
-      <button mat-raised-button color="primary" matStepperNext [disabled]="generalGroup.invalid || isBusy">
-        Siguiente
-      </button>
+    <div class="form-actions">
+      <app-standard-button
+        text="Cancelar"
+        variant="stroked"
+        (clicked)="cancel()"
+        [disabled]="isBusy">
+      </app-standard-button>
+      <app-standard-button
+        text="Siguiente"
+        variant="raised"
+        color="primary"
+        icon="arrow_forward"
+        iconPosition="right"
+        matStepperNext
+        [disabled]="generalGroup.invalid || isBusy">
+      </app-standard-button>
     </div>
   </form>
 </mat-step>
@@ -146,24 +156,23 @@
 
   <!-- Paso 2: Ubicación -->
   <mat-step [stepControl]="ubicacionGroup">
-    <form [formGroup]="ubicacionGroup" autocomplete="off" spellcheck="false">
+    <form [formGroup]="ubicacionGroup" autocomplete="off" spellcheck="false" class="form-step">
       <ng-template matStepLabel>Ubicación</ng-template>
 
-      <div class="info mb-4">
+      <div class="section-header">
         <h3>Ubicación del Local</h3>
-        <span>Seleccione la plaza y dirección del local</span>
       </div>
 
       <!-- Plaza -->
       <mat-form-field appearance="outline" class="w-100 mb-3">
         <mat-label>Plaza*</mat-label>
-        <mat-select formControlName="plazaId" required [disabled]="isBusy">
+        <mat-select formControlName="plazaId" required>
           <mat-option *ngFor="let plaza of Squares; trackBy: trackByIndex" [value]="plaza.id">
             {{ plaza.name }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="ubicacionGroup.get('plazaId')?.touched && ubicacionGroup.get('plazaId')?.errors as e">
-          <ng-container *ngIf="e['required']">{{ errors.plazaId.required }}</ng-container>
+          <ng-container *ngIf="e['required']">Por favor seleccione la plaza de mercado donde se ubicará el local comercial</ng-container>
         </mat-error>
       </mat-form-field>
 
@@ -173,25 +182,43 @@
         <input
           matInput
           formControlName="address"
-          placeholder="Ej: Cra 10 # 12-34"
+          placeholder="Carrera 7 # 14 - 28 Local 15"
           (blur)="onTrim(ubicacionGroup.get('address'))"
-          [disabled]="isBusy"
           autocomplete="off"
         />
         <mat-error *ngIf="ubicacionGroup.get('address')?.touched && ubicacionGroup.get('address')?.errors as e">
-          <ng-container *ngIf="e['maxlength']">{{ errors.address.maxlength }}</ng-container>
-          <ng-container *ngIf="e['addressInvalid']">{{ errors.address.addressInvalid }}</ng-container>
+          <ng-container *ngIf="e['maxlength']">La dirección no puede exceder 200 caracteres</ng-container>
+          <ng-container *ngIf="e['addressInvalid']">Por favor ingrese una dirección válida</ng-container>
         </mat-error>
       </mat-form-field>
 
-      <div class="d-flex justify-content-between mt-4">
+      <div class="form-actions space-between">
         <div>
-          <button mat-stroked-button type="button" (click)="cancel()" [disabled]="isBusy">Cancelar</button>
-          <button mat-button matStepperPrevious [disabled]="isBusy" class="ms-2">Anterior</button>
+          <app-standard-button
+            text="Cancelar"
+            variant="stroked"
+            (clicked)="cancel()"
+            [disabled]="isBusy">
+          </app-standard-button>
+          <app-standard-button
+            text="Anterior"
+            variant="flat"
+            icon="arrow_back"
+            iconPosition="left"
+            matStepperPrevious
+            [disabled]="isBusy"
+            class="ms-2">
+          </app-standard-button>
         </div>
-        <button mat-raised-button color="primary" matStepperNext [disabled]="ubicacionGroup.invalid || isBusy">
-          Siguiente
-        </button>
+        <app-standard-button
+          text="Siguiente"
+          variant="raised"
+          color="primary"
+          icon="arrow_forward"
+          iconPosition="right"
+          matStepperNext
+          [disabled]="ubicacionGroup.invalid || isBusy">
+        </app-standard-button>
       </div>
     </form>
   </mat-step>
@@ -199,10 +226,10 @@
   <!-- Paso 3: Imágenes -->
   <mat-step>
     <ng-template matStepLabel>Imágenes</ng-template>
+    <div class="form-step">
 
-    <div class="info mb-4">
+    <div class="section-header">
       <h3>Imágenes del Local</h3>
-      <span>Suba imágenes del local (máximo {{ MAX_IMAGES }})</span>
     </div>
 
     <!-- Dropzone usando la directiva -->
@@ -283,23 +310,38 @@
       </div>
     </div>
 
-    <div class="d-flex justify-content-between mt-4">
+    <div class="form-actions space-between">
       <div>
-        <button mat-stroked-button type="button" (click)="cancel()" [disabled]="isBusy">Cancelar</button>
-        <button mat-button matStepperPrevious [disabled]="isBusy" class="ms-2">Anterior</button>
+        <app-standard-button
+          text="Cancelar"
+          variant="stroked"
+          (clicked)="cancel()"
+          [disabled]="isBusy">
+        </app-standard-button>
+        <app-standard-button
+          text="Anterior"
+          variant="flat"
+          icon="arrow_back"
+          iconPosition="left"
+          matStepperPrevious
+          [disabled]="isBusy"
+          class="ms-2">
+        </app-standard-button>
       </div>
 
-      <button
-        mat-raised-button
+      <app-standard-button
+        [text]="isEdit ? 'Actualizar' : 'Crear'"
+        variant="raised"
         color="primary"
-        (click)="onSubmit()"
+        icon="save"
+        iconPosition="left"
+        [loading]="isBusy"
+        loadingText="Guardando..."
+        (clicked)="onSubmit()"
         [disabled]="isBusy"
-        [attr.aria-busy]="isBusy"
-        class="btn-progress"
-      >
-        <mat-spinner *ngIf="isBusy" diameter="18"></mat-spinner>
-        <span class="btn-label" *ngIf="!isBusy">{{ isEdit ? 'Actualizar' : 'Crear' }}</span>
-      </button>
+        class="btn-progress">
+      </app-standard-button>
+    </div>
     </div>
   </mat-step>
 </mat-horizontal-stepper>

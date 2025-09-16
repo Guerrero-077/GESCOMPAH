@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import {
   AbstractControl,
@@ -74,7 +74,7 @@ export class DymanicFormsComponent implements OnInit {
       if (personField) personField.type = 'hidden';
     }
 
-    // 4) Cargar opciones dinámicas
+    // 4) Cargar opciones dinÃ¡micas
     this.fields.forEach(field => {
       if (field.name === 'departmentId' && this.formType === 'City') {
         this.departmentService.getAll().pipe(
@@ -137,7 +137,7 @@ export class DymanicFormsComponent implements OnInit {
     });
   }
 
-  // ====== Mapeo de validadores ======
+  // Mapeo de validadores
   private mapValidators(field: DynamicFormField): ValidatorFn[] {
     const v = field.validations ?? {};
     const out: ValidatorFn[] = [];
@@ -158,7 +158,7 @@ export class DymanicFormsComponent implements OnInit {
     // pattern (compilado con 'u')
     if (v.pattern) out.push(Validators.pattern(new RegExp(v.pattern, 'u')));
 
-    // numérico con min/max (soporta coma)
+    // numÃ©rico con min/max (soporta coma)
     if (field.type === 'number' && (v.min !== undefined || v.max !== undefined)) {
       out.push(numberRange(v.min, v.max));
     }
@@ -175,7 +175,7 @@ export class DymanicFormsComponent implements OnInit {
     return out;
   }
 
-  // ===== Helpers de opciones/checkbox-list =====
+  // Helpers de opciones/checkbox-list
   private sortOptionsById(opts: Option[]) {
     return [...(opts ?? [])].sort((a, b) => Number(a.value) - Number(b.value));
   }
@@ -219,7 +219,7 @@ export class DymanicFormsComponent implements OnInit {
 
   trackByOption = (_: number, opt: Option) => String(opt.value);
 
-  // ===== UX helpers =====
+  // Utilidades UX
   compareById(o1: any, o2: any): boolean {
     if (o1 == null || o2 == null) return false;
     return String(o1) === String(o2);
@@ -249,16 +249,16 @@ export class DymanicFormsComponent implements OnInit {
     if (c.errors['required'])   return `${label} es obligatorio.`;
     if (c.errors['minlength'])  return `${label} requiere al menos ${c.errors['minlength'].requiredLength} caracteres.`;
     if (c.errors['maxlength'])  return `${label} no puede superar ${c.errors['maxlength'].requiredLength} caracteres.`;
-    if (c.errors['email'])      return `Ingresa un correo válido (ej. usuario@dominio.com).`;
-    if (c.errors['pattern'])    return `${label} tiene un formato inválido.`;
-    if (c.errors['NaN'])        return `${label} debe ser numérico.`;
+    if (c.errors['email'])      return `Ingresa un correo vÃ¡lido (ej. usuario@dominio.com).`;
+    if (c.errors['pattern'])    return `${label} tiene un formato invÃ¡lido.`;
+    if (c.errors['NaN'])        return `${label} debe ser numÃ©rico.`;
     if (c.errors['min'])        return `${label} no puede ser menor que ${c.errors['min'].min}.`;
     if (c.errors['max'])        return `${label} no puede ser mayor que ${c.errors['max'].max}.`;
     if (c.errors['onlySpaces']) return `${label} no puede ser solo espacios.`;
-    return 'Valor inválido.';
+    return 'Valor invÃ¡lido.';
   }
 
-  // ===== Submit =====
+  // Submit
   onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -294,7 +294,7 @@ export class DymanicFormsComponent implements OnInit {
   }
 }
 
-/** Valida números (soporta coma) y chequea min/max si se proveen */
+/** Valida nÃºmeros (soporta coma) y chequea min/max si se proveen */
 function numberRange(min?: number, max?: number) {
   return (c: AbstractControl) => {
     const raw = c.value;
@@ -312,3 +312,4 @@ function atLeastOneTrueInGroupValidator(c: AbstractControl) {
   const v = c.value as Record<string, boolean>;
   return Object.values(v || {}).some(Boolean) ? null : { required: true };
 }
+

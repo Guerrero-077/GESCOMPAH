@@ -1,0 +1,114 @@
+/* ============================================
+ * GESCOMPAH - MENSAJES DE ERROR ESTANDARIZADOS
+ * ============================================ */
+
+/* ========== MENSAJES DE ERROR ESPECÍFICOS ========== */
+
+/* Campos Personales */
+.error-firstName-required::before { content: "Por favor ingrese los nombres del usuario"; }
+.error-lastName-required::before { content: "Por favor ingrese los apellidos del usuario"; }
+.error-document-required::before { content: "Por favor ingrese el número de documento de identidad"; }
+.error-phone-required::before { content: "Por favor ingrese el número de teléfono celular"; }
+.error-address-required::before { content: "Por favor ingrese la dirección completa de residencia"; }
+.error-email-required::before { content: "Por favor ingrese el correo electrónico"; }
+
+/* Validaciones de formato */
+.error-document-colombianDocument::before { content: "El documento debe tener entre 7 y 10 dígitos numéricos"; }
+.error-phone-colombianPhone::before { content: "Ingrese un número celular válido (debe empezar en 3 y tener 10 dígitos)"; }
+.error-firstName-alphaHuman::before { content: "Los nombres solo pueden contener letras y espacios"; }
+.error-lastName-alphaHuman::before { content: "Los apellidos solo pueden contener letras y espacios"; }
+.error-firstName-onlySpaces::before { content: "Los nombres no pueden estar vacíos o contener solo espacios"; }
+.error-lastName-onlySpaces::before { content: "Los apellidos no pueden estar vacíos o contener solo espacios"; }
+.error-address-onlySpaces::before { content: "La dirección no puede estar vacía o contener solo espacios"; }
+
+/* Validaciones de longitud */
+.error-firstName-maxlength::before { content: "Los nombres no pueden exceder 50 caracteres"; }
+.error-lastName-maxlength::before { content: "Los apellidos no pueden exceder 50 caracteres"; }
+.error-address-maxlength::before { content: "La dirección no puede exceder 100 caracteres"; }
+
+/* Campos de Email */
+.error-email-email::before { content: "Por favor ingrese un correo electrónico válido"; }
+.error-email-domainMissing::before { content: "El correo debe incluir un dominio (ej: &#64;gmail.com)"; }
+.error-email-tldMissing::before { content: "El dominio debe incluir una extensión válida (.com, .co, etc.)"; }
+.error-email-tldInvalid::before { content: "La extensión del dominio no es válida"; }
+.error-email-domainInvalid::before { content: "El dominio del correo no es válido"; }
+
+/* Campos Geográficos */
+.error-departmentId-required::before { content: "Por favor seleccione el departamento de residencia"; }
+.error-cityId-required::before { content: "Por favor seleccione la ciudad donde reside el usuario"; }
+.error-cityId-min::before { content: "Debe seleccionar una ciudad válida de la lista"; }
+
+/* Campos de Establecimiento */
+.error-name-required::before { content: "Por favor ingrese el nombre del establecimiento"; }
+.error-areaM2-required::before { content: "Por favor ingrese el área en metros cuadrados"; }
+.error-rentValueBase-required::before { content: "Por favor ingrese el valor base del arriendo"; }
+.error-plazaId-required::before { content: "Por favor seleccione la plaza de mercado donde se ubicarán los locales comerciales"; }
+.error-establishmentIds-required::before { content: "Por favor seleccione al menos un local comercial para incluir en el contrato de arrendamiento"; }
+
+/* Campos de Fechas */
+.error-startDate-required::before { content: "Por favor seleccione la fecha de inicio del contrato de arrendamiento"; }
+.error-endDate-required::before { content: "Por favor seleccione la fecha de finalización del contrato de arrendamiento"; }
+.error-endBeforeStart::before { content: "La fecha de finalización debe ser posterior a la fecha de inicio"; }
+
+/* Campos de Seguridad */
+.error-password-required::before { content: "Por favor ingrese la contraseña"; }
+.error-currentPassword-required::before { content: "Por favor ingrese la contraseña actual"; }
+.error-newPassword-required::before { content: "Por favor ingrese la nueva contraseña"; }
+.error-confirmPassword-required::before { content: "Por favor confirme la nueva contraseña"; }
+.error-password-minlength::before { content: "La contraseña debe tener al menos 8 caracteres"; }
+.error-password-pattern::before { content: "La contraseña debe contener al menos una letra mayúscula, una minúscula y un número"; }
+.error-confirmPassword-mismatch::before { content: "Las contraseñas no coinciden"; }
+.error-currentPassword-incorrect::before { content: "La contraseña actual es incorrecta"; }
+
+/* Campos de Roles */
+.error-roleId-required::before { content: "Por favor seleccione el rol que tendrá el usuario en el sistema"; }
+.error-roleId-min::before { content: "Debe seleccionar un rol válido de la lista"; }
+
+/* Campos de Login */
+.error-username-required::before { content: "Por favor ingrese su nombre de usuario o correo electrónico"; }
+.error-login-invalid::before { content: "Credenciales incorrectas. Verifique su usuario y contraseña"; }
+
+/* ========== CLASES DE UTILIDAD PARA ERRORES ========== */
+.error-message {
+  display: block;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--form-error, #d32f2f);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.error-message::before {
+  content: attr(data-error-message);
+}
+
+/* Para errores múltiples */
+.error-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+}
+
+.error-list li {
+  font-size: 12px;
+  color: var(--form-error, #d32f2f);
+  margin-bottom: 2px;
+}
+
+.error-list li::before {
+  content: "• ";
+  margin-right: 4px;
+}
+
+/* ========== HINTS ESTANDARIZADOS ========== */
+.hint-document::before { content: "Número de cédula de ciudadanía (7 a 10 dígitos)"; }
+.hint-phone::before { content: "Número celular colombiano de 10 dígitos"; }
+.hint-email::before { content: "Se usará para el acceso al sistema y notificaciones"; }
+.hint-password::before { content: "Mínimo 8 caracteres, incluya mayúsculas, minúsculas y números"; }
+.hint-address::before { content: "Dirección completa donde reside actualmente"; }
+.hint-role::before { content: "Seleccione el rol que tendrá el usuario en el sistema"; }
+.hint-department::before { content: "Seleccione el departamento donde reside"; }
+.hint-city::before { content: "Seleccione la ciudad de residencia"; }
+.hint-establishment::before { content: "Puede seleccionar múltiples locales para el mismo contrato"; }
+.hint-plaza::before { content: "Seleccione la plaza donde se encuentran los locales a arrendar"; }
+.hint-dates::before { content: "Seleccione el período de vigencia del contrato"; }

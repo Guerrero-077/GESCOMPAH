@@ -3,7 +3,6 @@ import { Component, OnInit, TemplateRef, ViewChild, inject } from '@angular/core
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, EMPTY, filter, finalize, map, switchMap, take, tap } from 'rxjs';
 
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
@@ -22,7 +21,7 @@ import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-h
 })
 export class FormComponent implements OnInit {
 
-  // ===== Inyección de dependencias =====
+  // Inyección de dependencias
   private readonly formStore = inject(FormStore);
   // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlert    = inject(SweetAlertService);
@@ -30,7 +29,7 @@ export class FormComponent implements OnInit {
   private readonly pageHeaderService = inject(PageHeaderService);
   constructor(private dialog: MatDialog) {}
 
-  // ===== Estado / datos =====
+  // Estado / datos
   forms$ = this.formStore.forms$;
   selectedForm: FormSelectModel | null = null;
   columns: TableColumn<FormSelectModel>[] = [];
@@ -53,12 +52,13 @@ export class FormComponent implements OnInit {
     ];
   }
 
-  // ===== Crear =====
+  // Crear
   onCreateNew(): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: {}, formType: 'Form' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: {}, formType: 'Form' }
+      });
 
     dialogRef.afterClosed().pipe(
       filter(Boolean),
@@ -80,14 +80,16 @@ export class FormComponent implements OnInit {
         return EMPTY;
       })
     ).subscribe();
+    });
   }
 
-  // ===== Editar =====
+  // Editar
   onEdit(row: FormUpdateModel): void {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: row, formType: 'Form' }
-    });
+    import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
+        width: '600px',
+        data: { entity: row, formType: 'Form' }
+      });
 
     dialogRef.afterClosed().pipe(
       filter((result): result is Partial<FormUpdateModel> => !!result),
@@ -110,9 +112,10 @@ export class FormComponent implements OnInit {
         return EMPTY;
       })
     ).subscribe();
+    });
   }
 
-  // ===== Eliminar (lógico) =====
+  // Eliminar (lógico)
   async onDelete(row: FormSelectModel): Promise<void> {
     const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar form',
@@ -143,14 +146,9 @@ export class FormComponent implements OnInit {
   }
 
   onView(row: FormSelectModel): void {
-    console.log('Ver:', row);
   }
 
-  // ===== Toggle Activo/Inactivo =====
-  /**
-   * NOTA: algunos toggles emiten boolean (true/false) y otros emiten {checked:boolean}.
-   * Este handler acepta ambos para evitar “no ver feedback”.
-   */
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: FormSelectModel, e: boolean | { checked: boolean }): void {
     if (this.isBusy(row.id)) return;
 

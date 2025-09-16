@@ -24,7 +24,7 @@ export class RolFormPermissionStore {
     this._rolFormPermissions.next(val);
   }
 
-  // loadAll ahora usa el nuevo método del servicio
+  // Carga inicial (usa el método agrupado del servicio)
   loadAll() {
     this.rolFormPermissionService.getAll().pipe(
       tap(data => this.rolFormPermissions = data),
@@ -35,7 +35,7 @@ export class RolFormPermissionStore {
     ).subscribe();
   }
 
-  // create y update ahora refrescan la lista agrupada
+  // Crear/actualizar: refresca la lista agrupada
   create(rolFormPermission: RolFormPermissionCreateModel): Observable<RolFormPermissionGroupedModel> {
     return this.rolFormPermissionService.create(rolFormPermission).pipe(
       tap(() => {
@@ -52,7 +52,7 @@ export class RolFormPermissionStore {
     );
   }
 
-  // --- MÉTODO NUEVO Y CORREGIDO ---
+  // Eliminar por grupo
   deleteByGroup(rolId: number, formId: number): Observable<void> {
     return this.rolFormPermissionService.deleteByGroup(rolId, formId).pipe(
       tap(() => {
@@ -62,8 +62,7 @@ export class RolFormPermissionStore {
     );
   }
 
-  // Dejamos los métodos de borrado individual por si se usan en otra parte,
-  // pero ahora también refrescan la lista principal.
+  // Eliminar individual: también refresca la lista
   delete(id: number): Observable<void> {
     return this.rolFormPermissionService.delete(id).pipe(
       tap(() => {

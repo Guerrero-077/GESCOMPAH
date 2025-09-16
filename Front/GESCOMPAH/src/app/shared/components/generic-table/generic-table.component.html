@@ -25,9 +25,14 @@
 
     <!-- Botón crear (solo Admin con permiso CREAR) -->
     <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
-      <button mat-raised-button color="primary" (click)="onCreate()" *ngIf="showDetailButton">
-        {{ createButtonLabel }}
-      </button>
+      <app-standard-button 
+        *ngIf="showDetailButton"
+        [text]="createButtonLabel"
+        variant="raised"
+        color="primary"
+        icon="add"
+        (clicked)="onCreate()">
+      </app-standard-button>
     </ng-container>
   </div>
 
@@ -86,15 +91,23 @@
 
           <!-- 👇 Fallback actual si no se pasó template -->
           <ng-template #defaultActions>
-            <button *ngIf="showViewButton" mat-icon-button matTooltip="Ver"
-                    (click)="onView(row)">
-              <mat-icon>visibility</mat-icon>
-            </button>
+            <app-standard-button 
+              *ngIf="showViewButton"
+              variant="icon"
+              icon="visibility"
+              ariaLabel="Ver"
+              title="Ver"
+              (clicked)="onView(row)">
+            </app-standard-button>
 
             <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
-              <button mat-icon-button [matMenuTriggerFor]="menu">
-                <mat-icon>more_vert</mat-icon>
-              </button>
+              <app-standard-button 
+                variant="icon"
+                icon="more_vert"
+                ariaLabel="Más opciones"
+                title="Más opciones"
+                [matMenuTriggerFor]="menu">
+              </app-standard-button>
               <mat-menu #menu="matMenu">
                 <button mat-menu-item (click)="onEdit(row)">
                   <mat-icon>edit</mat-icon> Editar

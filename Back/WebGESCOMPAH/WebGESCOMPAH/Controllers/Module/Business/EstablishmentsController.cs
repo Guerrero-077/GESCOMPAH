@@ -34,6 +34,19 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         }
 
         /// <summary>
+        /// Listado liviano para tarjetas/grillas. Incluye PrimaryImagePath pero no la colección completa de imágenes.
+        /// </summary>
+        [HttpGet("cards")]
+        [ProducesResponseType(typeof(IEnumerable<EstablishmentCardDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetCards([FromQuery] bool activeOnly = false)
+        {
+            var result = activeOnly
+                ? await _establishmentService.GetCardsActiveAsync()
+                : await _establishmentService.GetCardsAnyAsync();
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Obtener un establecimiento por ID.
         /// Usa ?activeOnly=true para forzar que sea activo; por defecto busca cualquiera.
         /// </summary>

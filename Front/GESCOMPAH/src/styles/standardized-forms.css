@@ -1,0 +1,357 @@
+/* ============================================
+ * GESCOMPAH - ESTILOS ESTANDARIZADOS PARA FORMULARIOS
+ * ============================================ */
+
+/* ========== VARIABLES GLOBALES ========== */
+:root {
+  /* Espaciado estándar - Optimizado para modales */
+  --form-section-spacing: 20px;
+  --form-field-spacing: 12px;
+  --form-padding: 16px;
+  --form-border-radius: 6px;
+  
+  /* Colores de formularios */
+  --form-primary: var(--green-500, #22c55e);
+  --form-primary-hover: var(--green-600, #16a34a);
+  --form-error: #d32f2f;
+  --form-success: #2e7d32;
+  --form-warning: #ed6c02;
+  --form-info: #0288d1;
+  
+  /* Bordes y sombras */
+  --form-border: 1px solid #e0e0e0;
+  --form-border-focus: 2px solid var(--form-primary);
+  --form-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --form-shadow-focus: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+/* ========== CONTENEDORES DE FORMULARIOS ========== */
+.form-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: var(--form-padding);
+}
+
+.form-step {
+  padding: var(--form-padding);
+  max-width: 100%;
+}
+
+.form-card {
+  background: white;
+  border-radius: var(--form-border-radius);
+  box-shadow: var(--form-shadow);
+  padding: var(--form-padding);
+  margin-bottom: var(--form-section-spacing);
+}
+
+/* ========== ENCABEZADOS DE SECCIÓN - OPTIMIZADO PARA MODALES ========== */
+.section-header {
+  margin: var(--form-section-spacing) 0 12px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.section-header:first-child {
+  margin-top: 0;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #424242;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #616161;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+/* ========== GRIDS DE FORMULARIOS ========== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--form-field-spacing);
+  margin-bottom: var(--form-field-spacing);
+}
+
+.form-grid.two-cols {
+  grid-template-columns: 1fr;
+}
+
+.form-grid.three-cols {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .form-grid.two-cols {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .form-grid.three-cols {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* ========== CAMPOS DE FORMULARIO - COMPACTO PARA MODALES ========== */
+.form-field {
+  width: 100%;
+  margin-bottom: var(--form-field-spacing);
+}
+
+/* Material Design Form Fields - Optimizado para modales */
+:host ::ng-deep .mat-mdc-form-field {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+:host ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  min-height: 18px;
+  padding-top: 2px;
+}
+
+/* ========== MENSAJES DE ERROR ESTANDARIZADOS - COMPACTO ========== */
+:host ::ng-deep .mat-mdc-form-field-error {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--form-error);
+  margin-top: 2px;
+  display: block;
+  white-space: normal;
+  word-wrap: break-word;
+  font-weight: 400;
+}
+
+:host ::ng-deep .mat-mdc-form-field-hint {
+  font-size: 10px;
+  line-height: 1.2;
+  color: #666;
+  margin-top: 1px;
+}
+
+/* Espaciado adicional cuando hay errores - Reducido para modales */
+:host ::ng-deep .mat-mdc-form-field.mat-mdc-form-field-invalid {
+  margin-bottom: 12px;
+}
+
+/* ========== MENSAJES DE ESTADO ========== */
+.form-message {
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.form-message.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.form-message.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.form-message.warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+}
+
+.form-message.info {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+}
+
+/* ========== BOTONES DE ACCIÓN - COMPACTO PARA MODALES ========== */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.form-actions.center {
+  justify-content: center;
+}
+
+.form-actions.start {
+  justify-content: flex-start;
+}
+
+.form-actions.space-between {
+  justify-content: space-between;
+}
+
+/* ========== STEPPERS ESTANDARIZADOS ========== */
+.form-stepper {
+  background: white;
+  border-radius: var(--form-border-radius);
+  box-shadow: var(--form-shadow);
+}
+
+:host ::ng-deep .mat-horizontal-stepper {
+  background: white;
+  border-radius: var(--form-border-radius);
+}
+
+:host ::ng-deep .mat-horizontal-content-container {
+  padding: var(--form-padding) 0;
+}
+
+:host ::ng-deep .mat-stepper-horizontal {
+  margin-top: 16px;
+}
+
+/* ========== RESPONSIVE DESIGN - OPTIMIZADO PARA MODALES ========== */
+@media (max-width: 900px) {
+  .form-step,
+  .form-container {
+    padding: 12px;
+  }
+  
+  .form-grid {
+    gap: 10px;
+  }
+  
+  .section-header h3 {
+    font-size: 0.9rem;
+  }
+  
+  .section-header h4 {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+  
+  .form-grid.two-cols,
+  .form-grid.three-cols {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .section-header {
+    margin: 12px 0 8px 0;
+  }
+}
+
+/* ========== UTILIDADES ========== */
+.w-full {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mt-4 { margin-top: 32px; }
+
+/* ========== CAMPOS ESPECÍFICOS ========== */
+.field-document input {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+.field-phone input {
+  font-family: 'Courier New', monospace;
+}
+
+.field-currency input {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+/* ========== VALIDACIONES VISUALES ========== */
+.form-field.ng-invalid.ng-touched {
+  --mdc-outlined-text-field-outline-color: var(--form-error);
+}
+
+.form-field.ng-valid.ng-touched {
+  --mdc-outlined-text-field-outline-color: var(--form-success);
+}
+
+/* ========== LOADING STATES ========== */
+.form-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.form-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* ========== ANIMACIONES ========== */
+.form-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

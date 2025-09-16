@@ -36,14 +36,19 @@
             matInput
             [value]="filterKey()"
             (input)="onFilterChange($any($event.target).value || '')"
-            placeholder="Nombre, documento, teléfono o email" />
+            placeholder="Carlos García, 12345678, 3012345678..." />
 
         </mat-form-field>
 
         <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'CREAR'">
-          <button mat-raised-button color="primary" (click)="onCreate()">
-            Nuevo Contrato
-          </button>
+          <app-standard-button
+            text="Nuevo Contrato"
+            variant="raised"
+            color="primary"
+            icon="add"
+            iconPosition="left"
+            (clicked)="onCreate()">
+          </app-standard-button>
         </ng-container>
       </div>
     </header>

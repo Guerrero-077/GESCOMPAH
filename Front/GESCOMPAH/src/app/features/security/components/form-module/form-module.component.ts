@@ -5,7 +5,6 @@ import { BehaviorSubject, catchError, forkJoin, map, of, take } from 'rxjs';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { FormDialogComponent } from '../../../../shared/components/form-dialog/form-dialog.component';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
@@ -33,7 +32,7 @@ type SelectOption<T = number> = { value: T; label: string };
 })
 export class FormModuleComponent implements OnInit {
 
-  // ===== Inyección =====
+  // Inyección de dependencias
   private readonly formService        = inject(FormService);
   private readonly moduleService      = inject(ModuleService);
   private readonly formModuleService  = inject(FormModuleService);
@@ -42,17 +41,17 @@ export class FormModuleComponent implements OnInit {
   private readonly sweetAlert         = inject(SweetAlertService);
   private readonly sweetAlertService  = inject(SweetAlertService);
 
-  // ===== Estado =====
+  // Estado
   private readonly formModulesSubject = new BehaviorSubject<FormModuleSelectModel[]>([]);
   readonly formModules$               = this.formModulesSubject.asObservable();
   private readonly busyToggleIds      = new Set<number>(); // evita dobles clics en toggle
 
-  // ===== Tabla =====
+  // Tabla
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
   columns!: TableColumn<FormModuleSelectModel>[];
   trackById = (_: number, it: FormModuleSelectModel) => it.id;
 
-  // ===== Ciclo de vida =====
+  // Ciclo de vida
   ngOnInit(): void {
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
@@ -63,7 +62,7 @@ export class FormModuleComponent implements OnInit {
     this.loadFormModules();
   }
 
-  // ===== Utilidades UI =====
+  // Utilidades UI
   private notifySuccess(title: string, msg: string) {
     this.sweetAlertService.toast(title, msg, 'success');
   }
@@ -74,7 +73,7 @@ export class FormModuleComponent implements OnInit {
     this.sweetAlertService.toast('Advertencia', msg, 'warning');
   }
 
-  // ===== Data =====
+  // Datos
   private loadFormModules(): void {
     this.formModuleService.getAll().pipe(take(1)).subscribe({
       next: (data) => this.formModulesSubject.next(data as FormModuleSelectModel[]),
@@ -85,7 +84,7 @@ export class FormModuleComponent implements OnInit {
     });
   }
 
-  // --- helpers para selects ---
+  // Helpers para selects
   private getFormOptions$() {
     return this.formService.getAll().pipe(
       take(1),
@@ -106,7 +105,7 @@ export class FormModuleComponent implements OnInit {
     );
   }
 
-  // ===== CREATE =====
+  // Crear
   onCreateNew(): void {
     forkJoin({
       formOpts: this.getFormOptions$(),
@@ -118,7 +117,8 @@ export class FormModuleComponent implements OnInit {
         return;
       }
 
-      const dialogRef = this.dialog.open(FormDialogComponent, {
+      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
         width: '600px',
         data: {
           entity: {
@@ -152,6 +152,7 @@ export class FormModuleComponent implements OnInit {
             this.notifyError('No se pudo crear la relación Form–Module.');
           }
         });
+      });
       });
     });
   }
@@ -190,7 +191,8 @@ export class FormModuleComponent implements OnInit {
         return;
       }
 
-      const dialogRef = this.dialog.open(FormDialogComponent, {
+      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.FormDialogComponent, {
         width: '600px',
         data: {
           entity: initial,
@@ -222,10 +224,11 @@ export class FormModuleComponent implements OnInit {
           }
         });
       });
+      });
     });
   }
 
-  // ===== DELETE =====
+  // Eliminar
   async onDelete(row: FormModuleSelectModel): Promise<void> {
     const confirmed = await this.sweetAlert.confirm({
       title: 'Eliminar relación Form–Module',
@@ -248,16 +251,10 @@ export class FormModuleComponent implements OnInit {
   }
 
   onView(row: FormModuleSelectModel): void {
-    // Punto de extensión: dialog de detalle, navegación, etc.
-    console.log('Detalle FormModule:', row);
+    // Ver detalle (diálogo o navegación)
   }
 
-  // ===== Toggle activo/inactivo (optimista + rollback + guarda de concurrencia) =====
-  // En el template del toggle:
-  // <app-toggle-button-component
-  //   [checked]="row.active"
-  //   (toggleChange)="onToggleActive(row, $event)">
-  // </app-toggle-button-component>
+  // Toggle activo/inactivo (UI optimista + rollback)
   onToggleActive(row: FormModuleSelectModel, e: { checked: boolean } | boolean): void {
     const nextValue = typeof e === 'boolean' ? e : !!e?.checked;
 
