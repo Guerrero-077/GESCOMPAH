@@ -122,7 +122,6 @@ namespace Business.Mapping
                 .Ignore(dest => dest.ContractClauses)
                 .Ignore(dest => dest.TotalBaseRentAgreed) // calculado en Business
                 .Ignore(dest => dest.TotalUvtQtyAgreed)   // calculado en Business
-                .Ignore(dest => dest.Active)            // controlado por negocio
                 .Ignore(dest => dest.IsDeleted)
                 .Ignore(dest => dest.CreatedAt)
                 .Map(dest => dest.StartDate, src => src.StartDate)
@@ -137,7 +136,9 @@ namespace Business.Mapping
                 .Map(dest => dest.PremisesLeased, src => src.PremisesLeased.Adapt<List<PremisesLeasedSelectDto>>())
                 .Map(dest => dest.TotalBaseRentAgreed, src => src.TotalBaseRentAgreed)
                 .Map(dest => dest.TotalUvtQtyAgreed, src => src.TotalUvtQtyAgreed)
-                .Map(dest => dest.Active, src => !src.IsDeleted)
+                //.Map(dest => dest.Active, src => !src.IsDeleted)
+                .Map(dest => dest.Active, src => src.Active)
+
                 // Cláusulas: proyecta desde la tabla intermedia a DTOs simples
                 .Map(dest => dest.Clauses, src => src.ContractClauses
                     .Select(cc => cc.Clause)

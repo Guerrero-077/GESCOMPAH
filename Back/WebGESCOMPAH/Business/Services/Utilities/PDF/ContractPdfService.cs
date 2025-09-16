@@ -164,18 +164,6 @@ namespace Business.Services.Utilities.PDF
             sb.Replace("@Model.StartDate.ToString(\"dd/MM/yyyy\")", c.StartDate.ToString("dd/MM/yyyy"));
             sb.Replace("@Model.EndDate.ToString(\"dd/MM/yyyy\")", c.EndDate.ToString("dd/MM/yyyy"));
 
-            // Datos del arrendador con valores por defecto si no vienen en el DTO
-            var landlordEntity = string.IsNullOrWhiteSpace(c.LandlordEntityName) ? "MUNICIPIO DE PALERMO (H)" : c.LandlordEntityName!;
-            var landlordNit = string.IsNullOrWhiteSpace(c.LandlordNIT) ? "891.180.021-9" : c.LandlordNIT!;
-            var landlordRep = string.IsNullOrWhiteSpace(c.LandlordRepName) ? "KLEYVER OVIEDO FARFAN" : c.LandlordRepName!;
-            var landlordRepDoc = string.IsNullOrWhiteSpace(c.LandlordRepDocument) ? "7.717.624" : c.LandlordRepDocument!;
-            var landlordRepTitle = string.IsNullOrWhiteSpace(c.LandlordRepTitle) ? "Alcalde Municipal" : c.LandlordRepTitle!;
-
-            sb.Replace("@Model.LandlordEntityName", HtmlEncode(landlordEntity));
-            sb.Replace("@Model.LandlordNIT", HtmlEncode(landlordNit));
-            sb.Replace("@Model.LandlordRepName", HtmlEncode(landlordRep));
-            sb.Replace("@Model.LandlordRepDocument", HtmlEncode(landlordRepDoc));
-            sb.Replace("@Model.LandlordRepTitle", HtmlEncode(landlordRepTitle));
 
             var p = c.PremisesLeased?.FirstOrDefault();
             if (p != null)

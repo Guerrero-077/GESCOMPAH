@@ -8,7 +8,7 @@
 <head>
   <meta charset=""UTF-8"">
   <style>
-    /* Configuración de página y estilo general conforme a prácticas comunes (Colombia) */
+    /* Configuración de página y estilo general */
     @page { size: Letter; margin: 25mm; }
     body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; color: #000; }
     h1, h2 { text-align: center; text-transform: uppercase; }
@@ -27,14 +27,14 @@
 <body>
   <h1>Contrato de Arrendamiento de Local Comercial</h1>
 
-  <p class=""info"">Entre los suscritos a saber: por una parte el <strong>@Model.LandlordEntityName</strong>, identificado con Nit. No. <strong>@Model.LandlordNIT</strong>, representado legalmente por <strong>@Model.LandlordRepName</strong>, identificado con cédula de ciudadanía No. <strong>@Model.LandlordRepDocument</strong>, en calidad de <strong>@Model.LandlordRepTitle</strong>, quien en adelante se denominará EL ARRENDADOR; y por otra parte <strong>@Model.FullName</strong>, identificado(a) con cédula de ciudadanía No. <strong>@Model.Document</strong>, en adelante EL ARRENDATARIO; se celebra el presente contrato de arrendamiento que se regirá por las siguientes estipulaciones:</p>
+  <p class=""info"">Entre los suscritos a saber: por una parte el <strong>MUNICIPIO DE PALERMO (H)</strong>, identificado con NIT <strong>891.180.021-9</strong>, representado legalmente por <strong>KLEYVER OVIEDO FARFAN</strong>, identificado con cédula de ciudadanía No. <strong>7.717.624</strong>, en calidad de <strong>Alcalde Municipal</strong>, quien en adelante se denominará EL ARRENDADOR; y por otra parte <strong>@Model.FullName</strong>, identificado(a) con cédula de ciudadanía No. <strong>@Model.Document</strong>, en adelante EL ARRENDATARIO; se celebra el presente contrato de arrendamiento que se regirá por las siguientes estipulaciones:</p>
 
   <table class=""grid"">
     <tr>
       <td class=""label""><strong>Arrendador</strong></td>
       <td>
-        @Model.LandlordEntityName — NIT @Model.LandlordNIT<br />
-        Rep. legal: @Model.LandlordRepName — CC @Model.LandlordRepDocument — @Model.LandlordRepTitle
+        KLEYVER OVIEDO FARFAN — NIT 891.180.021-9<br />
+        Rep. legal: MUNICIPIO DE PALERMO (H) — CC 7.717.624
       </td>
     </tr>
     <tr>
@@ -119,10 +119,10 @@
     <div class=""signature"">
       ___________________________<br />
       EL ARRENDADOR<br />
-      @Model.LandlordEntityName<br />
-      Rep. Legal: @Model.LandlordRepName<br />
-      @Model.LandlordRepTitle<br />
-      CC @Model.LandlordRepDocument
+      MUNICIPIO DE PALERMO (H)<br />
+      Rep. Legal: KLEYVER OVIEDO FARFAN<br />
+      Alcalde Municipal<br />
+      CC 7.717.624
     </div>
     <div class=""signature"">
       ___________________________<br />

@@ -14,22 +14,22 @@ namespace Entity.Domain.Models.Implements.Business
         public DateTime DueDate { get; set; }
 
         // Fotocopia de los parámetros usados este mes
-        public decimal UvtQtyApplied { get; set; } // normalmente igual al pactado
-        public decimal UvtValueApplied { get; set; } // desde SystemParameters
-        public decimal VatRateApplied { get; set; } // desde SystemParameters
+        public decimal UvtQtyApplied { get; set; }
+        public decimal UvtValueApplied { get; set; }
+        public decimal VatRateApplied { get; set; }
 
         // Cálculo congelado
         public decimal BaseAmount { get; set; }
         public decimal VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
 
-        // Mora (solo si se liquida)
+        // Mora
         public int? DaysLate { get; set; }
         public decimal? LateAmount { get; set; }
 
         // Estado
         public string Status { get; set; }
 
-        public bool Locked { get; set; } = false; // Evita que se recalcule si ya fue liquidado
+        public bool Locked { get; set; } = false;
     }
 }

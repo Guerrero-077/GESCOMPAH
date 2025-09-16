@@ -91,12 +91,7 @@ public class ContractPdfServiceTests
             FullName = "Test",
             Document = "1",
             StartDate = new DateTime(2025, 1, 1),
-            EndDate = new DateTime(2025, 1, 2),
-            LandlordEntityName = null, // usa valor por defecto
-            LandlordNIT = "",          // usa valor por defecto
-            LandlordRepName = " ",     // usa valor por defecto
-            LandlordRepDocument = null, // usa valor por defecto
-            LandlordRepTitle = null     // usa valor por defecto
+            EndDate = new DateTime(2025, 1, 2)
         };
 
         var html = InvokeBuildHtml(dto);

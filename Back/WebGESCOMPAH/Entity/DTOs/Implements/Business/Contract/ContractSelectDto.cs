@@ -25,19 +25,8 @@ namespace Entity.DTOs.Implements.Business.Contract
         // Locales asociados
         public List<PremisesLeasedSelectDto> PremisesLeased { get; set; } = new();
 
-        // Términos del contrato
-        public ContractTermSelectDto Terms { get; set; } = null!;
-
         /// <summary>Cláusulas asociadas al contrato</summary>
         public List<ClauseSelectDto> Clauses { get; set; } = new();
-
-        // Datos del arrendador (parametrizables)
-        public string? LandlordEntityName { get; set; }
-        public string? LandlordNIT { get; set; }
-        public string? LandlordRepName { get; set; }
-        public string? LandlordRepDocument { get; set; }
-        public string? LandlordRepTitle { get; set; }
-
 
     }
 }
