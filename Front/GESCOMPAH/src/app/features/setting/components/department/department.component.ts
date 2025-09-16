@@ -92,7 +92,7 @@ export class DepartmentComponent implements OnInit {
     this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer').then(res => {
       if (!res.isConfirmed) return;
       this.store.delete(row.id!).pipe(take(1)).subscribe({
-        next: () => this.sweetAlert.toast('Éxito', 'Departamento eliminado exitosamente', 'success')
+        next: () => this.sweetAlert.showNotification('Éxito', 'Departamento eliminado exitosamente', 'success')
       });
     });
   }
@@ -109,14 +109,14 @@ export class DepartmentComponent implements OnInit {
       next: updated => {
         // Si la API devuelve 204, mantenemos el valor; si devuelve DTO, sincronizamos
         row.active = updated?.active ?? checked;
-        this.sweetAlert.toast('Éxito',
+        this.sweetAlert.showNotification('Éxito',
           `Departamento ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success');
       },
       error: err => {
         // Rollback
         row.active = prev;
-        this.sweetAlert.toast('Error',
+        this.sweetAlert.showNotification('Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error');
       }

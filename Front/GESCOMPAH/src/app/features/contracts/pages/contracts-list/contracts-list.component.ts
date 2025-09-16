@@ -125,7 +125,7 @@ export class ContractsListComponent implements OnInit, OnDestroy {
 
   onDownload(row: ContractCard): void {
     if (this.isDownloadingPdf) {
-      this.toast.toast('Información', 'Ya hay una descarga en curso.', 'info');
+      this.toast.showNotification('Información', 'Ya hay una descarga en curso.', 'info');
       return;
     }
     this.isDownloadingPdf = true;
@@ -150,10 +150,10 @@ export class ContractsListComponent implements OnInit, OnDestroy {
       ),
       finalize(() => (this.isDownloadingPdf = false))
     ).subscribe({
-      next: () => this.toast.toast('Éxito', 'La descarga del contrato ha comenzado.', 'success'),
+      next: () => this.toast.showNotification('Éxito', 'La descarga del contrato ha comenzado.', 'success'),
       error: (err) => {
         console.error('Error downloading PDF:', err);
-        this.toast.toast('Error', 'No se pudo descargar el contrato.', 'error');
+        this.toast.showNotification('Error', 'No se pudo descargar el contrato.', 'error');
       },
     });
   }
@@ -162,26 +162,21 @@ export class ContractsListComponent implements OnInit, OnDestroy {
     const next = typeof e === 'boolean' ? e : !!e?.checked;
     try {
       await this.store.changeActiveStatusRemote(row.id, next);
-      this.toast.toast('Éxito', `Contrato ${next ? 'activado' : 'desactivado'} correctamente.`, 'success');
+      this.toast.showNotification('Éxito', `Contrato ${next ? 'activado' : 'desactivado'} correctamente.`, 'success');
     } catch (err: any) {
-      this.toast.toast('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
+      this.toast.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
     }
   }
 
   async onDelete(row: ContractCard): Promise<void> {
-    const ok = await this.toast.confirm({
-      title: 'Eliminar contrato',
-      text: `¿Deseas eliminar el contrato de "${row.personFullName}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
-    });
+    const ok = await this.toast.showConfirm('Eliminar contrato', `¿Deseas eliminar el contrato de "${row.personFullName}"?`, 'Eliminar', 'Cancelar');
     if (!ok) return;
 
     try {
       await this.store.delete(row.id);
-      this.toast.toast('Eliminación Exitosa', 'Contrato eliminado correctamente.', 'success');
+      this.toast.showNotification('Eliminación Exitosa', 'Contrato eliminado correctamente.', 'success');
     } catch {
-      this.toast.toast('Error', 'No se pudo eliminar el contrato.', 'error');
+      this.toast.showNotification('Error', 'No se pudo eliminar el contrato.', 'error');
     }
   }
 

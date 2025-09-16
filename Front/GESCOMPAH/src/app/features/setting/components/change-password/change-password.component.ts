@@ -48,14 +48,14 @@ export class ChangePasswordComponent {
   async onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.sweetAlertService.toast('Advertencia', 'Por favor, completa todos los campos correctamente.', 'warning');
+      this.sweetAlertService.showNotification('Advertencia', 'Por favor, completa todos los campos correctamente.', 'warning');
       return;
     }
 
     const userId = this.userStore.snapshot?.id;
 
     if (!userId) {
-      this.sweetAlertService.error('Usuario no identificado');
+      this.sweetAlertService.showNotification('Error', 'Usuario no identificado', 'error');
       return;
     }
 
@@ -70,7 +70,7 @@ export class ChangePasswordComponent {
     this.authService.ChangePassword(dto).subscribe({
       next: () => {
         this.sweetAlertService.hideLoading();
-        this.sweetAlertService.success('Contraseña actualizada correctamente');
+        this.sweetAlertService.showNotification('Éxito', 'Contraseña actualizada correctamente', 'success');
         this.form.reset();
       },
       error: (err) => {
@@ -88,7 +88,7 @@ export class ChangePasswordComponent {
           this.form.get('currentPassword')?.updateValueAndValidity();
         }
 
-        this.sweetAlertService.error(errorMessage);
+        this.sweetAlertService.showNotification('Error', errorMessage, 'error');
       }
     });
   }

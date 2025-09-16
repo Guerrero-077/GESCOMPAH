@@ -170,7 +170,7 @@ export class LoginComponent implements OnInit {
       },
       error: (err) => {
         this.sweetAlertService.hideLoading();
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Oops...',
           err?.error?.message ?? 'Credenciales inválidas',
           'error'

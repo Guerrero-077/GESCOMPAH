@@ -120,18 +120,20 @@ export class TenantsListComponent implements OnInit {
   }
 
   async onDelete(row: TenantsSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.confirm({
-      text: `¿Deseas eliminar el Usuario "${row.personName}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
-    });
+    const confirmed = await this.sweetAlert.showConfirm(
+      'Eliminar usuario',
+      `¿Deseas eliminar el Usuario "${row.personName}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
     if (!confirmed) return;
 
     try {
       await this.store.delete(row.id); // si tu back es lógico: this.store.deleteLogic(row.id)
-      this.sweetAlert.toast('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
+      this.sweetAlert.showNotification('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
     } catch {
-      this.sweetAlert.toast('Error', 'No se pudo eliminar al Usuario.', 'error');
+      this.sweetAlert.showNotification('Error', 'No se pudo eliminar al Usuario.', 'error');
     }
   }
 
@@ -145,7 +147,7 @@ export class TenantsListComponent implements OnInit {
     e: { checked: boolean } | boolean | null | undefined
   ): Promise<void> {
     if (id == null) {
-      this.sweetAlert.toast('Sin usuario', 'No se pudo obtener el ID del usuario.', 'warning');
+      this.sweetAlert.showNotification('Sin usuario', 'No se pudo obtener el ID del usuario.', 'warning');
       return;
     }
 
@@ -153,13 +155,13 @@ export class TenantsListComponent implements OnInit {
 
     try {
       await this.store.changeActiveStatusRemote(id, checked);
-      this.sweetAlert.toast(
+      this.sweetAlert.showNotification(
         'Éxito',
         `Usuario ${checked ? 'activado' : 'desactivado'} correctamente.`,
         'success'
       );
     } catch (err: any) {
-      this.sweetAlert.toast('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
+      this.sweetAlert.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
     }
   }
 

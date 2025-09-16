@@ -64,7 +64,7 @@ export class FormComponent implements OnInit {
       filter(Boolean),
       switchMap(result => this.formStore.create(result).pipe(take(1))),
       tap(() => {
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Creación Exitosa',
           'Formulario creado exitosamente.',
           'success'
@@ -72,7 +72,7 @@ export class FormComponent implements OnInit {
       }),
       catchError(err => {
         console.error('Error creando el formulario:', err);
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Error',
           'No se pudo crear el formulario.',
           'error'
@@ -96,7 +96,7 @@ export class FormComponent implements OnInit {
       map(result => ({ id: row.id, ...result } as FormUpdateModel)),
       switchMap(dto => this.formStore.update(dto.id, dto).pipe(take(1))),
       tap(() => {
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Actualización Exitosa',
           'Formulario actualizado exitosamente.',
           'success'
@@ -104,7 +104,7 @@ export class FormComponent implements OnInit {
       }),
       catchError(err => {
         console.error('Error actualizando el formulario:', err);
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Error',
           'No se pudo actualizar el formulario.',
           'error'
@@ -117,18 +117,19 @@ export class FormComponent implements OnInit {
 
   // Eliminar (lógico)
   async onDelete(row: FormSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.confirm({
-      title: 'Eliminar form',
-      text: `¿Deseas eliminar el form "${row.name}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
-    });
+    const confirmed = await this.sweetAlert.showConfirm(
+      'Eliminar form',
+      `¿Deseas eliminar el form "${row.name}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
 
     if (!confirmed) return;
 
     this.formStore.deleteLogic(row.id).pipe(take(1)).subscribe({
       next: () => {
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Eliminación Exitosa',
           'Formulario eliminado exitosamente.',
           'success'
@@ -136,7 +137,7 @@ export class FormComponent implements OnInit {
       },
       error: err => {
         console.error('Error eliminando el formulario:', err);
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Error',
           'No se pudo eliminar el formulario.',
           'error'
@@ -166,7 +167,7 @@ export class FormComponent implements OnInit {
         // Asegura sincronizar el estado visible.
         row.active = updated?.active ?? checked;
 
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Éxito',
           `Formulario ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success'
@@ -177,7 +178,7 @@ export class FormComponent implements OnInit {
         // Revertir estado si falla
         row.active = previous;
 
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'

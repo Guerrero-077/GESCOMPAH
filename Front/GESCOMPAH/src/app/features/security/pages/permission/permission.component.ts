@@ -59,10 +59,10 @@ export class PermissionComponent implements OnInit {
       dialogRef.afterClosed().pipe(
       filter(Boolean),
       switchMap(result => this.permissionStore.create(result).pipe(take(1))),
-      tap(() => this.sweetAlertService.toast('Creación Exitosa', 'Permiso creado exitosamente.', 'success')),
+      tap(() => this.sweetAlertService.showNotification('Creación Exitosa', 'Permiso creado exitosamente.', 'success')),
       catchError(err => {
         console.error('Error creando el permiso:', err);
-        this.sweetAlertService.toast('Error', 'No se pudo crear el permiso.', 'error');
+        this.sweetAlertService.showNotification('Error', 'No se pudo crear el permiso.', 'error');
         return EMPTY;
       })
     ).subscribe();
@@ -81,10 +81,10 @@ export class PermissionComponent implements OnInit {
       filter((result): result is Partial<PermissionUpdateModel> => !!result),
       map(result => ({ id: row.id, ...result } as PermissionUpdateModel)),
       switchMap(dto => this.permissionStore.update(dto).pipe(take(1))),
-      tap(() => this.sweetAlertService.toast('Actualización Exitosa', 'Permiso actualizado exitosamente.', 'success')),
+      tap(() => this.sweetAlertService.showNotification('Actualización Exitosa', 'Permiso actualizado exitosamente.', 'success')),
       catchError(err => {
         console.error('Error actualizando el permiso:', err);
-        this.sweetAlertService.toast('Error', 'No se pudo actualizar el permiso.', 'error');
+        this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el permiso.', 'error');
         return EMPTY;
       })
     ).subscribe();
@@ -93,19 +93,20 @@ export class PermissionComponent implements OnInit {
 
   // Eliminar (lógico)
   async onDelete(row: PermissionSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.confirm({
-      title: 'Eliminar permiso',
-      text: `¿Deseas eliminar el permiso "${row.name}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
-    });
+    const confirmed = await this.sweetAlert.showConfirm(
+      'Eliminar permiso',
+      `¿Deseas eliminar el permiso "${row.name}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
     if (!confirmed) return;
 
     this.permissionStore.deleteLogic(row.id).pipe(take(1)).subscribe({
-      next: () => this.sweetAlertService.toast('Eliminación Exitosa', 'Permiso eliminado exitosamente.', 'success'),
+      next: () => this.sweetAlertService.showNotification('Eliminación Exitosa', 'Permiso eliminado exitosamente.', 'success'),
       error: err => {
         console.error('Error al eliminar el permiso:', err);
-        this.sweetAlertService.toast('Error', 'No se pudo eliminar el permiso.', 'error');
+        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el permiso.', 'error');
       }
     });
   }
@@ -129,7 +130,7 @@ export class PermissionComponent implements OnInit {
       tap(updated => {
         // Si la API responde 204, updated puede venir undefined
         row.active = updated?.active ?? checked;
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Éxito',
           `Permiso ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success'
@@ -138,7 +139,7 @@ export class PermissionComponent implements OnInit {
       catchError(err => {
         console.error('Error cambiando estado:', err);
         row.active = previous; // revertir
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'

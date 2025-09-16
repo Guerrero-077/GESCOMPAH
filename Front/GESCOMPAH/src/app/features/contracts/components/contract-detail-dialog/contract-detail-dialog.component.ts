@@ -10,6 +10,7 @@ import { forkJoin } from 'rxjs';
 import { ContractSelectModel, MonthlyObligation } from '../../models/contract.models';
 import { ContractService } from '../../services/contract/contract.service';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
+import { ContractStore } from '../../services/contract/contract.store';
 
 @Component({
   selector: 'app-contract-detail-dialog',

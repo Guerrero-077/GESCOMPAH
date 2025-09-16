@@ -101,7 +101,7 @@ export class EstablishmentsListComponent implements OnInit {
       this.sweetAlert.showNotification('Éxito', 'Local eliminado exitosamente', 'success');
       await this.store.loadCardsAll();
     } catch (err: any) {
-      this.sweetAlert.toast('Error', err?.message || 'No se pudo eliminar', 'error');
+      this.sweetAlert.showNotification('Error', err?.message || 'No se pudo eliminar', 'error');
     }
   }
 

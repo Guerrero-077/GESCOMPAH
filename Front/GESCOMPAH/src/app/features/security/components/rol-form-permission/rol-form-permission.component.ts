@@ -107,10 +107,10 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           }) as RolFormPermissionCreateModel),
           switchMap(payload =>
             this.rolFormPermissionStore.create(payload).pipe(
-              tap(() => this.sweetAlertService.toast('Creado', 'Relación creada con éxito.', 'success')),
+              tap(() => this.sweetAlertService.showNotification('Creado', 'Relación creada con éxito.', 'success')),
               catchError(err => {
                 console.error('Error creando:', err);
-                this.sweetAlertService.toast('Error', 'No se pudo crear.', 'error');
+                this.sweetAlertService.showNotification('Error', 'No se pudo crear.', 'error');
                 return EMPTY;
               })
             )
@@ -158,10 +158,10 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
           }) as RolFormPermissionUpdateModel),
           switchMap(payload =>
             this.rolFormPermissionStore.update(payload).pipe(
-              tap(() => this.sweetAlertService.toast('Actualizado', 'Relación actualizada con éxito.', 'success')),
+              tap(() => this.sweetAlertService.showNotification('Actualizado', 'Relación actualizada con éxito.', 'success')),
               catchError(err => {
                 console.error('Error actualizando:', err);
-                this.sweetAlertService.toast('Error', 'No se pudo actualizar.', 'error');
+                this.sweetAlertService.showNotification('Error', 'No se pudo actualizar.', 'error');
                 return EMPTY;
               })
             )
@@ -173,19 +173,20 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
 
   // Eliminar (grupo)
   async onDelete(row: RolFormPermissionGroupedModel): Promise<void> {
-    const confirmed = await this.sweetAlert.confirm({
-      title: 'Eliminar Grupo de Permisos',
-      text: `¿Eliminar todos los permisos del rol "${row.rolName}" para el formulario "${row.formName}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar'
-    });
+    const confirmed = await this.sweetAlertService.showConfirm(
+      'Eliminar Grupo de Permisos',
+      `¿Eliminar todos los permisos del rol "${row.rolName}" para el formulario "${row.formName}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
     if (!confirmed) return;
 
     this.rolFormPermissionStore.deleteByGroup(row.rolId, row.formId).pipe(take(1)).subscribe({
-      next: () => this.sweetAlertService.toast('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success'),
+      next: () => this.sweetAlertService.showNotification('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success'),
       error: err => {
         console.error('Error eliminando:', err);
-        this.sweetAlertService.toast('Error', 'No se pudo eliminar el grupo.', 'error');
+        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el grupo.', 'error');
       }
     });
   }
@@ -209,7 +210,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       tap(updated => {
         // Si la API devuelve 204, updated puede venir undefined
         row.active = updated?.active ?? checked;
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Éxito',
           `Permisos del grupo ${row.active ? 'activados' : 'desactivados'} correctamente.`,
           'success'
@@ -218,7 +219,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       catchError(err => {
         console.error('Error cambiando estado:', err);
         row.active = previous; // revertir
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'

@@ -63,7 +63,7 @@ export class UserComponent implements OnInit {
       next: (updated) => {
         // sincronizar con lo que devuelve el backend
         row.active = updated.active ?? row.active;
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Éxito',
           `Usuario ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success'
@@ -72,7 +72,7 @@ export class UserComponent implements OnInit {
       error: (err) => {
         // revertir si falla
         row.active = previous;
-        this.sweetAlertService.toast(
+        this.sweetAlertService.showNotification(
           'Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error'
@@ -103,7 +103,7 @@ export class UserComponent implements OnInit {
       };
       this.userStore.update(id, payload).subscribe({
         next: () => {
-          this.sweetAlertService.toast(
+          this.sweetAlertService.showNotification(
             'Actualización Exitosa',
             'Usuario actualizado exitosamente.',
             'success'
@@ -150,7 +150,7 @@ export class UserComponent implements OnInit {
         };
         this.userStore.create(payload).subscribe({
           next: () => {
-            this.sweetAlertService.toast(
+            this.sweetAlertService.showNotification(
               'Creación Exitosa',
               'Usuario creado exitosamente.',
               'success'
@@ -167,17 +167,18 @@ export class UserComponent implements OnInit {
 
   // ----- DELETE (soft delete) -----
   async onDelete(row: UserSelectModel) {
-    const confirmed = await this.sweetAlertService.confirm({
-      title: 'Eliminar Usuario',
-      text: `¿Deseas eliminar al usuario "${row.personName}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar'
-    });
+    const confirmed = await this.sweetAlertService.showConfirm(
+      'Eliminar Usuario',
+      `¿Deseas eliminar al usuario "${row.personName}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
 
     if (confirmed) {
       this.userStore.deleteLogic(row.id).subscribe({
         next: () => {
-          this.sweetAlertService.toast(
+          this.sweetAlertService.showNotification(
             'Eliminación Exitosa',
             'Usuario eliminado exitosamente.',
             'success'
@@ -185,7 +186,7 @@ export class UserComponent implements OnInit {
         },
         error: err => {
           console.error('Error eliminando el usuario:', err);
-          this.sweetAlertService.toast('Error', 'No se pudo eliminar el usuario.', 'error');
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el usuario.', 'error');
         }
       });
     }

@@ -63,14 +63,14 @@ export class FormModuleComponent implements OnInit {
   }
 
   // Utilidades UI
-  private notifySuccess(title: string, msg: string) {
-    this.sweetAlertService.toast(title, msg, 'success');
+  private notifySuccess(title: string, msg: string): void {
+    this.sweetAlertService.showNotification(title, msg, 'success');
   }
-  private notifyError(msg: string) {
-    this.sweetAlertService.toast('Error', msg, 'error');
+  private notifyError(msg: string): void {
+    this.sweetAlertService.showNotification('Error', msg, 'error');
   }
-  private notifyWarn(msg: string) {
-    this.sweetAlertService.toast('Advertencia', msg, 'warning');
+  private notifyWarn(msg: string): void {
+    this.sweetAlertService.showNotification('Advertencia', msg, 'warning');
   }
 
   // Datos
@@ -230,12 +230,13 @@ export class FormModuleComponent implements OnInit {
 
   // Eliminar
   async onDelete(row: FormModuleSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.confirm({
-      title: 'Eliminar relación Form–Module',
-      text: `¿Eliminar el formulario "${row.formName}" del módulo "${row.moduleName}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar'
-    });
+    const confirmed = await this.sweetAlert.showConfirm(
+      'Eliminar relación Form–Module',
+      `¿Eliminar el formulario "${row.formName}" del módulo "${row.moduleName}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
     if (!confirmed) return;
 
     this.formModuleService.delete(row.id).pipe(take(1)).subscribe({

@@ -110,12 +110,12 @@ export class RolUserComponent implements OnInit {
 
         this.rolUserService.create(payload).subscribe({
           next: () => {
-            this.load()
-            this.sweetAlertService.toast('Creación Exitosa', 'Rol-Usuario creado exitosamente.', 'success');
+            this.load() 
+            this.sweetAlertService.showNotification('Creación Exitosa', 'Rol-Usuario creado exitosamente.', 'success');
           },
           error: err => {
             console.error('Error creando RolUser:', err)
-            this.sweetAlertService.toast('Error', 'No se pudo crear la asignación Rol-Usuario.', 'error');
+            this.sweetAlertService.showNotification('Error', 'No se pudo crear la asignación Rol-Usuario.', 'error');
           }
         });
       });
@@ -182,11 +182,11 @@ export class RolUserComponent implements OnInit {
           this.rolUserService.update(id, payload).subscribe({
             next: () => {
               this.load()
-              this.sweetAlertService.toast('Actualización Exitosa', 'Rol-Usuario actualizado exitosamente.', 'success');
+              this.sweetAlertService.showNotification('Actualización Exitosa', 'Rol-Usuario actualizado exitosamente.', 'success');
             },
             error: err => {
               console.error('Error actualizando RolUser:', err)
-              this.sweetAlertService.toast('Error', 'No se pudo actualizar la asignación Rol-Usuario.', 'error');
+              this.sweetAlertService.showNotification('Error', 'No se pudo actualizar la asignación Rol-Usuario.', 'error');
             }
           });
         });
@@ -200,22 +200,23 @@ export class RolUserComponent implements OnInit {
 
   // DELETE
   async onDelete(row: RolUserSelectModel) {
-    const confirmed = await this.sweetAlert.confirm({
-      title: 'Eliminar Asignación Rol-Usuario',
-      text: `¿Deseas eliminar el rol "${row.rolName}" del usuario "${row.userEmail}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar'
-    });
+    const confirmed = await this.sweetAlertService.showConfirm(
+      'Eliminar Asignación Rol-Usuario',
+      `¿Deseas eliminar el rol "${row.rolName}" del usuario "${row.userEmail}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
 
     if (confirmed) {
       this.rolUserService.deleteLogic(row.id).subscribe({
         next: () => {
           this.load()
-          this.sweetAlertService.toast('Eliminación Exitosa', 'Asignación Rol-Usuario eliminada exitosamente.', 'success');
+          this.sweetAlertService.showNotification('Eliminación Exitosa', 'Asignación Rol-Usuario eliminada exitosamente.', 'success');
         },
         error: err => {
           console.error('Error eliminando RolUser:', err)
-          this.sweetAlertService.toast('Error', 'No se pudo eliminar la asignación Rol-Usuario.', 'error');
+          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar la asignación Rol-Usuario.', 'error');
         }
       });
     }

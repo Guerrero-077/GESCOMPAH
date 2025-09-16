@@ -63,10 +63,10 @@ export class RoleComponent implements OnInit {
   trackById = (_: number, it: RoleSelectModel) => it.id;
 
   private notifySuccess(title: string, message: string) {
-    this.sweetAlertService.toast(title, message, 'success');
+    this.sweetAlertService.showNotification(title, message, 'success');
   }
   private notifyError(message: string) {
-    this.sweetAlertService.toast('Error', message, 'error');
+    this.sweetAlertService.showNotification('Error', message, 'error');
   }
 
   // Crear
@@ -123,12 +123,13 @@ export class RoleComponent implements OnInit {
 
   // Eliminar (borrado lógico)
   async onDelete(row: RoleSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.confirm({
-      title: 'Eliminar rol',
-      text: `¿Deseas eliminar el rol "${row.name}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
-    });
+    const confirmed = await this.sweetAlertService.showConfirm(
+      'Eliminar rol',
+      `¿Deseas eliminar el rol "${row.name}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
 
     if (!confirmed) return;
 

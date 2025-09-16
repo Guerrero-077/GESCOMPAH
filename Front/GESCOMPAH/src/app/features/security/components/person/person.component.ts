@@ -57,10 +57,10 @@ export class PersonComponent implements OnInit {
   // Utilidades UI
   trackById = (_: number, it: PersonSelectModel) => it.id;
   private notifySuccess(title: string, msg: string) {
-    this.sweetAlertService.toast(title, msg, 'success');
+    this.sweetAlertService.showNotification(title, msg, 'success');
   }
   private notifyError(msg: string) {
-    this.sweetAlertService.toast('Error', msg, 'error');
+    this.sweetAlertService.showNotification('Error', msg, 'error');
   }
 
   // Helpers
@@ -130,12 +130,13 @@ export class PersonComponent implements OnInit {
 
   // Eliminar
   async onDelete(row: PersonSelectModel) {
-    const confirmed = await this.sweetAlert.confirm({
-      title: 'Eliminar Persona',
-      text: `¿Deseas eliminar a "${row.firstName} ${row.lastName}"?`,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
-    });
+    const confirmed = await this.sweetAlert.showConfirm(
+      'Eliminar Persona',
+      `¿Deseas eliminar a "${row.firstName} ${row.lastName}"?`,
+      'Eliminar',
+      'Cancelar',
+      'warning'
+    );
     if (!confirmed) return;
 
     this.personStore.deleteLogic(row.id).pipe(take(1)).subscribe({

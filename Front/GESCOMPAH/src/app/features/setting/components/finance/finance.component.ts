@@ -63,7 +63,7 @@ export class FinanceComponent {
       if (result) {
         this.store.create(result).subscribe({
           next: () => {
-            this.sweetAlert.toast('Éxito', 'Ciudad creada exitosamente', 'success');
+            this.sweetAlert.showNotification('Éxito', 'Ciudad creada exitosamente', 'success');
           }
         });
       }
@@ -83,7 +83,7 @@ export class FinanceComponent {
       if (result) {
         this.store.update(result).subscribe({
           next: () => {
-            this.sweetAlert.toast('Éxito', 'Ciudad actualizada exitosamente', 'success');
+            this.sweetAlert.showNotification('Éxito', 'Ciudad actualizada exitosamente', 'success');
           }
         });
       }
@@ -96,7 +96,7 @@ export class FinanceComponent {
         if (result.isConfirmed) {
           this.store.delete(row.id).subscribe({
             next: () => {
-              this.sweetAlert.toast('Éxito', 'Ciudad eliminada exitosamente', 'success');
+              this.sweetAlert.showNotification('Éxito', 'Ciudad eliminada exitosamente', 'success');
             }
           });
         }
@@ -117,14 +117,14 @@ export class FinanceComponent {
       next: updated => {
         // Si la API devuelve 204, mantenemos el valor; si devuelve DTO, sincronizamos
         row.active = updated?.active ?? checked;
-        this.sweetAlert.toast('Éxito',
+        this.sweetAlert.showNotification('Éxito',
           `Departamento ${row.active ? 'activado' : 'desactivado'} correctamente.`,
           'success');
       },
       error: err => {
         // Rollback
         row.active = prev;
-        this.sweetAlert.toast('Error',
+        this.sweetAlert.showNotification('Error',
           err?.error?.detail || 'No se pudo cambiar el estado.',
           'error');
       }
