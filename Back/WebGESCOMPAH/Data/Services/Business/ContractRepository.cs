@@ -1,12 +1,10 @@
 ﻿using Data.Interfaz.IDataImplement.Business;
 using Data.Repository;
 using Entity.Domain.Models.Implements.Business;
-using Entity.Domain.Models.Implements.Utilities;
-using Entity.DTOs.Implements.Business.Clause;
 using Entity.DTOs.Implements.Business.Contract;
-using Entity.DTOs.Implements.Business.PremisesLeased;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using Utilities.Exceptions;
 
 namespace Data.Services.Business
 {
@@ -14,51 +12,23 @@ namespace Data.Services.Business
     {
         public ContractRepository(ApplicationDbContext context) : base(context) { }
 
+        // ================== QUERIES BASE ==================
 
-        public override async Task<Contract?> GetByIdAsync(int id)
+        private IQueryable<Contract> GetContractFullQuery()
         {
-            return await _dbSet
+            return _dbSet
                 .Include(c => c.Person).ThenInclude(p => p.User)
                 .Include(c => c.PremisesLeased).ThenInclude(pl => pl.Establishment).ThenInclude(e => e.Plaza)
                 .Include(c => c.ContractClauses).ThenInclude(cc => cc.Clause)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .AsNoTracking();
         }
 
-        //public async Task<ContractSelectDto?> GetBasicByIdAsync(int id)
-        //{
-        //    return await _dbSet.AsNoTracking()
-        //        .Where(c => !c.IsDeleted && c.Id == id)
-        //        .Select(c => new ContractSelectDto
-        //        {
-        //            Id = c.Id,
-        //            StartDate = c.StartDate,
-        //            EndDate = c.EndDate,
-        //            Active = c.Active,
-
-        //            PersonId = c.PersonId,
-        //            FullName = c.Person != null ? (c.Person.FirstName + " " + c.Person.LastName) : "",
-        //            Document = c.Person != null ? c.Person.Document : "",
-        //            Phone = c.Person != null ? c.Person.Phone : "",
-        //            Email = c.Person != null && c.Person.User != null ? c.Person.User.Email : null,
-
-        //            TotalBaseRentAgreed = c.TotalBaseRentAgreed,
-        //            TotalUvtQtyAgreed = c.TotalUvtQtyAgreed,
-
-        //            PremisesLeased = new List<PremisesLeasedSelectDto>(),
-        //            Clauses = new List<ClauseSelectDto>()
-        //        })
-        //        .FirstOrDefaultAsync();
-        //}
-
-
-
-        // ============== PROYECCIONES PARA GRID (sin Include) ==============
-
-        public async Task<IReadOnlyList<ContractCardDto>> GetCardsByPersonAsync(int personId) =>
-            await _dbSet.AsNoTracking()
-                .Where(c => !c.IsDeleted && c.PersonId == personId)
-                .OrderByDescending(e => e.CreatedAt)
+        private IQueryable<ContractCardDto> GetCardQuery()
+        {
+            return _dbSet.AsNoTracking()
+                .Where(c => !c.IsDeleted)
+                .OrderByDescending(e => e.Active)
+                .ThenByDescending(e => e.CreatedAt)
                 .ThenByDescending(e => e.Id)
                 .Select(c => new ContractCardDto(
                     c.Id,
@@ -72,32 +42,79 @@ namespace Data.Services.Business
                     c.TotalBaseRentAgreed,
                     c.TotalUvtQtyAgreed,
                     c.Active
-                ))
-                .ToListAsync();
+                ));
+        }
+
+        // ================== MÉTODOS ==================
+
+        public override async Task<Contract?> GetByIdAsync(int id) =>
+            await GetContractFullQuery().FirstOrDefaultAsync(c => c.Id == id);
+
+        public async Task<IReadOnlyList<ContractCardDto>> GetCardsByPersonAsync(int personId) =>
+            await GetCardQuery().Where(c => c.PersonId == personId).ToListAsync();
 
         public async Task<IReadOnlyList<ContractCardDto>> GetCardsAllAsync() =>
-            await _dbSet.AsNoTracking()
-                .Where(c => !c.IsDeleted)
-                .OrderByDescending(c => c.Id)
-                .Select(c => new ContractCardDto(
-                    c.Id,
-                    c.PersonId,
-                    (c.Person.FirstName + " " + c.Person.LastName).Trim(),
-                    c.Person.Document,
-                    c.Person.Phone,
-                    c.Person.User != null ? c.Person.User.Email : null,
-                    c.StartDate,
-                    c.EndDate,
-                    c.TotalBaseRentAgreed,
-                    c.TotalUvtQtyAgreed,
-                    c.Active
-                ))
+            await GetCardQuery().ToListAsync();
+
+
+
+        // Metodo adicional 
+
+        /// <summary>
+        /// Crea un contrato con sus locales y cláusulas.
+        /// Calcula automáticamente los totales a partir de los establecimientos.
+        /// </summary>
+        public async Task<int> CreateContractAsync(ContractCreateDto dto, int personId, IReadOnlyCollection<int> establishmentIds)
+        {
+            if (establishmentIds == null || establishmentIds.Count == 0)
+                throw new BusinessException("Debe seleccionar al menos un establecimiento.");
+
+            // Totales
+            var basics = await _context.Set<Establishment>()
+                .AsNoTracking()
+                .Where(e => establishmentIds.Contains(e.Id))
+                .Select(e => new { e.RentValueBase, e.UvtQty })
                 .ToListAsync();
 
+            var totalBase = basics.Sum(b => b.RentValueBase);
+            var totalUvt = basics.Sum(b => b.UvtQty);
 
+            // Contrato
+            var contract = new Contract
+            {
+                PersonId = personId,
+                TotalBaseRentAgreed = totalBase,
+                TotalUvtQtyAgreed = totalUvt,
+                StartDate = dto.StartDate,
+                EndDate = dto.EndDate,
+                Active = true // o según regla de negocio
+            };
 
+            foreach (var estId in establishmentIds)
+                contract.PremisesLeased.Add(new PremisesLeased { EstablishmentId = estId });
 
+            await _dbSet.AddAsync(contract);
 
+            // Cláusulas
+            if (dto.ClauseIds is { Count: > 0 })
+            {
+                var uniqueClauseIds = dto.ClauseIds.Distinct().ToList();
+                var links = uniqueClauseIds.Select(cid => new ContractClause
+                {
+                    Contract = contract,
+                    ClauseId = cid
+                });
+                await _context.contractClauses.AddRangeAsync(links);
+            }
+
+            // Desactivar establecimientos
+            await _context.Set<Establishment>()
+                .Where(e => establishmentIds.Contains(e.Id))
+                .ExecuteUpdateAsync(up => up.SetProperty(e => e.Active, _ => false));
+
+            await _context.SaveChangesAsync();
+            return contract.Id;
+        }
 
 
 
@@ -120,9 +137,8 @@ namespace Data.Services.Business
             return ids;
         }
 
-
         /// <summary>
-        /// Libera establecimientos de esos contratos expirados SI no están ocupados por otro contrato activo.
+        /// Libera establecimientos de contratos expirados si no están ocupados por otro contrato activo.
         /// </summary>
         public async Task<int> ReleaseEstablishmentsForExpiredAsync(DateTime utcNow)
         {
@@ -143,7 +159,7 @@ namespace Data.Services.Business
 
             if (estIds.Count == 0) return 0;
 
-            // Establecimientos SIN otro contrato activo que los mantenga ocupados
+            // Establecimientos sin otro contrato activo que los mantenga ocupados
             var estToActivate = await _context.Set<PremisesLeased>()
                 .Where(pl => estIds.Contains(pl.EstablishmentId))
                 .GroupBy(pl => pl.EstablishmentId)
@@ -164,11 +180,14 @@ namespace Data.Services.Business
         /// </summary>
         public async Task<bool> AnyActiveByPlazaAsync(int plazaId)
         {
-            // Busca contratos activos relacionados a establecimientos de la plaza
             return await _dbSet.AsNoTracking()
                 .Where(c => !c.IsDeleted && c.Active)
-                .AnyAsync(c => c.PremisesLeased.Any(pl => !pl.IsDeleted &&
-                    _context.Set<Establishment>().Any(e => e.Id == pl.EstablishmentId && !e.IsDeleted && e.PlazaId == plazaId)));
+                .SelectMany(c => c.PremisesLeased)
+                .AnyAsync(pl => !pl.IsDeleted &&
+                                !pl.Establishment.IsDeleted &&
+                                pl.Establishment.PlazaId == plazaId);
         }
+
+        
     }
 }

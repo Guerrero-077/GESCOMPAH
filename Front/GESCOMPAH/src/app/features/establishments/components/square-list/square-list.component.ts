@@ -59,7 +59,7 @@ export class SquareListComponent implements OnInit {
         if (!result) return;
         try {
           await this.squaresStore.create(result);
-          this.sweetAlert.showNotification('Creaci�n Exitosa', 'Plaza creada exitosamente.', 'success');
+          this.sweetAlert.showNotification('Creación Exitosa', 'Plaza creada exitosamente.', 'success');
         } catch (err) {
           this.sweetAlert.showNotification('Error', 'No se pudo crear la plaza.', 'error');
         }
@@ -79,7 +79,7 @@ export class SquareListComponent implements OnInit {
         const dto: SquareUpdateModel = { ...row, ...partial, id: row.id };
         try {
           await this.squaresStore.update(dto.id, dto);
-          this.sweetAlert.showNotification('Actualizaci�n Exitosa', 'Plaza actualizada exitosamente.', 'success');
+          this.sweetAlert.showNotification('Actualización Exitosa', 'Plaza actualizada exitosamente.', 'success');
         } catch (err) {
           this.sweetAlert.showNotification('Error', 'No se pudo actualizar la plaza.', 'error');
         }
@@ -98,7 +98,7 @@ export class SquareListComponent implements OnInit {
     if (!confirmed) return;
     try {
       await this.squaresStore.deleteLogic(row.id);
-      this.sweetAlert.showNotification('Eliminaci�n exitosa', 'Plaza eliminada correctamente.', 'success');
+      this.sweetAlert.showNotification('Eliminación exitosa', 'Plaza eliminada correctamente.', 'success');
     } catch (err) {
       this.sweetAlert.showNotification('Error', 'No se pudo eliminar la plaza.', 'error');
     }
@@ -117,15 +117,15 @@ export class SquareListComponent implements OnInit {
       const res = await this.squaresStore.changeActiveStatusRemote(id, checked);
       if (!res?.ok) {
         const msg = res?.message || 'No se pudo cambiar el estado de la plaza.';
-        this.sweetAlert.showNotification('Operaci�n no permitida', msg, 'warning');
+        this.sweetAlert.showNotification('Operación no permitida', msg, 'warning');
         return;
       }
       this.sharedEvents.notifyPlazaStateChanged(id);
-      this.sweetAlert.showNotification('�xito', `Plaza ${checked ? 'activada' : 'desactivada'} correctamente.`, 'success');
+      this.sweetAlert.showNotification('Éxito', `Plaza ${checked ? 'activada' : 'desactivada'} correctamente.`, 'success');
     } catch (err: any) {
       const detail = err?.error?.detail || err?.error?.message || err?.error?.title || err?.message;
       const msg = detail || 'No se pudo cambiar el estado de la plaza.';
-      this.sweetAlert.showNotification('Operaci�n no permitida', msg, 'warning');
+      this.sweetAlert.showNotification('Operación no permitida', msg, 'warning');
     }
   }
 

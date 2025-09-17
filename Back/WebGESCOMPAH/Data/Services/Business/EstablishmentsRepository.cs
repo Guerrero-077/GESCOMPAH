@@ -8,45 +8,95 @@ using Entity.Enum;
 
 namespace Data.Services.Business
 {
+    /// <summary>
+    /// Repositorio para manejar operaciones relacionadas con los establecimientos (Establishment).
+    /// Incluye consultas optimizadas con filtros, proyecciones y actualizaciones masivas.
+    /// </summary>
     public class EstablishmentsRepository : DataGeneric<Establishment>, IEstablishmentsRepository
     {
         public EstablishmentsRepository(ApplicationDbContext context) : base(context) { }
 
-        // Query base: filtros comunes
-        private IQueryable<Establishment> BaseQuery() =>
-            _dbSet.AsNoTracking()
-                .OrderByDescending(e => e.CreatedAt)
-                .ThenByDescending(e => e.Id)
-                  .Where(e => !e.IsDeleted &&
-                              e.Plaza != null && e.Plaza.Active && !e.Plaza.IsDeleted)
-                  .Include(e => e.Plaza)
-                  .Include(e => e.Images.Where(img => img.Active && !img.IsDeleted));
+        // ================== QUERIES BASE ==================
 
-        // Compatibilidad: trae todos
+        /// <summary>
+        /// Construye la query base para establecimientos aplicando filtros comunes:
+        /// - Excluye eliminados (IsDeleted).
+        /// - Incluye solo plazas activas y no eliminadas.
+        /// - Incluye la plaza asociada.
+        /// - Si includeImages = true, incluye solo la primera imagen activa (ordenada por Id).
+        /// - Ordena resultados por fecha de creación y luego por Id en orden descendente.
+        /// </summary>
+        private IQueryable<Establishment> BaseQuery(bool includeImages = true)
+        {
+            var query = _dbSet.AsNoTracking()
+                .Where(e => !e.IsDeleted &&
+                            e.Plaza != null && e.Plaza.Active && !e.Plaza.IsDeleted);
+
+            if (includeImages)
+            {
+                query = query
+                    .Include(e => e.Plaza)
+                    .Include(e => e.Images
+                        .Where(img => img.Active && !img.IsDeleted)
+                        .OrderBy(img => img.Id)
+                        .Take(1)); // Solo toma la primera imagen activa para optimizar rendimiento
+            }
+            else
+            {
+                query = query.Include(e => e.Plaza);
+            }
+
+            return query
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id);
+        }
+
+        /// <summary>
+        /// Verifica si la colección de IDs es nula o está vacía.
+        /// </summary>
+        private static bool IsEmpty(IReadOnlyCollection<int> ids) =>
+            ids == null || ids.Count == 0;
+
+        // ================== MÉTODOS ==================
+
+        /// <summary>
+        /// Obtiene todos los establecimientos (compatibilidad).
+        /// </summary>
         public override Task<IEnumerable<Establishment>> GetAllAsync() =>
             GetAllAsync(ActivityFilter.Any);
 
-        // Sobrecarga
+        /// <summary>
+        /// Obtiene todos los establecimientos filtrados por actividad.
+        /// </summary>
+        /// <param name="filter">Filtro de actividad (Any / ActiveOnly).</param>
         public async Task<IEnumerable<Establishment>> GetAllAsync(ActivityFilter filter)
         {
-            var q = BaseQuery();
+            var q = BaseQuery(includeImages: true);
             if (filter == ActivityFilter.ActiveOnly)
                 q = q.Where(e => e.Active);
 
             return await q.ToListAsync();
         }
 
-        // Detalle
+        /// <summary>
+        /// Obtiene un establecimiento por Id (incluyendo eliminados lógicamente inactivos).
+        /// </summary>
         public Task<Establishment?> GetByIdAnyAsync(int id) =>
             BaseQuery().FirstOrDefaultAsync(e => e.Id == id);
 
+        /// <summary>
+        /// Obtiene un establecimiento por Id únicamente si está activo.
+        /// </summary>
         public Task<Establishment?> GetByIdActiveAsync(int id) =>
             BaseQuery().Where(e => e.Active).FirstOrDefaultAsync(e => e.Id == id);
 
-        // Proyección
+        /// <summary>
+        /// Obtiene solo información básica de establecimientos (Id, RentValueBase, UvtQty).
+        /// </summary>
         public async Task<IReadOnlyList<EstablishmentBasicsDto>> GetBasicsByIdsAsync(IReadOnlyCollection<int> ids)
         {
-            if (ids.Count == 0) return Array.Empty<EstablishmentBasicsDto>();
+            if (IsEmpty(ids)) return Array.Empty<EstablishmentBasicsDto>();
+
             return await _dbSet.AsNoTracking()
                 .Where(e => ids.Contains(e.Id) && e.Active && !e.IsDeleted)
                 .Select(e => new EstablishmentBasicsDto
@@ -58,18 +108,18 @@ namespace Data.Services.Business
                 .ToListAsync();
         }
 
-        // Lista liviana para tarjetas
+        /// <summary>
+        /// Obtiene una lista liviana de establecimientos para mostrar en tarjetas.
+        /// Incluye solo una imagen principal (la primera activa).
+        /// </summary>
         public async Task<IReadOnlyList<EstablishmentCardDto>> GetCardsAsync(ActivityFilter filter)
         {
-            var q = _dbSet.AsNoTracking()
-                .Where(e => !e.IsDeleted && e.Plaza != null && e.Plaza.Active && !e.Plaza.IsDeleted);
+            var q = BaseQuery(includeImages: false);
 
             if (filter == ActivityFilter.ActiveOnly)
                 q = q.Where(e => e.Active);
 
             return await q
-                .OrderByDescending(e => e.CreatedAt)
-                .ThenByDescending(e => e.Id)
                 .Select(e => new EstablishmentCardDto
                 {
                     Id = e.Id,
@@ -88,24 +138,38 @@ namespace Data.Services.Business
                 .ToListAsync();
         }
 
-        // Validación
-        public async Task<IReadOnlyList<int>> GetInactiveIdsAsync(IReadOnlyCollection<int> ids) =>
-            ids.Count == 0
-                ? Array.Empty<int>()
-                : await _dbSet.AsNoTracking()
-                    .Where(e => ids.Contains(e.Id) && !e.IsDeleted && !e.Active)
-                    .Select(e => e.Id)
-                    .ToListAsync();
+        /// <summary>
+        /// Devuelve los Ids de los establecimientos inactivos dentro de una lista de Ids.
+        /// </summary>
+        public async Task<IReadOnlyList<int>> GetInactiveIdsAsync(IReadOnlyCollection<int> ids)
+        {
+            if (IsEmpty(ids)) return Array.Empty<int>();
 
-        // Actualización masiva
-        public async Task<int> SetActiveByIdsAsync(IReadOnlyCollection<int> ids, bool active) =>
-            ids.Count == 0
-                ? 0
-                : await _dbSet
-                    .Where(e => ids.Contains(e.Id) && !e.IsDeleted && e.Active != active)
-                    .ExecuteUpdateAsync(up => up.SetProperty(e => e.Active, _ => active));
+            return await _dbSet.AsNoTracking()
+                .Where(e => ids.Contains(e.Id) && !e.IsDeleted && !e.Active)
+                .Select(e => e.Id)
+                .ToListAsync();
+        }
 
-        // Actualización masiva por PlazaId
+        /// <summary>
+        /// Activa o desactiva en masa establecimientos según una lista de Ids.
+        /// </summary>
+        /// <param name="ids">Lista de Ids a actualizar.</param>
+        /// <param name="active">Nuevo estado (true = activo, false = inactivo).</param>
+        public async Task<int> SetActiveByIdsAsync(IReadOnlyCollection<int> ids, bool active)
+        {
+            if (IsEmpty(ids)) return 0;
+
+            return await _dbSet
+                .Where(e => ids.Contains(e.Id) && !e.IsDeleted && e.Active != active)
+                .ExecuteUpdateAsync(up => up.SetProperty(e => e.Active, _ => active));
+        }
+
+        /// <summary>
+        /// Activa o desactiva en masa todos los establecimientos de una plaza específica.
+        /// </summary>
+        /// <param name="plazaId">Id de la plaza.</param>
+        /// <param name="active">Nuevo estado (true = activo, false = inactivo).</param>
         public async Task<int> SetActiveByPlazaIdAsync(int plazaId, bool active) =>
             await _dbSet
                 .Where(e => e.PlazaId == plazaId && !e.IsDeleted && e.Active != active)
