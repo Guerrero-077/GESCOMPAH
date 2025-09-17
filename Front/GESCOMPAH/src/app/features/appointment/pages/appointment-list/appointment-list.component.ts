@@ -9,7 +9,7 @@ import { GenericTableComponent } from "../../../../shared/components/generic-tab
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
-import { AppointmentSelectModel, AppointmentUpdateModel } from '../../models/appointment.models';
+import { AppointmentSelect, AppointmentUpdateModel } from '../../models/appointment.models';
 import { AppointmentStore } from '../../services/appointment/appointment.store';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 
@@ -35,7 +35,7 @@ export class AppointmentListComponent implements OnInit {
   pendingId: number | null = null;
   desiredState: boolean | null = null;
 
-  columns: TableColumn<AppointmentSelectModel>[] = [];
+  columns: TableColumn<AppointmentSelect>[] = [];
 
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
   @ViewChild('userTemplate', { static: true }) userTemplate!: TemplateRef<any>;
@@ -46,8 +46,8 @@ export class AppointmentListComponent implements OnInit {
     this.pageHeaderService.setPageHeader('Citas', 'Gestión de Citas');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
-      { key: 'email', header: 'User', template: this.userTemplate },
-      { key: 'phone', header: 'Telefono' },
+      { key: 'personName', header: 'Nombre' },
+      { key: 'description', header: 'Descripción' },
       { key: 'establishmentName', header: 'Local' },
       {
         key: 'active',
@@ -122,10 +122,10 @@ export class AppointmentListComponent implements OnInit {
   }
 
 
-  async onDelete(row: AppointmentSelectModel) {
+  async onDelete(row: AppointmentSelect) {
     const confirmed = await this.sweetAlertService.showConfirm(
       'Eliminar form',
-      `¿Deseas eliminar el form "${row.fullName}"?`,
+      `¿Deseas eliminar el form "${row.personName}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
@@ -144,13 +144,13 @@ export class AppointmentListComponent implements OnInit {
     }
   }
 
-  onView(row: AppointmentSelectModel) {
+  onView(row: AppointmentSelect) {
   }
 
 
 
   // Toggle activo/inactivo (UI optimista + rollback)
-  onToggleActive(row: AppointmentSelectModel, e: { checked: boolean }) {
+  onToggleActive(row: AppointmentSelect, e: { checked: boolean }) {
     const previous = row.active;
     row.active = e.checked;
     this.appointmentStore.changeActiveStatus(row.id, e.checked).subscribe({
