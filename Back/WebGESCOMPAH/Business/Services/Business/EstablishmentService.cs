@@ -1,5 +1,7 @@
 ﻿using Business.Interfaces.Implements.Business;
 using Business.Repository;
+using System.Collections.Generic;
+using System.Linq;
 using Data.Interfaz.IDataImplement.Business;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
@@ -122,6 +124,30 @@ namespace Business.Services.Business
             return basics.ToList().AsReadOnly();
         }
 
+        public async Task<(decimal totalBaseRent, decimal totalUvt)> ReserveForContractAsync(IReadOnlyCollection<int> ids)
+        {
+            var distinct = ids?.Where(id => id > 0).Distinct().ToList() ?? new List<int>();
+            if (distinct.Count == 0)
+                throw new BusinessException("Debe seleccionar al menos un establecimiento.");
+
+            var inactive = await _repo.GetInactiveIdsAsync(distinct);
+            if (inactive.Count > 0)
+                throw new BusinessException($"Los establecimientos {string.Join(", ", inactive)} no estan disponibles (Active = false).");
+
+            var basics = await _repo.GetBasicsByIdsAsync(distinct);
+            if (basics.Count != distinct.Count)
+                throw new BusinessException("Conflicto de concurrencia al recuperar los establecimientos seleccionados.");
+
+            var totalBase = basics.Sum(b => b.RentValueBase);
+            var totalUvt = basics.Sum(b => b.UvtQty);
+
+            var affected = await _repo.SetActiveByIdsAsync(distinct, active: false);
+            if (affected != distinct.Count)
+                throw new BusinessException("Conflicto de concurrencia al actualizar estados de establecimientos.");
+
+            return (totalBase, totalUvt);
+        }
+
         // Lista liviana para grid/cards (sin Includes pesados)
         public async Task<IReadOnlyList<EstablishmentCardDto>> GetCardsAnyAsync()
         {
@@ -154,3 +180,5 @@ namespace Business.Services.Business
         }
     }
 }
+
+

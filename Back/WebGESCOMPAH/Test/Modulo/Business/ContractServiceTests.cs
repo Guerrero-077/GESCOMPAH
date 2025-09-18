@@ -1,42 +1,36 @@
-using Business.Interfaces.Implements.Business;
-using Entity.DTOs.Implements.Business.Contract;
-using Business.Services.Business;
-using Data.Interfaz.IDataImplement.Business;
-using Business.Interfaces.Implements.Persons;
-using Business.CustomJWT;
-using Business.Interfaces.Implements.SecurityAuthentication;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Business.Interfaces;
+using Business.Interfaces.Implements.Business;
+using Business.Interfaces.Implements.Persons;
+using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Interfaces.PDF;
-using Data.Interfaz.IDataImplement.Persons;
-using Data.Interfaz.IDataImplement.SecurityAuthentication;
+using Business.Services.Business;
+using Business.CustomJWT;
+using Data.Interfaz.IDataImplement.Business;
 using Entity.Domain.Models.Implements.Business;
-using Entity.Domain.Models.Implements.Persons;
-using Entity.Domain.Models.Implements.SecurityAuthentication;
+using Entity.DTOs.Implements.Business.Contract;
 using Entity.DTOs.Implements.Business.ObligationMonth;
 using Entity.Infrastructure.Context;
 using MapsterMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Utilities.Exceptions;
 using Utilities.Messaging.Interfaces;
+using Xunit;
 
 namespace Tests.Business.Business;
 
 public class ContractServiceTests
 {
     private readonly Mock<IContractRepository> _contracts = new();
-    private readonly Mock<IObligationMonthRepository> _obligationRepo = new();
     private readonly Mock<IObligationMonthService> _obligationSvc = new();
     private readonly Mock<IPersonService> _personSvc = new();
-    private readonly Mock<IPersonRepository> _personRepo = new();
-    private readonly Mock<IUserRepository> _userRepo = new();
-    private readonly Mock<IRolUserRepository> _rolUserRepo = new();
-    private readonly Mock<IPremisesLeasedRepository> _premRepo = new();
-    private readonly Mock<IEstablishmentsRepository> _estRepo = new();
     private readonly Mock<IEstablishmentService> _estSvc = new();
-    private readonly Mock<IPasswordHasher<User>> _hasher = new();
+    private readonly Mock<IUserService> _userSvc = new();
     private readonly Mock<ISendCode> _email = new();
     private readonly Mock<IMapper> _mapper = new();
     private readonly Mock<ICurrentUser> _currentUser = new();
@@ -49,30 +43,24 @@ public class ContractServiceTests
 
     public ContractServiceTests()
     {
-        var opt = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        var opt = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
         _ctx = new ApplicationDbContext(opt);
 
         _service = new ContractService(
             _contracts.Object,
             _personSvc.Object,
-            _personRepo.Object,
-            _userRepo.Object,
-            _rolUserRepo.Object,
-            _premRepo.Object,
-            _estRepo.Object,
             _estSvc.Object,
+            _userSvc.Object,
             _mapper.Object,
-            _hasher.Object,
             _email.Object,
             _ctx,
             _currentUser.Object,
-            _obligationRepo.Object,
             _obligationSvc.Object,
             _userCtx.Object,
             _contractPdfService.Object,
             _uow.Object,
-            _logger.Object
-        );
+            _logger.Object);
     }
 
     [Fact]
@@ -120,24 +108,18 @@ public class ContractServiceTests
     }
 
     [Fact]
-    public async Task GetObligations_MapsList()
+    public async Task GetObligations_DelegatesToService()
     {
-        var optLocal = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        await using var ctxLocal = new ApplicationDbContext(optLocal);
-        ctxLocal.obligationMonths.Add(new ObligationMonth { Id = 1, ContractId = 5, Year = 2024, Month = 1, DueDate = DateTime.Today, UvtQtyApplied = 0, UvtValueApplied = 0, VatRateApplied = 0, BaseAmount = 0, VatAmount = 0, TotalAmount = 0, Status = "PENDING" });
-        ctxLocal.obligationMonths.Add(new ObligationMonth { Id = 2, ContractId = 6, Year = 2024, Month = 1, DueDate = DateTime.Today, UvtQtyApplied = 0, UvtValueApplied = 0, VatRateApplied = 0, BaseAmount = 0, VatAmount = 0, TotalAmount = 0, Status = "PENDING" });
-        await ctxLocal.SaveChangesAsync();
-
-        _obligationRepo.Setup(r => r.GetByContractQueryable(5))
-                       .Returns(ctxLocal.obligationMonths.Where(o => o.ContractId == 5));
-        _mapper.Setup(m => m.Map<List<ObligationMonthSelectDto>>(It.IsAny<List<ObligationMonth>>()))
-               .Returns(new List<ObligationMonthSelectDto> { new() });
+        _obligationSvc.Setup(s => s.GetByContractAsync(5))
+            .ReturnsAsync(new List<ObligationMonthSelectDto> { new() });
 
         var result = await _service.GetObligationsAsync(5);
+
         Assert.Single(result);
+        _obligationSvc.Verify(s => s.GetByContractAsync(5), Times.Once);
     }
 
-    [Fact(Skip="EF InMemory no soporta transacciones; cubrir en integración relacional")]
+    [Fact(Skip = "EF InMemory no soporta transacciones; cubrir en integracion relacional")]
     public async Task RunExpirationSweep_ReturnsRepositoryResults()
     {
         _contracts.Setup(r => r.DeactivateExpiredAsync(It.IsAny<DateTime>())).ReturnsAsync(new List<int> { 1, 2 });
@@ -148,3 +130,6 @@ public class ContractServiceTests
         Assert.Equal(3, result.ReactivatedEstablishments);
     }
 }
+
+
+

@@ -6,6 +6,7 @@ using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.ObligationMonth;
 using MapsterMapper;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Utilities.Exceptions;
@@ -78,6 +79,16 @@ namespace Business.Services.Business
             var vatRate = await GetParameterValueAsync("IVA", dueDate);
 
             await UpsertObligationAsync(contract, monthStart, uvtValue, vatRate);
+        }
+
+        public async Task<IReadOnlyList<ObligationMonthSelectDto>> GetByContractAsync(int contractId)
+        {
+            if (contractId <= 0)
+                throw new BusinessException("contractId invalido.");
+
+            var query = _obligationRepository.GetByContractQueryable(contractId);
+            var list = await query.AsNoTracking().ToListAsync();
+            return _mapper.Map<List<ObligationMonthSelectDto>>(list).AsReadOnly();
         }
 
         public async Task MarkAsPaidAsync(int id)
@@ -194,3 +205,6 @@ namespace Business.Services.Business
         }
     }
 }
+
+
+

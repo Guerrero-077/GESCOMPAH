@@ -7,7 +7,7 @@ namespace Business.Interfaces.Implements.Business
 {
     /// <summary>
     /// Contrato de servicio para Establecimientos.
-    /// CRUD + consultas por disponibilidad y proyección liviana para cálculos.
+    /// CRUD + consultas por disponibilidad y proyeccion liviana para calculos.
     /// </summary>
 
     public interface IEstablishmentService
@@ -26,16 +26,22 @@ namespace Business.Interfaces.Implements.Business
         /// <summary>Obtiene un establecimiento por Id (activo o inactivo).</summary>
         Task<EstablishmentSelectDto?> GetByIdAnyAsync(int id);
 
-        /// <summary>Obtiene un establecimiento activo por Id (retorna null si está inactivo o no existe).</summary>
+        /// <summary>Obtiene un establecimiento activo por Id (retorna null si esta inactivo o no existe).</summary>
         Task<EstablishmentSelectDto?> GetByIdActiveAsync(int id);
 
-        // === PROYECCIÓN LIVIANA (para contratos / sumatorias) ===
+        // === PROYECCION LIVIANA (para contratos / sumatorias) ===
 
         /// <summary>
-        /// Proyección liviana para sumatorias: Id, RentValueBase, UvtQty.
-        /// Evita materializar entidades completas y mejora rendimiento en cálculos.
+        /// Proyeccion liviana para sumatorias: Id, RentValueBase, UvtQty.
+        /// Evita materializar entidades completas y mejora rendimiento en calculos.
         /// </summary>
         Task<IReadOnlyList<EstablishmentBasicsDto>> GetBasicsByIdsAsync(IEnumerable<int> ids);
+
+        /// <summary>
+        /// Verifica disponibilidad y reserva los establecimientos para un contrato.
+        /// Devuelve los totales requeridos para el calculo del contrato.
+        /// </summary>
+        Task<(decimal totalBaseRent, decimal totalUvt)> ReserveForContractAsync(IReadOnlyCollection<int> ids);
 
         // === LISTA LIVIANA PARA GRID/CARDS ===
         Task<IReadOnlyList<EstablishmentCardDto>> GetCardsAnyAsync();
