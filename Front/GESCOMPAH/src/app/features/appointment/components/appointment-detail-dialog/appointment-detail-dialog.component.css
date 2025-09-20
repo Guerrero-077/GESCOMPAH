@@ -1,0 +1,466 @@
+/* === ADAPTADOR A TU PALETA GLOBAL (solo cambia este bloque) === */
+:host {
+  /* Superficies y texto (blanco + verdes/amarillos) */
+  --surface: var(--color-surface);
+  --surface-muted: var(--color-surface-muted);
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text);
+  --text-muted: var(--color-text-muted);
+
+  /* Bordes y sombra */
+  --border-color: var(--color-border);
+  --border-light: var(--gray-100);
+  --shadow: var(--shadow-1);
+  --radius: 12px;
+  --transition: .2s ease;
+
+  /* Marca y acentos (verde/amarillo) */
+  --primary-color: var(--color-primary);
+  --primary-light: var(--green-400);
+  /* usada en gradientes suaves */
+  --primary-soft: var(--color-primary-soft);
+
+  /* Estados (éxito/advertencia) — sin rojos */
+  --success-color: var(--state-success);
+  --success-bg: var(--state-success-bg);
+  --warning-color: var(--state-warning);
+  --warning-bg: var(--state-warning-bg);
+
+  /* Danger se mapea a advertencia (amarillo) para evitar rojos/negros */
+  --danger-color: var(--state-warning);
+  --danger-bg: var(--state-warning-bg);
+
+  /* Muted */
+  --muted-color: var(--color-text-muted);
+  --muted-bg: var(--gray-50);
+
+  /* Gradientes y foco */
+  --accent-gradient: var(--gradient-primary);
+  --accent-gradient-hover: var(--gradient-primary-hover);
+  --focus-ring-color: var(--focus-ring);
+  --focus-ring-offset: var(--focus-ring-offset);
+  --focus-ring-width: var(--focus-ring-width);
+}
+
+/* === A PARTIR DE AQUÍ, SOLO reuso tus reglas cambiando #fff y azules por tokens === */
+
+.dialog-container {
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.dialog-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: var(--shadow-1);
+}
+
+.title-wrap {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.accent {
+  width: 4px;
+  height: 28px;
+  border-radius: 2px;
+  background: var(--accent-gradient);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.dialog-header .title mat-icon {
+  color: var(--primary-color);
+}
+
+.dialog-header button {
+  transition: background-color var(--transition);
+}
+
+.dialog-header button:hover {
+  background-color: var(--primary-soft);
+}
+
+/* Content */
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section.card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+.section h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.section h4 {
+  margin: .5rem 0 .25rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Info grid */
+.grid {
+  display: grid;
+  gap: .75rem 1.5rem;
+}
+
+.info-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  padding: .4rem 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.field:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: var(--text-muted);
+  font-size: .875rem;
+  margin-bottom: .15rem;
+}
+
+.value {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .7rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.chip-icon {
+  font-size: 14px;
+  height: 14px;
+  width: 14px;
+  line-height: 14px;
+}
+
+.chip--success {
+  background: var(--success-bg);
+  color: var(--success-color);
+}
+
+.chip--warning {
+  background: var(--warning-bg);
+  color: var(--warning-color);
+}
+
+.chip--danger {
+  background: var(--danger-bg);
+  color: var(--danger-color);
+}
+
+.chip--muted {
+  background: var(--muted-bg);
+  color: var(--muted-color);
+}
+
+/* Timeline */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: .75rem;
+  align-items: start;
+}
+
+.rail {
+  position: relative;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.dot {
+  position: relative;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--muted-bg);
+  border: 2px solid var(--border-color);
+  margin-top: 10px;
+}
+
+.dot--success {
+  background: var(--success-bg);
+  border-color: var(--success-color);
+}
+
+.dot--warning {
+  background: var(--warning-bg);
+  border-color: var(--warning-color);
+}
+
+.dot--danger {
+  background: var(--danger-bg);
+  border-color: var(--danger-color);
+}
+
+.line {
+  position: absolute;
+  top: 18px;
+  bottom: -12px;
+  width: 2px;
+  background: var(--border-light);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.timeline-item:last-child .line {
+  display: none;
+}
+
+/* Obligation card */
+.ob-card {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: box-shadow var(--transition), transform .12s ease;
+}
+
+.ob-card:hover {
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+}
+
+.ob-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .75rem;
+  align-items: center;
+  padding: .9rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.ob-title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.period {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.period .year {
+  font-size: 1rem;
+}
+
+.period .sep {
+  opacity: .6;
+}
+
+.period .month {
+  font-size: 1rem;
+}
+
+.ob-total {
+  text-align: right;
+}
+
+.ob-total .label {
+  display: block;
+  color: var(--text-muted);
+  font-size: .75rem;
+}
+
+.ob-total .value {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.ob-body {
+  display: grid;
+  gap: .75rem 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  padding: .9rem 1rem 1rem;
+}
+
+.kv {
+  display: flex;
+  flex-direction: column;
+}
+
+.kv .k {
+  color: var(--text-muted);
+  font-size: .8rem;
+}
+
+.kv .v {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+/* Estado vencido destacado */
+.timeline-item--overdue .ob-card {
+  border-color: color-mix(in srgb, var(--warning-color) 35%, transparent);
+}
+
+.timeline-item--overdue .ob-header {
+  background: color-mix(in srgb, var(--warning-bg) 90%, transparent);
+}
+
+/* Premises */
+.premises ul {
+  margin: .5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.premises li {
+  padding: .25rem 0;
+  color: var(--text-secondary);
+}
+
+/* No-data y estados */
+.muted {
+  color: var(--text-muted);
+}
+
+.no-data {
+  text-align: center;
+  padding: 1rem;
+  font-style: italic;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.state.error {
+  color: var(--danger-color);
+}
+
+/* Actions */
+.dialog-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-light);
+  background: var(--surface);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dialog-header {
+    padding: 1rem;
+  }
+
+  .dialog-content {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .section.card {
+    padding: 1rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Se elimina el mapeo a modo oscuro con grises/negros para mantener blanco/verde/amarillo */
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+
+  .dialog-header button,
+  .ob-card {
+    transition: none;
+  }
+}
+
+button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}

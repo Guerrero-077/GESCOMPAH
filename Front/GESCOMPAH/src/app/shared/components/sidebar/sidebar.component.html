@@ -35,7 +35,7 @@
               <!-- Si el hijo es hoja (tiene route y no hijos) -->
               <a mat-list-item
                  *ngIf="(child.children?.length ?? 0) === 0 && child.route as r1"
-                 [routerLink]="'/admin/' + r1"
+                 [routerLink]="r1"
                  routerLinkActive="active"
                  [routerLinkActiveOptions]="{ exact: true }"
                  (click)="onItemClick()">
@@ -49,7 +49,7 @@
                 <div class="submenu-group-items">
                   <a mat-list-item
                      *ngFor="let grand of child.children; trackBy: trackByGrand"
-                     [routerLink]="'/admin/' + grand.route"
+                     [routerLink]="grand.route"
                      routerLinkActive="active"
                      [routerLinkActiveOptions]="{ exact: true }"
                      (click)="onItemClick()">

@@ -1,3 +1,5 @@
+﻿using System;
+using System.Text.RegularExpressions;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
 using FluentValidation;
 
@@ -5,39 +7,82 @@ namespace Entity.DTOs.Validations.Establishment
 {
     public class EstablishmentCreateDtoValidator : AbstractValidator<EstablishmentCreateDto>
     {
+        private const int NameMaxLength = 100;
+        private const int DescriptionMaxLength = 500;
+        private const int AddressMaxLength = 150;
+        private static readonly Regex AddressRegex = new(@"^[\p{L}\p{M}\d\s#\-,.]+$", RegexOptions.Compiled);
+
         public EstablishmentCreateDtoValidator()
         {
             RuleFor(x => x)
                 .Cascade(CascadeMode.Stop)
                 .Custom((dto, context) =>
                 {
-                    if (string.IsNullOrWhiteSpace(dto.Name))
-                        context.AddFailure(nameof(dto.Name), "El nombre es obligatorio.");
+                    if (dto is null)
+                    {
+                        context.AddFailure("Establishment", "Payload inválido.");
+                        return;
+                    }
 
-                    if (string.IsNullOrWhiteSpace(dto.Description))
-                        context.AddFailure(nameof(dto.Description), "La descripción es obligatoria.");
+                    var (name, nameError) = ValidateRequiredText(dto.Name, NameMaxLength);
+                    if (nameError is not null) context.AddFailure(nameof(dto.Name), nameError);
+                    dto.Name = name;
 
-                    if (dto.AreaM2 <= 0)
-                        context.AddFailure(nameof(dto.AreaM2), "El área debe ser mayor a 0.");
+                    var (description, descriptionError) = ValidateRequiredText(dto.Description, DescriptionMaxLength);
+                    if (descriptionError is not null) context.AddFailure(nameof(dto.Description), descriptionError);
+                    dto.Description = description;
 
-                    if (dto.RentValueBase < 0)
-                        context.AddFailure(nameof(dto.RentValueBase), "El valor de renta no puede ser negativo.");
+                    var (address, addressError) = ValidateOptionalAddress(dto.Address);
+                    if (addressError is not null) context.AddFailure(nameof(dto.Address), addressError);
+                    dto.Address = address;
 
-                    //if (dto.Files != null)
-                    //{
-                    //    foreach (var file in dto.Files)
-                    //    {
-                    //        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                    //        var allowed = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
+                    var areaError = ValidateDecimal(dto.AreaM2, 1m, 1_000_000m);
+                    if (areaError is not null) context.AddFailure(nameof(dto.AreaM2), areaError);
 
-                    //        if (!allowed.Contains(extension))
-                    //            context.AddFailure(nameof(dto.Files), $"El archivo '{file.FileName}' tiene una extensión inválida.");
+                    var rentError = ValidateDecimal(dto.RentValueBase, 1m, 9_999_999.99m);
+                    if (rentError is not null) context.AddFailure(nameof(dto.RentValueBase), rentError);
 
-                    //        if (file.Length > 5 * 1024 * 1024)
-                    //            context.AddFailure(nameof(dto.Files), $"El archivo '{file.FileName}' supera el tamaño máximo permitido (5 MB).");
-                    //    }
-                    //}
+                    var uvtError = ValidateDecimal(dto.UvtQty, 1m, 9_999m);
+                    if (uvtError is not null) context.AddFailure(nameof(dto.UvtQty), uvtError);
+
+                    if (dto.PlazaId <= 0)
+                        context.AddFailure(nameof(dto.PlazaId), "Debes seleccionar una plaza válida.");
                 });
         }
+
+        private static (string Sanitized, string? Error) ValidateRequiredText(string? value, int maxLength)
+        {
+            var trimmed = (value ?? string.Empty).Trim();
+            if (string.IsNullOrEmpty(trimmed))
+                return (trimmed, "Este campo es obligatorio.");
+            if (trimmed.Length > maxLength)
+                return (trimmed, $"No puede superar {maxLength} caracteres.");
+            return (trimmed, null);
+        }
+
+        private static (string Sanitized, string? Error) ValidateOptionalAddress(string? value)
+        {
+            var trimmed = (value ?? string.Empty).Trim();
+            if (string.IsNullOrEmpty(trimmed))
+                return (string.Empty, null);
+            if (trimmed.Length > AddressMaxLength)
+                return (trimmed, $"La dirección no puede superar {AddressMaxLength} caracteres.");
+            if (!AddressRegex.IsMatch(trimmed))
+                return (trimmed, "La dirección contiene caracteres no permitidos.");
+            return (trimmed, null);
+        }
+
+        private static string? ValidateDecimal(decimal value, decimal min, decimal max)
+        {
+            if (value < min)
+                return $"El valor debe ser mayor o igual a {min}.";
+            if (value > max)
+                return $"El valor no puede superar {max}.";
+            if (GetScale(value) > 2)
+                return "Solo se permiten hasta 2 decimales.";
+            return null;
+        }
+
+        private static int GetScale(decimal value) => (decimal.GetBits(value)[3] >> 16) & 0x7F;
     }
 }

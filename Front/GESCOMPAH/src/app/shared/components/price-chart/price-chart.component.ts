@@ -1,19 +1,21 @@
 // price-chart.component.ts
-import { Component, Input, OnChanges } from '@angular/core';
-import { BaseChartDirective } from 'ng2-charts';
+import { Component, Input } from '@angular/core';
 import {
-  Chart, ScatterController, PointElement,
-  LinearScale, TimeScale, Tooltip, Legend, ChartConfiguration
+  Chart,
+  Legend,
+  LinearScale,
+  PointElement,
+  ScatterController,
+  TimeScale, Tooltip
 } from 'chart.js';
-import 'chartjs-adapter-date-fns'; // <-- necesario para eje tiempo
-// import { ContractCard } from '../../../features/contracts/models/contract.models';
+import 'chartjs-adapter-date-fns';
 
 Chart.register(ScatterController, PointElement, LinearScale, TimeScale, Tooltip, Legend);
 
 @Component({
   selector: 'app-price-chart',
   standalone: true,
-  imports: [BaseChartDirective],
+  imports: [],
   templateUrl: './price-chart.component.html',
   styleUrls: ['./price-chart.component.css']
 })

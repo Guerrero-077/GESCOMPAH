@@ -1,24 +1,24 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, tap, catchError, throwError, Observable } from "rxjs";
-import { AppointmentCreateModel, AppointmentSelectModel, AppointmentUpdateModel } from "../../models/appointment.models";
+import { AppointmentCreateModel, AppointmentSelect, AppointmentUpdateModel } from "../../models/appointment.models";
 import { AppointmentService } from "./appointment.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppointmentStore {
-  private readonly _appointment = new BehaviorSubject<AppointmentSelectModel[]>([]);
+  private readonly _appointment = new BehaviorSubject<AppointmentSelect[]>([]);
   readonly appointments$ = this._appointment.asObservable();
 
   constructor(private appointmentService: AppointmentService) {
     this.loadAll();
   }
 
-  private get appointment(): AppointmentSelectModel[] {
+  private get appointment(): AppointmentSelect[] {
     return this._appointment.getValue();
   }
 
-  private set appointment(val: AppointmentSelectModel[]) {
+  private set appointment(val: AppointmentSelect[]) {
     this._appointment.next(val);
   }
 
@@ -32,7 +32,12 @@ export class AppointmentStore {
     ).subscribe();
   }
 
-  create(form: AppointmentCreateModel): Observable<AppointmentSelectModel> {
+  loadById(id : number): AppointmentSelect | undefined {
+    return this.appointment.find(c => c.id === id);
+  }
+
+
+  create(form: AppointmentCreateModel): Observable<AppointmentSelect> {
     return this.appointmentService.create(form).pipe(
       tap(() => {
         this.loadAll();
@@ -40,7 +45,7 @@ export class AppointmentStore {
     );
   }
 
-  update(id: number, updateDto: AppointmentUpdateModel): Observable<AppointmentSelectModel> {
+  update(id: number, updateDto: AppointmentUpdateModel): Observable<AppointmentSelect> {
     return this.appointmentService.update(id, updateDto).pipe(
       tap(() => {
         this.loadAll();
@@ -63,7 +68,7 @@ export class AppointmentStore {
       })
     );
   }
-  changeActiveStatus(id: number, active: boolean): Observable<AppointmentSelectModel> {
+  changeActiveStatus(id: number, active: boolean): Observable<AppointmentSelect> {
     return this.appointmentService.changeActiveStatus(id, active).pipe(
       tap(() => {
         this.loadAll();

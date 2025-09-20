@@ -1,50 +1,78 @@
-<div class="row d-flex justify-content-center gap-2">
-  <div class="row d-flex justify-content-between ">
-      <app-card-info class="col-md-6 col-sm-12 col-lg-6 mb-2" title="Total de ingresos mensuales" [value]="23">
-      </app-card-info>
-      <app-card-info class="col-md-6 col-sm-12 col-lg-6 mb-2" title="Total de ingresos anuales" [value]="23">
-      </app-card-info>
-  </div>
-  <div class="row d-flex justify-content-between ">
-    <div class="col-md-6 col-sm-12 my-3">
-      <app-circle-chart [title]="'Locales'" [labels]="[ 'Disponibles','Arrendados']"
-        [data]="[activeEstablishment(), inactiveEstablishment()]" [colors]="['#22c55e','#f87171']">
-      </app-circle-chart>
+<!-- Charts for Admin and other roles -->
+<!-- Assuming 'Administrador' and 'Secretaria' are the roles that can see the charts -->
+<!-- Please adjust the roles as needed -->
+<ng-container *appHasRoleAndPermission="['Administrador']">
+  <div class="row d-flex justify-content-center gap-2">
+    <div class="row d-flex justify-content-between ">
+        <app-card-info class="col-md-6 col-sm-12 col-lg-6 mb-2" title="Total de ingresos mensuales" [value]="23">
+        </app-card-info>
+        <app-card-info class="col-md-6 col-sm-12 col-lg-6 mb-2" title="Total de ingresos anuales" [value]="23">
+        </app-card-info>
     </div>
-    <div class="col-md-6 col-sm-12  my-3">
-      <app-quick-action>
+    <div class="row d-flex justify-content-between ">
+      <div class="col-md-6 col-sm-12 my-3">
+        <app-circle-chart [title]="'Locales'" [labels]="[ 'Disponibles','Arrendados']"
+          [data]="[activeEstablishment(), inactiveEstablishment()]" [colors]="['#22c55e','#f87171']">
+        </app-circle-chart>
+      </div>
+      <div class="col-md-6 col-sm-12  my-3">
+        <app-quick-action>
 
-      </app-quick-action>
+        </app-quick-action>
+      </div>
+    </div>
+
+    <div class="row d-flex justify-content-center">
+      <div class="col-md-7 col-sm-12 my-3">
+        <app-line-chart [title]="'Pagos por Mes - Comparación Anual'"
+          [labels]="['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']" [datasets]="[
+                  {
+                      data: [1200, 1350, 1100, 1400, 1600, 1700, 1550, 1800, 1650, 1900, 2000, 2100],
+                      label: '2025',
+                      borderColor: '#2563eb',
+                      backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                      fill: true,
+                      tension: 0.3
+                  },
+                  {
+                      data: [1000, 1150, 950, 1300, 1400, 1450, 1350, 1500, 1450, 1600, 1700, 1750],
+                      label: '2024',
+                      borderColor: '#94a3b8',
+                      backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                      fill: true,
+                      tension: 0.3
+                  }
+              ]">
+        </app-line-chart>
+      </div>
+      <div class="col-md-5 col-sm-12 my-3">
+        <app-circle-chart [title]="'Contratos'" [labels]="['Activos', 'Inactivos']"
+          [data]="[activeContract(), inactiveContract()]" [colors]="['#fcd34d', '#0ea5e9']">
+        </app-circle-chart>
+      </div>
     </div>
   </div>
+</ng-container>
 
+<!-- Chart for Arrendador -->
+<ng-container *appHasRoleAndPermission="['Arrendador']">
   <div class="row d-flex justify-content-center">
-    <div class="col-md-7 col-sm-12 my-3">
-      <app-line-chart [title]="'Pagos por Mes - Comparación Anual'"
-        [labels]="['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']" [datasets]="[
-                {
-                    data: [1200, 1350, 1100, 1400, 1600, 1700, 1550, 1800, 1650, 1900, 2000, 2100],
-                    label: '2025',
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
-                    fill: true,
-                    tension: 0.3
-                },
-                {
-                    data: [1000, 1150, 950, 1300, 1400, 1450, 1350, 1500, 1450, 1600, 1700, 1750],
-                    label: '2024',
-                    borderColor: '#94a3b8',
-                    backgroundColor: 'rgba(148, 163, 184, 0.2)',
-                    fill: true,
-                    tension: 0.3
-                }
-            ]">
-      </app-line-chart>
-    </div>
     <div class="col-md-5 col-sm-12 my-3">
       <app-circle-chart [title]="'Contratos'" [labels]="['Activos', 'Inactivos']"
         [data]="[activeContract(), inactiveContract()]" [colors]="['#fcd34d', '#0ea5e9']">
       </app-circle-chart>
     </div>
   </div>
-</div>
+</ng-container>
+
+
+<!-- Chart for Arrendatario -->
+<ng-container *appHasRoleAndPermission="['Arrendatario']">
+  <div class="row d-flex justify-content-center">
+    <div class="col-md-5 col-sm-12 my-3">
+      <app-circle-chart [title]="'Contratos'" [labels]="['Activos', 'Inactivos']"
+        [data]="[activeContract(), inactiveContract()]" [colors]="['#fcd34d', '#0ea5e9']">
+      </app-circle-chart>
+    </div>
+  </div>
+</ng-container>

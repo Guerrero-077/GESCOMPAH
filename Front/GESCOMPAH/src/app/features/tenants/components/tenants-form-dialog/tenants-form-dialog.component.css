@@ -98,6 +98,15 @@ body {
 }
 
 /* Estilos para campos de formulario */
+.document-digit-input {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.document-digit-input::placeholder {
+  text-align: center;
+}
+
 .mat-form-field {
   display: inline-block;
   position: relative;
@@ -354,3 +363,4 @@ body {
 }
 
 /* Eliminado - Los estilos disabled ahora los maneja StandardButton */
+

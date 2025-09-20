@@ -1,5 +1,7 @@
-﻿using Business.Interfaces.Implements.Business;
+﻿using System;
+using Business.Interfaces.Implements.Business;
 using Business.Repository;
+using Business.Services.Validation;
 using System.Collections.Generic;
 using System.Linq;
 using Data.Interfaz.IDataImplement.Business;
@@ -39,19 +41,27 @@ namespace Business.Services.Business
         // ========= LISTAS =========
 
         /// <summary>Todos: activos e inactivos.</summary>
-        public async Task<IReadOnlyList<EstablishmentSelectDto>> GetAllAnyAsync()
+        public async Task<IReadOnlyList<EstablishmentSelectDto>> GetAllAnyAsync(int? limit = null)
         {
-            var list = await _repo.GetAllAsync(); // ActivityFilter.Any (compat)
+            var list = await _repo.GetAllAsync(ActivityFilter.Any, limit);
             return list.Select(e => e.Adapt<EstablishmentSelectDto>()).ToList().AsReadOnly();
         }
 
         /// <summary>Solo activos.</summary>
-        public async Task<IReadOnlyList<EstablishmentSelectDto>> GetAllActiveAsync()
+        public async Task<IReadOnlyList<EstablishmentSelectDto>> GetAllActiveAsync(int? limit = null)
         {
-            var list = await _repo.GetAllAsync(ActivityFilter.ActiveOnly);
+            var list = await _repo.GetAllAsync(ActivityFilter.ActiveOnly, limit);
             return list.Select(e => e.Adapt<EstablishmentSelectDto>()).ToList().AsReadOnly();
         }
 
+        public async Task<IReadOnlyList<EstablishmentSelectDto>> GetByPlazaIdAsync(int plazaId, bool activeOnly = false, int? limit = null)
+        {
+            if (plazaId <= 0) return Array.Empty<EstablishmentSelectDto>();
+
+            var filter = activeOnly ? ActivityFilter.ActiveOnly : ActivityFilter.Any;
+            var list = await _repo.GetByPlazaIdAsync(plazaId, filter, limit);
+            return list.Select(e => e.Adapt<EstablishmentSelectDto>()).ToList().AsReadOnly();
+        }
         // ========= DETALLE =========
 
         public async Task<EstablishmentSelectDto?> GetByIdAnyAsync(int id)
@@ -165,20 +175,42 @@ namespace Business.Services.Business
 
         private static void Validate(EstablishmentCreateDto dto)
         {
-            if (dto.RentValueBase <= 0) throw new BusinessException("RentValueBase debe ser mayor que 0.");
-            if (dto.AreaM2 <= 0) throw new BusinessException("AreaM2 debe ser mayor que 0.");
-            if (dto.UvtQty <= 0) throw new BusinessException("UvtQty debe ser mayor que 0.");
-            if (dto.PlazaId <= 0) throw new BusinessException("PlazaId inválido.");
+            if (dto is null)
+                throw new BusinessException("Payload inválido.");
+
+            NormalizeCreate(dto);
         }
 
         private static void Validate(EstablishmentUpdateDto dto)
         {
-            if (dto.RentValueBase <= 0) throw new BusinessException("RentValueBase debe ser mayor que 0.");
-            if (dto.AreaM2 <= 0) throw new BusinessException("AreaM2 debe ser mayor que 0.");
-            if (dto.UvtQty <= 0) throw new BusinessException("UvtQty debe ser mayor que 0.");
-            if (dto.PlazaId <= 0) throw new BusinessException("PlazaId inválido.");
+            if (dto is null)
+                throw new BusinessException("Payload inválido.");
+
+            DomainValidation.EnsureId(dto.Id, "EstablishmentId");
+            NormalizeUpdate(dto);
+        }
+
+        private static void NormalizeCreate(EstablishmentCreateDto dto)
+        {
+            dto.Name = DomainValidation.RequireText(dto.Name, "Nombre", 100);
+            dto.Description = DomainValidation.RequireText(dto.Description, "Descripción", 500);
+            dto.RentValueBase = DomainValidation.EnsureDecimalRange(dto.RentValueBase, 1m, 9_999_999.99m, 2, "RentValueBase");
+            dto.UvtQty = DomainValidation.EnsureDecimalRange(dto.UvtQty, 1m, 9_999m, 2, "UvtQty");
+            dto.AreaM2 = DomainValidation.EnsureDecimalRange(dto.AreaM2, 1m, 1_000_000m, 2, "AreaM2");
+            dto.Address = DomainValidation.NormalizeAddress(dto.Address, required: false, maxLength: 150);
+            DomainValidation.EnsureId(dto.PlazaId, "PlazaId");
+        }
+
+        private static void NormalizeUpdate(EstablishmentUpdateDto dto)
+        {
+            dto.Name = DomainValidation.RequireText(dto.Name, "Nombre", 100);
+            dto.Description = DomainValidation.RequireText(dto.Description, "Descripción", 500);
+            dto.RentValueBase = DomainValidation.EnsureDecimalRange(dto.RentValueBase, 1m, 9_999_999.99m, 2, "RentValueBase");
+            dto.UvtQty = DomainValidation.EnsureDecimalRange(dto.UvtQty, 1m, 9_999m, 2, "UvtQty");
+            dto.AreaM2 = DomainValidation.EnsureDecimalRange(dto.AreaM2, 1m, 1_000_000m, 2, "AreaM2");
+            dto.Address = DomainValidation.NormalizeAddress(dto.Address, required: false, maxLength: 150);
+            DomainValidation.EnsureId(dto.PlazaId, "PlazaId");
         }
     }
 }
-
 

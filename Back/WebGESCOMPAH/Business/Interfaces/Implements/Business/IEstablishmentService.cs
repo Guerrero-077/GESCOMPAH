@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Business.Interfaces.IBusiness;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
@@ -16,10 +16,12 @@ namespace Business.Interfaces.Implements.Business
         // === LISTAS ===
 
         /// <summary>Obtiene TODOS los establecimientos (activos e inactivos).</summary>
-        Task<IReadOnlyList<EstablishmentSelectDto>> GetAllAnyAsync();
+        Task<IReadOnlyList<EstablishmentSelectDto>> GetAllAnyAsync(int? limit = null);
 
         /// <summary>Obtiene SOLO los establecimientos activos.</summary>
-        Task<IReadOnlyList<EstablishmentSelectDto>> GetAllActiveAsync();
+        Task<IReadOnlyList<EstablishmentSelectDto>> GetAllActiveAsync(int? limit = null);
+
+        Task<IReadOnlyList<EstablishmentSelectDto>> GetByPlazaIdAsync(int plazaId, bool activeOnly = false, int? limit = null);
 
         // === DETALLE ===
 

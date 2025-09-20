@@ -1,4 +1,5 @@
-﻿using Business.Interfaces.PDF;
+﻿using System.Text.Json.Serialization;
+using Business.Interfaces.PDF;
 using Business.Services.Utilities.PDF;
 using CloudinaryDotNet;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
@@ -7,12 +8,13 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Hangfire.SqlServer;
-using Hangfire.Server;                   // ✅ Necesario para JobCancellationToken.Null
 using TimeZoneConverter;
 using Utilities.Helpers.CloudinaryHelper;
 using WebGESCOMPAH.Extensions;
 using WebGESCOMPAH.RealTime;
 using WebGESCOMPAH.Security;
+using WebGESCOMPAH.Middleware;
+using Entity.Infrastructure.Binder; // <-- para el FlexibleDecimalModelBinder
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +26,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IContractPdfGeneratorService, ContractPdfService>();
 
 // Controllers / Swagger
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers(options =>
+    {
+        options.ModelBinderProviders.Insert(0, new FlexibleDecimalModelBinderProvider());
+    })
+    .AddJsonOptions(o =>
+    {
+        // permitir números como string en JSON
+        o.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -33,7 +45,7 @@ builder.Services.AddCustomCors(builder.Configuration);
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<CookieSettings>(builder.Configuration.GetSection("Cookie"));
 builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddApplicationServices();   // ← aquí registras tus servicios de capa Business/Data
+builder.Services.AddApplicationServices();   // registra Business/Data, incl. NotificationService
 
 // MULTI-DB (SqlServer + Postgres según tu extensión)
 builder.Services.AddDatabase(builder.Configuration);
@@ -58,6 +70,7 @@ builder.Services.AddScoped<CloudinaryUtility>();
 
 // Jobs (orquestador Hangfire)
 builder.Services.AddScoped<ObligationJobs>();
+builder.Services.AddScoped<ContractJobs>();  // job para contratos
 
 // --------------------------
 // HANGFIRE (Storage en SQL Server)
@@ -82,7 +95,6 @@ builder.Services.AddHangfire(cfg =>
            });
 });
 
-// Servidor de procesos Hangfire — UNA sola vez
 builder.Services.AddHangfireServer(options =>
 {
     options.Queues = new[] { "default", "maintenance" };
@@ -112,13 +124,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Migraciones multi-DB en arranque (tu helper)
+// Migraciones multi-DB en arranque
 MigrationManager.MigrateAllDatabases(app.Services, builder.Configuration);
 
 // SignalR hubs
 app.MapHub<ContractsHub>("/api/hubs/contracts");
 
-// Warmup Playwright/Chromium para evitar arranque en frío en la primera solicitud
+// Warmup Playwright/Chromium (evitar arranque en frío)
 try
 {
     using var scope = app.Services.CreateScope();
@@ -127,15 +139,12 @@ try
 }
 catch (Exception ex)
 {
-    // Loguea si tienes logger; no detiene el arranque
     Console.WriteLine($"[Warmup PDF] Aviso: {ex.Message}");
 }
 
 // --------------------------
-// HANGFIRE Dashboard + Recurring Job
+// HANGFIRE Dashboard + Recurring Jobs
 // --------------------------
-
-// En Dev: abre para loopback (HangfireDashboardAuth). En Prod: exige rol "Administrador".
 var dashboardAuth = app.Environment.IsDevelopment()
     ? (Hangfire.Dashboard.IDashboardAuthorizationFilter)new HangfireDashboardAuth()
     : new HangfireDashboardAuth();
@@ -145,22 +154,27 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
     Authorization = new[] { dashboardAuth }
 });
 
-// Cron y zona horaria desde appsettings (con fallback)
-var cron = builder.Configuration["Hangfire:CronObligations"] ?? "15 2 1 * *"; // 1° de cada mes 02:15
 var tz = TZConvert.GetTimeZoneInfo(builder.Configuration["Hangfire:TimeZoneIana"] ?? "America/Bogota");
 
-// Registrar job recurrente (cola "maintenance")
+// Obligaciones mensuales
+var cronObligations = builder.Configuration["Hangfire:CronObligations"] ?? "15 2 1 * *";
 RecurringJob.AddOrUpdate<ObligationJobs>(
-    recurringJobId: "obligations-monthly",
-    methodCall: j => j.GenerateForCurrentMonthAsync(JobCancellationToken.Null), 
-    cronExpression: cron,
-    options: new RecurringJobOptions { TimeZone = tz, QueueName = "maintenance" }
+    "obligations-monthly",
+    j => j.GenerateForCurrentMonthAsync(JobCancellationToken.Null),
+    cronObligations,
+    new RecurringJobOptions { TimeZone = tz, QueueName = "maintenance" }
 );
 
-// (Opcional) Smoke test:
-// BackgroundJob.Enqueue(() => Console.WriteLine($"Hangfire OK {DateTime.UtcNow:O}"));
+// Contratos (expiración)
+if (builder.Configuration.GetValue<bool>("Contracts:Expiration:Enabled"))
+{
+    var cronContracts = builder.Configuration["Contracts:Expiration:Cron"] ?? "*/10 * * * *";
+    RecurringJob.AddOrUpdate<ContractJobs>(
+        "contracts-expiration",
+        j => j.RunExpirationSweepAsync(CancellationToken.None),
+        cronContracts,
+        new RecurringJobOptions { TimeZone = tz, QueueName = "default" }
+    );
+}
 
-// --------------------------
-// RUN
-// --------------------------
 app.Run();

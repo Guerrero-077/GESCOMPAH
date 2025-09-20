@@ -24,13 +24,6 @@ public class AppointmentServiceTests
     }
 
     [Fact]
-    public async Task RejectedAppointment_Throws_WhenIdZero()
-    {
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.RejectedAppointment(0));
-        Assert.Contains("mayor que cero", ex.Message);
-    }
-
-    [Fact]
     public async Task Create_Throws_WhenDtoNull()
     {
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateAsync(null!));
@@ -42,7 +35,7 @@ public class AppointmentServiceTests
     {
         var dto = new AppointmentCreateDto
         {
-            FirstName = "A", LastName = "B", Document = "1", Address = "X", Phone = "Y", cityId = 1,
+            FirstName = "A", LastName = "B", Document = "1", Address = "X", Phone = "Y",
             Description = "d", RequestDate = DateTime.UtcNow, DateTimeAssigned = DateTime.UtcNow, EstablishmentId = 1
         };
 
@@ -60,7 +53,7 @@ public class AppointmentServiceTests
     {
         var dto = new AppointmentCreateDto
         {
-            FirstName = "A", LastName = "B", Document = "1", Address = "X", Phone = "Y", cityId = 1,
+            FirstName = "A", LastName = "B", Document = "1", Address = "X", Phone = "Y", 
             Description = "d", RequestDate = DateTime.UtcNow, DateTimeAssigned = DateTime.UtcNow, EstablishmentId = 1
         };
         _persons.Setup(p => p.GetByDocumentAsync("1")).ReturnsAsync(new Person { Id = 10, FirstName = "AX", LastName = "B", CityId = 1 });

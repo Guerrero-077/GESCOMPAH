@@ -15,13 +15,14 @@ import { take } from 'rxjs/operators';
 import { ContractService } from '../../../../contracts/services/contract/contract.service';
 import { ContractCard } from '../../../../contracts/models/contract.models';
 import { PriceChartComponent } from "../../../../../shared/components/price-chart/price-chart.component";
+import { HasRoleAndPermissionDirective } from '../../../../../core/Directives/HasRoleAndPermission.directive';
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
 @Component({
   selector: 'app-dashboard-component',
   standalone: true,
-  imports: [CommonModule, CardInfoComponent, SystemAlertComponent, QuickActionComponent, BaseChartDirective, CircleChartComponent, LineChartComponent],
+  imports: [CommonModule, CardInfoComponent, SystemAlertComponent, QuickActionComponent, BaseChartDirective, CircleChartComponent, LineChartComponent, HasRoleAndPermissionDirective],
   templateUrl: './dashboard-component.html',
   styleUrl: './dashboard-component.css'
 })
@@ -83,4 +84,6 @@ export class DashboardComponent implements OnInit {
   }
 
 }
+
+
 

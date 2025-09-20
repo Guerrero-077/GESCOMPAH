@@ -14,8 +14,17 @@
       <div class="row">
         <mat-form-field appearance="outline" class="field">
           <mat-label>Documento de Identidad</mat-label>
-          <input matInput formControlName="document" placeholder="12345678"
-            (keydown.enter)="personFormGroup.get('document')!.markAsTouched(); personFormGroup.get('document')!.updateValueAndValidity();">
+          <input
+            matInput
+            appDocumentFormat
+            class="document-digit-input"
+            formControlName="document"
+            placeholder="1.234.567"
+            maxlength="14"
+            inputmode="numeric"
+            required
+            (keydown.enter)="personFormGroup.get('document')!.markAsTouched(); personFormGroup.get('document')!.updateValueAndValidity();"
+          />
 
           <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
           <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">Por favor ingrese el número de documento de identidad</mat-error>
@@ -77,15 +86,15 @@
       </div>
 
       <div class="actions">
-        <app-standard-button 
-          text="Cancelar" 
-          variant="stroked" 
+        <app-standard-button
+          text="Cancelar"
+          variant="stroked"
           (clicked)="cancel()">
         </app-standard-button>
-        <app-standard-button 
-          text="Siguiente" 
-          variant="raised" 
-          color="primary" 
+        <app-standard-button
+          text="Siguiente"
+          variant="raised"
+          color="primary"
           icon="arrow_forward"
           iconPosition="right"
           (clicked)="stepper.next()">
@@ -163,21 +172,21 @@
       </div>
 
       <div class="actions">
-        <app-standard-button 
-          text="Cancelar" 
-          variant="stroked" 
+        <app-standard-button
+          text="Cancelar"
+          variant="stroked"
           (clicked)="cancel()">
         </app-standard-button>
-        <app-standard-button 
-          text="Atrás" 
-          variant="flat" 
+        <app-standard-button
+          text="Atrás"
+          variant="flat"
           icon="arrow_back"
           (clicked)="stepper.previous()">
         </app-standard-button>
-        <app-standard-button 
-          text="Siguiente" 
-          variant="raised" 
-          color="primary" 
+        <app-standard-button
+          text="Siguiente"
+          variant="raised"
+          color="primary"
           icon="arrow_forward"
           iconPosition="right"
           (clicked)="stepper.next()">
@@ -213,7 +222,7 @@
       <div class="row">
         <mat-form-field appearance="outline" class="field">
           <mat-label>Locales Comerciales</mat-label>
-          <mat-select formControlName="establishmentIds" multiple>
+          <mat-select formControlName="establishmentIds" multiple [disabled]="loadingEstablishments || !establishmentFormGroup.get('plazaId')?.value">
             <mat-option *ngFor="let e of filteredEstablishments" [value]="e.id">
               {{ e.name }}
               <span class="establishment-details" *ngIf="e.areaM2 || e.rentValueBase">
@@ -221,6 +230,7 @@
               </span>
             </mat-option>
           </mat-select>
+          <mat-hint *ngIf="loadingEstablishments">Cargando locales...</mat-hint>
           <mat-hint *ngIf="!establishmentFormGroup.get('plazaId')?.value">Primero seleccione una plaza de mercado</mat-hint>
           <mat-hint *ngIf="establishmentFormGroup.get('plazaId')?.value && filteredEstablishments.length === 0">No hay locales disponibles en la plaza seleccionada</mat-hint>
           <mat-hint *ngIf="filteredEstablishments.length > 0">Puede seleccionar múltiples locales para el mismo contrato</mat-hint>
@@ -246,21 +256,21 @@
       </div>
 
       <div class="actions">
-        <app-standard-button 
-          text="Cancelar" 
-          variant="stroked" 
+        <app-standard-button
+          text="Cancelar"
+          variant="stroked"
           (clicked)="cancel()">
         </app-standard-button>
-        <app-standard-button 
-          text="Atrás" 
-          variant="flat" 
+        <app-standard-button
+          text="Atrás"
+          variant="flat"
           icon="arrow_back"
           (clicked)="stepper.previous()">
         </app-standard-button>
-        <app-standard-button 
-          [text]="saving ? 'Creando…' : 'Crear contrato'" 
-          variant="raised" 
-          color="primary" 
+        <app-standard-button
+          [text]="saving ? 'Creando…' : 'Crear contrato'"
+          variant="raised"
+          color="primary"
           icon="save"
           [disabled]="personFormGroup.invalid || contractFormGroup.invalid || establishmentFormGroup.invalid || saving"
           [loading]="saving"
@@ -271,3 +281,4 @@
     </form>
   </mat-step>
 </mat-stepper>
+

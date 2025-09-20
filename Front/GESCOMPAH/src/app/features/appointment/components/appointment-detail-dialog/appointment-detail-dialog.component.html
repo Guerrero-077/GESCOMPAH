@@ -1,0 +1,109 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="title-wrap">
+      <div class="accent"></div>
+      <h2 class="title" id="dialog-title">
+        <mat-icon class="mr-1" aria-hidden="true">event_note</mat-icon>
+        Detalle de la Cita
+      </h2>
+    </div>
+
+    <app-standard-button
+      variant="icon"
+      icon="close"
+      (clicked)="close()"
+      ariaLabel="Cerrar diálogo">
+    </app-standard-button>
+  </div>
+
+  <!-- Contenido -->
+  <mat-dialog-content class="dialog-content" *ngIf="!loading && !error; else stateTpl">
+    <!-- Card: Información de la cita -->
+    <section class="section card" *ngIf="appointment as a" aria-labelledby="appt-info">
+      <div class="section-header">
+        <h3 id="appt-info">Información de la Cita</h3>
+
+        <span
+          class="chip"
+          [ngClass]="{
+            'chip--success': getComputedStatus(a) === 'SCHEDULED',
+            'chip--danger':  getComputedStatus(a) === 'OVERDUE',
+            'chip--warning': getComputedStatus(a) === 'CLOSED'
+          }"
+          aria-live="polite">
+          {{ getStatusText(getComputedStatus(a)) }}
+        </span>
+      </div>
+
+      <div class="grid info-grid">
+        <div class="field">
+          <span class="label">Arrendatario</span>
+          <span class="value">{{ a.personName }}</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Teléfono</span>
+          <span class="value">{{ a.phone || '—' }}</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Establecimiento</span>
+          <span class="value">{{ a.establishmentName }}</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Fecha de Solicitud</span>
+          <span class="value">{{ a.requestDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Asignada para</span>
+          <span class="value">{{ a.dateTimeAssigned | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Activo</span>
+          <span class="value">
+            <span class="chip chip--muted">{{ a.active ? 'Sí' : 'No' }}</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="section">
+        <h4>Descripción</h4>
+        <p class="muted" *ngIf="!a.description">—</p>
+        <p *ngIf="a.description">{{ a.description }}</p>
+      </div>
+
+      <div class="section" *ngIf="a.observation">
+        <h4>Observación</h4>
+        <p>{{ a.observation }}</p>
+      </div>
+    </section>
+
+  </mat-dialog-content>
+
+  <!-- Estados -->
+  <ng-template #stateTpl>
+    <div class="state" *ngIf="loading" aria-live="polite" aria-busy="true">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+      <div>Cargando detalle…</div>
+    </div>
+
+    <div class="state error" *ngIf="!loading && error" aria-live="assertive">
+      <mat-icon>error</mat-icon>
+      <div>{{ error }}</div>
+    </div>
+  </ng-template>
+
+  <!-- Actions -->
+  <mat-dialog-actions align="end" class="dialog-actions" *ngIf="!loading && !error">
+    <app-standard-button
+      text="Cerrar"
+      variant="stroked"
+      color="primary"
+      (clicked)="close()">
+    </app-standard-button>
+  </mat-dialog-actions>
+</div>

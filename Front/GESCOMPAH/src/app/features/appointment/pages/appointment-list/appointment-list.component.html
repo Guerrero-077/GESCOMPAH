@@ -10,15 +10,33 @@
   </app-generic-table>
 
   <ng-template #userTemplate let-row>
-    <div>{{ row.fullName }}</div>
+    <div>{{ row.personName }}</div>
     <small>{{ row.email }}</small>
   </ng-template>
+
+  <!-- Solo fecha -->
+  <ng-template #onlyDateTpl let-row>
+    {{ row.requestDate | date:'yyyy-MM-dd' }}
+  </ng-template>
+
+  <!-- Fecha y hora -->
+  <ng-template #dateTimeTpl let-row>
+    {{ row.dateTimeAssigned | date:'yyyy-MM-dd HH:mm' }}
+  </ng-template>
+
 
 
   <ng-template #estadoTemplate let-row>
     <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
 
       <div class="d-inline-flex align-items-center gap-2">
+        <button
+          mat-icon-button
+          matTooltip="Ver detalle"
+          (click)="onView(row)"
+          aria-label="Ver detalle">
+          <mat-icon>visibility</mat-icon>
+        </button>
         <!-- Activar -->
         <button mat-icon-button matTooltip="Activar" aria-label="Activar" class="text-white"
           class="badge-success--solid"

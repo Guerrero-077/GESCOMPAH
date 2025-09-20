@@ -7,7 +7,8 @@ namespace Entity.Domain.Models.Implements.Business
     {
         public string Description { get; set; }
         public DateTime RequestDate { get; set; } 
-        public DateTime? DateTimeAssigned { get; set; }       
+        public DateTime? DateTimeAssigned { get; set; }
+        public string? Observation { get; set; }
 
         // Ralacion con Persona
         public int PersonId { get; set; }
@@ -17,8 +18,10 @@ namespace Entity.Domain.Models.Implements.Business
         public int EstablishmentId { get; set; }
         public  Establishment Establishment { get; set; }
 
-        public int Status { get; set; }
+  
         public bool Active { get; set; }
+
+        //public int Status { get; set; }
 
     }
 }

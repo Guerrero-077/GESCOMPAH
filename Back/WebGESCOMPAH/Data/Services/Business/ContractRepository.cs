@@ -23,17 +23,26 @@ namespace Data.Services.Business
                 .AsNoTracking();
         }
 
-        private IQueryable<ContractCardDto> GetCardQuery()
+        /// <summary>
+        /// Query base para tarjetas de contrato, con filtro opcional por persona.
+        /// </summary>
+        private IQueryable<ContractCardDto> GetCardQuery(int? personId = null)
         {
-            return _dbSet.AsNoTracking()
-                .Where(c => !c.IsDeleted)
+            var query = _dbSet.AsNoTracking()
+                .Where(c => !c.IsDeleted);
+
+            if (personId.HasValue)
+                query = query.Where(c => c.PersonId == personId.Value);
+
+            return query
                 .OrderByDescending(e => e.Active)
                 .ThenByDescending(e => e.CreatedAt)
                 .ThenByDescending(e => e.Id)
                 .Select(c => new ContractCardDto(
                     c.Id,
                     c.PersonId,
-                    (c.Person.FirstName + " " + c.Person.LastName).Trim(),
+                    c.Person.FirstName,
+                    c.Person.LastName,
                     c.Person.Document,
                     c.Person.Phone,
                     c.Person.User != null ? c.Person.User.Email : null,
@@ -51,14 +60,10 @@ namespace Data.Services.Business
             await GetContractFullQuery().FirstOrDefaultAsync(c => c.Id == id);
 
         public async Task<IReadOnlyList<ContractCardDto>> GetCardsByPersonAsync(int personId) =>
-            await GetCardQuery().Where(c => c.PersonId == personId).ToListAsync();
+            await GetCardQuery(personId).ToListAsync();
 
         public async Task<IReadOnlyList<ContractCardDto>> GetCardsAllAsync() =>
             await GetCardQuery().ToListAsync();
-
-
-
-        // Metodo adicional 
 
         /// <summary>
         /// Crea un contrato con sus locales y cláusulas.
@@ -116,10 +121,8 @@ namespace Data.Services.Business
             return contract.Id;
         }
 
-
-
         /// <summary>
-        /// Desactiva contratos con EndDate &lt; utcNow y que sigan activos.
+        /// Desactiva contratos con EndDate < utcNow y que sigan activos.
         /// </summary>
         public async Task<IReadOnlyList<int>> DeactivateExpiredAsync(DateTime utcNow)
         {
@@ -187,7 +190,5 @@ namespace Data.Services.Business
                                 !pl.Establishment.IsDeleted &&
                                 pl.Establishment.PlazaId == plazaId);
         }
-
-        
     }
 }

@@ -6,7 +6,6 @@ namespace Business.Interfaces.Implements.Business
 {
     public interface IAppointmentService : IBusiness<AppointmentSelectDto, AppointmentCreateDto, AppointmentUpdateDto>
     {
-        Task<bool> RejectedAppointment(int id);
-        //Task<ContractCreateDto> AproveAppointment(int id);
+        //Task<AppointmentSelectDto> UpdateDateAsigned();
     }
 }

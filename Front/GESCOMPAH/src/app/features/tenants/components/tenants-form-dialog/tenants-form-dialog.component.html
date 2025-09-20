@@ -123,7 +123,16 @@
         <div class="form-grid two-cols">
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Documento de Identidad</mat-label>
-            <input matInput formControlName="document" required placeholder="12345678" maxlength="10" />
+            <input
+              matInput
+              appDocumentFormat
+              class="document-digit-input"
+              formControlName="document"
+              required
+              placeholder="1.234.567"
+              maxlength="14"
+              inputmode="numeric"
+            />
             <mat-hint>Número de cédula de ciudadanía (7 a 10 dígitos)</mat-hint>
             <mat-error *ngIf="personGroup.get('document')?.hasError('required')">Por favor ingrese el número de documento de identidad</mat-error>
             <mat-error *ngIf="personGroup.get('document')?.hasError('colombianDocument')">El documento debe tener entre 7 y 10 dígitos numéricos</mat-error>
@@ -250,3 +259,4 @@
     </mat-step>
   </mat-horizontal-stepper>
 </div>
+

@@ -76,6 +76,25 @@ export class SidebarComponent {
     // Orden estable por id de módulo
     const modules = [...backendMenu].sort((a, b) => a.id - b.id);
 
+    const normalizeRoute = (route?: string | null): string | undefined => {
+      if (!route) return undefined;
+      const trimmed = route.trim();
+      if (!trimmed) return undefined;
+
+      let normalizedRoute = trimmed;
+      while (normalizedRoute.startsWith('/')) {
+        normalizedRoute = normalizedRoute.slice(1);
+      }
+
+      if (normalizedRoute.toLowerCase().startsWith('admin/')) {
+        normalizedRoute = normalizedRoute.slice('admin/'.length);
+      }
+
+      if (!normalizedRoute) return undefined;
+
+      return `/${normalizedRoute}`;
+    };
+
     return modules.flatMap<SidebarItem>((mod) => {
       const forms = dedupeByRoute([...mod.forms].sort((a, b) => a.id - b.id));
 
@@ -87,7 +106,7 @@ export class SidebarComponent {
         nodesById.set(f.id, {
           id: f.id,
           label: f.name,
-          route: f.route || undefined,
+          route: normalizeRoute(f.route),
           children: [],
         })
       );
@@ -111,7 +130,7 @@ export class SidebarComponent {
         return [{
           label: mod.name,
           icon: mod.icon,
-          route: `/admin/${only.route}`,
+          route: normalizeRoute(only.route),
           children: [],
         }];
       }
@@ -128,7 +147,7 @@ export class SidebarComponent {
     function dedupeByRoute(arr: BackendSubMenuItem[]): BackendSubMenuItem[] {
       const seen = new Set<string>();
       return arr.filter(x => {
-        const key = x.route;
+        const key = normalizeRoute(x.route) ?? `__no_route__${x.id}`;
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
@@ -137,8 +156,10 @@ export class SidebarComponent {
 
     // Nodo root sin route: el template lo muestra como título (no clickeable)
     function normalizeRoutes(n: SidebarNode): SidebarNode {
+      const sanitizedRoute = normalizeRoute(n.route);
       return {
         ...n,
+        route: sanitizedRoute,
         children: (n.children ?? []).map(c => normalizeRoutes(c)),
       };
     }
@@ -151,7 +172,10 @@ export class SidebarComponent {
   }
 
   private isNodeActive(node: SidebarNode): boolean {
-    if (node.route && this.router.isActive(`/admin/${node.route}`, this.exactMatch)) return true;
+    if (node.route) {
+      const target = node.route.startsWith('/') ? node.route : `/${node.route}`;
+      if (this.router.isActive(target, this.exactMatch)) return true;
+    }
     return (node.children ?? []).some(ch => this.isNodeActive(ch));
   }
 

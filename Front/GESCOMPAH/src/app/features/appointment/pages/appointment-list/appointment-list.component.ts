@@ -9,13 +9,17 @@ import { GenericTableComponent } from "../../../../shared/components/generic-tab
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
-import { AppointmentSelectModel, AppointmentUpdateModel } from '../../models/appointment.models';
+import { AppointmentSelect, AppointmentUpdateModel } from '../../models/appointment.models';
 import { AppointmentStore } from '../../services/appointment/appointment.store';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
+import { StandardButtonComponent } from "../../../../shared/components/standard-button/standard-button.component";
+
+import {HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+
 
 @Component({
   selector: 'app-appointment-list',
-  imports: [CommonModule, GenericTableComponent, MatIconModule, MatProgressSpinnerModule],
+  imports: [CommonModule, GenericTableComponent, MatIconModule, MatProgressSpinnerModule, StandardButtonComponent, HasRoleAndPermissionDirective],
   templateUrl: './appointment-list.component.html',
   styleUrl: './appointment-list.component.css'
 })
@@ -35,10 +39,12 @@ export class AppointmentListComponent implements OnInit {
   pendingId: number | null = null;
   desiredState: boolean | null = null;
 
-  columns: TableColumn<AppointmentSelectModel>[] = [];
+  columns: TableColumn<AppointmentSelect>[] = [];
 
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
   @ViewChild('userTemplate', { static: true }) userTemplate!: TemplateRef<any>;
+  @ViewChild('onlyDateTpl',   { static: true }) onlyDateTpl!: TemplateRef<any>;
+  @ViewChild('dateTimeTpl',   { static: true }) dateTimeTpl!: TemplateRef<any>;
 
   constructor(private dialog: MatDialog) { }
 
@@ -46,9 +52,11 @@ export class AppointmentListComponent implements OnInit {
     this.pageHeaderService.setPageHeader('Citas', 'Gestión de Citas');
     this.columns = [
       { key: 'index', header: 'Nº', type: 'index' },
-      { key: 'email', header: 'User', template: this.userTemplate },
-      { key: 'phone', header: 'Telefono' },
+      { key: 'personName', header: 'User', template: this.userTemplate },
       { key: 'establishmentName', header: 'Local' },
+      { key: 'description', header: 'Descripcion' },
+      { key: 'requestDate', header: 'Fecha de solicitud', template: this.onlyDateTpl },
+      { key: 'dateTimeAssigned', header: 'Fecha de asignacion', template: this.dateTimeTpl},
       {
         key: 'active',
         header: 'Estado',
@@ -59,33 +67,23 @@ export class AppointmentListComponent implements OnInit {
   }
 
   onCreateNew() {
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      width: '600px',
-      data: { entity: {}, formType: 'Form' }
-    });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) return;
+    import('../../components/form-appointment/form-appointment.component').then(m => {
+      const ref = this.dialog.open(m.FormAppointmentComponent, {
+        width: '800px',
+        disableClose: true,
+        autoFocus: true,
+        data: null,
+      });
 
-      this.appointmentStore.create(result).pipe(take(1)).subscribe({
-        next: () => {
-          this.sweetAlertService.showNotification(
-            'Creación Exitosa',
-            'Formulario creado exitosamente.',
-            'success'
-          );
-        },
-        error: (err) => {
-          console.error('Error creando el formulario:', err);
-          this.sweetAlertService.showNotification(
-            'Error',
-            'No se pudo crear el formulario.',
-            'error'
-          );
-        }
+      ref.afterClosed().pipe(take(1)).subscribe(async (created: boolean) => {
+        if (!created) return;
+        this.sweetAlertService.showNotification('Éxito', 'Formulario creado correctamente.', 'success');
+        await this.appointmentStore.loadAll()
       });
     });
   }
+
   onEdit(row: AppointmentUpdateModel) {
     const dialogRef = this.dialog.open(FormDialogComponent, {
       width: '600px',
@@ -122,10 +120,10 @@ export class AppointmentListComponent implements OnInit {
   }
 
 
-  async onDelete(row: AppointmentSelectModel) {
+  async onDelete(row: AppointmentSelect) {
     const confirmed = await this.sweetAlertService.showConfirm(
       'Eliminar form',
-      `¿Deseas eliminar el form "${row.fullName}"?`,
+      `¿Deseas eliminar el form "${row.personName}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
@@ -144,13 +142,22 @@ export class AppointmentListComponent implements OnInit {
     }
   }
 
-  onView(row: AppointmentSelectModel) {
+  onView(row: AppointmentSelect): void {
+    import('../../components/appointment-detail-dialog/appointment-detail-dialog.component').then(m => {
+      this.dialog.open(m.AppointmentDetailDialogComponent,{
+        width: '900px',
+        maxWidth: '95vw',
+        data: { id: row.id },
+        autoFocus: false,
+        disableClose: false,
+      });
+    });
   }
 
 
 
   // Toggle activo/inactivo (UI optimista + rollback)
-  onToggleActive(row: AppointmentSelectModel, e: { checked: boolean }) {
+  onToggleActive(row: AppointmentSelect, e: { checked: boolean }) {
     const previous = row.active;
     row.active = e.checked;
     this.appointmentStore.changeActiveStatus(row.id, e.checked).subscribe({

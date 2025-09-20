@@ -1,0 +1,97 @@
+<mat-stepper linear #stepper>
+  <!-- Step 1: Person -->
+  <mat-step [stepControl]="personFormGroup">
+    <form [formGroup]="personFormGroup" class="form">
+      <ng-template matStepLabel>Información del Arrendatario</ng-template>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Documento</mat-label>
+        <input matInput formControlName="document" placeholder="12345678" />
+        <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
+        <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">Ingrese documento</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Nombres</mat-label>
+        <input matInput formControlName="firstName" />
+        <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('required')">Ingrese nombres</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Apellidos</mat-label>
+        <input matInput formControlName="lastName" />
+        <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('required')">Ingrese apellidos</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Teléfono</mat-label>
+        <input matInput formControlName="phone" />
+        <mat-error *ngIf="personFormGroup.get('phone')?.hasError('required')">Ingrese teléfono</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" (blur)="fixEmail()" />
+        <mat-error *ngIf="personFormGroup.get('email')?.errors as errs">{{ getFirstError(personFormGroup.get('email')) }}</mat-error>
+      </mat-form-field>
+
+      <div class="actions">
+        <app-standard-button text="Cancelar" variant="stroked" (clicked)="cancel()"></app-standard-button>
+        <app-standard-button text="Siguiente" variant="raised" color="primary" icon="arrow_forward" iconPosition="right" (clicked)="stepper.next()"></app-standard-button>
+      </div>
+    </form>
+  </mat-step>
+
+  <!-- Step 2: Appointment -->
+  <mat-step [stepControl]="appointmentFormGroup">
+    <form [formGroup]="appointmentFormGroup" class="form">
+      <ng-template matStepLabel>Detalles de la Cita</ng-template>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Descripción</mat-label>
+        <input matInput formControlName="description" />
+        <mat-error *ngIf="appointmentFormGroup.get('description')?.hasError('required')">Ingrese descripción</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Observación</mat-label>
+        <input matInput formControlName="observation" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Ciudad</mat-label>
+        <mat-select formControlName="cityId">
+          <mat-option *ngFor="let c of ciudades" [value]="c.id">{{ c.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Local</mat-label>
+        <input matInput formControlName="establishmentId" type="number" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Fecha Solicitud</mat-label>
+        <input matInput [matDatepicker]="pickerRequest" formControlName="requestDate" readonly />
+        <mat-datepicker-toggle matSuffix [for]="pickerRequest"></mat-datepicker-toggle>
+        <mat-datepicker #pickerRequest></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field">
+        <mat-label>Fecha y Hora Asignada</mat-label>
+        <input matInput [matDatepicker]="pickerAssigned" formControlName="dateTimeAssigned" readonly />
+        <mat-datepicker-toggle matSuffix [for]="pickerAssigned"></mat-datepicker-toggle>
+        <mat-datepicker #pickerAssigned></mat-datepicker>
+      </mat-form-field>
+
+      <div class="actions">
+        <app-standard-button text="Cancelar" variant="stroked" (clicked)="cancel()"></app-standard-button>
+        <app-standard-button text="Atrás" variant="flat" icon="arrow_back" (clicked)="stepper.previous()"></app-standard-button>
+        <app-standard-button [text]="saving ? 'Creando…' : 'Crear Cita'" variant="raised" color="primary"
+          icon="save" [disabled]="personFormGroup.invalid || appointmentFormGroup.invalid || saving"
+          [loading]="saving" loadingText="Creando…" (clicked)="submit()">
+        </app-standard-button>
+      </div>
+    </form>
+  </mat-step>
+</mat-stepper>

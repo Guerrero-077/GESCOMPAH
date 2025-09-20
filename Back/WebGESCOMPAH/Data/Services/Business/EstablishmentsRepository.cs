@@ -1,4 +1,4 @@
-﻿using Data.Interfaz.IDataImplement.Business;
+using Data.Interfaz.IDataImplement.Business;
 using Data.Repository;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Infrastructure.Context;
@@ -24,7 +24,7 @@ namespace Data.Services.Business
         /// - Incluye solo plazas activas y no eliminadas.
         /// - Incluye la plaza asociada.
         /// - Si includeImages = true, incluye solo la primera imagen activa (ordenada por Id).
-        /// - Ordena resultados por fecha de creación y luego por Id en orden descendente.
+        /// - Ordena resultados por fecha de creaci?n y luego por Id en orden descendente.
         /// </summary>
         private IQueryable<Establishment> BaseQuery(bool includeImages = true)
         {
@@ -52,12 +52,12 @@ namespace Data.Services.Business
         }
 
         /// <summary>
-        /// Verifica si la colección de IDs es nula o está vacía.
+        /// Verifica si la coleccion de IDs es nula o esta vacia.
         /// </summary>
         private static bool IsEmpty(IReadOnlyCollection<int> ids) =>
             ids == null || ids.Count == 0;
 
-        // ================== MÉTODOS ==================
+        // ================== METODOS ==================
 
         /// <summary>
         /// Obtiene todos los establecimientos (compatibilidad).
@@ -69,29 +69,46 @@ namespace Data.Services.Business
         /// Obtiene todos los establecimientos filtrados por actividad.
         /// </summary>
         /// <param name="filter">Filtro de actividad (Any / ActiveOnly).</param>
-        public async Task<IEnumerable<Establishment>> GetAllAsync(ActivityFilter filter)
+        public async Task<IEnumerable<Establishment>> GetAllAsync(ActivityFilter filter, int? limit = null)
         {
             var q = BaseQuery(includeImages: true);
             if (filter == ActivityFilter.ActiveOnly)
                 q = q.Where(e => e.Active);
 
+            if (limit.HasValue && limit.Value > 0)
+                q = q.Take(limit.Value);
+
+            return await q.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Establishment>> GetByPlazaIdAsync(int plazaId, ActivityFilter filter, int? limit = null)
+        {
+            var q = BaseQuery(includeImages: true)
+                .Where(e => e.PlazaId == plazaId);
+
+            if (filter == ActivityFilter.ActiveOnly)
+                q = q.Where(e => e.Active);
+
+            if (limit.HasValue && limit.Value > 0)
+                q = q.Take(limit.Value);
+
             return await q.ToListAsync();
         }
 
         /// <summary>
-        /// Obtiene un establecimiento por Id (incluyendo eliminados lógicamente inactivos).
+        /// Obtiene un establecimiento por Id (incluyendo eliminados logicamente inactivos).
         /// </summary>
         public Task<Establishment?> GetByIdAnyAsync(int id) =>
             BaseQuery().FirstOrDefaultAsync(e => e.Id == id);
 
         /// <summary>
-        /// Obtiene un establecimiento por Id únicamente si está activo.
+        /// Obtiene un establecimiento por Id unicamente si esta activo.
         /// </summary>
         public Task<Establishment?> GetByIdActiveAsync(int id) =>
             BaseQuery().Where(e => e.Active).FirstOrDefaultAsync(e => e.Id == id);
 
         /// <summary>
-        /// Obtiene solo información básica de establecimientos (Id, RentValueBase, UvtQty).
+        /// Obtiene solo informacion basica de establecimientos (Id, RentValueBase, UvtQty).
         /// </summary>
         public async Task<IReadOnlyList<EstablishmentBasicsDto>> GetBasicsByIdsAsync(IReadOnlyCollection<int> ids)
         {
@@ -152,7 +169,7 @@ namespace Data.Services.Business
         }
 
         /// <summary>
-        /// Activa o desactiva en masa establecimientos según una lista de Ids.
+        /// Activa o desactiva en masa establecimientos segun una lista de Ids.
         /// </summary>
         /// <param name="ids">Lista de Ids a actualizar.</param>
         /// <param name="active">Nuevo estado (true = activo, false = inactivo).</param>
@@ -166,7 +183,7 @@ namespace Data.Services.Business
         }
 
         /// <summary>
-        /// Activa o desactiva en masa todos los establecimientos de una plaza específica.
+        /// Activa o desactiva en masa todos los establecimientos de una plaza especifica.
         /// </summary>
         /// <param name="plazaId">Id de la plaza.</param>
         /// <param name="active">Nuevo estado (true = activo, false = inactivo).</param>

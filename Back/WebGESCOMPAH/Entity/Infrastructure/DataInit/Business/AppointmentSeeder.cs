@@ -24,7 +24,6 @@ namespace Entity.Infrastructure.DataInit.Business
                     DateTimeAssigned = seedDate.AddDays(3).AddHours(10),
                     EstablishmentId = 1,
                     PersonId = 1,
-                    Status = 1,
                     CreatedAt = seedDate,
                     Active = true,
                     IsDeleted = false
@@ -40,7 +39,6 @@ namespace Entity.Infrastructure.DataInit.Business
                     DateTimeAssigned = seedDate.AddDays(4).AddHours(11),
                     EstablishmentId = 2,
                     PersonId = 2,
-                    Status = 1,
                     CreatedAt = seedDate.AddDays(1),
                     Active = true,
                     IsDeleted = false
@@ -56,7 +54,6 @@ namespace Entity.Infrastructure.DataInit.Business
                     DateTimeAssigned = seedDate.AddDays(5).AddHours(9),
                     EstablishmentId = 3,
                     PersonId = 2,
-                    Status = 1,
                     CreatedAt = seedDate.AddDays(2),
                     Active = true,
                     IsDeleted = false

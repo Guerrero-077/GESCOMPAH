@@ -1,53 +1,75 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import {
-  ReactiveFormsModule, FormGroup, FormBuilder, Validators,
-  AbstractControl, ValidationErrors, ValidatorFn
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors, ValidatorFn,
+  Validators
 } from '@angular/forms';
 
+import { MatButtonModule } from '@angular/material/button';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
-import { MatStepperModule } from '@angular/material/stepper';
-import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 import { Subject, of } from 'rxjs';
-import { distinctUntilChanged, switchMap, tap, catchError, takeUntil, map, finalize } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { EstablishmentSelect } from '../../../establishments/models/establishment.models';
+import { SquareSelectModel } from '../../../establishments/models/squares.models';
 import { EstablishmentService } from '../../../establishments/services/establishment/establishment.service';
+import { SquareService } from '../../../establishments/services/square/square.service';
 import { PersonService } from '../../../security/services/person/person.service';
 import { CitySelectModel } from '../../../setting/models/city.models';
 import { CityService } from '../../../setting/services/city/city.service';
-import { ContractService } from '../../services/contract/contract.service';
-import { ContractCreateModel } from '../../models/contract.models';
-import { SquareService } from '../../../establishments/services/square/square.service';
-import { ClauseService } from '../../services/clause/clause.service';
 import { ClauseSelect } from '../../models/clause.models';
-import { SquareSelectModel } from '../../../establishments/models/squares.models';
+import { ContractCreateModel } from '../../models/contract.models';
+import { ClauseService } from '../../services/clause/clause.service';
+import { ContractService } from '../../services/contract/contract.service';
 
-import { AppValidators as AV } from '../../../../shared/utils/AppValidators';
-import { buildEmailValidators, FormUtilsService } from '../../../../shared/Services/forms/form-utils.service';
+import { MatStepper } from "@angular/material/stepper";
 import { ErrorMessageService } from '../../../../shared/Services/forms/error-message.service';
+import { FormUtilsService, buildEmailValidators } from '../../../../shared/Services/forms/form-utils.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
+import { DocumentFormatDirective } from '../../../../shared/directives/document-format/document-format.directive';
+import { AppValidators as AV } from '../../../../shared/utils/AppValidators';
+
+
+import { MatStepperModule } from '@angular/material/stepper';
+
 
 /* ========== Validadores auxiliares ========== */
-function endAfterOrEqualStartValidator(startCtrlName: string, endCtrlName: string): ValidatorFn {
+
+/**
+ * Validador que asegura que la fecha de fin no sea anterior a la de inicio.
+ *
+ * @param startCtrl - Nombre del control de fecha de inicio.
+ * @param endCtrl - Nombre del control de fecha de fin.
+ * @returns `ValidatorFn` que devuelve `{ endBeforeStart: true }` si la fecha de fin es inválida, o `null` si es válido.
+ */
+function endAfterOrEqualStartValidator(startCtrl: string, endCtrl: string): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
-    const start = group.get(startCtrlName)?.value as Date | null;
-    const end   = group.get(endCtrlName)?.value as Date | null;
+    const start = group.get(startCtrl)?.value as Date | null;
+    const end   = group.get(endCtrl)?.value as Date | null;
     if (!start || !end) return null;
-    const y = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-    return y(end) < y(start) ? { endBeforeStart: true } : null;
+    const normalize = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    return normalize(end) < normalize(start) ? { endBeforeStart: true } : null;
   };
 }
+
+/**
+ * Convierte un objeto Date en formato `YYYY-MM-DD`.
+ *
+ * @param d - Fecha a formatear.
+ * @returns Cadena de texto representando la fecha.
+ */
 function toDateOnly(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
@@ -65,12 +87,13 @@ function toDateOnly(d: Date): string {
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSlideToggleModule,
-    MatProgressSpinnerModule,
     MatIconModule,
-    MatStepperModule,
     StandardButtonComponent,
-  ],
+    DocumentFormatDirective,
+    MatStepper,
+    MatStepperModule,
+
+],
   templateUrl: './form-contract.component.html',
   styleUrls: ['./form-contract.component.css'],
 })
@@ -96,15 +119,15 @@ export class FormContractComponent implements OnInit, OnDestroy {
 
   ciudades: CitySelectModel[] = [];
   plazas: SquareSelectModel[] = [];
-  allEstablishments: EstablishmentSelect[] = [];
   filteredEstablishments: EstablishmentSelect[] = [];
   clauses: ClauseSelect[] = [];
 
   personaEncontrada = false;
   personId: number | null = null;
   foundCityName: string | null = null;
-  loadingPerson = false;
 
+  loadingPerson = false;
+  loadingEstablishments = false;
   saving = false;
 
   today = new Date();
@@ -113,25 +136,40 @@ export class FormContractComponent implements OnInit, OnDestroy {
 
   private lastQueriedDoc: string | null = null;
 
+  /**
+   * Hook de ciclo de vida de Angular.
+   * Inicializa formularios, listas y observadores reactivos.
+   */
   ngOnInit(): void {
     this.initForms();
     this.loadCiudades();
     this.loadPlazas();
-    this.loadAllEstablishments();
     this.loadClauses();
     this.setupReactivePersonLookup();
     this.setupPlazaFiltering();
   }
 
+  /**
+   * Hook de ciclo de vida de Angular.
+   * Cancela las suscripciones al destruir el componente.
+   */
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   /* ===================== Forms ===================== */
+
+  /**
+   * Inicializa los formularios principales:
+   * - PersonFormGroup: datos personales.
+   * - ContractFormGroup: datos del contrato.
+   * - EstablishmentFormGroup: relación con establecimientos.
+   *
+   * Configura validaciones personalizadas y dependencias entre campos.
+   */
   private initForms(): void {
     this.personFormGroup = this.fb.group({
-      // ⬇️ clave: updateOn: 'blur' para que valueChanges emita solo al perder foco
       document: this.fb.control(
         '',
         { validators: [Validators.required, AV.colombianDocument()], updateOn: 'blur' }
@@ -156,7 +194,6 @@ export class FormContractComponent implements OnInit, OnDestroy {
       clauseIds: [[]],
     });
 
-    // Sincroniza fechas: endDate >= startDate
     this.contractFormGroup.get('startDate')!
       .valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe((d: Date) => {
@@ -168,83 +205,83 @@ export class FormContractComponent implements OnInit, OnDestroy {
       });
   }
 
-  /* ===================== Cargas iniciales ===================== */
+  /* ===================== Cargas ===================== */
+
+  /**
+   * Carga la lista de ciudades desde el servicio y la asigna a `ciudades`.
+   */
   private loadCiudades(): void {
     this.citySvc.getAll()
       .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => (this.ciudades = res ?? []),
-        error: (err) => console.error('Error al cargar ciudades', err),
-      });
+      .subscribe({ next: (res) => (this.ciudades = res ?? []) });
   }
 
+  /**
+   * Carga la lista de plazas desde el servicio y la asigna a `plazas`.
+   */
   private loadPlazas(): void {
     this.squareSvc.getAll()
       .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => (this.plazas = res ?? []),
-        error: (err) => console.error('Error al cargar plazas', err),
-      });
+      .subscribe({ next: (res) => (this.plazas = res ?? []) });
   }
 
-  private loadAllEstablishments(): void {
-    this.estSvc.getAllActive()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          this.allEstablishments = res ?? [];
-          this.filteredEstablishments = [];
-        },
-        error: (err) => console.error('Error al cargar establecimientos', err),
-      });
-  }
-
+  /**
+   * Carga la lista de cláusulas desde el servicio y la asigna a `clauses`.
+   * Filtra cláusulas sin ID válido.
+   */
   private loadClauses(): void {
     this.clauseSvc.getAll()
       .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => (this.clauses = (res ?? []).filter(c => c?.id != null)),
-        error: (err) => console.error('Error al cargar cláusulas', err),
-      });
+      .subscribe({ next: (res) => (this.clauses = (res ?? []).filter(c => c?.id != null)) });
   }
 
-  /* ===================== Filtros dependientes ===================== */
+  /* ===================== Dependencias ===================== */
+
+  /**
+   * Configura la lógica para filtrar establecimientos al seleccionar una plaza.
+   * Reinicia `establishmentIds` y consulta establecimientos activos.
+   */
   private setupPlazaFiltering(): void {
     this.establishmentFormGroup.get('plazaId')!
-      .valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe((plazaId: number | string | null) => {
-        const id = plazaId == null ? null : Number(plazaId);
-        this.establishmentFormGroup.get('establishmentIds')!.setValue([], { emitEvent: false });
-        this.filteredEstablishments = id
-          ? this.allEstablishments.filter((e) => Number(e.plazaId) === id)
-          : [];
-      });
+      .valueChanges.pipe(
+        takeUntil(this.destroy$),
+        map((id: number | string | null) => (id == null ? null : Number(id))),
+        distinctUntilChanged(),
+        switchMap((plazaId) => {
+          this.establishmentFormGroup.get('establishmentIds')!.setValue([], { emitEvent: false });
+          if (!plazaId || plazaId <= 0) return of([]);
+          this.loadingEstablishments = true;
+          return this.estSvc.getByPlaza(plazaId, { activeOnly: true }).pipe(
+            catchError(() => of([])),
+            finalize(() => (this.loadingEstablishments = false))
+          );
+        })
+      )
+      .subscribe((list) => (this.filteredEstablishments = list ?? []));
   }
 
-  /* ===================== Lookup persona (solo en blur) ===================== */
+  /* ===================== Lookup persona ===================== */
+
+  /**
+   * Configura la búsqueda reactiva de personas por documento.
+   * - Evita consultas si el documento es corto (< 5 caracteres).
+   * - Actualiza los formularios si la persona existe.
+   */
   private setupReactivePersonLookup(): void {
     this.personFormGroup.get('document')!
       .valueChanges.pipe(
         takeUntil(this.destroy$),
         map((v: string) => String(v ?? '').trim()),
         distinctUntilChanged(),
-        tap((doc) => {
-          if (!doc || doc.length < 5) {
-            this.resetFoundPersonState();
-            this.enablePersonFields();
-          }
-        }),
         switchMap((doc) => {
-          if (!doc || doc.length < 5) return of(null); // corta llamadas si el doc es corto
+          if (!doc || doc.length < 5) {
+            this.resetFoundPerson();
+            return of(null);
+          }
           this.loadingPerson = true;
           this.lastQueriedDoc = doc;
           return this.personSvc.getByDocument(doc).pipe(
-            catchError((err) => {
-              if (err?.status === 404 && typeof err?.error === 'string') {
-                this.sweet.showNotification('No encontrado', err.error, 'error');
-              }
-              return of(null);
-            }),
+            catchError(() => of(null)),
             finalize(() => (this.loadingPerson = false))
           );
         })
@@ -253,107 +290,97 @@ export class FormContractComponent implements OnInit, OnDestroy {
         const currentDoc = String(this.personFormGroup.get('document')!.value ?? '').trim();
         if (this.lastQueriedDoc && currentDoc !== this.lastQueriedDoc) return;
 
-        if (person) {
-          this.personaEncontrada = true;
-          this.personId = Number(person.id ?? null);
-          this.foundCityName = person.cityName ?? null;
-          this.patchPerson(person);
-          this.disablePersonFields();
-        } else {
-          this.resetFoundPersonState();
-          this.enablePersonFields();
-        }
+        person ? this.setFoundPerson(person) : this.resetFoundPerson();
       });
   }
 
-  /* ===================== Helpers de patch/desbloqueo ===================== */
-  private patchPerson(p: any): void {
-    this.personFormGroup.patchValue(
-      {
-        firstName: p.firstName ?? '',
-        lastName:  p.lastName ?? '',
-        phone:     p.phone ?? '',
-        email:     p.email ?? '',
-      },
-      { emitEvent: false }
-    );
-    this.contractFormGroup.patchValue(
-      {
-        address: p.address ?? '',
-        cityId:  p.cityId ?? null,
-      },
-      { emitEvent: false }
-    );
+  /* ===================== Helpers persona ===================== */
+
+  /**
+   * Establece la información de una persona encontrada en los formularios.
+   *
+   * @param p - Datos de la persona.
+   */
+  private setFoundPerson(p: any): void {
+    this.personaEncontrada = true;
+    this.personId = Number(p.id ?? null);
+    this.foundCityName = p.cityName ?? null;
+    this.personFormGroup.patchValue({
+      firstName: p.firstName ?? '',
+      lastName:  p.lastName ?? '',
+      phone:     p.phone ?? '',
+      email:     p.email ?? '',
+    }, { emitEvent: false });
+    this.contractFormGroup.patchValue({
+      address: p.address ?? '',
+      cityId:  p.cityId ?? null,
+    }, { emitEvent: false });
+    this.togglePersonFields(false);
   }
 
-  private resetFoundPersonState(): void {
+  /**
+   * Resetea los formularios cuando no se encuentra la persona.
+   * Habilita los campos para entrada manual.
+   */
+  private resetFoundPerson(): void {
     this.personaEncontrada = false;
     this.personId = null;
     this.foundCityName = null;
-    this.personFormGroup.patchValue(
-      { firstName: '', lastName: '', phone: '', email: '' },
-      { emitEvent: false }
-    );
-    this.contractFormGroup.patchValue(
-      { address: '', cityId: null },
-      { emitEvent: false }
-    );
+    this.personFormGroup.patchValue({ firstName: '', lastName: '', phone: '', email: '' }, { emitEvent: false });
+    this.contractFormGroup.patchValue({ address: '', cityId: null }, { emitEvent: false });
+    this.togglePersonFields(true);
   }
 
-  private disablePersonFields(): void {
-    ['firstName', 'lastName', 'phone', 'email'].forEach((k) =>
-      this.personFormGroup.get(k)?.disable({ emitEvent: false })
-    );
-    ['address', 'cityId'].forEach((k) =>
-      this.contractFormGroup.get(k)?.disable({ emitEvent: false })
-    );
-  }
-
-  private enablePersonFields(): void {
-    ['firstName', 'lastName', 'phone', 'email'].forEach((k) =>
-      this.personFormGroup.get(k)?.enable({ emitEvent: false })
-    );
-    ['address', 'cityId'].forEach((k) =>
-      this.contractFormGroup.get(k)?.enable({ emitEvent: false })
+  /**
+   * Habilita o deshabilita campos de persona y contrato.
+   *
+   * @param enable - `true` para habilitar campos, `false` para deshabilitarlos.
+   */
+  private togglePersonFields(enable: boolean): void {
+    const personFields = ['firstName', 'lastName', 'phone', 'email'];
+    const contractFields = ['address', 'cityId'];
+    [...personFields, ...contractFields].forEach((k) =>
+      enable
+        ? this.personFormGroup.get(k)?.enable({ emitEvent: false })
+        : this.personFormGroup.get(k)?.disable({ emitEvent: false })
     );
   }
 
   /* ===================== Acciones ===================== */
+
+  /**
+   * Cierra el diálogo sin guardar cambios.
+   */
   cancel(): void {
     this.dialogRef.close(false);
   }
 
+  /**
+   * Envía el formulario para crear un contrato.
+   * - Valida todos los formularios.
+   * - Construye el payload con los valores normalizados.
+   * - Llama al servicio de contratos y cierra el diálogo al terminar.
+   */
   submit(): void {
-    // Normalización/coerción antes de validar
-    const p = this.personFormGroup;
-    const c = this.contractFormGroup;
-
-    const toNormalize: AbstractControl[] = [
-      p.get('firstName')!, p.get('lastName')!, p.get('document')!,
-      p.get('phone')!, c.get('address')!
-    ];
-    toNormalize.forEach(ctrl => this.utils.normalizeWhitespace(ctrl));
-    this.utils.coerceEmailTld(p.get('email')); // auto .com si falta
-
-    if (p.invalid || c.invalid || this.establishmentFormGroup.invalid || this.saving) {
+    if (this.personFormGroup.invalid || this.contractFormGroup.invalid || this.establishmentFormGroup.invalid || this.saving) {
       this.markAllTouched();
       return;
     }
 
-    const person = p.getRawValue();
-    const contract = c.getRawValue();
+    const p = this.personFormGroup.getRawValue();
+    const c = this.contractFormGroup.getRawValue();
     const est = this.establishmentFormGroup.getRawValue();
 
     const payload: ContractCreateModel = {
-      startDate: toDateOnly(contract.startDate),
-      endDate:   toDateOnly(contract.endDate),
-      address:   String(contract.address).trim(),
-      cityId:    Number(contract.cityId),
-      document:  String(person.document).trim(),
-      firstName: String(person.firstName).trim(),
-      lastName:  String(person.lastName).trim(),
-      phone:     String(person.phone).trim(),
-      email:     person.email ? String(person.email).trim() : null,
+      startDate: toDateOnly(c.startDate),
+      endDate:   toDateOnly(c.endDate),
+      address:   String(c.address).trim(),
+      cityId:    Number(c.cityId),
+      document:  String(p.document).trim(),
+      firstName: String(p.firstName).trim(),
+      lastName:  String(p.lastName).trim(),
+      phone:     String(p.phone).trim(),
+      email:     p.email ? String(p.email).trim() : null,
       establishmentIds: (est.establishmentIds as number[]).map(Number),
       useSystemParameters: !!est.useSystemParameters,
       clauseIds: Array.isArray(est.clauseIds) ? est.clauseIds.map(Number) : [],
@@ -362,28 +389,37 @@ export class FormContractComponent implements OnInit, OnDestroy {
     this.saving = true;
     this.contractSvc.create(payload)
       .pipe(finalize(() => (this.saving = false)))
-      .subscribe({
-        next: () => this.dialogRef.close(true),
-        error: (err) => console.error('❌ Error al crear contrato', err),
-      });
+      .subscribe({ next: () => this.dialogRef.close(true) });
   }
 
-  // Usado en (blur) del input email
+  /**
+   * Corrige el dominio del email si el TLD es incorrecto.
+   */
   fixEmail(): void {
     this.utils.coerceEmailTld(this.personFormGroup.get('email'));
   }
 
+  /**
+   * Marca todos los campos como tocados y actualiza su validez.
+   * Forza la visualización de errores de validación.
+   */
   markAllTouched(): void {
-    this.personFormGroup.markAllAsTouched();
-    this.contractFormGroup.markAllAsTouched();
-    this.establishmentFormGroup.markAllAsTouched();
-
-    Object.values(this.personFormGroup.controls).forEach(c => c.updateValueAndValidity());
-    Object.values(this.contractFormGroup.controls).forEach(c => c.updateValueAndValidity());
-    Object.values(this.establishmentFormGroup.controls).forEach(c => c.updateValueAndValidity());
+    [this.personFormGroup, this.contractFormGroup, this.establishmentFormGroup].forEach(g => {
+      g.markAllAsTouched();
+      Object.values(g.controls).forEach(c => c.updateValueAndValidity());
+    });
   }
 
+  /**
+   * Obtiene el primer error de un control de formulario.
+   *
+   * @param control - Control del cual obtener el error.
+   * @param order - Orden de prioridad de errores (opcional).
+   * @returns Mensaje de error o `null` si no hay errores.
+   */
   getFirstError(control: AbstractControl | null, order: string[] = []): string | null {
     return this.errMsg.firstError(control, order);
   }
 }
+
+

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using Business.CustomJWT;
@@ -11,6 +10,7 @@ using Business.Interfaces.Implements.Persons;
 using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Interfaces.PDF;
 using Business.Repository;
+using Business.Services.Validation;
 using Data.Interfaz.IDataImplement.Business;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.Contract;
@@ -44,6 +44,7 @@ namespace Business.Services.Business
         private readonly IUserContextService _userContextService;
         private readonly IContractPdfGeneratorService _contractPdfService;
         private readonly ILogger<ContractService> _logger;
+        private static readonly TimeZoneInfo BogotaTimeZone = TimeZoneConverter.TZConvert.GetTimeZoneInfo("America/Bogota");
 
         public ContractService(
             IContractRepository contracts,
@@ -86,31 +87,16 @@ namespace Business.Services.Business
             return list.ToList().AsReadOnly();
         }
         
-        private static bool IsValidEmail(string? email)
-        {
-            if (string.IsNullOrWhiteSpace(email)) return false;
-            try
-            {
-                _ = new MailAddress(email);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
 
         public async Task<int> CreateContractWithPersonHandlingAsync(ContractCreateDto dto)
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
 
-            var establishmentIds = NormalizeEstablishmentIds(dto.EstablishmentIds);
+            var sanitized = SanitizeContractCreateDto(dto);
+            var establishmentIds = sanitized.EstablishmentIds;
             EnsureEstablishmentsSelected(establishmentIds);
 
-            var emailCandidate = NormalizeEmail(dto.Email);
-            EnsureValidEmailIfPresent(emailCandidate);
-
-            var personPayload = _mapper.Map<PersonDto>(dto);
+            var personPayload = _mapper.Map<PersonDto>(sanitized);
 
             var personIdLocal = 0;
             var userWasCreated = false;
@@ -122,16 +108,16 @@ namespace Business.Services.Business
                 var personFullName = ComposeFullName(personSnapshot);
 
                 var (totalBaseRent, totalUvt) = await _establishmentService.ReserveForContractAsync(establishmentIds);
-                var userResult = await EnsureUserAsync(personSnapshot.Id, emailCandidate);
+                var userResult = await EnsureUserAsync(personSnapshot.Id, sanitized.Email);
                 userWasCreated = userResult.Created;
 
-                var contract = BuildContractEntity(dto, personSnapshot.Id, totalBaseRent, totalUvt, establishmentIds);
+                var contract = BuildContractEntity(sanitized, personSnapshot.Id, totalBaseRent, totalUvt, establishmentIds);
                 await _contractRepository.AddAsync(contract);
 
                 var contractSnapshot = await BuildContractSnapshotAsync(contract);
                 ScheduleUserPostCommit(userResult, personFullName);
                 ScheduleObligationPostCommit(contract.Id);
-                ScheduleContractEmail(contract.Id, emailCandidate, personFullName, contractSnapshot);
+                ScheduleContractEmail(contract.Id, sanitized.Email, personFullName, contractSnapshot);
 
                 return contract.Id;
             });
@@ -185,25 +171,50 @@ namespace Business.Services.Business
             return await _obligationMonthSvc.GetByContractAsync(contractId);
         }
 
-        private static List<int> NormalizeEstablishmentIds(IEnumerable<int>? establishmentIds)
+        private static ContractCreateDto SanitizeContractCreateDto(ContractCreateDto dto)
         {
-            return establishmentIds?.Where(id => id > 0).Distinct().ToList() ?? new List<int>();
-        }
+            if (dto is null)
+                throw new BusinessException("Payload inválido.");
 
+            var firstName = DomainValidation.RequireName(dto.FirstName, "Primer nombre", 50);
+            var lastName = DomainValidation.RequireName(dto.LastName, "Apellido", 50);
+            var document = DomainValidation.RequireColombianDocument(dto.Document);
+            var phone = DomainValidation.RequireColombianPhone(dto.Phone);
+            var address = DomainValidation.NormalizeAddress(dto.Address, required: true, maxLength: 150);
+
+            DomainValidation.EnsureCityId(dto.CityId);
+
+            var email = DomainValidation.NormalizeEmail(dto.Email);
+            DomainValidation.EnsureValidEmail(email);
+
+            var startDate = dto.StartDate.Date;
+            var endDate = dto.EndDate.Date;
+            DomainValidation.EnsureDateRange(startDate, endDate, "La fecha de inicio", "La fecha de finalización");
+            DomainValidation.EnsureStartNotInPast(startDate, "La fecha de inicio", BogotaTimeZone);
+
+            var establishmentIds = DomainValidation.NormalizePositiveIds(dto.EstablishmentIds);
+            var clauseIds = DomainValidation.NormalizePositiveIds(dto.ClauseIds);
+
+            return new ContractCreateDto
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Document = document,
+                Phone = phone,
+                Address = address,
+                CityId = dto.CityId,
+                Email = email,
+                StartDate = startDate,
+                EndDate = endDate,
+                EstablishmentIds = establishmentIds,
+                UseSystemParameters = dto.UseSystemParameters,
+                ClauseIds = clauseIds
+            };
+        }
         private static void EnsureEstablishmentsSelected(IReadOnlyCollection<int> establishmentIds)
         {
             if (establishmentIds.Count == 0)
                 throw new BusinessException("Debe seleccionar al menos un establecimiento.");
-        }
-
-        private static string? NormalizeEmail(string? email) =>
-            string.IsNullOrWhiteSpace(email) ? null : email.Trim();
-
-        private static void EnsureValidEmailIfPresent(string? email)
-        {
-            if (string.IsNullOrWhiteSpace(email)) return;
-            if (!IsValidEmail(email))
-                throw new BusinessException("El correo proporcionado no es valido.");
         }
 
         private static string ComposeFullName(PersonSelectDto person)
@@ -344,5 +355,4 @@ namespace Business.Services.Business
         }
     }
 }
-
 
