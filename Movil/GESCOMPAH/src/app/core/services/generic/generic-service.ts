@@ -1,61 +1,115 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment.prod';
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { from, Observable, switchMap, tap } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { LoginModel } from '../../../feature/auth/models/login.models';
+import { RegisterModel } from '../../../feature/auth/models/register.models';
+import { User } from '../../../shared/models/user.model';
+import { ChangePasswordDto } from '../../models/ChangePassword.models';
+import { UserStore } from '../permission/User.Store';
+import { CapacitorHttp } from '@capacitor/core';
 
-@Injectable({
-  providedIn: 'root'
-})
+function getCookie(name: string): string | null {
+  const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[$()*+./?[\\\]^{|}-]/g, '\\$&') + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
 
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private readonly urlBase = environment.apiURL + '/auth/';
 
-export abstract class GenericService<
-  TModel,
-  TCreate = unknown,
-  TUpdate = Partial<TCreate>,
-  ID = number
-> {
-  protected readonly http = inject(HttpClient);
-  protected readonly baseUrl = (environment.apiURL as string).replace(/\/+$/, '');
-  protected abstract resource: string;
+  constructor(
+    private router: Router,
+    private userStore: UserStore
+  ) {}
 
-  protected url(...segments: (string | number | undefined)[]) {
-    const segs = [this.baseUrl, this.resource, ...segments.filter(s => s !== undefined && s !== '')];
-    return segs.join('/').replace(/([^:]\/)\/+/g, '$1');
+  /** Obtiene headers con token CSRF si está disponible */
+  private async buildHeaders(): Promise<Record<string, string>> {
+    const token = getCookie('XSRF-TOKEN');
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { 'X-XSRF-TOKEN': token } : {}),
+    };
   }
 
-  // GET api/{resource}
-  getAll(): Observable<TModel[]> {
-    return this.http.get<TModel[]>(this.url());
+  /** Registro de usuario */
+  Register(obj: RegisterModel): Observable<any> {
+    return from(this.buildHeaders().then(headers =>
+      CapacitorHttp.post({
+        url: this.urlBase + 'register',
+        data: obj,
+        headers,
+      })
+    ));
   }
 
-  // GET api/{resource}/{id}
-  getById(id: ID): Observable<TModel> {
-    return this.http.get<TModel>(this.url(id as any));
+  /** Login y recuperación de sesión */
+  Login(obj: LoginModel): Observable<User> {
+    return from(this.buildHeaders().then(headers =>
+      CapacitorHttp.post({
+        url: this.urlBase + 'login',
+        data: obj,
+        headers,
+      })
+    )).pipe(
+      switchMap(() => this.GetMe())
+    );
   }
 
-  // POST api/{resource}
-  create(dto: TCreate): Observable<TModel> {
-    return this.http.post<TModel>(this.url(), dto);
+  /** Consulta la sesión activa y almacena el usuario */
+  GetMe(): Observable<User> {
+    return from(this.buildHeaders().then(headers =>
+      CapacitorHttp.get({
+        url: this.urlBase + 'me',
+        headers,
+      })
+    )).pipe(
+      tap(response => {
+        const user = response.data as User;
+        console.log('[GET /auth/me] user:', user);
+        this.userStore.set(user);
+      }),
+      switchMap(response => from([response.data as User]))
+    );
   }
 
-  // PUT api/{resource}/{id}
-  update(id: ID, dto: TUpdate): Observable<TModel> {
-    return this.http.put<TModel>(this.url(id as any), dto);
+  /** Cierre de sesión */
+  logout(): Observable<any> {
+    return from(this.buildHeaders().then(headers =>
+      CapacitorHttp.post({
+        url: this.urlBase + 'logout',
+        data: {},
+        headers,
+      })
+    )).pipe(
+      tap(() => {
+        this.userStore.clear();
+        this.router.navigate(['/']);
+      })
+    );
   }
 
-  // DELETE api/{resource}/{id}
-  delete(id: ID): Observable<void> {
-    return this.http.delete<void>(this.url(id as any));
+  /** Renovación del token de sesión */
+  RefreshToken(): Observable<User> {
+    return from(this.buildHeaders().then(headers =>
+      CapacitorHttp.post({
+        url: this.urlBase + 'refresh',
+        data: {},
+        headers,
+      })
+    )).pipe(
+      switchMap(() => this.GetMe())
+    );
   }
 
-  // PATCH api/{resource}/{id}  (delete lógico SIN body)
-  deleteLogic(id: ID): Observable<void> {
-    return this.http.patch<void>(`${this.url(id as any)}/soft-delete`, null);
-  }
-
-  /** PATCH /api/{resource}/{id}/estado  Body: { active: boolean }  -> devuelve TModel actualizado */
-  changeActiveStatus(id: ID, active: boolean): Observable<TModel> {
-    const body = { active };
-    return this.http.patch<TModel>(this.url(id as any, 'estado'), body);
+  /** Cambio de contraseña del usuario */
+  ChangePassword(dto: ChangePasswordDto): Observable<any> {
+    return from(this.buildHeaders().then(headers =>
+      CapacitorHttp.post({
+        url: this.urlBase + 'change-password',
+        data: dto,
+        headers,
+      })
+    ));
   }
 }

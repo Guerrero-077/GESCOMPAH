@@ -1,44 +1,96 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, switchMap, tap } from 'rxjs';
+import { from, Observable, switchMap, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { LoginModel } from '../../../feature/auth/models/login.models';
 import { RegisterModel } from '../../../feature/auth/models/register.models';
 import { User } from '../../../shared/models/user.model';
-import { PermissionService } from '../permission/permission.service';
-import { UserStore } from '../permission/User.Store';
 import { ChangePasswordDto } from '../../models/ChangePassword.models';
+import { UserStore } from '../permission/User.Store';
+import { CapacitorHttp, HttpResponse } from '@capacitor/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private http = inject(HttpClient);
-  private permissionService = inject(PermissionService);
-  private router = inject(Router);
-  private userStore = inject(UserStore);
+  private readonly urlBase = environment.apiURL + '/auth/';
 
-  private urlBase = environment.apiURL + '/auth/';
+  constructor(
+    private router: Router,
+    private userStore: UserStore
+  ) {}
 
-  Register(obj: RegisterModel): Observable<any> {
-    return this.http.post<any>(this.urlBase + 'register', obj, { withCredentials: true });
+  private async buildHeaders(): Promise<Record<string, string>> {
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
   }
 
-
-  Login(obj: LoginModel): Observable<User> {
-    return this.http.post<any>(this.urlBase + 'login', obj, { withCredentials: true }).pipe(
-      switchMap(() => this.GetMe())
+  Register(obj: RegisterModel): Observable<any> {
+    return from(
+      this.buildHeaders().then(headers =>
+        CapacitorHttp.post({
+          url: this.urlBase + 'register',
+          data: obj,
+          headers
+        })
+      )
     );
   }
 
+  Login(obj: LoginModel): Observable<User> {
+    return from(
+      this.buildHeaders().then(headers =>
+        CapacitorHttp.post({
+          url: this.urlBase + 'login',
+          data: obj,
+          headers
+        })
+      )
+    ).pipe(
+      switchMap((response: HttpResponse) => {
+        if (response.status >= 200 && response.status < 300) {
+          return this.GetMe();
+        } else {
+          throw new HttpErrorResponse({
+            status: response.status,
+            statusText: 'Login failed', // ⚠️ CapacitorHttp no tiene `statusText`
+            url: this.urlBase + 'login',
+            error: response.data || { message: 'Credenciales inválidas' }
+          });
+        }
+      })
+    );
+  }
 
   GetMe(): Observable<User> {
-    return this.http.get<User>(this.urlBase + 'me', { withCredentials: true }).pipe(
-      tap(user => this.userStore.set(user))
+    return from(
+      this.buildHeaders().then(headers =>
+        CapacitorHttp.get({
+          url: this.urlBase + 'me',
+          headers
+        })
+      )
+    ).pipe(
+      tap(response => {
+        const user = response.data as User;
+        console.log('[GET /auth/me] user:', user);
+        this.userStore.set(user);
+      }),
+      switchMap(response => from([response.data as User]))
     );
   }
 
   logout(): Observable<any> {
-    return this.http.post(this.urlBase + 'logout', {}, { withCredentials: true }).pipe(
+    return from(
+      this.buildHeaders().then(headers =>
+        CapacitorHttp.post({
+          url: this.urlBase + 'logout',
+          data: {},
+          headers
+        })
+      )
+    ).pipe(
       tap(() => {
         this.userStore.clear();
         this.router.navigate(['/']);
@@ -47,12 +99,39 @@ export class AuthService {
   }
 
   RefreshToken(): Observable<User> {
-    return this.http.post<any>(this.urlBase + 'refresh', {}, { withCredentials: true }).pipe(
-      switchMap(() => this.GetMe())
+    return from(
+      this.buildHeaders().then(headers =>
+        CapacitorHttp.post({
+          url: this.urlBase + 'refresh',
+          data: {},
+          headers
+        })
+      )
+    ).pipe(
+      switchMap((response: HttpResponse) => {
+        if (response.status >= 200 && response.status < 300) {
+          return this.GetMe();
+        } else {
+          throw new HttpErrorResponse({
+            status: response.status,
+            statusText: 'Refresh token failed',
+            url: this.urlBase + 'refresh',
+            error: response.data || { message: 'Token inválido' }
+          });
+        }
+      })
     );
   }
 
   ChangePassword(dto: ChangePasswordDto): Observable<any> {
-    return this.http.post(environment.apiURL + '/auth/change-password', dto, { withCredentials: true });
+    return from(
+      this.buildHeaders().then(headers =>
+        CapacitorHttp.post({
+          url: this.urlBase + 'change-password',
+          data: dto,
+          headers
+        })
+      )
+    );
   }
 }
