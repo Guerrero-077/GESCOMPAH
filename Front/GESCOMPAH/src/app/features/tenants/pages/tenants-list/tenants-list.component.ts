@@ -120,14 +120,14 @@ export class TenantsListComponent implements OnInit {
   }
 
   async onDelete(row: TenantsSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.showConfirm(
+    const result = await this.sweetAlert.showConfirm(
       'Eliminar usuario',
       `¿Deseas eliminar el Usuario "${row.personName}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
     );
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     try {
       await this.store.delete(row.id); // si tu back es lógico: this.store.deleteLogic(row.id)

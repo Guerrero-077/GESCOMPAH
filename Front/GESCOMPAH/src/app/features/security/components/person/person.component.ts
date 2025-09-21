@@ -130,14 +130,14 @@ export class PersonComponent implements OnInit {
 
   // Eliminar
   async onDelete(row: PersonSelectModel) {
-    const confirmed = await this.sweetAlert.showConfirm(
+    const result = await this.sweetAlert.showConfirm(
       'Eliminar Persona',
       `¿Deseas eliminar a "${row.firstName} ${row.lastName}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
     );
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     this.personStore.deleteLogic(row.id).pipe(take(1)).subscribe({
       next: () => this.notifySuccess('Eliminación Exitosa', 'Persona eliminada exitosamente.'),

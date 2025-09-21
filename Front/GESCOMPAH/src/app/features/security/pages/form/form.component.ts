@@ -117,7 +117,7 @@ export class FormComponent implements OnInit {
 
   // Eliminar (lógico)
   async onDelete(row: FormSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.showConfirm(
+    const result = await this.sweetAlert.showConfirm(
       'Eliminar form',
       `¿Deseas eliminar el form "${row.name}"?`,
       'Eliminar',
@@ -125,7 +125,7 @@ export class FormComponent implements OnInit {
       'warning'
     );
 
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     this.formStore.deleteLogic(row.id).pipe(take(1)).subscribe({
       next: () => {

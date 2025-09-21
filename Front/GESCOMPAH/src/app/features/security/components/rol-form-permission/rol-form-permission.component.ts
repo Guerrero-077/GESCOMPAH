@@ -173,14 +173,14 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
 
   // Eliminar (grupo)
   async onDelete(row: RolFormPermissionGroupedModel): Promise<void> {
-    const confirmed = await this.sweetAlertService.showConfirm(
+    const result = await this.sweetAlertService.showConfirm(
       'Eliminar Grupo de Permisos',
       `¿Eliminar todos los permisos del rol "${row.rolName}" para el formulario "${row.formName}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
     );
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     this.rolFormPermissionStore.deleteByGroup(row.rolId, row.formId).pipe(take(1)).subscribe({
       next: () => this.sweetAlertService.showNotification('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success'),

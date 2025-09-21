@@ -222,7 +222,7 @@
       <div class="row">
         <mat-form-field appearance="outline" class="field">
           <mat-label>Locales Comerciales</mat-label>
-          <mat-select formControlName="establishmentIds" multiple [disabled]="loadingEstablishments || !establishmentFormGroup.get('plazaId')?.value">
+          <mat-select formControlName="establishmentIds" multiple>
             <mat-option *ngFor="let e of filteredEstablishments" [value]="e.id">
               {{ e.name }}
               <span class="establishment-details" *ngIf="e.areaM2 || e.rentValueBase">

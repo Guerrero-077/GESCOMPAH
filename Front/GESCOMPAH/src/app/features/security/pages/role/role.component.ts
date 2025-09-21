@@ -123,7 +123,7 @@ export class RoleComponent implements OnInit {
 
   // Eliminar (borrado lógico)
   async onDelete(row: RoleSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlertService.showConfirm(
+    const result = await this.sweetAlertService.showConfirm(
       'Eliminar rol',
       `¿Deseas eliminar el rol "${row.name}"?`,
       'Eliminar',
@@ -131,7 +131,7 @@ export class RoleComponent implements OnInit {
       'warning'
     );
 
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     this.roleStore.deleteLogic(row.id).pipe(take(1)).subscribe({
       next: () => this.notifySuccess('Eliminación Exitosa', 'Rol eliminado exitosamente.'),

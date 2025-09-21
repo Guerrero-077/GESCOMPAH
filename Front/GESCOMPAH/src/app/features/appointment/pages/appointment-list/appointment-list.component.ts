@@ -121,7 +121,7 @@ export class AppointmentListComponent implements OnInit {
 
 
   async onDelete(row: AppointmentSelect) {
-    const confirmed = await this.sweetAlertService.showConfirm(
+    const result = await this.sweetAlertService.showConfirm(
       'Eliminar form',
       `¿Deseas eliminar el form "${row.personName}"?`,
       'Eliminar',
@@ -129,7 +129,7 @@ export class AppointmentListComponent implements OnInit {
       'warning'
     );
 
-    if (confirmed) {
+    if (result.isConfirmed) {
       this.appointmentStore.deleteLogic(row.id).subscribe({
         next: () => {
           this.sweetAlertService.showNotification('Eliminación Exitosa', 'Formulario eliminado exitosamente.', 'success');

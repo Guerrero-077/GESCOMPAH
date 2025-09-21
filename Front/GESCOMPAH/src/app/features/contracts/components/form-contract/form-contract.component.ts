@@ -57,7 +57,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 function endAfterOrEqualStartValidator(startCtrl: string, endCtrl: string): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
     const start = group.get(startCtrl)?.value as Date | null;
-    const end   = group.get(endCtrl)?.value as Date | null;
+    const end = group.get(endCtrl)?.value as Date | null;
     if (!start || !end) return null;
     const normalize = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
     return normalize(end) < normalize(start) ? { endBeforeStart: true } : null;
@@ -93,7 +93,7 @@ function toDateOnly(d: Date): string {
     MatStepper,
     MatStepperModule,
 
-],
+  ],
   templateUrl: './form-contract.component.html',
   styleUrls: ['./form-contract.component.css'],
 })
@@ -175,16 +175,16 @@ export class FormContractComponent implements OnInit, OnDestroy {
         { validators: [Validators.required, AV.colombianDocument()], updateOn: 'blur' }
       ),
       firstName: ['', [Validators.required, AV.notOnlySpaces(), AV.alphaHumanName(), Validators.maxLength(50)]],
-      lastName:  ['', [Validators.required, AV.notOnlySpaces(), AV.alphaHumanName(), Validators.maxLength(50)]],
-      phone:     ['', [Validators.required, AV.colombianPhone()]],
-      email:     ['', buildEmailValidators(true)],
+      lastName: ['', [Validators.required, AV.notOnlySpaces(), AV.alphaHumanName(), Validators.maxLength(50)]],
+      phone: ['', [Validators.required, AV.colombianPhone()]],
+      email: ['', buildEmailValidators(true)],
     });
 
     this.contractFormGroup = this.fb.group({
-      address:   ['', [Validators.required, AV.address()]],
-      cityId:    [null, Validators.required],
+      address: ['', [Validators.required, AV.address()]],
+      cityId: [null, Validators.required],
       startDate: [this.startMinDate, Validators.required],
-      endDate:   [this.startMinDate, Validators.required],
+      endDate: [this.startMinDate, Validators.required],
     }, { validators: endAfterOrEqualStartValidator('startDate', 'endDate') });
 
     this.establishmentFormGroup = this.fb.group({
@@ -242,23 +242,44 @@ export class FormContractComponent implements OnInit, OnDestroy {
    * Reinicia `establishmentIds` y consulta establecimientos activos.
    */
   private setupPlazaFiltering(): void {
-    this.establishmentFormGroup.get('plazaId')!
-      .valueChanges.pipe(
-        takeUntil(this.destroy$),
-        map((id: number | string | null) => (id == null ? null : Number(id))),
-        distinctUntilChanged(),
-        switchMap((plazaId) => {
-          this.establishmentFormGroup.get('establishmentIds')!.setValue([], { emitEvent: false });
-          if (!plazaId || plazaId <= 0) return of([]);
-          this.loadingEstablishments = true;
-          return this.estSvc.getByPlaza(plazaId, { activeOnly: true }).pipe(
-            catchError(() => of([])),
-            finalize(() => (this.loadingEstablishments = false))
-          );
-        })
-      )
-      .subscribe((list) => (this.filteredEstablishments = list ?? []));
+    const estCtrl = this.establishmentFormGroup.get('establishmentIds')!;
+    const plazaCtrl = this.establishmentFormGroup.get('plazaId')!;
+
+    plazaCtrl.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      map((id: number | string | null) => (id == null ? null : Number(id))),
+      distinctUntilChanged(),
+      switchMap((plazaId) => {
+        estCtrl.setValue([], { emitEvent: false });
+        estCtrl.disable({ emitEvent: false }); // 🔒 Deshabilita por defecto
+
+        if (!plazaId || plazaId <= 0) return of([]);
+
+        this.loadingEstablishments = true;
+        return this.estSvc.getByPlaza(plazaId, { activeOnly: true }).pipe(
+          catchError(() => of([])),
+          finalize(() => {
+            this.loadingEstablishments = false;
+
+            // 🧠 Reactiva solo si hay plaza válida y terminó de cargar
+            if (this.filteredEstablishments.length > 0) {
+              estCtrl.enable({ emitEvent: false });
+            }
+          })
+        );
+      })
+    ).subscribe((list) => {
+      this.filteredEstablishments = list ?? [];
+
+      // Habilita o no según el resultado, en caso de finalización muy rápida
+      if (this.filteredEstablishments.length > 0) {
+        estCtrl.enable({ emitEvent: false });
+      } else {
+        estCtrl.disable({ emitEvent: false });
+      }
+    });
   }
+
 
   /* ===================== Lookup persona ===================== */
 
@@ -307,13 +328,13 @@ export class FormContractComponent implements OnInit, OnDestroy {
     this.foundCityName = p.cityName ?? null;
     this.personFormGroup.patchValue({
       firstName: p.firstName ?? '',
-      lastName:  p.lastName ?? '',
-      phone:     p.phone ?? '',
-      email:     p.email ?? '',
+      lastName: p.lastName ?? '',
+      phone: p.phone ?? '',
+      email: p.email ?? '',
     }, { emitEvent: false });
     this.contractFormGroup.patchValue({
       address: p.address ?? '',
-      cityId:  p.cityId ?? null,
+      cityId: p.cityId ?? null,
     }, { emitEvent: false });
     this.togglePersonFields(false);
   }
@@ -373,14 +394,14 @@ export class FormContractComponent implements OnInit, OnDestroy {
 
     const payload: ContractCreateModel = {
       startDate: toDateOnly(c.startDate),
-      endDate:   toDateOnly(c.endDate),
-      address:   String(c.address).trim(),
-      cityId:    Number(c.cityId),
-      document:  String(p.document).trim(),
+      endDate: toDateOnly(c.endDate),
+      address: String(c.address).trim(),
+      cityId: Number(c.cityId),
+      document: String(p.document).trim(),
       firstName: String(p.firstName).trim(),
-      lastName:  String(p.lastName).trim(),
-      phone:     String(p.phone).trim(),
-      email:     p.email ? String(p.email).trim() : null,
+      lastName: String(p.lastName).trim(),
+      phone: String(p.phone).trim(),
+      email: p.email ? String(p.email).trim() : null,
       establishmentIds: (est.establishmentIds as number[]).map(Number),
       useSystemParameters: !!est.useSystemParameters,
       clauseIds: Array.isArray(est.clauseIds) ? est.clauseIds.map(Number) : [],
