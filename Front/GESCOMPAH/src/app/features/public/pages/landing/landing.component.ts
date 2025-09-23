@@ -17,6 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { EstablishmentService } from '../../../establishments/services/establishment/establishment.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { fromEvent } from 'rxjs';
+import { AppointmentStore } from '../../../appointment/services/appointment/appointment.store';
 
 @Component({
   selector: 'app-landing',
@@ -27,6 +28,7 @@ import { fromEvent } from 'rxjs';
 })
 export class LandingComponent implements OnInit, AfterViewInit {
   private readonly store = inject(EstablishmentStore);
+  private readonly storeAppointment = inject(AppointmentStore);
   private readonly sweetAlert = inject(SweetAlertService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
@@ -48,6 +50,40 @@ export class LandingComponent implements OnInit, AfterViewInit {
     // con un pequeño delay para esperar render del DOM
     setTimeout(() => this.updateScrollButtons(), 50);
   }
+
+  onView(id: number): void {
+    import('../../../establishments/services/establishment/establishment.service').then(({ EstablishmentService }) => {
+      const service = (this as any).store['svc'] as EstablishmentService;
+      service.getById(id).subscribe({
+        next: row => {
+          import('../../../establishments/components/establishment-detail-dialog/establishment-detail-dialog.component').then(m => {
+            this.dialog.open(m.EstablishmentDetailDialogComponent, {
+              width: '900px',
+              data: row
+            });
+          });
+        },
+        error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
+      });
+    });
+  }
+
+  // onCreateAppointment(id: number): void {
+  //   import('../../../appointment/services/appointment/appointment.service').then(({ AppointmentService }) => {
+  //     const service = (this as any).storeAppointment['svc'] as AppointmentService;
+  //     service.getById(id).subscribe({
+  //       next: row => {
+  //         import('../../../appointment/components/form-appointment/form-appointment.component').then(m => {
+  //           this.dialog.open(m.FormAppointmentComponent, {
+  //             width: '900px',
+  //             data: row
+  //           });
+  //         });
+  //       },
+  //       error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
+  //     });
+  //   });
+  // }
 
   ngAfterViewInit(): void {
     const el = this.carruselRef?.nativeElement;
@@ -77,23 +113,6 @@ export class LandingComponent implements OnInit, AfterViewInit {
 
     // primera verificación tras paint
     requestAnimationFrame(() => this.updateScrollButtons());
-  }
-
-  onView(id: number): void {
-    import('../../../establishments/services/establishment/establishment.service').then(({ EstablishmentService }) => {
-      const service = (this as any).store['svc'] as EstablishmentService;
-      service.getById(id).subscribe({
-        next: row => {
-          import('../../../establishments/components/establishment-detail-dialog/establishment-detail-dialog.component').then(m => {
-            this.dialog.open(m.EstablishmentDetailDialogComponent, {
-              width: '900px',
-              data: row
-            });
-          });
-        },
-        error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
-      });
-    });
   }
 
   private updateScrollButtons(): void {
