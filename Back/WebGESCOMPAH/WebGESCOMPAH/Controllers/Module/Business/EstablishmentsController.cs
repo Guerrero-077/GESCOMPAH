@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebGESCOMPAH.Controllers.Module.Business
 {
     [ApiController]
-    [Authorize] // [Authorize(Policy = "CanManageEstablishments")]
+    //[Authorize] // [Authorize(Policy = "CanManageEstablishments")]
     [Route("api/[controller]")]
     [Produces("application/json")]
     public sealed class EstablishmentsController : ControllerBase
