@@ -1,12 +1,13 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { User } from '../../../../shared/models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserStore {
-  private _user = signal<User | null>(null);
+  // Fuente de verdad en memoria (RAM)
+  private readonly _user = signal<User | null>(null);
 
-  // Señal pública reactiva
-  readonly user = computed(() => this._user());
+  // Exposición solo-lectura (evita mutaciones accidentales desde afuera)
+  readonly user = this._user.asReadonly();
 
   set(user: User | null): void {
     this._user.set(user);
@@ -16,6 +17,7 @@ export class UserStore {
     this._user.set(null);
   }
 
+  // Lectura "no reactiva" (no crea dependencias con Signals)
   get snapshot(): User | null {
     return this._user();
   }

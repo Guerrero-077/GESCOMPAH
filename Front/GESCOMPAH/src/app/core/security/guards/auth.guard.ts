@@ -1,68 +1,58 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { CanActivateFn, Router, UrlTree, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { of, map, catchError } from 'rxjs';
 import { AuthService } from '../services/auth/auth.service';
-import { map, of, catchError } from 'rxjs';
-import { UserStore } from '../services/permission/User.Store';
 import { User } from '../../../shared/models/user.model';
+import { UserStore } from '../services/permission/User.Store';
+import { normalizeUrl } from '../../utils/url-normalize';
+
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-  const authService = inject(AuthService);
-  const userStore = inject(UserStore);
   const router = inject(Router);
+  const auth = inject(AuthService);
+  const userStore = inject(UserStore);
 
-  const check = (profile: User) => {
-    if (!profile || !profile.menu) {
-      router.navigate(['/auth/login']);
-      return false;
-    }
+  const buildAllowed = (u: User) => new Set(
+    (u.menu ?? []).flatMap(m => (m.forms ?? []).map(f => f.route))
+  );
 
-    const allowedRoutes = profile.menu.flatMap(module => module.forms.map(form => form.route));
-
-    const requestedRoute = state.url.split('?')[0].substring(1); // remove leading '/'
-
-    if (requestedRoute === '') {
-      if (allowedRoutes.includes('dashboard')) {
-        return true;
-      }
-    }
-
-    const urlSegments = requestedRoute.split('/');
-    let currentRouteToCheck = '';
-    for (let i = 0; i < urlSegments.length; i++) {
-      currentRouteToCheck += (i > 0 ? '/' : '') + urlSegments[i];
-      if (allowedRoutes.includes(currentRouteToCheck)) {
-        return true;
-      }
-    }
-
-    if (allowedRoutes.includes('dashboard')) {
-      router.navigate(['/dashboard']);
-    } else {
-      router.navigate(['/auth/login']);
-    }
-    return false;
+  const fallbackUrl = (u: User | null): UrlTree => {
+    const hasDashboard = !!(u?.menu ?? []).some(m => (m.forms ?? []).some(f => f.route === 'dashboard'));
+    return router.parseUrl(hasDashboard ? '/dashboard' : '/auth/login');
   };
 
-  const currentUser = userStore.snapshot;
-  if (currentUser) {
-    return check(currentUser);
-  }
+  const can = (u: User | null): boolean | UrlTree => {
+    if (!u?.menu?.length) return router.parseUrl('/auth/login');
 
-  return authService.GetMe().pipe(
-    map(user => {
-      if (user) {
-        userStore.set(user);
-        return check(user);
-      }
-      router.navigate(['/auth/login']);
-      return false;
+    const allowed = buildAllowed(u);
+    const req = normalizeUrl(state.url);
+
+    // Si ruta vacía, permite si existe 'dashboard'
+    if (req === '' && allowed.has('dashboard')) return true;
+
+    // Chequeo progresivo de segmentos: admin/users/edit -> admin -> admin/users -> admin/users/edit
+    let curr = '';
+    for (const seg of req.split('/').filter(Boolean)) {
+      curr = curr ? `${curr}/${seg}` : seg;
+      if (allowed.has(curr)) return true;
+    }
+
+    return fallbackUrl(u);
+  };
+
+  const cached = userStore.snapshot;
+  if (cached) return can(cached);
+
+  // Rehidrata desde backend si no hay usuario en memoria
+  return auth.GetMe().pipe(
+    map(u => {
+      if (!u) return router.parseUrl('/auth/login');
+      userStore.set(u);
+      return can(u);
     }),
-    catchError(() => {
-      router.navigate(['/auth/login']);
-      return of(false);
-    })
+    catchError(() => of(router.parseUrl('/auth/login')))
   );
 };
