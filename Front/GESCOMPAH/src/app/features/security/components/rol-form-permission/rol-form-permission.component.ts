@@ -21,7 +21,7 @@ import { RoleStore } from '../../services/role/role.store';
 
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 
 @Component({
   standalone: true,
@@ -44,7 +44,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
   // private readonly confirmDialog = inject(ConfirmDialogService);
-  private readonly sweetAlert    = inject(SweetAlertService);
+  private readonly sweetAlert = inject(SweetAlertService);
   private readonly sweetAlertService = inject(SweetAlertService);
 
   // Estado
@@ -58,7 +58,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
   @ViewChild('permissionsTemplate') permissionsTemplate!: TemplateRef<any>;
   @ViewChild('estadoTemplate') estadoTemplate!: TemplateRef<any>;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.roleStore.loadAll();
@@ -84,38 +84,38 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       .pipe(take(1))
       .subscribe(([roles, forms, permissions]) => {
         import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
-        const dialogRef = this.dialog.open(m.FormDialogComponent, {
-          width: '600px',
-          data: {
-            entity: { active: true },
-            formType: 'RolFormPermission',
-            title: 'Nueva Asignación de Permisos',
-            selectOptions: {
-              rolId: roles.map(r => ({ value: r.id, label: r.name })),
-              formId: forms.map(f => ({ value: f.id, label: f.name })),
-              permissionIds: permissions.map(p => ({ value: p.id, label: p.name }))
+          const dialogRef = this.dialog.open(m.FormDialogComponent, {
+            width: '600px',
+            data: {
+              entity: { active: true },
+              formType: 'RolFormPermission',
+              title: 'Nueva Asignación de Permisos',
+              selectOptions: {
+                rolId: roles.map(r => ({ value: r.id, label: r.name })),
+                formId: forms.map(f => ({ value: f.id, label: f.name })),
+                permissionIds: permissions.map(p => ({ value: p.id, label: p.name }))
+              }
             }
-          }
-        });
+          });
 
-        dialogRef.afterClosed().pipe(
-          filter(Boolean),
-          map((result: any) => ({
-            rolId: +result.rolId,
-            formId: +result.formId,
-            permissionIds: result.permissionIds
-          }) as RolFormPermissionCreateModel),
-          switchMap(payload =>
-            this.rolFormPermissionStore.create(payload).pipe(
-              tap(() => this.sweetAlertService.showNotification('Creado', 'Relación creada con éxito.', 'success')),
-              catchError(err => {
-                console.error('Error creando:', err);
-                this.sweetAlertService.showNotification('Error', 'No se pudo crear.', 'error');
-                return EMPTY;
-              })
+          dialogRef.afterClosed().pipe(
+            filter(Boolean),
+            map((result: any) => ({
+              rolId: +result.rolId,
+              formId: +result.formId,
+              permissionIds: result.permissionIds
+            }) as RolFormPermissionCreateModel),
+            switchMap(payload =>
+              this.rolFormPermissionStore.create(payload).pipe(
+                tap(() => this.sweetAlertService.showNotification('Creado', 'Relación creada con éxito.', 'success')),
+                catchError(err => {
+                  console.error('Error creando:', err);
+                  this.sweetAlertService.showNotification('Error', 'No se pudo crear.', 'error');
+                  return EMPTY;
+                })
+              )
             )
-          )
-        ).subscribe();
+          ).subscribe();
         });
       });
   }
@@ -133,40 +133,40 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
         };
 
         import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
-        const dialogRef = this.dialog.open(m.FormDialogComponent, {
-          width: '600px',
-          data: {
-            entity: entityForDialog,
-            formType: 'RolFormPermission',
-            title: 'Editar Asignación de Permisos',
-            selectOptions: {
-              rolId: roles.map(r => ({ value: r.id, label: r.name })),
-              formId: forms.map(f => ({ value: f.id, label: f.name })),
-              permissionIds: permissions.map(p => ({ value: p.id, label: p.name }))
+          const dialogRef = this.dialog.open(m.FormDialogComponent, {
+            width: '600px',
+            data: {
+              entity: entityForDialog,
+              formType: 'RolFormPermission',
+              title: 'Editar Asignación de Permisos',
+              selectOptions: {
+                rolId: roles.map(r => ({ value: r.id, label: r.name })),
+                formId: forms.map(f => ({ value: f.id, label: f.name })),
+                permissionIds: permissions.map(p => ({ value: p.id, label: p.name }))
+              }
             }
-          }
-        });
+          });
 
-        dialogRef.afterClosed().pipe(
-          filter(Boolean),
-          map((result: any) => ({
-            id: row.id, // si tu backend usa clave compuesta, cambia a método por grupo
-            rolId: +result.rolId,
-            formId: +result.formId,
-            permissionIds: result.permissionIds,
-            active: result.active
-          }) as RolFormPermissionUpdateModel),
-          switchMap(payload =>
-            this.rolFormPermissionStore.update(payload).pipe(
-              tap(() => this.sweetAlertService.showNotification('Actualizado', 'Relación actualizada con éxito.', 'success')),
-              catchError(err => {
-                console.error('Error actualizando:', err);
-                this.sweetAlertService.showNotification('Error', 'No se pudo actualizar.', 'error');
-                return EMPTY;
-              })
+          dialogRef.afterClosed().pipe(
+            filter(Boolean),
+            map((result: any) => ({
+              id: row.id, // si tu backend usa clave compuesta, cambia a método por grupo
+              rolId: +result.rolId,
+              formId: +result.formId,
+              permissionIds: result.permissionIds,
+              active: result.active
+            }) as RolFormPermissionUpdateModel),
+            switchMap(payload =>
+              this.rolFormPermissionStore.update(payload).pipe(
+                tap(() => this.sweetAlertService.showNotification('Actualizado', 'Relación actualizada con éxito.', 'success')),
+                catchError(err => {
+                  console.error('Error actualizando:', err);
+                  this.sweetAlertService.showNotification('Error', 'No se pudo actualizar.', 'error');
+                  return EMPTY;
+                })
+              )
             )
-          )
-        ).subscribe();
+          ).subscribe();
         });
       });
   }

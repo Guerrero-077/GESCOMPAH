@@ -1,4 +1,4 @@
-﻿using Entity.Domain.Models.Implements.SecurityAuthentication;
+using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Microsoft.Extensions.Options;
 
 namespace WebGESCOMPAH.Infrastructure
@@ -23,17 +23,17 @@ namespace WebGESCOMPAH.Infrastructure
         {
             HttpOnly = true,
             Secure = _settings.Secure,
-            SameSite = _settings.SameSite,
+            SameSite = SameSiteMode.None,
             Expires = expires.UtcDateTime,
             Path = _settings.Path,
-            Domain = _settings.Domain
+            Domain = _settings.Domain  
         };
 
         public CookieOptions RefreshCookieOptions(DateTimeOffset expires) => new()
         {
             HttpOnly = true,
             Secure = _settings.Secure,
-            SameSite = SameSiteMode.None,
+            SameSite = SameSiteMode.None, 
             Expires = expires.UtcDateTime,
             Path = _settings.Path,
             Domain = _settings.Domain
@@ -41,9 +41,9 @@ namespace WebGESCOMPAH.Infrastructure
 
         public CookieOptions CsrfCookieOptions(DateTimeOffset expires) => new()
         {
-            HttpOnly = false, // accesible por JS para double-submit
+            HttpOnly = false,                         
             Secure = _settings.Secure,
-            SameSite = SameSiteMode.None,
+            SameSite = SameSiteMode.None,             
             Expires = expires.UtcDateTime,
             Path = _settings.Path,
             Domain = _settings.Domain

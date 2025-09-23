@@ -33,21 +33,31 @@ namespace WebGESCOMPAH.Controllers.Base
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public virtual async Task<ActionResult<TGet>> Post([FromBody] TCreate dto)
         {
             var created = await Service.CreateAsync(dto);
-            if (created is BaseDto withId)
-                return CreatedAtAction(nameof(GetById), new { id = withId.Id }, created);
 
-            return StatusCode(StatusCodes.Status201Created, created);
+            if (created is not BaseDto withId || withId.Id == 0)
+                return BadRequest("El recurso creado no contiene un ID válido.");
+
+            // En el futuro puedes incluir enlaces HATEOAS aquí
+
+            return CreatedAtAction(nameof(GetById), new { id = withId.Id }, created);
         }
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public virtual async Task<ActionResult<TGet>> Put(int id, [FromBody] TUpdate dto)
         {
-            if (dto is BaseDto withId) withId.Id = id;
+            if (dto is BaseDto withId && withId.Id != 0 && withId.Id != id)
+                return BadRequest("El ID del cuerpo no coincide con el ID de la URL.");
+
+            if (dto is BaseDto baseDto)
+                baseDto.Id = id;
+
             var updated = await Service.UpdateAsync(dto);
             return updated is null ? NotFound() : Ok(updated);
         }
@@ -66,15 +76,41 @@ namespace WebGESCOMPAH.Controllers.Base
 
         [HttpPatch("{id:int}/estado")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public virtual async Task<IActionResult> ChangeActiveStatus(int id, [FromBody] ChangeActiveStatusRequest body)
         {
-            await Service.UpdateActiveStatusAsync(id, body.Active!.Value);
+            if (body.Active is null)
+                return BadRequest("El campo 'Active' no puede ser nulo.");
+
+            await Service.UpdateActiveStatusAsync(id, body.Active.Value);
             return NoContent();
         }
 
-        
+        [HttpGet("query")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<PagedResult<TGet>>> Query(
+            [FromQuery] int Page = 1,
+            [FromQuery] int Size = 20,
+            [FromQuery] string? Search = null,
+            [FromQuery] string? Sort = null,
+            [FromQuery] bool Desc = true,
+            [FromQuery] IDictionary<string, string>? Filters = null)
+        {
+            if (Page <= 0 || Size <= 0)
+                return BadRequest("Los valores de paginación deben ser mayores a cero.");
+
+            var query = new PageQuery(Page, Size, Search, Sort, Desc, Filters);
+            var result = await Service.QueryAsync(query);
+
+            // Headers para UI/paginación
+            Response.Headers["X-Total-Count"] = result.Total.ToString();
+            Response.Headers["X-Total-Pages"] = result.TotalPages.ToString();
+            Response.Headers["X-Page"] = result.Page.ToString();
+            Response.Headers["X-Size"] = result.Size.ToString();
+
+            return Ok(result);
+        }
     }
 }

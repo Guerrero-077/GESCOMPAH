@@ -4,6 +4,7 @@ using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
 using MapsterMapper;
+using System.Linq.Expressions;
 
 namespace Business.Services.SecurityAuthentication
 {
@@ -211,5 +212,33 @@ namespace Business.Services.SecurityAuthentication
                 }
             }
         }
+
+
+        protected override Expression<Func<RolFormPermission, string?>>[] SearchableFields() =>
+        [
+            x => x.Rol.Name,
+            x => x.Form.Name,
+            x => x.Permission.Name
+        ];
+
+        protected override string[] SortableFields() =>
+        [
+            nameof(RolFormPermission.Id),
+            nameof(RolFormPermission.RolId),
+            nameof(RolFormPermission.FormId),
+            nameof(RolFormPermission.PermissionId),
+            nameof(RolFormPermission.CreatedAt),
+            nameof(RolFormPermission.Active)
+        ];
+
+        protected override IDictionary<string, Func<string, Expression<Func<RolFormPermission, bool>>>> AllowedFilters() =>
+            new Dictionary<string, Func<string, Expression<Func<RolFormPermission, bool>>>>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(RolFormPermission.RolId)] = val => x => x.RolId == int.Parse(val),
+                [nameof(RolFormPermission.FormId)] = val => x => x.FormId == int.Parse(val),
+                [nameof(RolFormPermission.PermissionId)] = val => x => x.PermissionId == int.Parse(val),
+                [nameof(RolFormPermission.Active)] = val => x => x.Active == bool.Parse(val)
+            };
+
     }
 }

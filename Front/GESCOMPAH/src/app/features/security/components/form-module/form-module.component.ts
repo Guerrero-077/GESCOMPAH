@@ -10,7 +10,7 @@ import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 import {
   FormModuleCreateModel,
   FormModuleSelectModel,
@@ -33,18 +33,18 @@ type SelectOption<T = number> = { value: T; label: string };
 export class FormModuleComponent implements OnInit {
 
   // Inyección de dependencias
-  private readonly formService        = inject(FormService);
-  private readonly moduleService      = inject(ModuleService);
-  private readonly formModuleService  = inject(FormModuleService);
-  private readonly dialog             = inject(MatDialog);
+  private readonly formService = inject(FormService);
+  private readonly moduleService = inject(ModuleService);
+  private readonly formModuleService = inject(FormModuleService);
+  private readonly dialog = inject(MatDialog);
   // private readonly confirmDialog      = inject(ConfirmDialogService);
-  private readonly sweetAlert         = inject(SweetAlertService);
-  private readonly sweetAlertService  = inject(SweetAlertService);
+  private readonly sweetAlert = inject(SweetAlertService);
+  private readonly sweetAlertService = inject(SweetAlertService);
 
   // Estado
   private readonly formModulesSubject = new BehaviorSubject<FormModuleSelectModel[]>([]);
-  readonly formModules$               = this.formModulesSubject.asObservable();
-  private readonly busyToggleIds      = new Set<number>(); // evita dobles clics en toggle
+  readonly formModules$ = this.formModulesSubject.asObservable();
+  private readonly busyToggleIds = new Set<number>(); // evita dobles clics en toggle
 
   // Tabla
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
@@ -118,41 +118,41 @@ export class FormModuleComponent implements OnInit {
       }
 
       import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
-      const dialogRef = this.dialog.open(m.FormDialogComponent, {
-        width: '600px',
-        data: {
-          entity: {
-            formId: formOpts[0].value,
-            moduleId: moduleOpts[0].value,
-            active: true
-          },
-          formType: 'FormModule',
-          selectOptions: {
-            formId: formOpts,
-            moduleId: moduleOpts
-          }
-        }
-      });
-
-      dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
-        if (!result) return;
-
-        const payload: FormModuleCreateModel = {
-          formId: +result.formId,
-          moduleId: +result.moduleId
-        };
-
-        this.formModuleService.create(payload).pipe(take(1)).subscribe({
-          next: () => {
-            this.notifySuccess('Creación Exitosa', 'Relación Form–Module creada exitosamente.');
-            this.loadFormModules();
-          },
-          error: (err) => {
-            console.error('Error creando FormModule:', err);
-            this.notifyError('No se pudo crear la relación Form–Module.');
+        const dialogRef = this.dialog.open(m.FormDialogComponent, {
+          width: '600px',
+          data: {
+            entity: {
+              formId: formOpts[0].value,
+              moduleId: moduleOpts[0].value,
+              active: true
+            },
+            formType: 'FormModule',
+            selectOptions: {
+              formId: formOpts,
+              moduleId: moduleOpts
+            }
           }
         });
-      });
+
+        dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
+          if (!result) return;
+
+          const payload: FormModuleCreateModel = {
+            formId: +result.formId,
+            moduleId: +result.moduleId
+          };
+
+          this.formModuleService.create(payload).pipe(take(1)).subscribe({
+            next: () => {
+              this.notifySuccess('Creación Exitosa', 'Relación Form–Module creada exitosamente.');
+              this.loadFormModules();
+            },
+            error: (err) => {
+              console.error('Error creando FormModule:', err);
+              this.notifyError('No se pudo crear la relación Form–Module.');
+            }
+          });
+        });
       });
     });
   }
@@ -166,66 +166,66 @@ export class FormModuleComponent implements OnInit {
       moduleOpts: this.getModuleOptions$(),
       current: this.formModuleService.getById(id).pipe(take(1))
     })
-    .pipe(
-      map(({ formOpts, moduleOpts, current }: { formOpts: SelectOption[]; moduleOpts: SelectOption[]; current: any }) => ({
-        formOpts,
-        moduleOpts,
-        initial: {
-          id: current?.id ?? id,
-          formId: current?.formId,
-          moduleId: current?.moduleId,
-          active: current?.active
-        }
-      })),
-      catchError(err => {
-        console.error('Error al obtener datos para edición:', err);
-        this.notifyError('No se pudieron cargar los datos para editar la relación Form–Module.');
-        return of({ formOpts: [], moduleOpts: [], initial: {} as any });
-      }),
-      take(1)
-    )
-    .subscribe(({ formOpts, moduleOpts, initial }) => {
-      if (!formOpts.length || !moduleOpts.length) {
-        console.warn('No hay opciones disponibles para Form/Module');
-        this.notifyWarn('No hay opciones disponibles para Formularios o Módulos. Asegúrese de que existan.');
-        return;
-      }
-
-      import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
-      const dialogRef = this.dialog.open(m.FormDialogComponent, {
-        width: '600px',
-        data: {
-          entity: initial,
-          formType: 'FormModule',
-          selectOptions: {
-            formId: formOpts,
-            moduleId: moduleOpts
+      .pipe(
+        map(({ formOpts, moduleOpts, current }: { formOpts: SelectOption[]; moduleOpts: SelectOption[]; current: any }) => ({
+          formOpts,
+          moduleOpts,
+          initial: {
+            id: current?.id ?? id,
+            formId: current?.formId,
+            moduleId: current?.moduleId,
+            active: current?.active
           }
+        })),
+        catchError(err => {
+          console.error('Error al obtener datos para edición:', err);
+          this.notifyError('No se pudieron cargar los datos para editar la relación Form–Module.');
+          return of({ formOpts: [], moduleOpts: [], initial: {} as any });
+        }),
+        take(1)
+      )
+      .subscribe(({ formOpts, moduleOpts, initial }) => {
+        if (!formOpts.length || !moduleOpts.length) {
+          console.warn('No hay opciones disponibles para Form/Module');
+          this.notifyWarn('No hay opciones disponibles para Formularios o Módulos. Asegúrese de que existan.');
+          return;
         }
-      });
 
-      dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
-        if (!result) return;
+        import('../../../../shared/components/form-dialog/form-dialog.component').then(m => {
+          const dialogRef = this.dialog.open(m.FormDialogComponent, {
+            width: '600px',
+            data: {
+              entity: initial,
+              formType: 'FormModule',
+              selectOptions: {
+                formId: formOpts,
+                moduleId: moduleOpts
+              }
+            }
+          });
 
-        const payload: FormModuleUpdateModel = {
-          id,
-          formId: +result.formId,
-          moduleId: +result.moduleId
-        };
+          dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
+            if (!result) return;
 
-        this.formModuleService.update(id, payload).pipe(take(1)).subscribe({
-          next: () => {
-            this.notifySuccess('Actualización Exitosa', 'Relación Form–Module actualizada exitosamente.');
-            this.loadFormModules();
-          },
-          error: (err) => {
-            console.error('Error actualizando FormModule:', err);
-            this.notifyError('No se pudo actualizar la relación Form–Module.');
-          }
+            const payload: FormModuleUpdateModel = {
+              id,
+              formId: +result.formId,
+              moduleId: +result.moduleId
+            };
+
+            this.formModuleService.update(id, payload).pipe(take(1)).subscribe({
+              next: () => {
+                this.notifySuccess('Actualización Exitosa', 'Relación Form–Module actualizada exitosamente.');
+                this.loadFormModules();
+              },
+              error: (err) => {
+                console.error('Error actualizando FormModule:', err);
+                this.notifyError('No se pudo actualizar la relación Form–Module.');
+              }
+            });
+          });
         });
       });
-      });
-    });
   }
 
   // Eliminar

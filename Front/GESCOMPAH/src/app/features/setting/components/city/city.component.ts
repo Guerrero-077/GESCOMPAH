@@ -12,7 +12,7 @@ import { CityStore } from '../../services/city/city.store';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { CitySelectModel } from '../../models/city.models';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 
 @Component({
   selector: 'app-city',

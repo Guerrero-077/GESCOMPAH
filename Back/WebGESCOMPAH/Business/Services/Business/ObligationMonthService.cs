@@ -6,9 +6,10 @@ using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.ObligationMonth;
 using MapsterMapper;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq.Expressions;
 using Utilities.Exceptions;
 
 namespace Business.Services.Business
@@ -185,5 +186,41 @@ namespace Business.Services.Business
             if (decimal.TryParse(raw, NumberStyles.Any, es, out value)) return true;
             return decimal.TryParse(raw, NumberStyles.Any, CultureInfo.CurrentCulture, out value);
         }
+
+
+
+        protected override Expression<Func<ObligationMonth, string>>[] SearchableFields() =>
+        [
+            e => e.Status
+        ];
+
+
+        protected override string[] SortableFields() =>
+        [
+            nameof(ObligationMonth.Year),
+            nameof(ObligationMonth.Month),
+            nameof(ObligationMonth.DueDate),
+            nameof(ObligationMonth.BaseAmount),
+            nameof(ObligationMonth.TotalAmount),
+            nameof(ObligationMonth.LateAmount),
+            nameof(ObligationMonth.Status),
+            nameof(ObligationMonth.Locked),
+            nameof(ObligationMonth.Active),
+            nameof(ObligationMonth.CreatedAt),
+            nameof(ObligationMonth.Id)
+        ];
+
+        protected override IDictionary<string, Func<string, Expression<Func<ObligationMonth, bool>>>> AllowedFilters() =>
+        new Dictionary<string, Func<string, Expression<Func<ObligationMonth, bool>>>>(StringComparer.OrdinalIgnoreCase)
+        {
+            [nameof(ObligationMonth.ContractId)] = val => e => e.ContractId == int.Parse(val),
+            [nameof(ObligationMonth.Year)] = val => e => e.Year == int.Parse(val),
+            [nameof(ObligationMonth.Month)] = val => e => e.Month == int.Parse(val),
+            [nameof(ObligationMonth.Status)] = val => e => e.Status == val,
+            [nameof(ObligationMonth.Locked)] = val => e => e.Locked == bool.Parse(val),
+            [nameof(ObligationMonth.Active)] = val => e => e.Active == bool.Parse(val),
+            [nameof(ObligationMonth.DueDate)] = val => e => e.DueDate.Date == DateTime.Parse(val).Date
+        };
+
     }
 }

@@ -6,7 +6,7 @@ import { RolFormPermissionCreateModel, RolFormPermissionGroupedModel, RolFormPer
 @Injectable({
   providedIn: 'root'
 })
-export class RolFormPermissionService  extends GenericService<RolFormPermissionGroupedModel, RolFormPermissionCreateModel, RolFormPermissionUpdateModel >{
+export class RolFormPermissionService extends GenericService<RolFormPermissionGroupedModel, RolFormPermissionCreateModel, RolFormPermissionUpdateModel> {
   protected override resource = 'rolformpermission';
 
   // Métodos específicos

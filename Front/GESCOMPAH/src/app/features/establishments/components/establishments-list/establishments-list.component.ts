@@ -16,7 +16,7 @@ import { EstablishmentService } from '../../services/establishment/establishment
 import { EstablishmentStore } from '../../services/establishment/establishment.store';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { SharedEventsServiceService } from '../../services/shared/shared-events-service.service';
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 @Component({

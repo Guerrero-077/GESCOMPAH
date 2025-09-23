@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Utilities.Exceptions;
 using Utilities.Messaging.Interfaces;
+using System.Linq.Expressions;
 
 namespace Business.Services.Business
 {
@@ -276,5 +277,34 @@ namespace Business.Services.Business
                 return Task.CompletedTask;
             });
         }
+        protected override Expression<Func<Contract, string>>[] SearchableFields() =>
+        [
+            c => c.Person.FirstName,
+            c => c.Person.LastName,
+            c => c.Person.Document
+        ];
+
+
+
+        protected override string[] SortableFields() => new[]
+        {
+            nameof(Contract.StartDate),
+            nameof(Contract.EndDate),
+            nameof(Contract.TotalBaseRentAgreed),
+            nameof(Contract.TotalUvtQtyAgreed),
+            nameof(Contract.PersonId),
+            nameof(Contract.Id),
+            nameof(Contract.CreatedAt),
+            nameof(Contract.Active)
+        };
+
+        protected override IDictionary<string, Func<string, Expression<Func<Contract, bool>>>> AllowedFilters() =>
+            new Dictionary<string, Func<string, Expression<Func<Contract, bool>>>>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(Contract.PersonId)] = value => entity => entity.PersonId == int.Parse(value),
+                [nameof(Contract.Active)] = value => entity => entity.Active == bool.Parse(value),
+                [nameof(Contract.StartDate)] = value => entity => entity.StartDate == DateTime.Parse(value),
+                [nameof(Contract.EndDate)] = value => entity => entity.EndDate == DateTime.Parse(value)
+            };
     }
 }

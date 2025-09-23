@@ -7,9 +7,10 @@ public class ExceptionMiddleware : IMiddleware
     private readonly IHostEnvironment _env;
     private readonly IEnumerable<IExceptionHandler> _handlers;
 
-    public ExceptionMiddleware(ILogger<ExceptionMiddleware> logger,
-                               IHostEnvironment env,
-                               IEnumerable<IExceptionHandler> handlers)
+    public ExceptionMiddleware(
+        ILogger<ExceptionMiddleware> logger,
+        IHostEnvironment env,
+        IEnumerable<IExceptionHandler> handlers)
     {
         _logger = logger;
         _env = env;
@@ -24,9 +25,21 @@ public class ExceptionMiddleware : IMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Excepción no manejada en {Path}", context.Request.Path);
-            await HandleExceptionAsync(context, ex);
+            var actualException = ex switch
+            {
+                AggregateException agg => agg.Flatten().InnerException ?? agg,
+                _ => ex.InnerException ?? ex
+            };
+
+            Log(actualException, context);
+            await HandleExceptionAsync(context, actualException);
         }
+    }
+
+    private void Log(Exception ex, HttpContext context)
+    {
+        // Puedes ajustar según tipo, esto es un ejemplo
+        _logger.LogError(ex, "Excepción no manejada en {Path}", context.Request.Path);
     }
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
@@ -35,11 +48,12 @@ public class ExceptionMiddleware : IMiddleware
 
         var handler = _handlers
             .OrderBy(h => h.Priority)
-            .First(h => h.CanHandle(exception)); // siempre habrá al menos Default
+            .FirstOrDefault(h => h.CanHandle(exception))
+            ?? throw new InvalidOperationException("No se encontró handler para la excepción.");
 
         var (problem, statusCode) = handler.Handle(exception, _env, context);
 
-        // metadatos útiles
+        // Metadata útil para trazabilidad
         problem.Extensions ??= new Dictionary<string, object?>();
         problem.Extensions["traceId"] = context.TraceIdentifier;
         problem.Extensions["path"] = context.Request.Path.Value;

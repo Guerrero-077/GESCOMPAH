@@ -5,7 +5,7 @@ import { FormModuleCreateModel, FormModuleSelectModel, FormModuleUpdateModel } f
 @Injectable({
   providedIn: 'root'
 })
-export class FormModuleService extends GenericService<FormModuleSelectModel, FormModuleCreateModel, FormModuleUpdateModel>{
+export class FormModuleService extends GenericService<FormModuleSelectModel, FormModuleCreateModel, FormModuleUpdateModel> {
   protected override resource = 'formModule';
 
 }

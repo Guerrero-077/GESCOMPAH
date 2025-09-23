@@ -5,6 +5,7 @@ using Data.Interfaz.IDataImplement.Location;
 using Entity.Domain.Models.Implements.Location;
 using Entity.DTOs.Implements.Location.City;
 using MapsterMapper;
+using System.Linq.Expressions;
 
 namespace Business.Services.Location
 {
@@ -29,5 +30,28 @@ namespace Business.Services.Location
             }
 
         }
+
+        protected override Expression<Func<City, string>>[] SearchableFields() => [
+            c => c.Name,
+            c => c.Department.Name
+        ];
+
+        protected override string[] SortableFields() => new[]
+        {
+            nameof(City.Name),
+            nameof(City.DepartmentId),
+            nameof(City.CreatedAt),
+            nameof(City.Id),
+            nameof(City.Active)
+        };
+
+        protected override IDictionary<string, Func<string, Expression<Func<City, bool>>>> AllowedFilters() =>
+            new Dictionary<string, Func<string, Expression<Func<City, bool>>>>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(City.Name)] = value => c => c.Name == value,
+                [nameof(City.DepartmentId)] = value => c => c.DepartmentId == int.Parse(value),
+                [nameof(City.Active)] = value => c => c.Active == bool.Parse(value)
+            };
+
     }
 }

@@ -1,18 +1,19 @@
-﻿using System;
-using Business.Interfaces.Implements.Business;
+﻿using Business.Interfaces.Implements.Business;
 using Business.Repository;
 using Business.Services.Validation;
-using System.Collections.Generic;
-using System.Linq;
 using Data.Interfaz.IDataImplement.Business;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
+using Entity.Enum;
 using Entity.Infrastructure.Context;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using Utilities.Exceptions;
-using Entity.Enum;
 
 namespace Business.Services.Business
 {
@@ -211,6 +212,32 @@ namespace Business.Services.Business
             dto.Address = DomainValidation.NormalizeAddress(dto.Address, required: false, maxLength: 150);
             DomainValidation.EnsureId(dto.PlazaId, "PlazaId");
         }
+
+
+
+
+
+        protected override Expression<Func<Establishment, string>>[] SearchableFields() =>
+        [
+            e => e.Name!,
+            e => e.Description!,
+            e => e.Address!,
+            e => e.Plaza.Name!
+        ];
+
+        protected override string[] SortableFields() =>
+        [
+            nameof(Establishment.Name),
+            nameof(Establishment.Description),
+            nameof(Establishment.RentValueBase),
+            nameof(Establishment.AreaM2),
+            nameof(Establishment.PlazaId),
+            nameof(Establishment.Id),
+            nameof(Establishment.CreatedAt),
+            nameof(Establishment.Active)
+        ];
+
+
     }
 }
 

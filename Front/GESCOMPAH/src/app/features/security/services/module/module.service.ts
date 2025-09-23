@@ -7,5 +7,5 @@ import { ModuleCreateModel, ModuleSelectModel, ModuleUpdateModel } from '../../m
 })
 export class ModuleService extends GenericService<ModuleSelectModel, ModuleCreateModel, ModuleUpdateModel> {
   protected override resource = 'module';
-}{
+} {
 }

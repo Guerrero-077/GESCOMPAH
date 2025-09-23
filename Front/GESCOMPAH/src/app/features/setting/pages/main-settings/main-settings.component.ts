@@ -5,7 +5,7 @@ import { LocationSettingsComponent } from '../location-settings/location-setting
 import { FinanceComponent } from "../../components/finance/finance.component";
 import { ChangePasswordComponent } from "../../components/change-password/change-password.component";
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 import { ProfileFormComponent } from '../../components/profile-form/profile-form.component';
 
 @Component({
@@ -19,7 +19,7 @@ import { ProfileFormComponent } from '../../components/profile-form/profile-form
     ChangePasswordComponent,
     HasRoleAndPermissionDirective,
     ProfileFormComponent
-],
+  ],
   templateUrl: './main-settings.component.html',
   styleUrl: './main-settings.component.css',
   encapsulation: ViewEncapsulation.None,

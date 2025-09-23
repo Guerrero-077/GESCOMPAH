@@ -8,9 +8,8 @@ import {
 import { inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { SweetAlertService } from '../../shared/Services/sweet-alert/sweet-alert.service'
 import { Router } from '@angular/router';
-
+import { SweetAlertService } from '../../shared/Services/sweet-alert/sweet-alert.service';
 
 export const errorInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -22,19 +21,27 @@ export const errorInterceptor: HttpInterceptorFn = (
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       const currentUrl = router.url;
-      const isAuthEndpoint = req.url.includes('/Auth/Refresh-Token') || req.url.includes('/Auth/me') || req.url.includes('/Auth/Login') || req.url.includes('/Auth/Register');
+
+      // Evitar mostrar notificaciones en rutas públicas o endpoints de auth
+      const isAuthEndpoint = req.url.includes('/Auth/Refresh-Token')
+        || req.url.includes('/Auth/me')
+        || req.url.includes('/Auth/Login')
+        || req.url.includes('/Auth/Register');
       const isPublicRoute = currentUrl === '/' || currentUrl.startsWith('/Auth');
       const suppress = isAuthEndpoint || isPublicRoute;
 
-      // Evitar toasts en 401: el auth interceptor gestionará refresh/logout
+      // No mostrar notificaciones en endpoints de auth
       if (error.status === 401) {
         return throwError(() => error);
       }
 
-      if (error.status === 403) {
-        if (!suppress) {
-          sweetAlert.showNotification('Acceso denegado', 'No tienes permisos para realizar esta acción.', 'warning');
-        }
+      // Mostrar toast para 403 si no estamos en rutas públicas
+      if (error.status === 403 && !suppress) {
+        sweetAlert.showNotification(
+          'Acceso denegado',
+          'No tienes permisos para realizar esta acción.',
+          'warning'
+        );
         return throwError(() => error);
       }
 
@@ -42,20 +49,37 @@ export const errorInterceptor: HttpInterceptorFn = (
         return throwError(() => error);
       }
 
-      let errorMessage = 'Ocurrió un error inesperado';
+      // Manejo de errores tipo ProblemDetails
+      let errorMessage = 'Ocurrió un error inesperado.';
 
       if (error.error instanceof ErrorEvent) {
         // Error del lado del cliente
         errorMessage = `Error: ${error.error.message}`;
       } else {
-        // Error del lado del servidor
-        errorMessage = (error.error && (error.error.message || error.error.title)) 
-          ? (error.error.message || error.error.title)
-          : `Error Código: ${error.status}, Mensaje: ${error.message}`;
+        const problem = error.error;
+        if (typeof problem === 'object') {
+          if (problem.detail) {
+            errorMessage = problem.detail;
+          } else if (problem.title && !problem.errors) {
+            errorMessage = problem.title;
+          } else if (problem.errors) {
+            const campos = Object.keys(problem.errors);
+            if (campos.length > 0) {
+              const primerCampo = campos[0];
+              const mensajes = problem.errors[primerCampo];
+              if (mensajes?.length > 0) {
+                errorMessage = mensajes[0];
+              }
+            }
+          }
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
       }
 
       sweetAlert.showNotification('Error', errorMessage, 'error');
-
       return throwError(() => error);
     })
   );
