@@ -19,11 +19,11 @@ public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonU
     public override async Task<PersonSelectDto> CreateAsync(PersonDto dto)
     {
         if (dto == null)
-            throw new BusinessException("Payload inválido.");
+            throw new BusinessException("Payload invalido.");
 
         // Validar documento duplicado (regla de negocio propia de Persona)
         if (await _personRepository.ExistsByDocumentAsync(dto.Document))
-            throw new BusinessException("Ya existe una persona registrada con ese número de documento.");
+            throw new BusinessException("Ya existe una persona registrada con ese numero de documento.");
 
         // Mapear DTO -> Entidad
         var entity = _mapper.Map<Person>(dto);
@@ -31,7 +31,7 @@ public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonU
         // Persistir en base de datos
         var created = await Data.AddAsync(entity);
 
-        // Recargar con navegación (City, si aplica)
+        // Recargar con navegacion (City, si aplica)
         var reloaded = await _personRepository.GetByIdAsync(created.Id) ?? created;
 
         // Mapear Entidad -> SelectDto
@@ -41,7 +41,7 @@ public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonU
     public override async Task<PersonSelectDto> UpdateAsync(PersonUpdateDto dto)
     {
         if (dto == null)
-            throw new BusinessException("Payload inválido.");
+            throw new BusinessException("Payload invalido.");
 
         var existing = await Data.GetByIdAsync(dto.Id)
             ?? throw new BusinessException("Persona no encontrada.");
@@ -61,6 +61,18 @@ public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonU
     {
         var person = await _personRepository.GetByDocumentAsync(document);
         return person is null ? null : _mapper.Map<PersonSelectDto>(person);
+    }
+
+    public async Task<PersonSelectDto> GetOrCreateByDocumentAsync(PersonDto dto)
+    {
+        if (dto == null)
+            throw new BusinessException("Payload invalido.");
+
+        var existing = await _personRepository.GetByDocumentAsync(dto.Document);
+        if (existing is not null)
+            return _mapper.Map<PersonSelectDto>(existing);
+
+        return await CreateAsync(dto);
     }
 
 }

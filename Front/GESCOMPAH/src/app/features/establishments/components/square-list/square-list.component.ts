@@ -88,14 +88,14 @@ export class SquareListComponent implements OnInit {
   }
 
   async onDelete(row: SquareSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.showConfirm(
+    const result = await this.sweetAlert.showConfirm(
       'Eliminar plaza',
-      `�Deseas eliminar la plaza "${row.name}"?`,
+      `¿Deseas eliminar la plaza "${row.name}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
     );
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
     try {
       await this.squaresStore.deleteLogic(row.id);
       this.sweetAlert.showNotification('Eliminación exitosa', 'Plaza eliminada correctamente.', 'success');

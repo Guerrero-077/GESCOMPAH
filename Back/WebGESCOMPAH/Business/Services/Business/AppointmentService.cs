@@ -1,14 +1,20 @@
 ﻿using Business.Interfaces.Implements.Business;
+using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Repository;
+using Business.Services.SecurityAuthentication;
+using CloudinaryDotNet.Actions;
 using Data.Interfaz.IDataImplement.Business;
 using Data.Interfaz.IDataImplement.Persons;
+using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.Business;
 using Entity.Domain.Models.Implements.Persons;
+using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.Business.Appointment;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Utilities.Exceptions;
 using Utilities.Helpers.Business;
+using Utilities.Messaging.Interfaces;
 
 namespace Business.Services.Business
 {
@@ -17,27 +23,28 @@ namespace Business.Services.Business
         private readonly IAppointmentRepository _data;
         private readonly IMapper _mapper;
         private readonly IPersonRepository _dataPerson;
+        private readonly IUserService _userRepository;
+        private readonly ISendCode _emailService;
 
         public AppointmentService(
             IAppointmentRepository data, 
             IMapper mapper, 
-            IPersonRepository dataPerson
+            IPersonRepository dataPerson,
+            IUserService userRepository,
+            ISendCode emailService
         )
             :base (data, mapper)
         {
             _data = data;
             _mapper = mapper;
             _dataPerson = dataPerson;
-        }
-
-        public async Task<bool> RejectedAppointment(int id)
-        {
-            BusinessValidationHelper.ThrowIfZeroOrLess(id, "El ID debe ser mayor que cero.");
-            return await _data.RejectedAppointment(id);
+            _userRepository = userRepository;
+            _emailService = emailService;
         }
 
         public override async Task<AppointmentSelectDto> CreateAsync(AppointmentCreateDto dto) 
         {
+
             try
             {
                 BusinessValidationHelper.ThrowIfNull(dto, "El DTO no puede ser nulo.");
@@ -48,7 +55,7 @@ namespace Business.Services.Business
                 {
                     if (existPerson.FirstName != dto.FirstName ||
                         existPerson.LastName != dto.LastName ||
-                        existPerson.CityId != dto.cityId)
+                        existPerson.CityId != dto.CityId)
                     {
                         throw new BusinessException($"Ya existe una persona con documento {dto.Document} pero con datos diferentes. Verifica la información.");
                     }
@@ -60,16 +67,40 @@ namespace Business.Services.Business
                         RequestDate = dto.RequestDate,
                         DateTimeAssigned = dto.DateTimeAssigned,
                         EstablishmentId = dto.EstablishmentId,
-                        PersonId = existPerson.Id
+                        PersonId = existPerson.Id,
+                        Active = true,
                     };
 
                     var existingAppointmentCreated = await _data.AddAsync(existingAppointment);
                     return _mapper.Map<AppointmentSelectDto>(existingAppointmentCreated);
                 }
+                
+                var newPerson = new Person
+                {
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                    Document = dto.Document,
+                    Address = dto.Address,
+                    Phone = dto.Phone,
+                    CityId = dto.CityId,
+                };
 
-                var personCreate = await _dataPerson.AddAsync(_mapper.Map<Person>(dto));
+                var personCreate = await _dataPerson.AddAsync(newPerson);
 
-                var newAppointment = await _data.AddAsync(_mapper.Map<Appointment>(dto));
+                var userCreate = await _userRepository.EnsureUserForPersonAsync(personCreate.Id, dto.Email);
+                await _emailService.SendTemporaryPasswordAsync(dto.Email, dto.FirstName, userCreate.tempPassword);
+
+                var newAppointment = new Appointment  
+                {
+                    Description = dto.Description,
+                    RequestDate = dto.RequestDate,
+                    DateTimeAssigned = dto.DateTimeAssigned,
+                    EstablishmentId = dto.EstablishmentId,
+                    PersonId = personCreate.Id,
+                    Active = true,
+                };
+
+                var appoitmentCreate = await _data.AddAsync(newAppointment);
 
                 return _mapper.Map<AppointmentSelectDto>(newAppointment);
             }
@@ -80,5 +111,6 @@ namespace Business.Services.Business
             }
 
         }
+
     }
 }

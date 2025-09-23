@@ -10,25 +10,31 @@ import {
 } from '../../models/establishment.models';
 
 export interface GetAllOptions {
-  /** Si true, trae sólo activos; si no se envía, trae todos (Any). */
+  /** Si true, trae solo activos; si no se envia, trae todos (Any). */
   activeOnly?: boolean;
+  /** Limite maximo de registros a solicitar. */
+  limit?: number;
 }
 
 @Injectable({ providedIn: 'root' })
 export class EstablishmentService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiURL}/Establishments`;
+  private readonly defaultLimit = environment.establishmentsDefaultLimit;
 
   // Consultas
 
   /**
    * Obtener establecimientos:
-   * - sin opciones -> todos (Any)
-   * - { activeOnly: true } -> sólo activos
+   * - sin opciones -> aplica limite por defecto (si existe) y trae todos (Any)
+   * - { activeOnly: true } -> solo activos
+   * - { limit: 25 } -> limita la respuesta
    */
   getAll(options?: GetAllOptions): Observable<EstablishmentSelect[]> {
     let params = new HttpParams();
+    const limit = options?.limit ?? this.defaultLimit ?? undefined;
     if (options?.activeOnly) params = params.set('activeOnly', 'true');
+    if (typeof limit === 'number' && limit > 0) params = params.set('limit', limit.toString());
     return this.http.get<EstablishmentSelect[]>(this.baseUrl, { params });
   }
 
@@ -43,12 +49,23 @@ export class EstablishmentService {
   getCardsActive(): Observable<EstablishmentCard[]> { return this.getCards({ activeOnly: true }); }
 
   /** Conveniencias explícitas (opcionales) */
-  getAllAny(): Observable<EstablishmentSelect[]> {
-    return this.getAll(); // Any
+  getAllAny(limit?: number): Observable<EstablishmentSelect[]> {
+    return this.getAll({ limit }); // Any
   }
 
-  getAllActive(): Observable<EstablishmentSelect[]> {
-    return this.getAll({ activeOnly: true });
+  getAllActive(limit?: number): Observable<EstablishmentSelect[]> {
+    return this.getAll({ activeOnly: true, limit });
+  }
+
+  /**
+   * Obtener establecimientos por plaza.
+   */
+  getByPlaza(plazaId: number, options?: GetAllOptions): Observable<EstablishmentSelect[]> {
+    let params = new HttpParams();
+    const limit = options?.limit ?? this.defaultLimit ?? undefined;
+    if (options?.activeOnly) params = params.set('activeOnly', 'true');
+    if (typeof limit === 'number' && limit > 0) params = params.set('limit', limit.toString());
+    return this.http.get<EstablishmentSelect[]>(`${this.baseUrl}/plaza/${plazaId}`, { params });
   }
 
   /** Detalle (puedes reutilizar activeOnly si tu backend lo soporta) */

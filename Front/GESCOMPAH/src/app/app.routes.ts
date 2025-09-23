@@ -18,7 +18,7 @@ export const routes: Routes = [
 
   // Área privada
   {
-    path: 'admin',
+    path: '',
     component: LayoutComponent,
     canActivate: [authGuard],
     children: [
@@ -33,7 +33,6 @@ export const routes: Routes = [
         path: 'establishments',
         loadChildren: () => import('./features/establishments/establishments.routes').then(m => m.ESTABLISHMENTS_ROUTES),
         title: 'Establecimientos',
-        // data: { roles: ['Administrador'] }, // si necesitas filtrar por rol/permiso con otro guard
       },
       {
         path: 'tenants',
@@ -54,7 +53,6 @@ export const routes: Routes = [
         path: 'security',
         loadChildren: () => import('./features/security/security.routes').then(m => m.SECURITY_ROUTES),
         title: 'Seguridad',
-        // data: { permissions: ['AdministrarSeguridad'] },
       },
       {
         path: 'settings',

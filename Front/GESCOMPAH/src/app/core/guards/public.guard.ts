@@ -8,10 +8,11 @@ export const publicGuard: CanActivateFn = (route, state) => {
 
   // Si ya hay usuario en memoria, redirige al dashboard
   if (userStore.snapshot) {
-    router.navigate(['/admin/dashboard'], { replaceUrl: true });
+    router.navigate(['/dashboard'], { replaceUrl: true });
     return false;
   }
 
   // Si no hay usuario, puede acceder a ruta pública (ej: login, register)
   return true;
 };
+

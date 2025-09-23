@@ -1,35 +1,91 @@
-using FluentValidation;
+﻿using System;
+using System.Text.RegularExpressions;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
+using FluentValidation;
 
 namespace Entity.DTOs.Validations.Establishment
 {
     public class EstablishmentUpdateDtoValidator : AbstractValidator<EstablishmentUpdateDto>
     {
+        private const int NameMaxLength = 100;
+        private const int DescriptionMaxLength = 500;
+        private const int AddressMaxLength = 150;
+        private static readonly Regex AddressRegex = new(@"^[\p{L}\p{M}\d\s#\-,.]+$", RegexOptions.Compiled);
+
         public EstablishmentUpdateDtoValidator()
         {
-            RuleFor(x => x.Id)
-                .GreaterThan(0).WithMessage("El Id debe ser mayor a 0.");
+            RuleFor(x => x)
+                .Cascade(CascadeMode.Stop)
+                .Custom((dto, context) =>
+                {
+                    if (dto is null)
+                    {
+                        context.AddFailure("Establishment", "Payload inválido.");
+                        return;
+                    }
 
-            RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("El nombre es obligatorio.")
-                .MaximumLength(200).WithMessage("El nombre no puede exceder 200 caracteres.");
+                    if (dto.Id <= 0)
+                        context.AddFailure(nameof(dto.Id), "El identificador es obligatorio.");
 
-            RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("La descripción es obligatoria.")
-                .MaximumLength(1000).WithMessage("La descripción no puede exceder 1000 caracteres.");
+                    var (name, nameError) = ValidateRequiredText(dto.Name, NameMaxLength);
+                    if (nameError is not null) context.AddFailure(nameof(dto.Name), nameError);
+                    dto.Name = name;
 
-            RuleFor(x => x.Address)
-                .NotEmpty().WithMessage("La dirección es obligatoria.")
-                .MaximumLength(200).WithMessage("La dirección no puede exceder 200 caracteres.");
+                    var (description, descriptionError) = ValidateRequiredText(dto.Description, DescriptionMaxLength);
+                    if (descriptionError is not null) context.AddFailure(nameof(dto.Description), descriptionError);
+                    dto.Description = description;
 
-            RuleFor(x => x.AreaM2)
-                .GreaterThanOrEqualTo(0).WithMessage("El área debe ser mayor o igual a 0.");
+                    var (address, addressError) = ValidateOptionalAddress(dto.Address);
+                    if (addressError is not null) context.AddFailure(nameof(dto.Address), addressError);
+                    dto.Address = address;
 
-            RuleFor(x => x.RentValueBase)
-                .GreaterThanOrEqualTo(0).WithMessage("El valor de renta no puede ser negativo.");
+                    var areaError = ValidateDecimal(dto.AreaM2, 1m, 1_000_000m);
+                    if (areaError is not null) context.AddFailure(nameof(dto.AreaM2), areaError);
 
-            RuleFor(x => x.PlazaId)
-                .GreaterThan(0).WithMessage("Debe seleccionar una plaza válida.");
+                    var rentError = ValidateDecimal(dto.RentValueBase, 1m, 9_999_999.99m);
+                    if (rentError is not null) context.AddFailure(nameof(dto.RentValueBase), rentError);
+
+                    var uvtError = ValidateDecimal(dto.UvtQty, 1m, 9_999m);
+                    if (uvtError is not null) context.AddFailure(nameof(dto.UvtQty), uvtError);
+
+                    if (dto.PlazaId <= 0)
+                        context.AddFailure(nameof(dto.PlazaId), "Debes seleccionar una plaza válida.");
+                });
         }
+
+        private static (string Sanitized, string? Error) ValidateRequiredText(string? value, int maxLength)
+        {
+            var trimmed = (value ?? string.Empty).Trim();
+            if (string.IsNullOrEmpty(trimmed))
+                return (trimmed, "Este campo es obligatorio.");
+            if (trimmed.Length > maxLength)
+                return (trimmed, $"No puede superar {maxLength} caracteres.");
+            return (trimmed, null);
+        }
+
+        private static (string Sanitized, string? Error) ValidateOptionalAddress(string? value)
+        {
+            var trimmed = (value ?? string.Empty).Trim();
+            if (string.IsNullOrEmpty(trimmed))
+                return (string.Empty, null);
+            if (trimmed.Length > AddressMaxLength)
+                return (trimmed, $"La dirección no puede superar {AddressMaxLength} caracteres.");
+            if (!AddressRegex.IsMatch(trimmed))
+                return (trimmed, "La dirección contiene caracteres no permitidos.");
+            return (trimmed, null);
+        }
+
+        private static string? ValidateDecimal(decimal value, decimal min, decimal max)
+        {
+            if (value < min)
+                return $"El valor debe ser mayor o igual a {min}.";
+            if (value > max)
+                return $"El valor no puede superar {max}.";
+            if (GetScale(value) > 2)
+                return "Solo se permiten hasta 2 decimales.";
+            return null;
+        }
+
+        private static int GetScale(decimal value) => (decimal.GetBits(value)[3] >> 16) & 0x7F;
     }
 }

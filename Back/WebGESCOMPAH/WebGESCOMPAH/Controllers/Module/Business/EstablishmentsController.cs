@@ -1,4 +1,4 @@
-﻿using Business.Interfaces.Implements.Business;
+using Business.Interfaces.Implements.Business;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,21 +20,37 @@ namespace WebGESCOMPAH.Controllers.Module.Business
 
         /// <summary>
         /// Obtener establecimientos. 
-        /// Usa ?activeOnly=true para traer solo activos; por defecto trae todos (activos e inactivos).
+        /// Usa ?activeOnly=true para traer solo activos; por defecto trae todos (activos e inactivos). Usa ?limit=10 para limitar la cantidad de registros.
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EstablishmentSelectDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<EstablishmentSelectDto>>> GetAll([FromQuery] bool activeOnly = false)
+        public async Task<ActionResult<IEnumerable<EstablishmentSelectDto>>> GetAll([FromQuery] bool activeOnly = false, [FromQuery] int? limit = null)
         {
             var result = activeOnly
-                ? await _establishmentService.GetAllActiveAsync()
-                : await _establishmentService.GetAllAnyAsync();
+                ? await _establishmentService.GetAllActiveAsync(limit)
+                : await _establishmentService.GetAllAnyAsync(limit);
 
             return Ok(result);
         }
 
         /// <summary>
-        /// Listado liviano para tarjetas/grillas. Incluye PrimaryImagePath pero no la colección completa de imágenes.
+        /// Obtener establecimientos de una plaza. Usa ?activeOnly=true para traer solo activos y ?limit=10 para limitar resultados.
+        /// </summary>
+        [HttpGet("plaza/{plazaId:int}")]
+        [ProducesResponseType(typeof(IEnumerable<EstablishmentSelectDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<EstablishmentSelectDto>>> GetByPlaza(int plazaId, [FromQuery] bool activeOnly = false, [FromQuery] int? limit = null)
+        {
+            if (plazaId <= 0)
+                return BadRequest(new { plazaId = new[] { "El plazaId debe ser mayor a 0." } });
+
+            var result = await _establishmentService.GetByPlazaIdAsync(plazaId, activeOnly, limit);
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// Listado liviano para tarjetas/grillas. Incluye PrimaryImagePath pero no la coleccion completa de imagenes.
         /// </summary>
         [HttpGet("cards")]
         [ProducesResponseType(typeof(IEnumerable<EstablishmentCardDto>), StatusCodes.Status200OK)]
@@ -63,7 +79,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             return Ok(result);
         }
 
-        /// <summary>Crear un establecimiento (JSON puro; SIN imágenes).</summary>
+        /// <summary>Crear un establecimiento (JSON puro; SIN imagenes).</summary>
         [HttpPost]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(EstablishmentSelectDto), StatusCodes.Status201Created)]
@@ -74,7 +90,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
-        /// <summary>Actualizar un establecimiento (JSON puro; imágenes aparte).</summary>
+        /// <summary>Actualizar un establecimiento (JSON puro; imagenes aparte).</summary>
         [HttpPut("{id:int}")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(EstablishmentSelectDto), StatusCodes.Status200OK)]
@@ -93,7 +109,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
             return Ok(updated);
         }
 
-        /// <summary>Eliminar (borrado lógico).</summary>
+        /// <summary>Eliminar (borrado logico).</summary>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -105,7 +121,7 @@ namespace WebGESCOMPAH.Controllers.Module.Business
         }
 
         /// <summary>
-        /// (Opcional) Obtener datos básicos por IDs para sumatorias (RentValueBase, UvtQty).
+        /// (Opcional) Obtener datos basicos por IDs para sumatorias (RentValueBase, UvtQty).
         /// </summary>
         [HttpPost("basics")]
         [Consumes("application/json")]

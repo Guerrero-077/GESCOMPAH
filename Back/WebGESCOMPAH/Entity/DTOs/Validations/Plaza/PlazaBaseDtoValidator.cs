@@ -1,26 +1,42 @@
-using FluentValidation;
+﻿using System.Text.RegularExpressions;
 using Entity.DTOs.Implements.Business.Plaza;
+using FluentValidation;
 
 namespace Entity.DTOs.Validations.Plaza
 {
     public abstract class PlazaBaseDtoValidator<T> : AbstractValidator<T> where T : IPlazaDto
     {
-        public PlazaBaseDtoValidator()
+        private const int NameMaxLength = 200;
+        private const int DescriptionMaxLength = 1000;
+        private const int LocationMaxLength = 200;
+        private static readonly Regex AllowedLocationRegex = new(@"^[\p{L}\p{M}\d\s#\-,.]+$", RegexOptions.Compiled);
+
+        protected PlazaBaseDtoValidator()
         {
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("El nombre es obligatorio.")
-                .MaximumLength(200);
+                .Cascade(CascadeMode.Stop)
+                .Must(NotBlank)
+                    .WithMessage("El nombre es obligatorio.")
+                .Must(value => value!.Trim().Length <= NameMaxLength)
+                    .WithMessage($"El nombre no puede superar {NameMaxLength} caracteres.");
 
             RuleFor(x => x.Description)
-                .NotEmpty().WithMessage("La descripción es obligatoria.")
-                .MaximumLength(1000);
+                .Cascade(CascadeMode.Stop)
+                .Must(NotBlank)
+                    .WithMessage("La descripcion es obligatoria.")
+                .Must(value => value!.Trim().Length <= DescriptionMaxLength)
+                    .WithMessage($"La descripcion no puede superar {DescriptionMaxLength} caracteres.");
 
             RuleFor(x => x.Location)
-                .NotEmpty().WithMessage("La ubicación es obligatoria.")
-                .MaximumLength(200);
-
-            //RuleFor(x => x.Capacity)
-            //    .GreaterThanOrEqualTo(0).WithMessage("La capacidad no puede ser negativa.");
+                .Cascade(CascadeMode.Stop)
+                .Must(NotBlank)
+                    .WithMessage("La ubicacion es obligatoria.")
+                .Must(value => value!.Trim().Length <= LocationMaxLength)
+                    .WithMessage($"La ubicacion no puede superar {LocationMaxLength} caracteres.")
+                .Must(value => AllowedLocationRegex.IsMatch(value!.Trim()))
+                    .WithMessage("La ubicacion contiene caracteres no permitidos.");
         }
+
+        private static bool NotBlank(string? value) => !string.IsNullOrWhiteSpace(value);
     }
 }

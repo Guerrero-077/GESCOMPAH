@@ -60,7 +60,8 @@ namespace Business.Mapping
             // Appointment
             config.NewConfig<Appointment, AppointmentSelectDto>()
                     .Map(dest => dest.EstablishmentName, src => src.Establishment.Name)
-                    .Map(dest => dest.PersonName, src => src.Person.FirstName);
+                    .Map(dest => dest.PersonName, src => src.Person.FirstName)
+                    .Map(dest => dest.Phone, src => src.Person.Phone);
 
             config.NewConfig<Person, AppointmentCreateDto>()
                 .Ignore(dest => dest.Description)
@@ -74,7 +75,7 @@ namespace Business.Mapping
                 .Ignore(dest => dest.Document)
                 .Ignore(dest => dest.Address)
                 .Ignore(dest => dest.Phone)
-                .Ignore(dest => dest.cityId);
+                .Ignore(dest => dest.CityId);
 
             
 

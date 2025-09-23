@@ -67,19 +67,11 @@ function appendDefaultTldIfNeeded(email: string, defaultTld = '.com'): string {
   standalone: true,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [IonNote, IonLabel, IonCardContent, IonCardSubtitle, IonCardTitle, IonCardHeader, IonCard, IonImg, IonCol, IonRow, IonGrid,
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    // Ionic standalone
-    IonContent,
-    IonLoading,
-    IonAlert,
-    IonButton,
-    IonItem,
-    IonInput,
-    IonText,
-    IonIcon,
+  imports: [
+    IonNote, IonLabel, IonCardContent, IonCardSubtitle, IonCardTitle, IonCardHeader, IonCard,
+    IonImg, IonCol, IonRow, IonGrid,
+    CommonModule, ReactiveFormsModule, RouterModule,
+    IonContent, IonLoading, IonAlert, IonButton, IonItem, IonInput, IonText, IonIcon,
   ],
 })
 export class LoginComponent implements OnInit {
@@ -101,8 +93,7 @@ export class LoginComponent implements OnInit {
       email: 'Ingresa un correo válido (ej. usuario&#64;dominio.com).',
       maxlength: 'El correo no puede superar 254 caracteres.',
       onlySpaces: 'El correo no puede ser solo espacios.',
-      pattern:
-        'Ingresa un correo completo con dominio y TLD (ej. usuario&#64;dominio.com).',
+      pattern: 'Ingresa un correo completo con dominio y TLD (ej. usuario&#64;dominio.com).',
     },
     password: {
       required: 'La contraseña es obligatoria.',
@@ -134,12 +125,8 @@ export class LoginComponent implements OnInit {
     }),
   });
 
-  get emailCtrl() {
-    return this.formLogin.get('email')!;
-  }
-  get passwordCtrl() {
-    return this.formLogin.get('password')!;
-  }
+  get emailCtrl() { return this.formLogin.get('email')!; }
+  get passwordCtrl() { return this.formLogin.get('password')!; }
 
   isInvalid(control: AbstractControl | null): boolean {
     return !!control && control.invalid && (control.dirty || control.touched);
@@ -156,21 +143,21 @@ export class LoginComponent implements OnInit {
   }
 
   constructor() {}
-
   ngOnInit(): void {}
 
   togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;
   }
 
+  // 👇 Ahora loguea el /me en consola
   me() {
     this.auth.GetMe().subscribe({
-      next: () => {},
+      next: (user) => {
+        console.log('[GET /auth/me] → user:', user);
+      },
       error: (err) => {
-        this.showIonAlert(
-          'Oops...',
-          err?.message ?? 'Error inesperado'
-        );
+        this.showIonAlert('Oops...', err?.message ?? 'Error inesperado');
+        console.error('[GET /auth/me] error:', err);
       },
     });
   }
@@ -184,45 +171,45 @@ export class LoginComponent implements OnInit {
     }
   }
 
-// estado del loading
-showLoading = false;
+  // estado del loading
+  showLoading = false;
 
-login() {
-  if (this.formLogin.invalid) {
-    this.formLogin.markAllAsTouched();
-    const fixed = appendDefaultTldIfNeeded(
-      (this.emailCtrl.value ?? '').toLowerCase().trim(),
-      '.com'
-    );
-    if (fixed !== this.emailCtrl.value) {
-      this.emailCtrl.setValue(fixed, { emitEvent: false });
-      this.emailCtrl.updateValueAndValidity();
+  login() {
+    if (this.formLogin.invalid) {
+      this.formLogin.markAllAsTouched();
+      const fixed = appendDefaultTldIfNeeded(
+        (this.emailCtrl.value ?? '').toLowerCase().trim(),
+        '.com'
+      );
+      if (fixed !== this.emailCtrl.value) {
+        this.emailCtrl.setValue(fixed, { emitEvent: false });
+        this.emailCtrl.updateValueAndValidity();
+      }
+      if (this.formLogin.invalid) return;
     }
-    if (this.formLogin.invalid) return;
+
+    let email = (this.emailCtrl.value ?? '').toLowerCase().trim();
+    email = appendDefaultTldIfNeeded(email, '.com');
+    const password = this.passwordCtrl.value ?? '';
+
+    // mostrar spinner
+    this.showLoading = true;
+
+    this.auth.Login({ email, password }).subscribe({
+      next: (user) => {
+        console.log('[POST /auth/login] OK → luego /me:', user);
+        this.showLoading = false; // cierra el loading
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 100);
+      },
+      error: (err) => {
+        this.showLoading = false;
+        this.showIonAlert('Oops...', err?.error?.message ?? 'Credenciales inválidas');
+        console.error('[POST /auth/login] error:', err);
+      },
+    });
   }
-
-  let email = (this.emailCtrl.value ?? '').toLowerCase().trim();
-  email = appendDefaultTldIfNeeded(email, '.com');
-  const password = this.passwordCtrl.value ?? '';
-
-  // mostrar spinner
-  this.showLoading = true;
-
-  this.auth.Login({ email, password }).subscribe({
-    next: () => {
-      this.showLoading = false; // 👈 cierra manualmente
-      setTimeout(() => {
-        this.router.navigate(['/home']); // ✅ navegación luego de cerrar
-      }, 100); // delay corto para asegurar que se cierre el ion-loading
-    },
-    error: (err) => {
-      this.showLoading = false;
-      this.showIonAlert('Oops...', err?.error?.message ?? 'Credenciales inválidas');
-    },
-  });
-
-}
-
 
   /** Muestra un ion-alert */
   private showIonAlert(header: string, message: string) {

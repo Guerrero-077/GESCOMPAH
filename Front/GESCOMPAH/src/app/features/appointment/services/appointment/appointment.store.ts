@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, tap, catchError, throwError, Observable } from "rxjs";
-import { AppointmentCreateModel, AppointmentSelect, AppointmentSelectModel, AppointmentUpdateModel } from "../../models/appointment.models";
+import { AppointmentCreateModel, AppointmentSelect, AppointmentUpdateModel } from "../../models/appointment.models";
 import { AppointmentService } from "./appointment.service";
 
 @Injectable({
@@ -31,6 +31,11 @@ export class AppointmentStore {
       })
     ).subscribe();
   }
+
+  loadById(id : number): AppointmentSelect | undefined {
+    return this.appointment.find(c => c.id === id);
+  }
+
 
   create(form: AppointmentCreateModel): Observable<AppointmentSelect> {
     return this.appointmentService.create(form).pipe(

@@ -200,7 +200,7 @@ export class RolUserComponent implements OnInit {
 
   // DELETE
   async onDelete(row: RolUserSelectModel) {
-    const confirmed = await this.sweetAlertService.showConfirm(
+    const result = await this.sweetAlertService.showConfirm(
       'Eliminar Asignación Rol-Usuario',
       `¿Deseas eliminar el rol "${row.rolName}" del usuario "${row.userEmail}"?`,
       'Eliminar',
@@ -208,7 +208,7 @@ export class RolUserComponent implements OnInit {
       'warning'
     );
 
-    if (confirmed) {
+    if (result.isConfirmed) {
       this.rolUserService.deleteLogic(row.id).subscribe({
         next: () => {
           this.load()

@@ -116,15 +116,15 @@ export class EstablishmentStore {
 
   // I/O (async; el servicio hace HTTP)
   /** Carga inicial; si quieres filtrar en el backend, ajusta aquí. */
-  async loadAll(): Promise<void> {
+  async loadAll(options?: { limit?: number }): Promise<void> {
     this._loading.set(true);
     this._error.set(null);
     try {
       // Si prefieres mantener endpoints separados:
       // const obs = this._activeOnlyView() ? this.svc.getAllActive() : this.svc.getAllAny();
       // const data = await firstValueFrom(obs);
-      // Recomendación: trae "todo" y filtra en 'view' (reduce acoplamiento):
-      const data = await firstValueFrom(this.svc.getAllAny());
+      // Recomendación: trae "todo" (opcionalmente limitado) y filtra en 'view' (reduce acoplamiento):
+      const data = await firstValueFrom(this.svc.getAllAny(options?.limit));
       this.setAll(data ?? []);
     } catch (e: any) {
       this._error.set(String(e?.message ?? e));

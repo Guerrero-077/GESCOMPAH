@@ -93,14 +93,14 @@ export class PermissionComponent implements OnInit {
 
   // Eliminar (lógico)
   async onDelete(row: PermissionSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.showConfirm(
+    const result = await this.sweetAlert.showConfirm(
       'Eliminar permiso',
       `¿Deseas eliminar el permiso "${row.name}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
     );
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     this.permissionStore.deleteLogic(row.id).pipe(take(1)).subscribe({
       next: () => this.sweetAlertService.showNotification('Eliminación Exitosa', 'Permiso eliminado exitosamente.', 'success'),

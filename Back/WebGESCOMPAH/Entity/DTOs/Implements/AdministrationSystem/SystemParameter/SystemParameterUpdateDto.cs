@@ -2,7 +2,7 @@
 
 namespace Entity.DTOs.Implements.AdministrationSystem.SystemParameter
 {
-    public class SystemParameterUpdateDto : BaseDto
+    public class SystemParameterUpdateDto : BaseDto, ISystemParameterDto
     {
         public string Key { get; set; }  = null!;
         public string Value { get; set; } = null!;
@@ -10,3 +10,4 @@ namespace Entity.DTOs.Implements.AdministrationSystem.SystemParameter
         public DateTime? EffectiveTo { get; set; }
     }
 }
+

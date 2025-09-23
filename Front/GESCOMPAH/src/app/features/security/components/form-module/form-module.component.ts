@@ -230,14 +230,14 @@ export class FormModuleComponent implements OnInit {
 
   // Eliminar
   async onDelete(row: FormModuleSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.showConfirm(
+    const result = await this.sweetAlert.showConfirm(
       'Eliminar relación Form–Module',
       `¿Eliminar el formulario "${row.formName}" del módulo "${row.moduleName}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
     );
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     this.formModuleService.delete(row.id).pipe(take(1)).subscribe({
       next: () => {

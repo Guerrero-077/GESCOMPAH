@@ -169,8 +169,8 @@ export class ContractsListComponent implements OnInit, OnDestroy {
   }
 
   async onDelete(row: ContractCard): Promise<void> {
-    const ok = await this.toast.showConfirm('Eliminar contrato', `¿Deseas eliminar el contrato de "${row.personFullName}"?`, 'Eliminar', 'Cancelar');
-    if (!ok) return;
+    const result = await this.toast.showConfirm('Eliminar contrato', `¿Deseas eliminar el contrato de "${row.personFullName}"?`, 'Eliminar', 'Cancelar');
+    if (!result.isConfirmed) return;
 
     try {
       await this.store.delete(row.id);

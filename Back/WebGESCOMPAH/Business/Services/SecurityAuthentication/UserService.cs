@@ -188,5 +188,40 @@ namespace Business.Services.SecurityAuthentication
             return result;
         }
 
+        public async Task<(int userId, bool created, string? tempPassword)> EnsureUserForPersonAsync(int personId, string email)
+        {
+            if (personId <= 0)
+                throw new BusinessException("PersonId invalido.");
+
+            if (string.IsNullOrWhiteSpace(email))
+                throw new BusinessException("El correo es requerido.");
+
+            var normalizedEmail = email.Trim();
+
+            var existing = await _userRepository.GetByPersonIdAsync(personId);
+            if (existing is not null)
+                return (existing.Id, false, null);
+
+            if (await _userRepository.ExistsByEmailAsync(normalizedEmail))
+                throw new BusinessException("El correo ya esta registrado.");
+
+            if (await _personRepository.GetByIdAsync(personId) is null)
+                throw new BusinessException("Persona no encontrada para crear el usuario.");
+
+            var tempPassword = PasswordGenerator.Generate(12);
+
+            var user = new User
+            {
+                Email = normalizedEmail,
+                PersonId = personId
+            };
+
+            user.Password = _passwordHasher.HashPassword(user, tempPassword);
+
+            await _userRepository.AddAsync(user);
+            await _rolUserRepository.AsignateRolDefault(user);
+
+            return (user.Id, true, tempPassword);
+        }
     }
 }

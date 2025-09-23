@@ -14,11 +14,30 @@ public class EstablishmentsControllerTests
     [Fact]
     public async Task GetAll_ActiveOnly_UsesActiveService()
     {
-        _svc.Setup(s => s.GetAllActiveAsync()).ReturnsAsync(new List<EstablishmentSelectDto> { new() { Id = 1 } });
+        _svc.Setup(s => s.GetAllActiveAsync(It.IsAny<int?>())).ReturnsAsync(new List<EstablishmentSelectDto> { new() { Id = 1 } });
         var res = await Create().GetAll(activeOnly: true);
         var ok = Assert.IsType<OkObjectResult>(res.Result);
         var list = Assert.IsAssignableFrom<IEnumerable<EstablishmentSelectDto>>(ok.Value);
         Assert.Single(list);
+    }
+
+    [Fact]
+    public async Task GetByPlaza_ReturnsBadRequest_WhenPlazaIdInvalid()
+    {
+        var res = await Create().GetByPlaza(0, activeOnly: false, limit: null);
+        Assert.IsType<BadRequestObjectResult>(res.Result);
+    }
+
+    [Fact]
+    public async Task GetByPlaza_ReturnsItems()
+    {
+        var list = new List<EstablishmentSelectDto> { new() { Id = 1 } };
+        _svc.Setup(s => s.GetByPlazaIdAsync(5, false, null)).ReturnsAsync(list);
+
+        var res = await Create().GetByPlaza(5, activeOnly: false, limit: null);
+        var ok = Assert.IsType<OkObjectResult>(res.Result);
+        var payload = Assert.IsAssignableFrom<IEnumerable<EstablishmentSelectDto>>(ok.Value);
+        Assert.Single(payload);
     }
 
     [Fact]

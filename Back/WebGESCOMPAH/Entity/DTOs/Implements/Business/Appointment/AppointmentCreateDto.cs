@@ -15,7 +15,9 @@ namespace Entity.DTOs.Implements.Business.Appointment
 
         public string? Phone { get; set; }
 
-        public int cityId { get; set; }
+        public string Email { get; set; }
+
+        public int CityId { get; set; }
 
         // Data necesaria para crea la cita
 
@@ -28,5 +30,7 @@ namespace Entity.DTOs.Implements.Business.Appointment
         //public int PersonId { get; set; }
 
         public int EstablishmentId { get; set; }
+
+        public bool Active { get; set; }
     }
 }

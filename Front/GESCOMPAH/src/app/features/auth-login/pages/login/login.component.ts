@@ -166,13 +166,17 @@ export class LoginComponent implements OnInit {
     this.auth.Login({ email, password }).subscribe({
       next: () => {
         this.sweetAlertService.hideLoading();
-        this.router.navigate(['/admin/dashboard']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.sweetAlertService.hideLoading();
+        let message = err?.error?.message ?? 'Credenciales inválidas';
+        if (err.status === 401) {
+          message = 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.';
+        }
         this.sweetAlertService.showNotification(
           'Oops...',
-          err?.error?.message ?? 'Credenciales inválidas',
+          message,
           'error'
         );
       }

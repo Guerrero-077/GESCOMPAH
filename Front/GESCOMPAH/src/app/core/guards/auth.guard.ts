@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../service/auth/auth.service';
-import { PermissionService } from '../service/permission/permission.service';
 import { map, of, catchError } from 'rxjs';
 import { UserStore } from '../service/permission/User.Store';
 import { User } from '../../shared/models/user.model';
@@ -11,43 +10,40 @@ export const authGuard: CanActivateFn = (
   state: RouterStateSnapshot
 ) => {
   const authService = inject(AuthService);
-  const permissionService = inject(PermissionService);
   const userStore = inject(UserStore);
   const router = inject(Router);
 
   const check = (profile: User) => {
-    if (!profile.roles) {
+    if (!profile || !profile.menu) {
       router.navigate(['/auth/login']);
       return false;
     }
 
-    if (!route.data) {
-      return true; // No requirements, allow access
+    const allowedRoutes = profile.menu.flatMap(module => module.forms.map(form => form.route));
+    
+    const requestedRoute = state.url.split('?')[0].substring(1); // remove leading '/'
+
+    if (requestedRoute === '') {
+        if (allowedRoutes.includes('dashboard')) {
+            return true;
+        }
     }
 
-    // --- Role Check ---
-    const requiredRoles = route.data['roles'] as string[] | undefined;
-    if (requiredRoles?.length) {
-      const hasRole = requiredRoles.some(role => permissionService.userHasRole(profile, role));
-      if (!hasRole) {
-        router.navigate(['/admin/dashboard']); // Or a dedicated 'unauthorized' page
-        return false;
-      }
+    const urlSegments = requestedRoute.split('/');
+    let currentRouteToCheck = '';
+    for (let i = 0; i < urlSegments.length; i++) {
+        currentRouteToCheck += (i > 0 ? '/' : '') + urlSegments[i];
+        if (allowedRoutes.includes(currentRouteToCheck)) {
+            return true;
+        }
     }
 
-    // --- Permission Check ---
-    const requiredPermissions = route.data['permissions'] as string[] | undefined;
-    if (requiredPermissions?.length) {
-      const hasPermission = requiredPermissions.every(p =>
-        permissionService.userHasPermissionForRoute(profile, p, state.url)
-      );
-      if (!hasPermission) {
-        router.navigate(['/admin/dashboard']); // Or a dedicated 'unauthorized' page
-        return false;
-      }
+    if (allowedRoutes.includes('dashboard')) {
+      router.navigate(['/dashboard']);
+    } else {
+      router.navigate(['/auth/login']);
     }
-
-    return true;
+    return false;
   };
 
   const currentUser = userStore.snapshot;

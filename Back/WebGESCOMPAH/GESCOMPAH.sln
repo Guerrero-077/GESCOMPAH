@@ -5,8 +5,6 @@ VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entity", "Entity\Entity.csproj", "{4A320A8B-A597-44C7-A80B-F4ED529BB8F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diagrama", "Diagrama\Diagrama.csproj", "{B82D6C63-777C-4C3B-9484-E80DFA1FC803}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business", "Business\Business.csproj", "{FB5654F1-D39D-4F4C-9129-34303F210FFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{DAD8A014-FFCD-401E-8D6F-F06790934732}"
@@ -29,9 +27,6 @@ Global
 		{4A320A8B-A597-44C7-A80B-F4ED529BB8F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A320A8B-A597-44C7-A80B-F4ED529BB8F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A320A8B-A597-44C7-A80B-F4ED529BB8F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B82D6C63-777C-4C3B-9484-E80DFA1FC803}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B82D6C63-777C-4C3B-9484-E80DFA1FC803}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B82D6C63-777C-4C3B-9484-E80DFA1FC803}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB5654F1-D39D-4F4C-9129-34303F210FFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB5654F1-D39D-4F4C-9129-34303F210FFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB5654F1-D39D-4F4C-9129-34303F210FFC}.Release|Any CPU.ActiveCfg = Release|Any CPU

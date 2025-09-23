@@ -1,6 +1,6 @@
 ﻿namespace Entity.DTOs.Implements.Business.ObligationMonth
 {
-    public class ObligationMonthDto
+    public class ObligationMonthDto : IObligationMonthDto
     {
         public int ContractId { get; set; }
         public int Year { get; set; }

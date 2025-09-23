@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
+import { DocumentFormatDirective } from '../../../../shared/directives/document-format/document-format.directive';
 import { BehaviorSubject, catchError, distinctUntilChanged, finalize, map, of, switchMap, tap } from 'rxjs';
 
 import { RoleSelectModel } from '../../../security/models/role.models';
@@ -44,7 +45,8 @@ import { CatalogsMapperService } from '../../../../shared/Services/mappers/catal
     MatButtonModule,
     MatIconModule,
     MatStepperModule,
-    StandardButtonComponent
+    StandardButtonComponent,
+    DocumentFormatDirective
   ],
   templateUrl: './tenants-form-dialog.component.html',
   styleUrls: ['./tenants-form-dialog.component.css'],
@@ -310,3 +312,4 @@ export class TenantsFormDialogComponent implements OnInit {
     return this.errMsg.firstError(control, order);
   }
 }
+

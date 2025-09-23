@@ -167,7 +167,7 @@ export class UserComponent implements OnInit {
 
   // ----- DELETE (soft delete) -----
   async onDelete(row: UserSelectModel) {
-    const confirmed = await this.sweetAlertService.showConfirm(
+    const result = await this.sweetAlertService.showConfirm(
       'Eliminar Usuario',
       `¿Deseas eliminar al usuario "${row.personName}"?`,
       'Eliminar',
@@ -175,7 +175,7 @@ export class UserComponent implements OnInit {
       'warning'
     );
 
-    if (confirmed) {
+    if (result.isConfirmed) {
       this.userStore.deleteLogic(row.id).subscribe({
         next: () => {
           this.sweetAlertService.showNotification(

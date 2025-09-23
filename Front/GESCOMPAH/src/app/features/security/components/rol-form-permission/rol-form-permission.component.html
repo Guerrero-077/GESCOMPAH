@@ -1,16 +1,19 @@
 <div class="row d-flex justify-content-center">
   <app-generic-table
-    [data]="items$ | async"
-    [columns]="columns"
-    [titulo]="'Roles, Formularios y Permisos '"
-    [subTitulo]="'Gesiones sus Roles, Formularios y Permisos del sistema'"
-    [createButtonLabel]="'Nuevo'"
-    [showViewButton]="false"
-    (edit)="onEdit($event)"
-    (delete)="onDelete($event)"
-    (view)="onView($event)"
-    (create)="onCreateNew()">
-  </app-generic-table>
+  *ngIf="columns"
+  [data]="items$ | async"
+  [columns]="columns"
+  [titulo]="'Roles, Formularios y Permisos '"
+  [subTitulo]="'Gestione sus Roles, Formularios y Permisos del sistema'"
+  [createButtonLabel]="'Nuevo'"
+  [showViewButton]="false"
+  (edit)="onEdit($event)"
+  (delete)="onDelete($event)"
+  (view)="onView($event)"
+  (create)="onCreateNew()"
+>
+</app-generic-table>
+
 
   <!-- Template para mostrar la lista de permisos -->
   <ng-template #permissionsTemplate let-row>

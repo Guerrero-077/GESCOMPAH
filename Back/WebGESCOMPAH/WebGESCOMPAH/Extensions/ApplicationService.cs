@@ -1,15 +1,14 @@
 ﻿using Business.CustomJWT;
 using Business.Interfaces;
-using Business.Interfaces.IBusiness;
 using Business.Interfaces.Implements.AdministrationSystem;
 using Business.Interfaces.Implements.Business;
 using Business.Interfaces.Implements.Location;
 using Business.Interfaces.Implements.Persons;
 using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Interfaces.Implements.Utilities;
+using Business.Interfaces.Notifications;                    // <-- NEW
 using Business.Mapping;
 using Business.Repository;
-using Microsoft.Extensions.DependencyInjection;
 using Business.Services.AdministrationSystem;
 using Business.Services.Business;
 using Business.Services.Location;
@@ -31,17 +30,14 @@ using Data.Services.Location;
 using Data.Services.Persons;
 using Data.Services.SecurityAuthentication;
 using Data.Services.Utilities;
-using Entity.Domain.Models.Implements.Business;
-using Entity.DTOs.Implements.Business.Clause;
-using Entity.Infrastructure.Binder;
 using Mapster;
-using Utilities.Messaging.Implements;
 using Utilities.Messaging.Factories;
+using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
 using WebGESCOMPAH.Infrastructure;
 using WebGESCOMPAH.Middleware;
 using WebGESCOMPAH.Middleware.Handlers;
-using WebGESCOMPAH.Workers;
+using WebGESCOMPAH.RealTime;
 
 namespace WebGESCOMPAH.Extensions
 {
@@ -49,21 +45,18 @@ namespace WebGESCOMPAH.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-
-
             services.AddScoped<IUserMeRepository, MeRepository>();
 
-            //Email (Factory + fachada)
+            // Email (Factory + fachada)
             services.AddSingleton<IEmailServiceFactory, EmailServiceFactory>();
             services.AddTransient<ISendCode, EmailService>();
 
-            //Auth
+            // Auth
             services.AddScoped<IPasswordResetCodeRepository, PasswordResetCodeRepository>();
-            //services.AddScoped<EncriptePassword>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserContextService, UserContextService>();
 
-            //Services
+            // Services
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRolService, RolService>();
@@ -79,29 +72,19 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<ISystemParameterService, SystemParameterService>();
 
-            services.AddScoped<IContractService, ContractService>(); 
+            services.AddScoped<IContractService, ContractService>();
 
             services.AddScoped<IClauseService, ClauseService>();
             services.AddScoped<IContractClauseService, ContractClauseService>();
 
             services.AddScoped<IObligationMonthService, ObligationMonthService>();
 
-
-
-            services.AddHostedService<ContractExpirationWorker>();
-
-
-            //Mapping
-            services.AddMapster();
-            MapsterConfig.Register();
-
-            //services Data
+            // Data genérica
             services.AddScoped(typeof(IDataGeneric<>), typeof(DataGeneric<>));
 
+            // Repositorios
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRolFormPermissionRepository, RolFormPermissionRepository>();
-
-
             services.AddScoped<IEstablishmentsRepository, EstablishmentsRepository>();
             services.AddScoped<IImagesRepository, ImagesRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
@@ -109,66 +92,46 @@ namespace WebGESCOMPAH.Extensions
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IFormModuleRepository, FormModuleRepository>();
-            services.AddScoped<IRolUserRepository,  RolUserRepository>();
+            services.AddScoped<IRolUserRepository, RolUserRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IContractRepository, ContractRepository>();
-            //services.AddScoped<IContractTermsRepository, ContractTermsRepository>();
             services.AddScoped<IPremisesLeasedRepository, PremisesLeasedRepository>();
             services.AddScoped<IObligationMonthRepository, ObligationMonthRepository>();
 
-
-
-
-
-            // JWT 
+            // JWT, UoW, CurrentUser, etc.
             services.AddScoped<IToken, TokenBusiness>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddSingleton<IAuthCookieFactory, AuthCookieFactory>();
             services.AddScoped<Microsoft.AspNetCore.Identity.IPasswordHasher<Entity.Domain.Models.Implements.SecurityAuthentication.User>, Microsoft.AspNetCore.Identity.PasswordHasher<Entity.Domain.Models.Implements.SecurityAuthentication.User>>();
 
             services.AddMemoryCache();
-
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-
-
-
-            //Validaciones
-
+            // Middleware/Excepciones
             services.AddTransient<ExceptionMiddleware>();
-
-
-            // Handlers (elige Singleton/Scoped; Singleton suele bastar)
             services.AddSingleton<IExceptionHandler, ValidationExceptionHandler>();
             services.AddSingleton<IExceptionHandler, BusinessExceptionHandler>();
             services.AddSingleton<IExceptionHandler, EntityNotFoundExceptionHandler>();
-            services.AddSingleton<IExceptionHandler, ForbiddenExceptionHandler>(); 
+            services.AddSingleton<IExceptionHandler, ForbiddenExceptionHandler>();
             services.AddSingleton<IExceptionHandler, UnauthorizedAccessHandler>();
             services.AddSingleton<IExceptionHandler, SecurityTokenExceptionHandler>();
             services.AddSingleton<IExceptionHandler, DbConcurrencyExceptionHandler>();
-            services.AddSingleton<IExceptionHandler, DbUpdateExceptionHandler>();     
-            services.AddSingleton<IExceptionHandler, HttpRequestExceptionHandler>();  
+            services.AddSingleton<IExceptionHandler, DbUpdateExceptionHandler>();
+            services.AddSingleton<IExceptionHandler, HttpRequestExceptionHandler>();
             services.AddSingleton<IExceptionHandler, ExternalServiceExceptionHandler>();
             services.AddSingleton<IExceptionHandler, DefaultExceptionHandler>();
 
+            // Mapster
+            services.AddMapster();
+            MapsterConfig.Register();
 
-            services
-            .AddControllers(options =>
-            {
-                options.ModelBinderProviders.Insert(0, new FlexibleDecimalModelBinderProvider());
-            })
-            .AddJsonOptions(o =>
-            {
-                // por si llega JSON con números como string
-                o.JsonSerializerOptions.NumberHandling =
-                    System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
-            });
+            // Registro de notificaciones: Business -> (impl SignalR en Web)
+            services.AddScoped<IContractNotificationService, SignalRContractNotificationService>();
 
 
             return services;
         }
-
     }
 }

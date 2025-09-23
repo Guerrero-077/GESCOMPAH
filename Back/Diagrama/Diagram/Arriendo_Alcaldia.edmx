@@ -13,634 +13,665 @@
     <edmx:ConceptualModels>
       <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="Model1" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
         <EntityContainer Name="Model1Container" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Rols" EntityType="Model1.Rol" />
-          <EntitySet Name="Users" EntityType="Model1.User" />
-          <EntitySet Name="Permissions" EntityType="Model1.Permission" />
-          <EntitySet Name="Forms" EntityType="Model1.Form" />
-          <EntitySet Name="ModuleForms" EntityType="Model1.ModuleForm" />
-          <EntitySet Name="Modules" EntityType="Model1.Module" />
-          <EntitySet Name="Logs" EntityType="Model1.Log" />
-          <EntitySet Name="ContractSet" EntityType="Model1.Contract" />
-          <EntitySet Name="RolFormPermissionSet" EntityType="Model1.RolFormPermission" />
-          <EntitySet Name="RolUsers" EntityType="Model1.RolUser" />
-          <EntitySet Name="Calculations" EntityType="Model1.Calculation" />
-          <EntitySet Name="PersonSet" EntityType="Model1.Person" />
-          <EntitySet Name="Companys" EntityType="Model1.Company" />
-          <EntitySet Name="Notifications" EntityType="Model1.Notification" />
-          <EntitySet Name="Paremeters" EntityType="Model1.SystemParameter" />
-          <EntitySet Name="DepartamentSet" EntityType="Model1.Departament" />
-          <EntitySet Name="CitySet" EntityType="Model1.City" />
-          <EntitySet Name="MonthlyPaymentSet" EntityType="Model1.MonthlyPayment" />
-          <AssociationSet Name="CityCompany" Association="Model1.CityCompany">
-            <End Role="City" EntitySet="CitySet" />
-            <End Role="Company" EntitySet="Companys" />
+          <EntitySet Name="Appointments" EntityType="Model1.Appointments" />
+          <EntitySet Name="Cities" EntityType="Model1.Cities" />
+          <EntitySet Name="clauses" EntityType="Model1.clauses" />
+          <EntitySet Name="contractClauses" EntityType="Model1.contractClauses" />
+          <EntitySet Name="contracts" EntityType="Model1.contracts" />
+          <EntitySet Name="Departments" EntityType="Model1.Departments" />
+          <EntitySet Name="Establishments" EntityType="Model1.Establishments" />
+          <EntitySet Name="FormModules" EntityType="Model1.FormModules" />
+          <EntitySet Name="Forms" EntityType="Model1.Forms" />
+          <EntitySet Name="Images" EntityType="Model1.Images" />
+          <EntitySet Name="Modules" EntityType="Model1.Modules" />
+          <EntitySet Name="ObligationMonths" EntityType="Model1.ObligationMonths" />
+          <EntitySet Name="PasswordResetCodes" EntityType="Model1.PasswordResetCodes" />
+          <EntitySet Name="Permissions" EntityType="Model1.Permissions" />
+          <EntitySet Name="Persons" EntityType="Model1.Persons" />
+          <EntitySet Name="plaza" EntityType="Model1.plaza" />
+          <EntitySet Name="premisesLeaseds" EntityType="Model1.premisesLeaseds" />
+          <EntitySet Name="RefreshToken" EntityType="Model1.RefreshToken" />
+          <EntitySet Name="Roles" EntityType="Model1.Roles" />
+          <EntitySet Name="RolFormPermissions" EntityType="Model1.RolFormPermissions" />
+          <EntitySet Name="RolUsers" EntityType="Model1.RolUsers" />
+          <EntitySet Name="systemParameters" EntityType="Model1.systemParameters" />
+          <EntitySet Name="Users" EntityType="Model1.Users" />
+          <AssociationSet Name="FK_Appointments_Establishments_EstablishmentId" Association="Model1.FK_Appointments_Establishments_EstablishmentId">
+            <End Role="Establishments" EntitySet="Establishments" />
+            <End Role="Appointments" EntitySet="Appointments" />
           </AssociationSet>
-          <AssociationSet Name="DepartamentCity" Association="Model1.DepartamentCity">
-            <End Role="Departament" EntitySet="DepartamentSet" />
-            <End Role="City" EntitySet="CitySet" />
+          <AssociationSet Name="FK_Appointments_Persons_PersonId" Association="Model1.FK_Appointments_Persons_PersonId">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="Appointments" EntitySet="Appointments" />
           </AssociationSet>
-          <AssociationSet Name="CityPerson" Association="Model1.CityPerson">
-            <End Role="City" EntitySet="CitySet" />
-            <End Role="Person" EntitySet="PersonSet" />
+          <AssociationSet Name="FK_Cities_Departments_DepartmentId" Association="Model1.FK_Cities_Departments_DepartmentId">
+            <End Role="Departments" EntitySet="Departments" />
+            <End Role="Cities" EntitySet="Cities" />
           </AssociationSet>
-          <AssociationSet Name="PersonUser" Association="Model1.PersonUser">
-            <End Role="Person" EntitySet="PersonSet" />
-            <End Role="User" EntitySet="Users" />
+          <AssociationSet Name="FK_Persons_Cities_CityId" Association="Model1.FK_Persons_Cities_CityId">
+            <End Role="Cities" EntitySet="Cities" />
+            <End Role="Persons" EntitySet="Persons" />
           </AssociationSet>
-          <AssociationSet Name="UserNotification" Association="Model1.UserNotification">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Notification" EntitySet="Notifications" />
+          <AssociationSet Name="FK_contractClauses_clauses_ClauseId" Association="Model1.FK_contractClauses_clauses_ClauseId">
+            <End Role="clauses" EntitySet="clauses" />
+            <End Role="contractClauses" EntitySet="contractClauses" />
           </AssociationSet>
-          <AssociationSet Name="UserRolUser" Association="Model1.UserRolUser">
-            <End Role="User" EntitySet="Users" />
-            <End Role="RolUser" EntitySet="RolUsers" />
+          <AssociationSet Name="FK_contractClauses_contracts_ContractId" Association="Model1.FK_contractClauses_contracts_ContractId">
+            <End Role="contracts" EntitySet="contracts" />
+            <End Role="contractClauses" EntitySet="contractClauses" />
           </AssociationSet>
-          <AssociationSet Name="RolRolUser" Association="Model1.RolRolUser">
-            <End Role="Rol" EntitySet="Rols" />
-            <End Role="RolUser" EntitySet="RolUsers" />
+          <AssociationSet Name="FK_contracts_Persons_PersonId" Association="Model1.FK_contracts_Persons_PersonId">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="contracts" EntitySet="contracts" />
           </AssociationSet>
-          <AssociationSet Name="RolRolFormPermission" Association="Model1.RolRolFormPermission">
-            <End Role="Rol" EntitySet="Rols" />
-            <End Role="RolFormPermission" EntitySet="RolFormPermissionSet" />
+          <AssociationSet Name="FK_ObligationMonths_contracts_ContractId" Association="Model1.FK_ObligationMonths_contracts_ContractId">
+            <End Role="contracts" EntitySet="contracts" />
+            <End Role="ObligationMonths" EntitySet="ObligationMonths" />
           </AssociationSet>
-          <AssociationSet Name="FormRolFormPermission" Association="Model1.FormRolFormPermission">
-            <End Role="Form" EntitySet="Forms" />
-            <End Role="RolFormPermission" EntitySet="RolFormPermissionSet" />
+          <AssociationSet Name="FK_premisesLeaseds_contracts_ContractId" Association="Model1.FK_premisesLeaseds_contracts_ContractId">
+            <End Role="contracts" EntitySet="contracts" />
+            <End Role="premisesLeaseds" EntitySet="premisesLeaseds" />
           </AssociationSet>
-          <AssociationSet Name="PermissionRolFormPermission" Association="Model1.PermissionRolFormPermission">
-            <End Role="Permission" EntitySet="Permissions" />
-            <End Role="RolFormPermission" EntitySet="RolFormPermissionSet" />
+          <AssociationSet Name="FK_FormModules_Forms_FormId" Association="Model1.FK_FormModules_Forms_FormId">
+            <End Role="Forms" EntitySet="Forms" />
+            <End Role="FormModules" EntitySet="FormModules" />
           </AssociationSet>
-          <AssociationSet Name="FormModuleForm" Association="Model1.FormModuleForm">
-            <End Role="Form" EntitySet="Forms" />
-            <End Role="ModuleForm" EntitySet="ModuleForms" />
+          <AssociationSet Name="FK_FormModules_Modules_ModuleId" Association="Model1.FK_FormModules_Modules_ModuleId">
+            <End Role="Modules" EntitySet="Modules" />
+            <End Role="FormModules" EntitySet="FormModules" />
           </AssociationSet>
-          <AssociationSet Name="ModuleModuleForm" Association="Model1.ModuleModuleForm">
-            <End Role="Module" EntitySet="Modules" />
-            <End Role="ModuleForm" EntitySet="ModuleForms" />
+          <AssociationSet Name="FK_Images_Establishments_EstablishmentId" Association="Model1.FK_Images_Establishments_EstablishmentId">
+            <End Role="Establishments" EntitySet="Establishments" />
+            <End Role="Images" EntitySet="Images" />
           </AssociationSet>
-          <EntitySet Name="AppointmentSet" EntityType="Model1.Appointment" />
-          <AssociationSet Name="ContractMonthlyPayment" Association="Model1.ContractMonthlyPayment">
-            <End Role="Contract" EntitySet="ContractSet" />
-            <End Role="MonthlyPayment" EntitySet="MonthlyPaymentSet" />
+          <AssociationSet Name="FK_RolFormPermissions_Permissions_PermissionId" Association="Model1.FK_RolFormPermissions_Permissions_PermissionId">
+            <End Role="Permissions" EntitySet="Permissions" />
+            <End Role="RolFormPermissions" EntitySet="RolFormPermissions" />
           </AssociationSet>
-          <EntitySet Name="ContractTemplateSet" EntityType="Model1.ContractTemplate" />
-          <AssociationSet Name="ContractTemplateContract" Association="Model1.ContractTemplateContract">
-            <End Role="ContractTemplate" EntitySet="ContractTemplateSet" />
-            <End Role="Contract" EntitySet="ContractSet" />
+          <AssociationSet Name="FK_Establishments_plaza_PlazaId" Association="Model1.FK_Establishments_plaza_PlazaId">
+            <End Role="plaza" EntitySet="plaza" />
+            <End Role="Establishments" EntitySet="Establishments" />
           </AssociationSet>
-          <EntitySet Name="ImageSet" EntityType="Model1.Image" />
-          <EntitySet Name="BaseSet" EntityType="Model1.Base" />
-          <EntitySet Name="EstablishmentSet" EntityType="Model1.Establishment" />
-          <EntitySet Name="PlazaSet" EntityType="Model1.Plaza" />
-          <AssociationSet Name="PlazaEstablishment" Association="Model1.PlazaEstablishment">
-            <End Role="Plaza" EntitySet="PlazaSet" />
-            <End Role="Establishment" EntitySet="EstablishmentSet" />
+          <AssociationSet Name="FK_RolFormPermissions_Roles_RolId" Association="Model1.FK_RolFormPermissions_Roles_RolId">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RolFormPermissions" EntitySet="RolFormPermissions" />
           </AssociationSet>
-          <AssociationSet Name="EstablishmentImage" Association="Model1.EstablishmentImage">
-            <End Role="Establishment" EntitySet="EstablishmentSet" />
-            <End Role="Image" EntitySet="ImageSet" />
+          <AssociationSet Name="FK_RolUsers_Roles_RolId" Association="Model1.FK_RolUsers_Roles_RolId">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RolUsers" EntitySet="RolUsers" />
           </AssociationSet>
-          <AssociationSet Name="EstablishmentContract" Association="Model1.EstablishmentContract">
-            <End Role="Establishment" EntitySet="EstablishmentSet" />
-            <End Role="Contract" EntitySet="ContractSet" />
+          <AssociationSet Name="FK_RolFormPermissions_Forms_FormId" Association="Model1.FK_RolFormPermissions_Forms_FormId">
+            <End Role="Forms" EntitySet="Forms" />
+            <End Role="RolFormPermissions" EntitySet="RolFormPermissions" />
           </AssociationSet>
-          <AssociationSet Name="PersonContract" Association="Model1.PersonContract">
-            <End Role="Person" EntitySet="PersonSet" />
-            <End Role="Contract" EntitySet="ContractSet" />
+          <AssociationSet Name="FK_Users_Persons_PersonId" Association="Model1.FK_Users_Persons_PersonId">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="Users" EntitySet="Users" />
           </AssociationSet>
-          <AssociationSet Name="PersonAppointment" Association="Model1.PersonAppointment">
-            <End Role="Person" EntitySet="PersonSet" />
-            <End Role="Appointment" EntitySet="AppointmentSet" />
+          <AssociationSet Name="FK_RolUsers_Users_UserId" Association="Model1.FK_RolUsers_Users_UserId">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="RolUsers" EntitySet="RolUsers" />
           </AssociationSet>
         </EntityContainer>
-        <EntityType Name="Rol">
+        <EntityType Name="Appointments">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="RolUser" Relationship="Model1.RolRolUser" FromRole="Rol" ToRole="RolUser" />
-          <NavigationProperty Name="RolFormPermission" Relationship="Model1.RolRolFormPermission" FromRole="Rol" ToRole="RolFormPermission" />
-        </EntityType>
-        <EntityType Name="User">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Email" Type="String" Nullable="false" />
-          <Property Name="Password" Type="String" Nullable="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Person" Relationship="Model1.PersonUser" FromRole="User" ToRole="Person" />
-          <NavigationProperty Name="Notification" Relationship="Model1.UserNotification" FromRole="User" ToRole="Notification" />
-          <NavigationProperty Name="RolUser" Relationship="Model1.UserRolUser" FromRole="User" ToRole="RolUser" />
-        </EntityType>
-        <EntityType Name="Permission">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="RolFormPermission" Relationship="Model1.PermissionRolFormPermission" FromRole="Permission" ToRole="RolFormPermission" />
-        </EntityType>
-        <EntityType Name="Form">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="RolFormPermission" Relationship="Model1.FormRolFormPermission" FromRole="Form" ToRole="RolFormPermission" />
-          <NavigationProperty Name="ModuleForm" Relationship="Model1.FormModuleForm" FromRole="Form" ToRole="ModuleForm" />
-        </EntityType>
-        <EntityType Name="ModuleForm">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Form" Relationship="Model1.FormModuleForm" FromRole="ModuleForm" ToRole="Form" />
-          <Property Name="FormId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Module" Relationship="Model1.ModuleModuleForm" FromRole="ModuleForm" ToRole="Module" />
-          <Property Name="ModuleId" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Module">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="Code" Type="String" Nullable="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="ModuleForm" Relationship="Model1.ModuleModuleForm" FromRole="Module" ToRole="ModuleForm" />
-        </EntityType>
-        <EntityType Name="Log">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TableName" Type="String" Nullable="false" />
-          <Property Name="PropietyName" Type="String" Nullable="false" />
-          <Property Name="Action" Type="String" Nullable="false" />
-          <Property Name="TimeStamp" Type="String" Nullable="false" />
-          <Property Name="UserId" Type="String" Nullable="false" />
-          <Property Name="OldValue" Type="String" Nullable="false" />
-          <Property Name="NewValue" Type="String" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Contract">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ContractNumber" Type="String" Nullable="false" />
-          <Property Name="TypeContract" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="RequestDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="DateTimeAssigned" Type="DateTime" Precision="7" />
+          <Property Name="Observation" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PersonId" Type="Int32" Nullable="false" />
           <Property Name="EstablishmentId" Type="Int32" Nullable="false" />
-          <Property Name="StartDate" Type="DateTime" Nullable="false" />
-          <Property Name="EndDate" Type="DateTime" Nullable="false" />
-          <Property Name="CreationDate" Type="String" Nullable="false" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="MonthlyPayment" Relationship="Model1.ContractMonthlyPayment" FromRole="Contract" ToRole="MonthlyPayment" />
-          <Property Name="Status" Type="String" Nullable="false" />
-          <NavigationProperty Name="ContractTemplate" Relationship="Model1.ContractTemplateContract" FromRole="Contract" ToRole="ContractTemplate" />
-          <Property Name="ContractTemplateId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Establishment" Relationship="Model1.EstablishmentContract" FromRole="Contract" ToRole="Establishment" />
-          <Property Name="EstablishmentId1" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Person" Relationship="Model1.PersonContract" FromRole="Contract" ToRole="Person" />
-          <Property Name="PersonId" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="RolFormPermission">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Rol" Relationship="Model1.RolRolFormPermission" FromRole="RolFormPermission" ToRole="Rol" />
-          <Property Name="RolId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Form" Relationship="Model1.FormRolFormPermission" FromRole="RolFormPermission" ToRole="Form" />
-          <Property Name="FormId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Permission" Relationship="Model1.PermissionRolFormPermission" FromRole="RolFormPermission" ToRole="Permission" />
-          <Property Name="PermissionId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Establishments" Relationship="Model1.FK_Appointments_Establishments_EstablishmentId" FromRole="Appointments" ToRole="Establishments" />
+          <NavigationProperty Name="Persons" Relationship="Model1.FK_Appointments_Persons_PersonId" FromRole="Appointments" ToRole="Persons" />
         </EntityType>
-        <EntityType Name="RolUser">
+        <EntityType Name="Cities">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="DepartmentId" Type="Int32" Nullable="false" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="User" Relationship="Model1.UserRolUser" FromRole="RolUser" ToRole="User" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Rol" Relationship="Model1.RolRolUser" FromRole="RolUser" ToRole="Rol" />
-          <Property Name="RolId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Departments" Relationship="Model1.FK_Cities_Departments_DepartmentId" FromRole="Cities" ToRole="Departments" />
+          <NavigationProperty Name="Persons" Relationship="Model1.FK_Persons_Cities_CityId" FromRole="Cities" ToRole="Persons" />
         </EntityType>
-        <EntityType Name="Calculation">
+        <EntityType Name="clauses">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Type" Type="String" Nullable="false" />
-          <Property Name="Formula" Type="String" Nullable="false" />
-          <Property Name="Description" Type="String" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Person">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="LastName" Type="String" Nullable="false" />
-          <Property Name="Address" Type="String" Nullable="false" />
-          <Property Name="IdentificationType" Type="String" Nullable="false" />
-          <Property Name="Identification" Type="String" Nullable="false" />
-          <Property Name="Phone" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="City" Relationship="Model1.CityPerson" FromRole="Person" ToRole="City" />
-          <Property Name="CityId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="User" Relationship="Model1.PersonUser" FromRole="Person" ToRole="User" />
-          <NavigationProperty Name="Contract" Relationship="Model1.PersonContract" FromRole="Person" ToRole="Contract" />
-          <NavigationProperty Name="Appointment" Relationship="Model1.PersonAppointment" FromRole="Person" ToRole="Appointment" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="contractClauses" Relationship="Model1.FK_contractClauses_clauses_ClauseId" FromRole="clauses" ToRole="contractClauses" />
         </EntityType>
-        <EntityType Name="Company">
+        <EntityType Name="contractClauses">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Type" Type="String" Nullable="false" />
-          <Property Name="ContactInfo" Type="String" Nullable="false" />
-          <Property Name="Status" Type="String" Nullable="false" />
-          <NavigationProperty Name="City" Relationship="Model1.CityCompany" FromRole="Company" ToRole="City" />
-          <Property Name="CityId" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Notification">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Type" Type="String" Nullable="false" />
-          <Property Name="Message" Type="String" Nullable="false" />
-          <Property Name="Status" Type="String" Nullable="false" />
-          <Property Name="CreatedDate" Type="String" Nullable="false" />
-          <Property Name="ReadDate" Type="String" Nullable="false" />
-          <NavigationProperty Name="User" Relationship="Model1.UserNotification" FromRole="Notification" ToRole="User" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="SystemParameter">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Value" Type="Decimal" Nullable="false" Precision="15" Scale="2" />
-          <Property Name="Category" Type="String" Nullable="false" />
-          <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="ValidFrom" Type="String" Nullable="false" />
-          <Property Name="Status" Type="String" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Departament">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <NavigationProperty Name="City" Relationship="Model1.DepartamentCity" FromRole="Departament" ToRole="City" />
-        </EntityType>
-        <EntityType Name="City">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <NavigationProperty Name="Company" Relationship="Model1.CityCompany" FromRole="City" ToRole="Company" />
-          <NavigationProperty Name="Departament" Relationship="Model1.DepartamentCity" FromRole="City" ToRole="Departament" />
-          <Property Name="DepartamentId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Person" Relationship="Model1.CityPerson" FromRole="City" ToRole="Person" />
-        </EntityType>
-        <EntityType Name="MonthlyPayment">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Period" Type="String" Nullable="false" />
-          <Property Name="Amount" Type="String" Nullable="false" />
-          <Property Name="IsPaid" Type="String" Nullable="false" />
-          <Property Name="PaymentDate" Type="String" Nullable="false" />
-          <Property Name="Observations" Type="String" Nullable="false" />
-          <NavigationProperty Name="Contract" Relationship="Model1.ContractMonthlyPayment" FromRole="MonthlyPayment" ToRole="Contract" />
           <Property Name="ContractId" Type="Int32" Nullable="false" />
+          <Property Name="ClauseId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="clauses" Relationship="Model1.FK_contractClauses_clauses_ClauseId" FromRole="contractClauses" ToRole="clauses" />
+          <NavigationProperty Name="contracts" Relationship="Model1.FK_contractClauses_contracts_ContractId" FromRole="contractClauses" ToRole="contracts" />
         </EntityType>
-        <Association Name="CityCompany">
-          <End Type="Model1.City" Role="City" Multiplicity="1" />
-          <End Type="Model1.Company" Role="Company" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="City">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Company">
-              <PropertyRef Name="CityId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="DepartamentCity">
-          <End Type="Model1.Departament" Role="Departament" Multiplicity="1" />
-          <End Type="Model1.City" Role="City" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Departament">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="City">
-              <PropertyRef Name="DepartamentId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="CityPerson">
-          <End Type="Model1.City" Role="City" Multiplicity="1" />
-          <End Type="Model1.Person" Role="Person" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="City">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Person">
-              <PropertyRef Name="CityId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="PersonUser">
-          <End Type="Model1.Person" Role="Person" Multiplicity="1" />
-          <End Type="Model1.User" Role="User" Multiplicity="1" />
-        </Association>
-        <Association Name="UserNotification">
-          <End Type="Model1.User" Role="User" Multiplicity="1" />
-          <End Type="Model1.Notification" Role="Notification" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Notification">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="UserRolUser">
-          <End Type="Model1.User" Role="User" Multiplicity="1" />
-          <End Type="Model1.RolUser" Role="RolUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="RolUser">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="RolRolUser">
-          <End Type="Model1.Rol" Role="Rol" Multiplicity="1" />
-          <End Type="Model1.RolUser" Role="RolUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Rol">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="RolUser">
-              <PropertyRef Name="RolId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="RolRolFormPermission">
-          <End Type="Model1.Rol" Role="Rol" Multiplicity="1" />
-          <End Type="Model1.RolFormPermission" Role="RolFormPermission" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Rol">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="RolFormPermission">
-              <PropertyRef Name="RolId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FormRolFormPermission">
-          <End Type="Model1.Form" Role="Form" Multiplicity="1" />
-          <End Type="Model1.RolFormPermission" Role="RolFormPermission" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Form">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="RolFormPermission">
-              <PropertyRef Name="FormId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="PermissionRolFormPermission">
-          <End Type="Model1.Permission" Role="Permission" Multiplicity="1" />
-          <End Type="Model1.RolFormPermission" Role="RolFormPermission" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Permission">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="RolFormPermission">
-              <PropertyRef Name="PermissionId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FormModuleForm">
-          <End Type="Model1.Form" Role="Form" Multiplicity="1" />
-          <End Type="Model1.ModuleForm" Role="ModuleForm" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Form">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ModuleForm">
-              <PropertyRef Name="FormId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="ModuleModuleForm">
-          <End Type="Model1.Module" Role="Module" Multiplicity="1" />
-          <End Type="Model1.ModuleForm" Role="ModuleForm" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Module">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ModuleForm">
-              <PropertyRef Name="ModuleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="Appointment">
+        <EntityType Name="contracts">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="RequestDate" Type="String" Nullable="false" />
-          <Property Name="DateVisit" Type="String" Nullable="false" />
-          <Property Name="Status" Type="String" Nullable="false" />
-          <Property Name="Observations" Type="String" Nullable="false" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Person" Relationship="Model1.PersonAppointment" FromRole="Appointment" ToRole="Person" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="7" />
           <Property Name="PersonId" Type="Int32" Nullable="false" />
+          <Property Name="TotalBaseRentAgreed" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="TotalUvtQtyAgreed" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="contractClauses" Relationship="Model1.FK_contractClauses_contracts_ContractId" FromRole="contracts" ToRole="contractClauses" />
+          <NavigationProperty Name="Persons" Relationship="Model1.FK_contracts_Persons_PersonId" FromRole="contracts" ToRole="Persons" />
+          <NavigationProperty Name="ObligationMonths" Relationship="Model1.FK_ObligationMonths_contracts_ContractId" FromRole="contracts" ToRole="ObligationMonths" />
+          <NavigationProperty Name="premisesLeaseds" Relationship="Model1.FK_premisesLeaseds_contracts_ContractId" FromRole="contracts" ToRole="premisesLeaseds" />
         </EntityType>
-        <Association Name="ContractMonthlyPayment">
-          <End Type="Model1.Contract" Role="Contract" Multiplicity="1" />
-          <End Type="Model1.MonthlyPayment" Role="MonthlyPayment" Multiplicity="*" />
+        <EntityType Name="Departments">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Cities" Relationship="Model1.FK_Cities_Departments_DepartmentId" FromRole="Departments" ToRole="Cities" />
+        </EntityType>
+        <EntityType Name="Establishments">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AreaM2" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="RentValueBase" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="Address" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="UvtQty" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="PlazaId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Appointments" Relationship="Model1.FK_Appointments_Establishments_EstablishmentId" FromRole="Establishments" ToRole="Appointments" />
+          <NavigationProperty Name="Images" Relationship="Model1.FK_Images_Establishments_EstablishmentId" FromRole="Establishments" ToRole="Images" />
+          <NavigationProperty Name="plaza" Relationship="Model1.FK_Establishments_plaza_PlazaId" FromRole="Establishments" ToRole="plaza" />
+        </EntityType>
+        <EntityType Name="FormModules">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FormId" Type="Int32" Nullable="false" />
+          <Property Name="ModuleId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Forms" Relationship="Model1.FK_FormModules_Forms_FormId" FromRole="FormModules" ToRole="Forms" />
+          <NavigationProperty Name="Modules" Relationship="Model1.FK_FormModules_Modules_ModuleId" FromRole="FormModules" ToRole="Modules" />
+        </EntityType>
+        <EntityType Name="Forms">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Route" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="FormModules" Relationship="Model1.FK_FormModules_Forms_FormId" FromRole="Forms" ToRole="FormModules" />
+          <NavigationProperty Name="RolFormPermissions" Relationship="Model1.FK_RolFormPermissions_Forms_FormId" FromRole="Forms" ToRole="RolFormPermissions" />
+        </EntityType>
+        <EntityType Name="Images">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FileName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="FilePath" Type="String" Nullable="false" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="PublicId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="EstablishmentId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Establishments" Relationship="Model1.FK_Images_Establishments_EstablishmentId" FromRole="Images" ToRole="Establishments" />
+        </EntityType>
+        <EntityType Name="Modules">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Icon" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="FormModules" Relationship="Model1.FK_FormModules_Modules_ModuleId" FromRole="Modules" ToRole="FormModules" />
+        </EntityType>
+        <EntityType Name="ObligationMonths">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ContractId" Type="Int32" Nullable="false" />
+          <Property Name="Year" Type="Int32" Nullable="false" />
+          <Property Name="Month" Type="Int32" Nullable="false" />
+          <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="UvtQtyApplied" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="UvtValueApplied" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="VatRateApplied" Type="Decimal" Nullable="false" Precision="5" Scale="4" />
+          <Property Name="BaseAmount" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="VatAmount" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="TotalAmount" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="DaysLate" Type="Int32" />
+          <Property Name="LateAmount" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Locked" Type="Boolean" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="contracts" Relationship="Model1.FK_ObligationMonths_contracts_ContractId" FromRole="ObligationMonths" ToRole="contracts" />
+        </EntityType>
+        <EntityType Name="PasswordResetCodes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Expiration" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IsUsed" Type="Boolean" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="Permissions">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="RolFormPermissions" Relationship="Model1.FK_RolFormPermissions_Permissions_PermissionId" FromRole="Permissions" ToRole="RolFormPermissions" />
+        </EntityType>
+        <EntityType Name="Persons">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Document" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Address" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Phone" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="CityId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Appointments" Relationship="Model1.FK_Appointments_Persons_PersonId" FromRole="Persons" ToRole="Appointments" />
+          <NavigationProperty Name="Cities" Relationship="Model1.FK_Persons_Cities_CityId" FromRole="Persons" ToRole="Cities" />
+          <NavigationProperty Name="contracts" Relationship="Model1.FK_contracts_Persons_PersonId" FromRole="Persons" ToRole="contracts" />
+          <NavigationProperty Name="Users" Relationship="Model1.FK_Users_Persons_PersonId" FromRole="Persons" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="plaza">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Location" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Establishments" Relationship="Model1.FK_Establishments_plaza_PlazaId" FromRole="plaza" ToRole="Establishments" />
+        </EntityType>
+        <EntityType Name="premisesLeaseds">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ContractId" Type="Int32" Nullable="false" />
+          <Property Name="EstablishmentId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="contracts" Relationship="Model1.FK_premisesLeaseds_contracts_ContractId" FromRole="premisesLeaseds" ToRole="contracts" />
+        </EntityType>
+        <EntityType Name="RefreshToken">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="TokenHash" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ExpiresAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IsRevoked" Type="Boolean" Nullable="false" />
+          <Property Name="ReplacedByTokenHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="RolFormPermissions" Relationship="Model1.FK_RolFormPermissions_Roles_RolId" FromRole="Roles" ToRole="RolFormPermissions" />
+          <NavigationProperty Name="RolUsers" Relationship="Model1.FK_RolUsers_Roles_RolId" FromRole="Roles" ToRole="RolUsers" />
+        </EntityType>
+        <EntityType Name="RolFormPermissions">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RolId" Type="Int32" Nullable="false" />
+          <Property Name="FormId" Type="Int32" Nullable="false" />
+          <Property Name="PermissionId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Permissions" Relationship="Model1.FK_RolFormPermissions_Permissions_PermissionId" FromRole="RolFormPermissions" ToRole="Permissions" />
+          <NavigationProperty Name="Roles" Relationship="Model1.FK_RolFormPermissions_Roles_RolId" FromRole="RolFormPermissions" ToRole="Roles" />
+          <NavigationProperty Name="Forms" Relationship="Model1.FK_RolFormPermissions_Forms_FormId" FromRole="RolFormPermissions" ToRole="Forms" />
+        </EntityType>
+        <EntityType Name="RolUsers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="RolId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Roles" Relationship="Model1.FK_RolUsers_Roles_RolId" FromRole="RolUsers" ToRole="Roles" />
+          <NavigationProperty Name="Users" Relationship="Model1.FK_RolUsers_Users_UserId" FromRole="RolUsers" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="systemParameters">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Key" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Value" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="EffectiveFrom" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="EffectiveTo" Type="DateTime" Precision="7" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="PersonId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Persons" Relationship="Model1.FK_Users_Persons_PersonId" FromRole="Users" ToRole="Persons" />
+          <NavigationProperty Name="RolUsers" Relationship="Model1.FK_RolUsers_Users_UserId" FromRole="Users" ToRole="RolUsers" />
+        </EntityType>
+        <Association Name="FK_Appointments_Establishments_EstablishmentId">
+          <End Type="Model1.Establishments" Role="Establishments" Multiplicity="1" />
+          <End Type="Model1.Appointments" Role="Appointments" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Contract">
+            <Principal Role="Establishments">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="MonthlyPayment">
+            <Dependent Role="Appointments">
+              <PropertyRef Name="EstablishmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Appointments_Persons_PersonId">
+          <End Type="Model1.Persons" Role="Persons" Multiplicity="1" />
+          <End Type="Model1.Appointments" Role="Appointments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Appointments">
+              <PropertyRef Name="PersonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Cities_Departments_DepartmentId">
+          <End Type="Model1.Departments" Role="Departments" Multiplicity="1" />
+          <End Type="Model1.Cities" Role="Cities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Departments">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Cities">
+              <PropertyRef Name="DepartmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Persons_Cities_CityId">
+          <End Type="Model1.Cities" Role="Cities" Multiplicity="1" />
+          <End Type="Model1.Persons" Role="Persons" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cities">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Persons">
+              <PropertyRef Name="CityId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_contractClauses_clauses_ClauseId">
+          <End Type="Model1.clauses" Role="clauses" Multiplicity="1" />
+          <End Type="Model1.contractClauses" Role="contractClauses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="clauses">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="contractClauses">
+              <PropertyRef Name="ClauseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_contractClauses_contracts_ContractId">
+          <End Type="Model1.contracts" Role="contracts" Multiplicity="1" />
+          <End Type="Model1.contractClauses" Role="contractClauses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="contracts">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="contractClauses">
               <PropertyRef Name="ContractId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="ContractTemplate">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Content" Type="String" Nullable="false" />
-          <Property Name="Type" Type="String" Nullable="false" />
-          <Property Name="Version" Type="String" Nullable="false" />
-          <Property Name="Status" Type="String" Nullable="false" />
-          <Property Name="CreateAt" Type="String" Nullable="false" />
-          <NavigationProperty Name="Contract" Relationship="Model1.ContractTemplateContract" FromRole="ContractTemplate" ToRole="Contract" />
-        </EntityType>
-        <Association Name="ContractTemplateContract">
-          <End Type="Model1.ContractTemplate" Role="ContractTemplate" Multiplicity="1" />
-          <End Type="Model1.Contract" Role="Contract" Multiplicity="*" />
+        <Association Name="FK_contracts_Persons_PersonId">
+          <End Type="Model1.Persons" Role="Persons" Multiplicity="1" />
+          <End Type="Model1.contracts" Role="contracts" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="ContractTemplate">
+            <Principal Role="Persons">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Contract">
-              <PropertyRef Name="ContractTemplateId" />
+            <Dependent Role="contracts">
+              <PropertyRef Name="PersonId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Image">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FileName" Type="String" Nullable="false" />
-          <Property Name="FilePath" Type="String" Nullable="false" />
-          <Property Name="EstablishmentId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Establishment" Relationship="Model1.EstablishmentImage" FromRole="Image" ToRole="Establishment" />
-          <Property Name="EstablishmentId1" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Base">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CreatedAt" Type="String" Nullable="false" />
-          <Property Name="UpdatedAt" Type="String" Nullable="false" />
-          <Property Name="DeletedAt" Type="String" Nullable="false" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
-          <Property Name="CreatedBy" Type="String" Nullable="false" />
-          <Property Name="UpdatedBy" Type="String" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Establishment">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="Type" Type="String" Nullable="false" />
-          <Property Name="AreaM2" Type="String" Nullable="false" />
-          <Property Name="RentBaseValue" Type="String" Nullable="false" />
-          <Property Name="Status" Type="String" Nullable="false" />
-          <NavigationProperty Name="Plaza" Relationship="Model1.PlazaEstablishment" FromRole="Establishment" ToRole="Plaza" />
-          <Property Name="PlazaId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Image" Relationship="Model1.EstablishmentImage" FromRole="Establishment" ToRole="Image" />
-          <NavigationProperty Name="Contract" Relationship="Model1.EstablishmentContract" FromRole="Establishment" ToRole="Contract" />
-        </EntityType>
-        <EntityType Name="Plaza">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" />
-          <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="Ubication" Type="String" Nullable="false" />
-          <Property Name="Capacity" Type="String" Nullable="false" />
-          <Property Name="Status" Type="String" Nullable="false" />
-          <NavigationProperty Name="Establishment" Relationship="Model1.PlazaEstablishment" FromRole="Plaza" ToRole="Establishment" />
-        </EntityType>
-        <Association Name="PlazaEstablishment">
-          <End Type="Model1.Plaza" Role="Plaza" Multiplicity="1" />
-          <End Type="Model1.Establishment" Role="Establishment" Multiplicity="*" />
+        <Association Name="FK_ObligationMonths_contracts_ContractId">
+          <End Type="Model1.contracts" Role="contracts" Multiplicity="1" />
+          <End Type="Model1.ObligationMonths" Role="ObligationMonths" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Plaza">
+            <Principal Role="contracts">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Establishment">
+            <Dependent Role="ObligationMonths">
+              <PropertyRef Name="ContractId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_premisesLeaseds_contracts_ContractId">
+          <End Type="Model1.contracts" Role="contracts" Multiplicity="1" />
+          <End Type="Model1.premisesLeaseds" Role="premisesLeaseds" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="contracts">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="premisesLeaseds">
+              <PropertyRef Name="ContractId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FormModules_Forms_FormId">
+          <End Type="Model1.Forms" Role="Forms" Multiplicity="1" />
+          <End Type="Model1.FormModules" Role="FormModules" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Forms">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FormModules">
+              <PropertyRef Name="FormId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FormModules_Modules_ModuleId">
+          <End Type="Model1.Modules" Role="Modules" Multiplicity="1" />
+          <End Type="Model1.FormModules" Role="FormModules" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Modules">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FormModules">
+              <PropertyRef Name="ModuleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Images_Establishments_EstablishmentId">
+          <End Type="Model1.Establishments" Role="Establishments" Multiplicity="1" />
+          <End Type="Model1.Images" Role="Images" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Establishments">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Images">
+              <PropertyRef Name="EstablishmentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RolFormPermissions_Permissions_PermissionId">
+          <End Type="Model1.Permissions" Role="Permissions" Multiplicity="1" />
+          <End Type="Model1.RolFormPermissions" Role="RolFormPermissions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Permissions">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="RolFormPermissions">
+              <PropertyRef Name="PermissionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Establishments_plaza_PlazaId">
+          <End Type="Model1.plaza" Role="plaza" Multiplicity="1" />
+          <End Type="Model1.Establishments" Role="Establishments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="plaza">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Establishments">
               <PropertyRef Name="PlazaId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="EstablishmentImage">
-          <End Type="Model1.Establishment" Role="Establishment" Multiplicity="1" />
-          <End Type="Model1.Image" Role="Image" Multiplicity="*" />
+        <Association Name="FK_RolFormPermissions_Roles_RolId">
+          <End Type="Model1.Roles" Role="Roles" Multiplicity="1" />
+          <End Type="Model1.RolFormPermissions" Role="RolFormPermissions" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Establishment">
+            <Principal Role="Roles">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Image">
-              <PropertyRef Name="EstablishmentId1" />
+            <Dependent Role="RolFormPermissions">
+              <PropertyRef Name="RolId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="EstablishmentContract">
-          <End Type="Model1.Establishment" Role="Establishment" Multiplicity="1" />
-          <End Type="Model1.Contract" Role="Contract" Multiplicity="*" />
+        <Association Name="FK_RolUsers_Roles_RolId">
+          <End Type="Model1.Roles" Role="Roles" Multiplicity="1" />
+          <End Type="Model1.RolUsers" Role="RolUsers" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Establishment">
+            <Principal Role="Roles">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Contract">
-              <PropertyRef Name="EstablishmentId1" />
+            <Dependent Role="RolUsers">
+              <PropertyRef Name="RolId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="PersonContract">
-          <End Type="Model1.Person" Role="Person" Multiplicity="1" />
-          <End Type="Model1.Contract" Role="Contract" Multiplicity="*" />
+        <Association Name="FK_RolFormPermissions_Forms_FormId">
+          <End Type="Model1.Forms" Role="Forms" Multiplicity="1" />
+          <End Type="Model1.RolFormPermissions" Role="RolFormPermissions" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Person">
+            <Principal Role="Forms">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Contract">
+            <Dependent Role="RolFormPermissions">
+              <PropertyRef Name="FormId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Users_Persons_PersonId">
+          <End Type="Model1.Persons" Role="Persons" Multiplicity="1" />
+          <End Type="Model1.Users" Role="Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
               <PropertyRef Name="PersonId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="PersonAppointment">
-          <End Type="Model1.Person" Role="Person" Multiplicity="1" />
-          <End Type="Model1.Appointment" Role="Appointment" Multiplicity="*" />
+        <Association Name="FK_RolUsers_Users_UserId">
+          <End Type="Model1.Users" Role="Users" Multiplicity="1" />
+          <End Type="Model1.RolUsers" Role="RolUsers" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Person">
+            <Principal Role="Users">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Appointment">
-              <PropertyRef Name="PersonId" />
+            <Dependent Role="RolUsers">
+              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>

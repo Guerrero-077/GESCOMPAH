@@ -95,14 +95,14 @@ export class ModuleComponent implements OnInit {
 
   // Eliminar (lógico)
   async onDelete(row: ModuleSelectModel): Promise<void> {
-    const confirmed = await this.sweetAlert.showConfirm(
+    const result = await this.sweetAlert.showConfirm(
       'Eliminar módulo',
       `¿Deseas eliminar el módulo "${row.name}"?`,
       'Eliminar',
       'Cancelar',
       'warning'
     );
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     this.moduleStore.deleteLogic(row.id).pipe(take(1)).subscribe({
       next: () => this.sweetAlertService.showNotification('Eliminación Exitosa', 'Módulo eliminado exitosamente.', 'success'),
