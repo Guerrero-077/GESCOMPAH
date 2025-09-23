@@ -1,7 +1,7 @@
 import { Injectable, computed } from '@angular/core';
-import { BackendMenuItem } from '../../../shared/components/sidebar/sidebar.config';
+import { BackendMenuItem } from '../../../../shared/components/sidebar/sidebar.config';
 import { UserStore } from './User.Store';
-import { User } from '../../../shared/models/user.model';
+import { User } from '../../../../shared/models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {

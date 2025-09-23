@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormGroup } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../../core/service/auth/auth.service';
+import { AuthService } from '../../../../core/security/services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 

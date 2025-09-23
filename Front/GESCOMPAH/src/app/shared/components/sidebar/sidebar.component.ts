@@ -12,8 +12,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Router, RouterModule, IsActiveMatchOptions } from '@angular/router';
 import { finalize } from 'rxjs';
-import { AuthService } from '../../../core/service/auth/auth.service';
-import { PermissionService } from '../../../core/service/permission/permission.service';
+import { AuthService } from '../../../core/security/services/auth/auth.service';
+import { PermissionService } from '../../../core/security/services/permission/permission.service';
 import { SweetAlertService } from '../../Services/sweet-alert/sweet-alert.service';
 import { BackendMenuItem, BackendSubMenuItem, SidebarItem, SidebarNode } from './sidebar.config';
 

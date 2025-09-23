@@ -3,10 +3,10 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, switchMap, throwError, EMPTY } from 'rxjs';
 
-import { SweetAlertService } from '../../shared/Services/sweet-alert/sweet-alert.service';
-import { environment } from '../../../environments/environment';
-import { AuthService } from '../service/auth/auth.service';
-import { UserStore } from '../service/permission/User.Store';
+import { SweetAlertService } from '../../../shared/Services/sweet-alert/sweet-alert.service';
+import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../security/services/auth/auth.service';
+import { UserStore } from '../../security/services/permission/User.Store';
 
 function getCookie(name: string): string | null {
   const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));

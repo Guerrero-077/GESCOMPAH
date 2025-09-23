@@ -12,7 +12,7 @@ import { PersonSelectModel, PersonUpdateModel } from '../../../security/models/p
 import { CitySelectModel } from '../../models/city.models';
 import { DepartmentSelectModel } from '../../models/department.models';
 import { AppValidators } from '../../../../shared/utils/AppValidators';
-import { UserStore } from '../../../../core/service/permission/User.Store';
+import { UserStore } from '../../../../core/security/services/permission/User.Store';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
@@ -100,7 +100,7 @@ export class ProfileFormComponent implements OnInit {
     });
   }
 
-    private loadProfile(): void {
+  private loadProfile(): void {
     this.isLoading = true;
 
     const profile$ = this.profileService.getProfile();
