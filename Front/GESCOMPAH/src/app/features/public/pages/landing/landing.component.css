@@ -157,10 +157,121 @@
   color: var(--yellow-300) ;
 }
 
+.seccion-locales {
+  padding: 20px;
+  background-color: #fff;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+}
+
+.titulo-seccion {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.ver-mas-link {
+  font-size: 14px;
+  color: #3483fa;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.ver-mas-link:hover {
+  color: #1a54d3;
+  text-decoration: underline;
+}
+
+/* Carrusel */
+.seccion-locales { padding: 20px; background-color: #fff; }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+}
+
+/* Wrapper para posicionar flechas */
+.contenedor-carrusel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Contenedor visible (ventana del carrusel) */
+.contenedor-carrusel {
+  overflow-x: auto;        /* <-- important: permitir scroll programático y táctil */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;   /* firefox */
+  -ms-overflow-style: none; /* ie 10+ */
+  flex: 1;
+}
+
+/* ocultar scrollbar webkit */
+.contenedor-carrusel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fila de tarjetas: forzamos que sea una sola fila y que su ancho sea el necesario */
+.carrusel-locales {
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;
+  width: max-content;         /* importante: evita que flex items "se contraigan" en columna */
+  align-items: flex-start;
+  padding: 8px 0;
+  box-sizing: border-box;
+}
+
+/* Cada tarjeta no debe crecer ni ocupar 100%: definir flex-basis o min-width */
+.tarjeta-local {
+  flex: 0 0 240px;  /* ancho fijo/estimado por tarjeta (ajusta 240px a tu necesidad) */
+  min-width: 200px; /* mínimo para responsividad */
+  box-sizing: border-box;
+}
+
+/* Flechas */
+.flecha {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  transition: background 0.2s ease;
+}
+
+.flecha:hover { background-color: rgba(240, 240, 240, 0.95); }
+
+.flecha-izquierda { left: 8px; }
+.flecha-derecha { right: 8px; }
+
+.flecha:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+
 /* 📱 En móviles: un poco más pequeña, pero mínima de 400px */
 @media (max-width: 768px) {
   .imagen-local img {
     height: 50vh;          /* 60% de la pantalla en móviles */
     min-height: 400px;     /* Nunca menos de 400px */
   }
+
+  .flecha { display: none; }
+  .contenedor-carrusel { overflow-x: auto; } /* permitir scroll táctil en mobile */
 }
