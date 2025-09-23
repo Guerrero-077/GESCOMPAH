@@ -1,8 +1,8 @@
 import { Component, computed, inject, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { PageHeaderService } from '../../Services/PageHeader/page-header.service';
-import { UserStore } from '../../../core/service/permission/User.Store';
-import { AuthService } from '../../../core/service/auth/auth.service';
+import { UserStore } from '../../../core/security/services/permission/User.Store';
+import { AuthService } from '../../../core/security/services/auth/auth.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 

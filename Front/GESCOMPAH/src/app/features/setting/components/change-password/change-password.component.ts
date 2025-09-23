@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
-import { AuthService } from '../../../../core/service/auth/auth.service';
-import { UserStore } from '../../../../core/service/permission/User.Store';
+import { AuthService } from '../../../../core/security/services/auth/auth.service';
+import { UserStore } from '../../../../core/security/services/permission/User.Store';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from "@angular/material/input";

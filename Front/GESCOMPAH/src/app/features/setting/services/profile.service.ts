@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { PersonSelectModel, PersonUpdateModel } from '../../security/models/person.models';
-import { UserStore } from '../../../core/service/permission/User.Store';
+import { UserStore } from '../../../core/security/services/permission/User.Store';
 import { PersonService } from '../../security/services/person/person.service';
 
 @Injectable({

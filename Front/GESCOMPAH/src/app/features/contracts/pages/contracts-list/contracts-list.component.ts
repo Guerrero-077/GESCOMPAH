@@ -20,7 +20,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
-import { ContractsRealtimeService } from '../../../../core/service/realtime/contracts-realtime.service';
+import { ContractsRealtimeService } from '../../../../core/realtime/contracts-realtime.service';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
 
 @Component({

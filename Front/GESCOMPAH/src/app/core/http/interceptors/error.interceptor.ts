@@ -9,7 +9,7 @@ import { inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { SweetAlertService } from '../../shared/Services/sweet-alert/sweet-alert.service';
+import { SweetAlertService } from '../../../shared/Services/sweet-alert/sweet-alert.service';
 
 export const errorInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,

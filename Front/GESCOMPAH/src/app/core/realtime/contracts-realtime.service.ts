@@ -1,8 +1,8 @@
 // src/app/core/service/realtime/contracts-realtime.service.ts
 import { Injectable, inject, NgZone, ApplicationRef } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { environment } from '../../../../environments/environment.development';
-import { ContractStore } from '../../../features/contracts/services/contract/contract.store';
+import { environment } from '../../../environments/environment.development';
+import { ContractStore } from '../../features/contracts/services/contract/contract.store';
 
 type ExpiredPayload = {
   deactivatedIds?: number[];
@@ -13,7 +13,7 @@ type ExpiredPayload = {
 @Injectable({ providedIn: 'root' })
 export class ContractsRealtimeService {
   private readonly store = inject(ContractStore);
-  private readonly zone  = inject(NgZone);
+  private readonly zone = inject(NgZone);
   private readonly appRef = inject(ApplicationRef);
   private hub?: signalR.HubConnection;
   private handlersBound = false;
