@@ -13,7 +13,7 @@ import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-h
 
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -74,8 +74,8 @@ export class ContractsListComponent implements OnInit, OnDestroy {
     ));
   });
 
-  readonly totalCount    = computed(() => (this.rows()?.length ?? 0));
-  readonly activeCount   = computed(() => (this.rows()?.filter(x => x.active).length ?? 0));
+  readonly totalCount = computed(() => (this.rows()?.length ?? 0));
+  readonly activeCount = computed(() => (this.rows()?.filter(x => x.active).length ?? 0));
   readonly inactiveCount = computed(() => (this.rows()?.filter(x => !x.active).length ?? 0));
 
   isDownloadingPdf = false;

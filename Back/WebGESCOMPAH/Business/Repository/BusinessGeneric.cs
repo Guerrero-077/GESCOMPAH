@@ -1,8 +1,10 @@
 ﻿using Data.Interfaz.DataBasic;
 using Entity.Domain.Models.ModelBase;
+using Entity.DTOs.Base;
 using Entity.DTOs.Implements.Business.Plaza;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using Utilities.Exceptions;
 using Utilities.Helpers.Business;
 
@@ -197,6 +199,72 @@ namespace Business.Repository
             }
         }
 
+
+        /// <summary>
+        /// Campos de TEntity sobre los que aplicar "Search" (Contains).
+        /// Ej.: return new[] { nameof(Plaza.Name), nameof(Plaza.Code) };
+        /// </summary>
+        protected virtual Expression<Func<TEntity, string>>[] SearchableFields() => Array.Empty<Expression<Func<TEntity, string>>>();
+
+
+        /// <summary>
+        /// Lista blanca de campos sobre los que se permite ordenar.
+        /// </summary>
+        protected virtual string[] SortableFields() => Array.Empty<string>();
+
+        /// <summary>
+        /// Lista blanca de filtros (propiedad -> builder de expresión) para "Filters".
+        /// Controla QUÉ se puede filtrar desde la Web (hardening).
+        /// </summary>
+        protected virtual IDictionary<string, Func<string, Expression<Func<TEntity, bool>>>> AllowedFilters()
+            => new Dictionary<string, Func<string, Expression<Func<TEntity, bool>>>>();
+
+        /// <summary>
+        /// Ejecuta consulta genérica: valida filtros permitidos y delega a Data.
+        /// </summary>
+        public override async Task<PagedResult<TDtoGet>> QueryAsync(PageQuery query)
+        {
+            try
+            {
+                // 1) Traducir filtros permitidos a expresiones tipadas
+                var safeFilters = new List<Expression<Func<TEntity, bool>>>();
+                if (query.Filters is not null)
+                {
+                    var allow = AllowedFilters();
+                    foreach (var (k, v) in query.Filters)
+                    {
+                        if (allow.TryGetValue(k, out var builder))
+                            safeFilters.Add(builder(v));
+                        // Filtros no permitidos: se ignoran (o lanzar excepción si lo prefieres)
+                    }
+                }
+
+                // Validate sort field
+                if (!SortableFields().Contains(query.Sort, StringComparer.OrdinalIgnoreCase))
+                {
+                    query = query with { Sort = null };
+                }
+
+                // 2) Data ejecuta server-side con Search + Sort + Paginado
+                var result = await Data.QueryAsync(
+                    query,
+                    SearchableFields(),
+                    safeFilters.ToArray()
+                );
+
+                // 3) Mapear entidades -> DTOs de salida
+                return new PagedResult<TDtoGet>(
+                    Items: _mapper.Map<IEnumerable<TDtoGet>>(result.Items),
+                    Total: result.Total,
+                    Page: result.Page,
+                    Size: result.Size
+                );
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException("Error en consulta genérica.", ex);
+            }
+        }
 
     }
 }

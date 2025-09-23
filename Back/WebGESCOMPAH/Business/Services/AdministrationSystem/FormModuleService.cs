@@ -5,6 +5,7 @@ using Data.Interfaz.IDataImplement.AdministrationSystem;
 using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.DTOs.Implements.AdministrationSystem.FormModule;
 using MapsterMapper;
+using System.Linq.Expressions;
 
 namespace Business.Services.AdministrationSystem
 {
@@ -60,5 +61,29 @@ namespace Business.Services.AdministrationSystem
 
             return ok;
         }
+
+        protected override Expression<Func<FormModule, string>>[] SearchableFields() =>
+        [
+            f => f.Form.Name,
+            f => f.Module.Name
+        ];
+
+
+        protected override string[] SortableFields() => new[]
+        {
+            nameof(FormModule.FormId),
+            nameof(FormModule.ModuleId),
+            nameof(FormModule.Id),
+            nameof(FormModule.CreatedAt),
+            nameof(FormModule.Active)
+        };
+
+        protected override IDictionary<string, Func<string, Expression<Func<FormModule, bool>>>> AllowedFilters() =>
+            new Dictionary<string, Func<string, Expression<Func<FormModule, bool>>>>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(FormModule.FormId)] = value => entity => entity.FormId == int.Parse(value),
+                [nameof(FormModule.ModuleId)] = value => entity => entity.ModuleId == int.Parse(value),
+                [nameof(FormModule.Active)] = value => entity => entity.Active == bool.Parse(value)
+            };
     }
 }

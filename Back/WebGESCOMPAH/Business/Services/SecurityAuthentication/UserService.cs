@@ -9,6 +9,7 @@ using Entity.Infrastructure.Context;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore; // CreateExecutionStrategy
+using System.Linq.Expressions;
 using Utilities.Exceptions;
 using Utilities.Helpers.GeneratePassword;
 using Utilities.Messaging.Interfaces;
@@ -223,5 +224,35 @@ namespace Business.Services.SecurityAuthentication
 
             return (user.Id, true, tempPassword);
         }
+
+
+        protected override Expression<Func<User, string?>>[] SearchableFields() =>
+        [
+            x => x.Email,
+            x => x.Person.FirstName,
+            x => x.Person.LastName,
+            x => x.Person.Document,
+            x => x.Person.Phone,
+            x => x.Person.Address,
+            x => x.Person.City.Name
+        ];
+
+        protected override string[] SortableFields() =>
+        [
+            nameof(User.Email),
+            nameof(User.PersonId),
+            nameof(User.Id),
+            nameof(User.CreatedAt),
+            nameof(User.Active)
+        ];
+
+        protected override IDictionary<string, Func<string, Expression<Func<User, bool>>>> AllowedFilters() =>
+            new Dictionary<string, Func<string, Expression<Func<User, bool>>>>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(User.Email)] = value => x => x.Email == value,
+                [nameof(User.PersonId)] = value => x => x.PersonId == int.Parse(value),
+                [nameof(User.Active)] = value => x => x.Active == bool.Parse(value),
+                [nameof(User.Id)] = value => x => x.Id == int.Parse(value)
+            };
     }
 }

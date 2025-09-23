@@ -18,7 +18,7 @@ import {
   TenantsCreateModel,
 } from '../../models/tenants.models';
 import { TenantStore } from '../../services/tenants/tenants.store';
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 
 @Component({
   selector: 'app-tenants-list',
@@ -173,13 +173,13 @@ export class TenantsListComponent implements OnInit {
     const dto: TenantsUpdateModel = {
       id: row.id,
       firstName: partial.firstName ?? (row as any).firstName ?? '',
-      lastName:  partial.lastName  ?? (row as any).lastName  ?? '',
-      email:     partial.email     ?? row.email,
-      phone:     partial.phone     ?? row.personPhone ?? '',
-      address:   partial.address   ?? row.personAddress ?? '',
-      cityId:    partial.cityId    ?? (row as any).cityId,
-      roleIds:   partial.roleIds   ?? (row as any).roleIds ?? [],
-      active:    partial.active    ?? row.active,
+      lastName: partial.lastName ?? (row as any).lastName ?? '',
+      email: partial.email ?? row.email,
+      phone: partial.phone ?? row.personPhone ?? '',
+      address: partial.address ?? row.personAddress ?? '',
+      cityId: partial.cityId ?? (row as any).cityId,
+      roleIds: partial.roleIds ?? (row as any).roleIds ?? [],
+      active: partial.active ?? row.active,
     };
 
     if (!dto.firstName || !dto.lastName || !dto.email || dto.cityId == null) return null;

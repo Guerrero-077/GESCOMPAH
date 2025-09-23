@@ -5,6 +5,7 @@ using Data.Interfaz.IDataImplement.Business;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.Plaza;
 using MapsterMapper;
+using System.Linq.Expressions;
 using Utilities.Exceptions;
 
 namespace Business.Services.Business
@@ -50,6 +51,32 @@ namespace Business.Services.Business
             // Cascada: activar/desactivar establecimientos de la plaza
             await _establishmentsRepository.SetActiveByPlazaIdAsync(id, active);
         }
+
+
+        protected override Expression<Func<Plaza, string>>[] SearchableFields() =>
+        [
+            p => p.Name,
+            p => p.Description,
+            p => p.Location
+        ];
+
+        protected override string[] SortableFields() =>
+        [
+            nameof(Plaza.Name),
+            nameof(Plaza.Description),
+            nameof(Plaza.Location),
+            nameof(Plaza.Active),
+            nameof(Plaza.CreatedAt),
+            nameof(Plaza.Id)
+        ];
+
+        protected override IDictionary<string, Func<string, Expression<Func<Plaza, bool>>>> AllowedFilters() =>
+            new Dictionary<string, Func<string, Expression<Func<Plaza, bool>>>>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(Plaza.Name)] = value => p => p.Name == value,
+                [nameof(Plaza.Active)] = value => p => p.Active == bool.Parse(value)
+            };
+
     }
 }
 

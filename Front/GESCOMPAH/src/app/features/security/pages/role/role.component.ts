@@ -25,10 +25,10 @@ import { IsActive } from '../../../../core/models/IsAcitve.models';
 export class RoleComponent implements OnInit {
 
   // Inyección de dependencias
-  private readonly dialog            = inject(MatDialog);
-  private readonly roleStore         = inject(RoleStore);
+  private readonly dialog = inject(MatDialog);
+  private readonly roleStore = inject(RoleStore);
   // private readonly confirmDialog     = inject(ConfirmDialogService);
-  private readonly sweetAlert        = inject(SweetAlertService);
+  private readonly sweetAlert = inject(SweetAlertService);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
 

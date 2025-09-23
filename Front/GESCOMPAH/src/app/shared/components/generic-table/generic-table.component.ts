@@ -25,7 +25,7 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { TableColumn } from '../../models/TableColumn.models';
-import { HasRoleAndPermissionDirective } from '../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../core/security/directives/HasRoleAndPermission.directive';
 import { StandardButtonComponent } from '../standard-button/standard-button.component';
 
 export type RowDetailContext<T> = { $implicit: T; row: T };
@@ -100,7 +100,7 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     this.connectSort();
   }
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.updateDisplayedColumns();
@@ -121,7 +121,7 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     }
 
     if (changes['data']) {
-      // ★ Siempre clona al asignar
+      // Siempre clona al asignar
       this.dataSource.data = this.data ? [...this.data] as T[] : [];
 
       if (this._paginator) {
@@ -134,7 +134,7 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
       this.connectSort();
       this.connectPaginator();
 
-      try { (this.dataSource as any)._updateChangeSubscription(); } catch {}
+      try { (this.dataSource as any)._updateChangeSubscription(); } catch { }
 
       this.cdr.detectChanges();
     }

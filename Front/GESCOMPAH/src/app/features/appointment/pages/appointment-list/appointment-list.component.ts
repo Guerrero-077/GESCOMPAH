@@ -14,7 +14,7 @@ import { AppointmentStore } from '../../services/appointment/appointment.store';
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 import { StandardButtonComponent } from "../../../../shared/components/standard-button/standard-button.component";
 
-import {HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 
 
 @Component({
@@ -43,8 +43,8 @@ export class AppointmentListComponent implements OnInit {
 
   @ViewChild('estadoTemplate', { static: true }) estadoTemplate!: TemplateRef<any>;
   @ViewChild('userTemplate', { static: true }) userTemplate!: TemplateRef<any>;
-  @ViewChild('onlyDateTpl',   { static: true }) onlyDateTpl!: TemplateRef<any>;
-  @ViewChild('dateTimeTpl',   { static: true }) dateTimeTpl!: TemplateRef<any>;
+  @ViewChild('onlyDateTpl', { static: true }) onlyDateTpl!: TemplateRef<any>;
+  @ViewChild('dateTimeTpl', { static: true }) dateTimeTpl!: TemplateRef<any>;
 
   constructor(private dialog: MatDialog) { }
 
@@ -56,7 +56,7 @@ export class AppointmentListComponent implements OnInit {
       { key: 'establishmentName', header: 'Local' },
       { key: 'description', header: 'Descripcion' },
       { key: 'requestDate', header: 'Fecha de solicitud', template: this.onlyDateTpl },
-      { key: 'dateTimeAssigned', header: 'Fecha de asignacion', template: this.dateTimeTpl},
+      { key: 'dateTimeAssigned', header: 'Fecha de asignacion', template: this.dateTimeTpl },
       {
         key: 'active',
         header: 'Estado',
@@ -144,7 +144,7 @@ export class AppointmentListComponent implements OnInit {
 
   onView(row: AppointmentSelect): void {
     import('../../components/appointment-detail-dialog/appointment-detail-dialog.component').then(m => {
-      this.dialog.open(m.AppointmentDetailDialogComponent,{
+      this.dialog.open(m.AppointmentDetailDialogComponent, {
         width: '900px',
         maxWidth: '95vw',
         data: { id: row.id },

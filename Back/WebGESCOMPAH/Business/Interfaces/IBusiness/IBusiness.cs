@@ -1,4 +1,6 @@
-﻿namespace Business.Interfaces.IBusiness
+﻿using Entity.DTOs.Base;
+
+namespace Business.Interfaces.IBusiness
 {
     public interface IBusiness<TDtoGet, TDtoCreate, TDtoUpdate>
     {
@@ -10,5 +12,8 @@
         Task<bool> DeleteLogicAsync(int id);
         //Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active);
         Task UpdateActiveStatusAsync(int id, bool active);
+
+
+        Task<PagedResult<TDtoGet>> QueryAsync(PageQuery query);
     }
 }

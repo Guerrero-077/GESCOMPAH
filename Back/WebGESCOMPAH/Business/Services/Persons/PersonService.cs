@@ -5,6 +5,7 @@ using Entity.Domain.Models.Implements.Persons;
 using Entity.DTOs.Implements.Persons.Person;
 using MapsterMapper;
 using Utilities.Exceptions;
+using System.Linq.Expressions;
 
 public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonUpdateDto, Person>, IPersonService
 {
@@ -74,5 +75,36 @@ public class PersonService : BusinessGeneric<PersonSelectDto, PersonDto, PersonU
 
         return await CreateAsync(dto);
     }
+
+    protected override Expression<Func<Person, string>>[] SearchableFields() =>
+    [
+        p => p.FirstName,
+        p => p.LastName,
+        p => p.Document,
+        p => p.Address,
+        p => p.Phone,
+        p => p.User.Email
+    ];
+
+    protected override string[] SortableFields() => new[]
+    {
+        nameof(Person.FirstName),
+        nameof(Person.LastName),
+        nameof(Person.Document),
+        nameof(Person.CityId),
+        nameof(Person.Id),
+        nameof(Person.CreatedAt),
+        nameof(Person.Active)
+    };
+
+    protected override IDictionary<string, Func<string, Expression<Func<Person, bool>>>> AllowedFilters() =>
+        new Dictionary<string, Func<string, Expression<Func<Person, bool>>>>(StringComparer.OrdinalIgnoreCase)
+        {
+            [nameof(Person.Document)] = value => p => p.Document == value,
+            [nameof(Person.CityId)] = value => p => p.CityId == int.Parse(value),
+            [nameof(Person.Active)] = value => p => p.Active == bool.Parse(value),
+            [nameof(Person.FirstName)] = value => p => p.FirstName == value,
+            [nameof(Person.LastName)] = value => p => p.LastName == value
+        };
 
 }

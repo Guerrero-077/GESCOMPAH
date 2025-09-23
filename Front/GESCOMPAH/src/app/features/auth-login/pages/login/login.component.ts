@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormGroup } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-// Centraliza alertas en SweetAlertService (ya inyectado abajo)
 import { AuthService } from '../../../../core/service/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
@@ -14,16 +13,9 @@ function notOnlySpaces(): (control: AbstractControl) => ValidationErrors | null 
   };
 }
 
-/**
- * Regex que obliga:
- * - 1–254 chars totales
- * - 1–64 chars antes de @
- * - dominio con al menos un punto y TLD de 2+ letras
- */
 const FULL_EMAIL_REGEX =
   /^(?=.{1,254}$)(?=.{1,64}@)[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
-/** Devuelve true si hay @ pero no hay punto en la parte del dominio */
 function hasAtButNoTld(email: string): boolean {
   const idx = email.indexOf('@');
   if (idx === -1) return false;
@@ -31,7 +23,6 @@ function hasAtButNoTld(email: string): boolean {
   return domain.length > 0 && !domain.includes('.');
 }
 
-/** Si el correo tiene @ pero no TLD, agrega ".com" */
 function appendDefaultTldIfNeeded(email: string, defaultTld = '.com'): string {
   const trimmed = (email ?? '').trim();
   if (!trimmed) return trimmed;
@@ -80,10 +71,10 @@ export class LoginComponent implements OnInit {
     email: this.fb.nonNullable.control<string>('', {
       validators: [
         Validators.required,
-        Validators.email,          // chequeo básico
+        Validators.email,
         Validators.maxLength(254),
         notOnlySpaces(),
-        Validators.pattern(FULL_EMAIL_REGEX) // exige TLD
+        Validators.pattern(FULL_EMAIL_REGEX)
       ],
       updateOn: 'blur'
     }),
@@ -98,7 +89,6 @@ export class LoginComponent implements OnInit {
     })
   });
 
-  // Accesores
   get emailCtrl() { return this.formLogin.get('email')!; }
   get passwordCtrl() { return this.formLogin.get('password')!; }
 
@@ -128,12 +118,12 @@ export class LoginComponent implements OnInit {
     this.auth.GetMe().subscribe({
       next: () => { },
       error: (err) => {
-        this.sweetAlertService.showNotification('Oops...', err?.message ?? 'Error inesperado', 'error');
+        const message = err?.error?.detail || err?.error?.title || err?.message || 'Error inesperado';
+        this.sweetAlertService.showNotification('Oops...', message, 'error');
       }
     });
   }
 
-  /** Hook del blur del email: agrega .com si falta TLD y normaliza */
   onEmailBlur() {
     const current = (this.emailCtrl.value ?? '').toLowerCase().trim();
     const patched = appendDefaultTldIfNeeded(current, '.com');
@@ -146,19 +136,18 @@ export class LoginComponent implements OnInit {
   login() {
     if (this.formLogin.invalid) {
       this.formLogin.markAllAsTouched();
-      // Intento adicional: si solo falta TLD, parchear y revalidar
+
       const fixed = appendDefaultTldIfNeeded((this.emailCtrl.value ?? '').toLowerCase().trim(), '.com');
       if (fixed !== this.emailCtrl.value) {
         this.emailCtrl.setValue(fixed, { emitEvent: false });
         this.emailCtrl.updateValueAndValidity();
       }
+
       if (this.formLogin.invalid) return;
     }
 
-    // Normaliza antes de enviar (lower + trim + .com si falta)
     let email = (this.emailCtrl.value ?? '').toLowerCase().trim();
     email = appendDefaultTldIfNeeded(email, '.com');
-
     const password = this.passwordCtrl.value ?? '';
 
     this.sweetAlertService.showLoading('Iniciando sesión', 'Por favor, espere...');
@@ -170,10 +159,28 @@ export class LoginComponent implements OnInit {
       },
       error: (err) => {
         this.sweetAlertService.hideLoading();
-        let message = err?.error?.message ?? 'Credenciales inválidas';
-        if (err.status === 401) {
-          message = 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.';
+
+        let message = 'Ocurrió un error inesperado.';
+
+        const problem = err?.error;
+
+        if (problem) {
+          if (problem.detail) {
+            message = problem.detail;
+          } else if (problem.title && !problem.errors) {
+            message = problem.title;
+          } else if (problem.errors) {
+            const errores = problem.errors;
+            const primerCampo = Object.keys(errores)[0];
+            const primerMensaje = errores[primerCampo][0];
+            message = primerMensaje;
+          }
+        } else if (typeof err?.error === 'string') {
+          message = err.error;
+        } else if (err?.message) {
+          message = err.message;
         }
+
         this.sweetAlertService.showNotification(
           'Oops...',
           message,

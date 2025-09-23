@@ -1,8 +1,6 @@
-// core/services/base-crud.service.ts
 import { inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-// Ajusta este import a tu proyecto si no usas alias
 import { environment } from '../../../../environments/environment';
 
 export abstract class GenericService<

@@ -12,7 +12,7 @@ import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet
 import { DepartmentStore } from '../../services/department/department.store';
 import { DepartmentSelectModel } from '../../models/department.models';
 import { ToggleButtonComponent } from '../../../../shared/components/toggle-button-component/toggle-button-component.component';
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 import { IsActive } from '../../../../core/models/IsAcitve.models';
 
 @Component({
@@ -46,7 +46,7 @@ export class DepartmentComponent implements OnInit {
     private readonly store: DepartmentStore,
     private readonly dialog: MatDialog,
     private readonly sweetAlert: SweetAlertService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.columns = [

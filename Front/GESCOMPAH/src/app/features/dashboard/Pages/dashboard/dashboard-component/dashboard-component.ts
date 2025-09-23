@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal, computed} from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CardInfoComponent } from '../../../components/card-info/card-info.component';
 import { QuickActionComponent } from '../../../components/quick-action/quick-action.component';
 import { SystemAlertComponent } from "../../../components/system-alert/system-alert.component";
 import { PageHeaderService } from '../../../../../shared/Services/PageHeader/page-header.service';
 import { BaseChartDirective } from 'ng2-charts';
-import { Chart, DoughnutController, ArcElement, Tooltip, Legend, ChartOptions} from 'chart.js';
+import { Chart, DoughnutController, ArcElement, Tooltip, Legend, ChartOptions } from 'chart.js';
 import { CircleChartComponent } from "../../../../../shared/components/circle-chart/circle-chart.component";
 import { LineChartComponent } from "../../../../../shared/components/line-chart/line-chart.component";
 import { EstablishmentService } from '../../../../establishments/services/establishment/establishment.service';
@@ -15,7 +15,7 @@ import { take } from 'rxjs/operators';
 import { ContractService } from '../../../../contracts/services/contract/contract.service';
 import { ContractCard } from '../../../../contracts/models/contract.models';
 import { PriceChartComponent } from "../../../../../shared/components/price-chart/price-chart.component";
-import { HasRoleAndPermissionDirective } from '../../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../../core/security/directives/HasRoleAndPermission.directive';
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
     this.establishments().filter(e => e.active).length
   );
 
-  readonly inactiveEstablishment  = computed(() =>
+  readonly inactiveEstablishment = computed(() =>
     this.establishments().filter(e => !e.active).length
   );
 
@@ -51,7 +51,7 @@ export class DashboardComponent implements OnInit {
   readonly activeContract = computed(() =>
     this.contract().filter(e => e.active).length
   );
-  readonly inactiveContract  = computed(() =>
+  readonly inactiveContract = computed(() =>
     this.contract().filter(e => !e.active).length
   );
 

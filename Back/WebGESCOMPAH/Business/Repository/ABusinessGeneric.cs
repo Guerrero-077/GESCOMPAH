@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces.IBusiness;
 using Entity.Domain.Models.ModelBase;
+using Entity.DTOs.Base;
 
 namespace Business.Repository
 {
@@ -13,5 +14,10 @@ namespace Business.Repository
         public abstract Task<bool> DeleteLogicAsync(int id);
         //public abstract Task<TDtoGet> UpdateActiveStatusAsync(int id, bool active);
         public abstract Task UpdateActiveStatusAsync(int id, bool active);
+
+        /// <summary>
+        /// Consulta genérica con paginado/búsqueda/filtros. Expone DTOs al controlador.
+        /// </summary>
+        public abstract Task<PagedResult<TDtoGet>> QueryAsync(PageQuery query);
     }
 }

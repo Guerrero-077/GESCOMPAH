@@ -3,7 +3,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { SquareListComponent } from "../../components/square-list/square-list.component";
 import { EstablishmentsListComponent } from "../../components/establishments-list/establishments-list.component";
 import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
-import { HasRoleAndPermissionDirective } from '../../../../core/Directives/HasRoleAndPermission.directive';
+import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 
 @Component({
   selector: 'app-squares-establishments',

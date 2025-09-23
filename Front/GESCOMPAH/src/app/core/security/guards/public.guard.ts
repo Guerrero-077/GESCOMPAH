@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { UserStore } from '../service/permission/User.Store';
+import { UserStore } from '../../service/permission/User.Store';
 
 export const publicGuard: CanActivateFn = (route, state) => {
   const userStore = inject(UserStore);

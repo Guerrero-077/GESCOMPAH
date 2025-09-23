@@ -4,20 +4,39 @@
     {
         public static IServiceCollection AddCustomCors(this IServiceCollection services, IConfiguration configuration)
         {
-            var allowedOrigins = configuration.GetValue<string>("OrigenesPermitidos")!
-                .Split(",", StringSplitOptions.RemoveEmptyEntries)
-                .Select(o => o.Trim())
-                .ToArray();
+            var fromConfig = (configuration.GetValue<string>("OrigenesPermitidos") ?? "")
+                .Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
                 {
-                    policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                    policy
+                        .SetIsOriginAllowed(origin =>
+                        {
+                            if (string.Equals(origin, "capacitor://localhost", StringComparison.OrdinalIgnoreCase))
+                                return true;
+
+                            if (Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+                            {
+                                if (uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase))
+                                    return true;
+
+                                if (uri.Host.EndsWith(".ngrok-free.app", StringComparison.OrdinalIgnoreCase) ||
+                                    uri.Host.EndsWith(".ngrok.app", StringComparison.OrdinalIgnoreCase))
+                                    return true;
+                            }
+
+                            return fromConfig.Contains(origin, StringComparer.OrdinalIgnoreCase);
+                        })
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
 
             return services;
         }
     }
+
 }

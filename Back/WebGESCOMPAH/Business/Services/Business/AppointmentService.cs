@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Utilities.Exceptions;
 using Utilities.Helpers.Business;
 using Utilities.Messaging.Interfaces;
+using System.Linq.Expressions;
 
 namespace Business.Services.Business
 {
@@ -112,5 +113,36 @@ namespace Business.Services.Business
 
         }
 
+        protected override Expression<Func<Appointment, string>>[] SearchableFields() =>
+            [
+                a => a.Description!,
+                a => a.Person.FirstName!,
+                a => a.Person.LastName!,
+                a => a.Person.Phone!,
+                a => a.Establishment.Name!
+            ];
+
+        protected override string[] SortableFields() => new[]
+        {
+            nameof(Appointment.Description),
+            nameof(Appointment.RequestDate),
+            nameof(Appointment.DateTimeAssigned),
+            nameof(Appointment.EstablishmentId),
+            nameof(Appointment.PersonId),
+            nameof(Appointment.Id),
+            nameof(Appointment.CreatedAt),
+            nameof(Appointment.Active)
+        };
+
+        protected override IDictionary<string, Func<string, Expression<Func<Appointment, bool>>>> AllowedFilters() =>
+            new Dictionary<string, Func<string, Expression<Func<Appointment, bool>>>>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(Appointment.EstablishmentId)] = v => e => e.EstablishmentId == int.Parse(v),
+                [nameof(Appointment.PersonId)] = v => e => e.PersonId == int.Parse(v),
+                [nameof(Appointment.Active)] = v => e => e.Active == bool.Parse(v),
+                [nameof(Appointment.RequestDate)] = v => e => e.RequestDate == DateTime.Parse(v)
+            };
+
     }
 }
+
