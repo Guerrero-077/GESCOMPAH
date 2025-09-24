@@ -65,7 +65,9 @@ export class EstablishmentsListComponent implements OnInit {
 
   openCreateDialog(): void {
     import('../form-establishment/form-establishment.component').then(m => {
+      this.dialog.closeAll(); // cierra otros diálogos abiertos
       const ref = this.dialog.open(m.FormEstablishmentComponent, {
+        id: 'createDialog',
         width: '600px',
         data: null
       });
@@ -75,22 +77,6 @@ export class EstablishmentsListComponent implements OnInit {
     });
   }
 
-  openEditDialogById(id: number): void {
-    this.estSvc.getById(id).subscribe({
-      next: row => {
-        import('../form-establishment/form-establishment.component').then(m => {
-          const ref = this.dialog.open(m.FormEstablishmentComponent, {
-            width: '600px',
-            data: row
-          });
-          ref.afterClosed().subscribe(async ok => {
-            if (ok) await this.store.loadCardsAll();
-          });
-        });
-      },
-      error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
-    });
-  }
 
   async handleDelete(id: number): Promise<void> {
     const result = await this.sweetAlert.showConfirm('¿Está seguro?', 'Esta acción no se puede deshacer');
@@ -108,20 +94,44 @@ export class EstablishmentsListComponent implements OnInit {
   onCardUpdated(): void { void this.store.loadCardsAll(); }
 
   onView(id: number): void {
-    import('../../services/establishment/establishment.service').then(({ EstablishmentService }) => {
-      const service = (this as any).store['svc'] as EstablishmentService; // usa el servicio del store
-      service.getById(id).subscribe({
-        next: row => {
-          import('../establishment-detail-dialog/establishment-detail-dialog.component').then(m => {
-            this.dialog.open(m.EstablishmentDetailDialogComponent, {
-              width: '900px',
-              data: row
-            });
+    if (this.dialog.getDialogById('viewDialog')) {
+      return;
+    }
+
+    this.estSvc.getById(id).subscribe({
+      next: row => {
+        import('../establishment-detail-dialog/establishment-detail-dialog.component').then(m => {
+          this.dialog.open(m.EstablishmentDetailDialogComponent, {
+            id: 'viewDialog',
+            width: '900px',
+            data: row
           });
-        },
-        error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
-      });
+        });
+      },
+      error: () =>
+        this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
     });
   }
+
+  openEditDialogById(id: number): void {
+    this.estSvc.getById(id).subscribe({
+      next: row => {
+        import('../form-establishment/form-establishment.component').then(m => {
+          this.dialog.closeAll(); // fuerza que solo quede este abierto
+          const ref = this.dialog.open(m.FormEstablishmentComponent, {
+            id: 'editDialog',
+            width: '600px',
+            data: row
+          });
+          ref.afterClosed().subscribe(async ok => {
+            if (ok) await this.store.loadCardsAll();
+          });
+        });
+      },
+      error: () =>
+        this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
+    });
+  }
+
 }
 

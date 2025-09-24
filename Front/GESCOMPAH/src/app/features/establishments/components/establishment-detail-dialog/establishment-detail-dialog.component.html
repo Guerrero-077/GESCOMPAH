@@ -11,25 +11,35 @@
         <div class="col-lg-6 col-md-12 mb-4">
           <div *ngIf="data.images?.length > 0" class="carousel-container">
             <div class="carousel-wrapper">
-              <img [src]="data.images[currentImageIndex]?.filePath" [alt]="'Imagen de ' + data.name" loading="lazy" decoding="async"
-                class="carousel-image" (click)="viewImage(data.images[currentImageIndex].filePath)" tabindex="0"
-                (keydown.enter)="viewImage(data.images[currentImageIndex].filePath)" role="button"
-                [attr.aria-label]="'Ver imagen de ' + data.name" />
+              <img [src]="data.images[currentImageIndex]?.filePath"
+                   [alt]="'Imagen de ' + data.name"
+                   loading="lazy" decoding="async"
+                   class="carousel-image"
+                   (click)="viewImage(data.images[currentImageIndex].filePath)"
+                   tabindex="0"
+                   (keydown.enter)="viewImage(data.images[currentImageIndex].filePath)"
+                   role="button"
+                   [attr.aria-label]="'Ver imagen de ' + data.name" />
 
               <!-- Flechas dentro del .carousel-wrapper -->
-              <button class="carousel-arrow left" (click)="prevImage()" aria-label="Imagen anterior">
+              <button class="carousel-arrow left"
+                      (click)="prevImage()"
+                      aria-label="Imagen anterior">
                 <mat-icon>chevron_left</mat-icon>
               </button>
 
-              <button class="carousel-arrow right" (click)="nextImage()" aria-label="Imagen siguiente">
+              <button class="carousel-arrow right"
+                      (click)="nextImage()"
+                      aria-label="Imagen siguiente">
                 <mat-icon>chevron_right</mat-icon>
               </button>
-
             </div>
 
             <div class="carousel-dots">
-              <span *ngFor="let image of data.images; let idx = index" class="dot"
-                [class.active]="idx === currentImageIndex" (click)="goToImage(idx)">
+              <span *ngFor="let image of data.images; let idx = index"
+                    class="dot"
+                    [class.active]="idx === currentImageIndex"
+                    (click)="goToImage(idx)">
               </span>
             </div>
           </div>
@@ -42,13 +52,16 @@
           <div class="info-card">
             <p><strong>Dirección:</strong> {{ data.address }}</p>
           </div>
+
           <div class="info-card mt-2">
-            <p><strong>Área m²:</strong> {{ data.areaM2 }}</p>
+            <!-- Área con separador de miles -->
+            <p><strong>Área m²:</strong> {{ data.areaM2 | number:'1.0-0' }}</p>
           </div>
 
           <div class="title m-3"><span>Información Financiera</span></div>
           <div class="info-card">
-            <p><strong>Renta base:</strong> {{ data.rentValueBase }}</p>
+            <!-- Renta base en pesos colombianos, sin decimales -->
+            <p><strong>Renta base:</strong> {{ data.rentValueBase | currency:'COP':'symbol':'1.0-0' }}</p>
           </div>
         </div>
       </div>

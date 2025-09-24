@@ -1,8 +1,6 @@
 export const environment = {
-  apiURL: "https://6ecf35302fb9.ngrok-free.app/api"
-  // apiURL: "http://172.30.2.214:5163/api"
-  ,
+  production: true,
+  apiURL: "https://ae377c61b925.ngrok-free.app/api",
   // 0 = sin limite; ajusta segun despliegue
   establishmentsDefaultLimit: 0
-  // apiURL: "https://localhost:7165/api"
 };

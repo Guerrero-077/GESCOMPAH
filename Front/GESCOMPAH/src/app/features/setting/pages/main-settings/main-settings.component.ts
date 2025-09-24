@@ -33,14 +33,15 @@ export class MainSettingsComponent implements OnInit {
 
   onTabChange(index: number): void {
     if (index === 0) {
-      this.pageHeaderService.setPageHeader('Finanzas', 'Gestión de finanzas');
-    } else if (index === 1) {
-      this.pageHeaderService.setPageHeader('Ubicación', 'Gestión de ubicaciones');
-    } else if (index === 2) {
       this.pageHeaderService.setPageHeader('Actualiza tu información', 'Actualiza tus datos personales');
+    } else if (index === 1) {
+      this.pageHeaderService.setPageHeader('Finanzas', 'Gestión de finanzas');
+    } else if (index === 2) {
+      this.pageHeaderService.setPageHeader('Ubicación', 'Gestión de ubicaciones');
     } else if (index === 3) {
       this.pageHeaderService.setPageHeader('Seguridad', 'Cambio de contraseña');
     }
   }
+
 }
 
