@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, Inject} from '@angular/core';
 import {
   ReactiveFormsModule, FormGroup, FormBuilder, Validators,
   AbstractControl, ValidatorFn, ValidationErrors
@@ -34,6 +34,9 @@ import { CitySelectModel } from '../../../setting/models/city.models';
 import { EstablishmentSelect } from '../../../establishments/models/establishment.models';
 import { SquareService } from '../../../establishments/services/square/square.service';
 import { EstablishmentService } from '../../../establishments/services/establishment/establishment.service';
+
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+
 
 function toDateOnly(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -80,7 +83,7 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
   establishmentFormGroup!: FormGroup;
 
   ciudades: CitySelectModel[] = [];
-  plazas: SquareSelectModel[] = [];
+  establishment: EstablishmentSelect | null = null;
   filteredEstablishments: EstablishmentSelect[] = [];
 
   personaEncontrada = false;
@@ -97,12 +100,21 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
 
   private lastQueriedDoc: string | null = null;
 
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {}
+
   ngOnInit(): void {
     this.initForms();
     this.loadCiudades();
-    this.loadPlazas();
     this.setupReactivePersonLookup();
-    this.setupPlazaFiltering();
+
+    if (this.data) {
+      this.appointmentFormGroup.patchValue({
+        establishmentId: this.data.id,
+        establishmentName: this.data.name       // para mostrar en input
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -127,7 +139,8 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
       requestDate: [this.today, Validators.required],
       dateTimeAssigned: [this.today, Validators.required],
       cityId: [null, Validators.required],
-      establishmentId: [null, Validators.required]
+      establishmentId: [null, Validators.required],
+      establishmentName: [null, Validators.required]
     });
   }
 
@@ -139,12 +152,6 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
         next: (res) => (this.ciudades = res ?? []),
         error: (err) => console.error('Error al cargar ciudades', err)
       });
-  }
-
-  private loadPlazas(): void {
-    this.squareSvc.getAll()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({ next: (res) => (this.plazas = res ?? []) });
   }
 
   /* ===================== Lookup persona ===================== */
@@ -198,13 +205,17 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
         firstName: p.firstName ?? '',
         lastName: p.lastName ?? '',
         phone: p.phone ?? '',
-        email: p.email ?? ''
+        email: p.email ?? '',
+        address: p.address ?? ''
       },
       { emitEvent: false }
     );
 
     this.appointmentFormGroup.patchValue(
-      { cityId: p.cityId ?? null },
+      { cityId: p.cityId ?? null,
+        establishmentId: this.data.id,
+        establishmentName: this.data.name
+      },
       { emitEvent: false }
     );
   }
@@ -213,64 +224,20 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
     this.personaEncontrada = false;
     this.personId = null;
     this.foundCityName = null;
-    this.personFormGroup.patchValue({ firstName: '', lastName: '', phone: '', email: '' }, { emitEvent: false });
+    this.personFormGroup.patchValue({ firstName: '', lastName: '', phone: '', email: '', address: ''}, { emitEvent: false });
     this.appointmentFormGroup.patchValue({ cityId: null }, { emitEvent: false });
   }
 
   private disablePersonFields(): void {
-    ['firstName', 'lastName', 'phone', 'email'].forEach(k => this.personFormGroup.get(k)?.disable({ emitEvent: false }));
+    ['firstName', 'lastName', 'phone', 'email', 'address'].forEach(k => this.personFormGroup.get(k)?.disable({ emitEvent: false }));
     ['cityId'].forEach(k => this.appointmentFormGroup.get(k)?.disable({ emitEvent: false }));
   }
 
   private enablePersonFields(): void {
-    ['firstName', 'lastName', 'phone', 'email'].forEach(k => this.personFormGroup.get(k)?.enable({ emitEvent: false }));
+    ['firstName', 'lastName', 'phone', 'email', 'address'].forEach(k => this.personFormGroup.get(k)?.enable({ emitEvent: false }));
     ['cityId'].forEach(k => this.appointmentFormGroup.get(k)?.enable({ emitEvent: false }));
   }
 
-  /* ===================== Dependencias ===================== */
-
-  /**
-   * Configura la lógica para filtrar establecimientos al seleccionar una plaza.
-   * Reinicia `establishmentIds` y consulta establecimientos activos.
-   */
-  private setupPlazaFiltering(): void {
-    const estCtrl = this.establishmentFormGroup.get('establishmentIds')!;
-    const plazaCtrl = this.establishmentFormGroup.get('plazaId')!;
-
-    plazaCtrl.valueChanges.pipe(
-      takeUntil(this.destroy$),
-      map((id: number | string | null) => (id == null ? null : Number(id))),
-      distinctUntilChanged(),
-      switchMap((plazaId) => {
-        estCtrl.setValue([], { emitEvent: false });
-        estCtrl.disable({ emitEvent: false }); // 🔒 Deshabilita por defecto
-
-        if (!plazaId || plazaId <= 0) return of([]);
-
-        this.loadingEstablishments = true;
-        return this.estSvc.getByPlaza(plazaId, { activeOnly: true }).pipe(
-          catchError(() => of([])),
-          finalize(() => {
-            this.loadingEstablishments = false;
-
-            // 🧠 Reactiva solo si hay plaza válida y terminó de cargar
-            if (this.filteredEstablishments.length > 0) {
-              estCtrl.enable({ emitEvent: false });
-            }
-          })
-        );
-      })
-    ).subscribe((list) => {
-      this.filteredEstablishments = list ?? [];
-
-      // Habilita o no según el resultado, en caso de finalización muy rápida
-      if (this.filteredEstablishments.length > 0) {
-        estCtrl.enable({ emitEvent: false });
-      } else {
-        estCtrl.disable({ emitEvent: false });
-      }
-    });
-  }
 
   /* ===================== Acciones ===================== */
   cancel(): void {

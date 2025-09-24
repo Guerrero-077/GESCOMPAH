@@ -67,7 +67,7 @@
 
   <div class="col-md-12 row d-flex pb-3 d-flex justify-content-center gap mx-1">
     <div class="col-md-4 col-lg-4 col-sm-12 d-flex justify-content-center pb-3">
-      <app-card-feature 
+      <app-card-feature
         title="Tradición Cafetera"
         description="Reconocidos por la producción de café de alta calidad, con fincas familiares que mantienen tradiciones ancestrales de cultivo."
       >
@@ -78,7 +78,7 @@
     </div>
 
     <div class="col-md-4 col-lg-4 col-sm-12 d-flex justify-content-center pb-3">
-      <app-card-feature 
+      <app-card-feature
         title="Ubicación Estratégica"
         description="Situado en el valle del río Magdalena, con acceso privilegiado a las principales vías de comunicación del departamento del Huila."
       >
@@ -89,7 +89,7 @@
     </div>
 
     <div class="col-md-4 col-lg-4 col-sm-12 d-flex justify-content-center pb-3">
-      <app-card-feature 
+      <app-card-feature
         title="Comunidad Unida"
         description="Una comunidad comprometida con el desarrollo sostenible, la preservación cultural y el crecimiento económico inclusivo."
       >
@@ -107,8 +107,8 @@
     </div>
 
     <div class="contenedor-carrusel-wrapper">
-      <button class="flecha flecha-izquierda" 
-        (click)="scrollCarrusel(-1)" 
+      <button class="flecha flecha-izquierda"
+        (click)="scrollCarrusel(-1)"
         [disabled]="!canScrollLeft">
         &#10094;
       </button>
@@ -120,7 +120,7 @@
               [local]="establishment"
               [showAvailableTag]="true"
               (onView)="onView($event)"
-              (onCreateAppointment)="onCreateAppointment()"
+              (onCreateAppointment)="onCreateAppointment(establishment.id)"
             >
             </app-card>
           </div>

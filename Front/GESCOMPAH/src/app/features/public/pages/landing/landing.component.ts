@@ -18,6 +18,7 @@ import { EstablishmentService } from '../../../establishments/services/establish
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { fromEvent } from 'rxjs';
 import { AppointmentStore } from '../../../appointment/services/appointment/appointment.store';
+import { AppointmentService } from '../../../appointment/services/appointment/appointment.service';
 
 @Component({
   selector: 'app-landing',
@@ -68,16 +69,24 @@ export class LandingComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onCreateAppointment(): void {
-    import('../../../appointment/components/form-appointment/form-appointment.component').then(m => {
-      const ref = this.dialog.open(m.FormAppointmentComponent, { 
-        width: '600px', 
-        data: null 
+  onCreateAppointment(id: number): void {
+    import('../../../appointment/services/appointment/appointment.service').then(({ AppointmentService }) => {
+      const service = (this as any).store['svc'] as AppointmentService;
+      service.getById(id).subscribe({
+        next: row => {
+          import('../../../appointment/components/form-appointment/form-appointment.component').then(m => {
+            this.dialog.open(m.FormAppointmentComponent, {
+              width: '600px',
+              data: row
+            });
+            console.log(row);
+
+          });
+        }, 
+        error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
       });
-      ref.afterClosed().subscribe(async ok => {
-        if (ok) await this.storeAppointment.loadAll();
-      });
-    });
+    }
+    );
   }
 
   ngAfterViewInit(): void {
