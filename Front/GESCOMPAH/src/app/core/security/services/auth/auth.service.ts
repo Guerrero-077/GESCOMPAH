@@ -62,4 +62,15 @@ export class AuthService {
   ChangePassword(dto: ChangePasswordDto): Observable<any> {
     return this.http.post(environment.apiURL + '/auth/change-password', dto, { withCredentials: true });
   }
+
+  // Recuperación de contraseña: enviar código
+  RequestPasswordReset(email: string): Observable<any> {
+    const body = { email };
+    return this.http.post(this.urlBase + 'recuperar/enviar-codigo', body);
+  }
+
+  // Recuperación de contraseña: confirmar código y establecer nueva contraseña
+  ConfirmPasswordReset(params: { email: string; code: string; newPassword: string; }): Observable<any> {
+    return this.http.post(this.urlBase + 'recuperar/confirmar', params);
+  }
 }
