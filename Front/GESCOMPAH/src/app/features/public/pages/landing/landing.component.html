@@ -119,7 +119,9 @@
             <app-card
               [local]="establishment"
               [showAvailableTag]="true"
-              (onView)="onView($event)">
+              (onView)="onView($event)"
+              (onCreateAppointment)="onCreateAppointment()"
+            >
             </app-card>
           </div>
         </div>

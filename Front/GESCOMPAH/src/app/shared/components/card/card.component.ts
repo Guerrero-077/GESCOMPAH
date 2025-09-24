@@ -19,7 +19,7 @@ export class CardComponent {
   @Output() onEdit = new EventEmitter<number>();
   @Output() onDelete = new EventEmitter<number>();
   @Output() onUpdate = new EventEmitter<void>(); // Nuevo evento para actualización
-  @Output() onCreateAppointment = new EventEmitter<number>();
+  @Output() onCreateAppointment = new EventEmitter<void>();
 
   constructor() { }
 
@@ -90,6 +90,6 @@ export class CardComponent {
   }
 
   handleCreateAppointment(): void {
-    this.onCreateAppointment.emit(this.local.id);
+    this.onCreateAppointment.emit();
   }
 }

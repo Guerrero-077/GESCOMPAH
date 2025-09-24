@@ -10,3 +10,7 @@ export class AppointmentService extends GenericService<AppointmentSelect, Appoin
   protected override resource = 'appointment';
 
 }
+
+export function FormAppointmentComponent(FormAppointmentComponent: any, arg1: { width: string; data: null; }) {
+  throw new Error('Function not implemented.');
+}

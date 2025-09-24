@@ -29,6 +29,11 @@ import { buildEmailValidators, FormUtilsService } from '../../../../shared/Servi
 import { ErrorMessageService } from '../../../../shared/Services/forms/error-message.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { AppointmentCreateModel } from '../../models/appointment.models';
+import { SquareSelectModel } from '../../../establishments/models/squares.models';
+import { CitySelectModel } from '../../../setting/models/city.models';
+import { EstablishmentSelect } from '../../../establishments/models/establishment.models';
+import { SquareService } from '../../../establishments/services/square/square.service';
+import { EstablishmentService } from '../../../establishments/services/establishment/establishment.service';
 
 function toDateOnly(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -58,9 +63,12 @@ function toDateOnly(d: Date): string {
 export class FormAppointmentComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly citySvc = inject(CityService);
+  private readonly estSvc = inject(EstablishmentService);
   private readonly personSvc = inject(PersonService);
   private readonly appointmentSvc = inject(AppointmentService);
+  private readonly squareSvc = inject(SquareService);
   private readonly dialogRef = inject(MatDialogRef<FormAppointmentComponent>);
+
   private readonly utils = inject(FormUtilsService);
   private readonly errMsg = inject(ErrorMessageService);
   private readonly sweet = inject(SweetAlertService);
@@ -69,22 +77,32 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
 
   personFormGroup!: FormGroup;
   appointmentFormGroup!: FormGroup;
+  establishmentFormGroup!: FormGroup;
 
-  ciudades: any[] = [];
+  ciudades: CitySelectModel[] = [];
+  plazas: SquareSelectModel[] = [];
+  filteredEstablishments: EstablishmentSelect[] = [];
+
   personaEncontrada = false;
   personId: number | null = null;
   foundCityName: string | null = null;
+
   loadingPerson = false;
+  loadingEstablishments = false;
   saving = false;
 
   today = new Date();
+  minEndDate = this.today;
+  startMinDate = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
 
   private lastQueriedDoc: string | null = null;
 
   ngOnInit(): void {
     this.initForms();
     this.loadCiudades();
+    this.loadPlazas();
     this.setupReactivePersonLookup();
+    this.setupPlazaFiltering();
   }
 
   ngOnDestroy(): void {
@@ -100,6 +118,7 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
       lastName: ['', [Validators.required, AV.notOnlySpaces(), AV.alphaHumanName(), Validators.maxLength(50)]],
       phone: ['', [Validators.required, AV.colombianPhone()]],
       email: ['', buildEmailValidators(true)],
+      address: ['', Validators.required]
     });
 
     this.appointmentFormGroup = this.fb.group({
@@ -120,6 +139,12 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
         next: (res) => (this.ciudades = res ?? []),
         error: (err) => console.error('Error al cargar ciudades', err)
       });
+  }
+
+  private loadPlazas(): void {
+    this.squareSvc.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: (res) => (this.plazas = res ?? []) });
   }
 
   /* ===================== Lookup persona ===================== */
@@ -202,6 +227,51 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
     ['cityId'].forEach(k => this.appointmentFormGroup.get(k)?.enable({ emitEvent: false }));
   }
 
+  /* ===================== Dependencias ===================== */
+
+  /**
+   * Configura la lógica para filtrar establecimientos al seleccionar una plaza.
+   * Reinicia `establishmentIds` y consulta establecimientos activos.
+   */
+  private setupPlazaFiltering(): void {
+    const estCtrl = this.establishmentFormGroup.get('establishmentIds')!;
+    const plazaCtrl = this.establishmentFormGroup.get('plazaId')!;
+
+    plazaCtrl.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      map((id: number | string | null) => (id == null ? null : Number(id))),
+      distinctUntilChanged(),
+      switchMap((plazaId) => {
+        estCtrl.setValue([], { emitEvent: false });
+        estCtrl.disable({ emitEvent: false }); // 🔒 Deshabilita por defecto
+
+        if (!plazaId || plazaId <= 0) return of([]);
+
+        this.loadingEstablishments = true;
+        return this.estSvc.getByPlaza(plazaId, { activeOnly: true }).pipe(
+          catchError(() => of([])),
+          finalize(() => {
+            this.loadingEstablishments = false;
+
+            // 🧠 Reactiva solo si hay plaza válida y terminó de cargar
+            if (this.filteredEstablishments.length > 0) {
+              estCtrl.enable({ emitEvent: false });
+            }
+          })
+        );
+      })
+    ).subscribe((list) => {
+      this.filteredEstablishments = list ?? [];
+
+      // Habilita o no según el resultado, en caso de finalización muy rápida
+      if (this.filteredEstablishments.length > 0) {
+        estCtrl.enable({ emitEvent: false });
+      } else {
+        estCtrl.disable({ emitEvent: false });
+      }
+    });
+  }
+
   /* ===================== Acciones ===================== */
   cancel(): void {
     this.dialogRef.close(false);
@@ -227,15 +297,18 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
       firstName: String(p.get('firstName')!.value).trim(),
       lastName: String(p.get('lastName')!.value).trim(),
       document: String(p.get('document')!.value).trim(),
-      adrress: String(a.get('address')?.value ?? '').trim(),
+      address: String(a.get('address')?.value ?? '').trim(), // 🔥 corregido
       phone: String(p.get('phone')!.value).trim(),
+      email: String(p.get('email')!.value).trim(),           // 🔥 agregado
       cityId: Number(a.get('cityId')!.value),
       establishmentId: Number(a.get('establishmentId')!.value),
       description: String(a.get('description')!.value).trim(),
       observation: String(a.get('observation')!.value ?? '').trim(),
       requestDate: a.get('requestDate')!.value,
-      dateTimeAssigned: a.get('dateTimeAssigned')!.value
+      dateTimeAssigned: a.get('dateTimeAssigned')!.value,
+      active: true                                          // 🔥 agregado
     };
+
 
     this.saving = true;
     this.appointmentSvc.create(payload)

@@ -68,22 +68,17 @@ export class LandingComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // onCreateAppointment(id: number): void {
-  //   import('../../../appointment/services/appointment/appointment.service').then(({ AppointmentService }) => {
-  //     const service = (this as any).storeAppointment['svc'] as AppointmentService;
-  //     service.getById(id).subscribe({
-  //       next: row => {
-  //         import('../../../appointment/components/form-appointment/form-appointment.component').then(m => {
-  //           this.dialog.open(m.FormAppointmentComponent, {
-  //             width: '900px',
-  //             data: row
-  //           });
-  //         });
-  //       },
-  //       error: () => this.sweetAlert.showNotification('Error', 'Establecimiento no encontrado', 'error')
-  //     });
-  //   });
-  // }
+  onCreateAppointment(): void {
+    import('../../../appointment/components/form-appointment/form-appointment.component').then(m => {
+      const ref = this.dialog.open(m.FormAppointmentComponent, { 
+        width: '600px', 
+        data: null 
+      });
+      ref.afterClosed().subscribe(async ok => {
+        if (ok) await this.storeAppointment.loadAll();
+      });
+    });
+  }
 
   ngAfterViewInit(): void {
     const el = this.carruselRef?.nativeElement;
