@@ -1,6 +1,5 @@
 ﻿using Business.Interfaces.Notifications;
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
 
 namespace WebGESCOMPAH.RealTime
 {
