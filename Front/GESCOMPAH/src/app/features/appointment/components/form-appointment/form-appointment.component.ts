@@ -66,10 +66,8 @@ function toDateOnly(d: Date): string {
 export class FormAppointmentComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly citySvc = inject(CityService);
-  private readonly estSvc = inject(EstablishmentService);
   private readonly personSvc = inject(PersonService);
   private readonly appointmentSvc = inject(AppointmentService);
-  private readonly squareSvc = inject(SquareService);
   private readonly dialogRef = inject(MatDialogRef<FormAppointmentComponent>);
 
   private readonly utils = inject(FormUtilsService);
@@ -288,6 +286,17 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
 
   fixEmail(): void {
     this.utils.coerceEmailTld(this.personFormGroup.get('email'));
+  }
+
+  /**
+   * Marca todos los campos como tocados y actualiza su validez.
+   * Forza la visualización de errores de validación.
+   */
+  markAllTouched(): void {
+    [this.personFormGroup, this.appointmentFormGroup, this.establishmentFormGroup].forEach(g => {
+      g.markAllAsTouched();
+      Object.values(g.controls).forEach(c => c.updateValueAndValidity());
+    });
   }
 
   getFirstError(control: AbstractControl | null, order: string[] = []): string | null {
