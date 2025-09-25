@@ -12,9 +12,26 @@
   background-color: var(--text-color-white) !important;
 }
 
-::ng-deep .mat-raised-button.mat-primary {
+/* Force primary raised buttons to use project green */
+::ng-deep .mat-raised-button.mat-primary,
+::ng-deep .mat-mdc-raised-button.mat-primary {
   background-color: var(--color-primary) !important;
   color: var(--white) !important;
+}
+
+/* Disabled override to ensure grey, even with ::ng-deep and !important above */
+::ng-deep .mat-raised-button.mat-primary[disabled],
+::ng-deep .mat-mdc-raised-button.mat-primary[disabled] {
+  background-color: var(--gray-300) !important;
+  color: var(--gray-600) !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .mat-raised-button.mat-primary[disabled]:hover,
+::ng-deep .mat-mdc-raised-button.mat-primary[disabled]:hover {
+  background-color: var(--gray-300) !important;
+  color: var(--gray-600) !important;
+  box-shadow: none !important;
 }
 
 ::ng-deep .mat-step-label {

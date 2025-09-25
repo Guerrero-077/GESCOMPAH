@@ -6,6 +6,7 @@
     [createButtonLabel]="'Nuevo parametro'"
     [titulo]="'Gestión de parametros del sistema'"
     [subTitulo]="'Gestione las variables del sistema'"
+    [showViewButton]="false"
     (edit)="openEditDialog($event)"
     (delete)="handleDelete($event)"
     (create)="openCreateDialog()">
@@ -14,7 +15,7 @@
 
   <ng-template #estadoTemplate let-row>
     <div class="d-inline-flex align-items-center gap-3 flex-nowrap">
-      <span class="badge align-middle" [ngClass]="row.active ? 'badge-success' : 'badge-secondary'">
+      <span class="badge align-middle" [ngClass]="row.active ? 'badge-success--solid' : 'badge-warning'">
         {{ row.active ? 'Activo' : 'Inactivo' }}
       </span>
 

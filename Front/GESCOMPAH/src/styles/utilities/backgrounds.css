@@ -1,0 +1,12 @@
+.bg-surface {
+  background: var(--color-surface) !important;
+}
+
+.bg-surface-muted {
+  background: var(--color-surface-muted) !important;
+}
+
+.bg-primary {
+  background: var(--gradient-primary) !important;
+  color: var(--color-primary-contrast) !important;
+}

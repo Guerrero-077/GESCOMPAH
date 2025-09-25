@@ -38,8 +38,8 @@ import { ErrorMessageService } from '../../../../shared/Services/forms/error-mes
 import { FormUtilsService, buildEmailValidators } from '../../../../shared/Services/forms/form-utils.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
-import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { DocumentFormatDirective } from '../../../../shared/directives/document-format/document-format.directive';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { AppValidators as AV } from '../../../../shared/utils/AppValidators';
 
 
@@ -93,8 +93,6 @@ function toDateOnly(d: Date): string {
     DocumentFormatDirective,
     MatStepper,
     MatStepperModule,
-    MoneyPipe,
-
   ],
   templateUrl: './form-contract.component.html',
   styleUrls: ['./form-contract.component.css'],
@@ -137,6 +135,7 @@ export class FormContractComponent implements OnInit, OnDestroy {
   startMinDate = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
 
   private lastQueriedDoc: string | null = null;
+  private lastNotFoundAlertForDoc: string | null = null;
 
   /**
    * Hook de ciclo de vida de Angular.
@@ -303,8 +302,17 @@ export class FormContractComponent implements OnInit, OnDestroy {
           }
           this.loadingPerson = true;
           this.lastQueriedDoc = doc;
+          this.lastNotFoundAlertForDoc = null; // reinicia alerta por nuevo documento consultado
           return this.personSvc.getByDocument(doc).pipe(
-            catchError(() => of(null)),
+            // Si el backend responde 404, mostramos alerta (string o { detail })
+            catchError((err) => {
+              if (err?.status === 404) {
+                const msg = typeof err?.error === 'string' ? err.error : (err?.error?.detail ?? 'La persona no existe.');
+                this.sweet.showNotification('No encontrado', msg, 'warning');
+                this.lastNotFoundAlertForDoc = this.lastQueriedDoc;
+              }
+              return of(null);
+            }),
             finalize(() => (this.loadingPerson = false))
           );
         })
@@ -313,7 +321,15 @@ export class FormContractComponent implements OnInit, OnDestroy {
         const currentDoc = String(this.personFormGroup.get('document')!.value ?? '').trim();
         if (this.lastQueriedDoc && currentDoc !== this.lastQueriedDoc) return;
 
-        person ? this.setFoundPerson(person) : this.resetFoundPerson();
+        if (person) {
+          this.setFoundPerson(person);
+        } else {
+          // Si no hubo alerta previa (p.ej. API devolvió null 200 OK), mostramos una por defecto
+          if (currentDoc && currentDoc.length >= 5 && this.lastNotFoundAlertForDoc !== currentDoc) {
+            this.sweet.showNotification('No encontrado', 'No existe una persona con el documento ingresado.', 'warning');
+          }
+          this.resetFoundPerson();
+        }
       });
   }
 

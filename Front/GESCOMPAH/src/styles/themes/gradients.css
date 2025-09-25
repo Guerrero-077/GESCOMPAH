@@ -1,0 +1,9 @@
+:root {
+  --gradient-primary: linear-gradient(135deg, var(--green-600) 0%, var(--green-500) 100%);
+  --gradient-primary-hover: linear-gradient(135deg, var(--green-500) 0%, var(--green-400) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--yellow-500) 0%, var(--yellow-400) 100%);
+  --gradient-surface: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%);
+
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.2);
+}

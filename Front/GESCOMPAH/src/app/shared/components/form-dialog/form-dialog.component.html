@@ -16,6 +16,7 @@
     variant="raised" 
     color="primary" 
     icon="save"
+    [disabled]="!dynamicForm || !dynamicForm.form || dynamicForm.form.invalid"
     (clicked)="dynamicForm.onSubmit()">
   </app-standard-button>
 </mat-dialog-actions>

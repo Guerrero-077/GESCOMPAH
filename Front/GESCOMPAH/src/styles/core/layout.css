@@ -1,0 +1,8 @@
+body {
+  background: var(--gradient-surface);
+  color: var(--color-text);
+}
+
+.tab-spacing {
+  padding: 24px 0;
+}

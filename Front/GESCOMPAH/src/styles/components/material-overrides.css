@@ -1,0 +1,82 @@
+/* Angular Material color overrides using project CSS variables */
+
+/* Filled (raised) buttons */
+.mat-mdc-raised-button.mat-primary {
+  --mdc-filled-button-container-color: var(--color-primary) !important;
+  --mdc-filled-button-label-text-color: var(--color-primary-contrast) !important;
+}
+
+.mat-mdc-raised-button.mat-accent {
+  --mdc-filled-button-container-color: var(--color-accent) !important;
+  --mdc-filled-button-label-text-color: var(--white) !important;
+}
+
+.mat-mdc-raised-button.mat-warn {
+  --mdc-filled-button-container-color: var(--state-warning) !important;
+  --mdc-filled-button-label-text-color: var(--white) !important;
+}
+
+/* Text (flat) buttons */
+.mat-mdc-button.mat-primary {
+  --mdc-text-button-label-text-color: var(--color-primary) !important;
+}
+
+.mat-mdc-button.mat-accent {
+  --mdc-text-button-label-text-color: var(--color-accent) !important;
+}
+
+.mat-mdc-button.mat-warn {
+  --mdc-text-button-label-text-color: var(--state-warning) !important;
+}
+
+/* Stroked (outlined) buttons */
+.mat-mdc-outlined-button.mat-primary,
+.mat-mdc-stroked-button.mat-primary {
+  --mdc-outlined-button-outline-color: var(--color-primary) !important;
+  --mdc-outlined-button-label-text-color: var(--color-primary) !important;
+}
+
+.mat-mdc-outlined-button.mat-accent,
+.mat-mdc-stroked-button.mat-accent {
+  --mdc-outlined-button-outline-color: var(--color-accent) !important;
+  --mdc-outlined-button-label-text-color: var(--color-accent) !important;
+}
+
+.mat-mdc-outlined-button.mat-warn,
+.mat-mdc-stroked-button.mat-warn {
+  --mdc-outlined-button-outline-color: var(--state-warning) !important;
+  --mdc-outlined-button-label-text-color: var(--state-warning) !important;
+}
+
+/* Icon buttons */
+.mat-mdc-icon-button.mat-primary {
+  --mdc-icon-button-icon-color: var(--color-primary) !important;
+}
+
+.mat-mdc-icon-button.mat-accent {
+  --mdc-icon-button-icon-color: var(--color-accent) !important;
+}
+
+.mat-mdc-icon-button.mat-warn {
+  --mdc-icon-button-icon-color: var(--state-warning) !important;
+}
+
+/* FAB buttons */
+.mat-mdc-fab.mat-primary,
+.mat-mdc-mini-fab.mat-primary {
+  --mdc-fab-container-color: var(--color-primary) !important;
+  --mdc-fab-icon-color: var(--color-primary-contrast) !important;
+}
+
+.mat-mdc-fab.mat-accent,
+.mat-mdc-mini-fab.mat-accent {
+  --mdc-fab-container-color: var(--color-accent) !important;
+  --mdc-fab-icon-color: var(--white) !important;
+}
+
+.mat-mdc-fab.mat-warn,
+.mat-mdc-mini-fab.mat-warn {
+  --mdc-fab-container-color: var(--state-warning) !important;
+  --mdc-fab-icon-color: var(--white) !important;
+}
+

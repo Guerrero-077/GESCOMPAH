@@ -1,0 +1,11 @@
+.text-primary {
+  color: var(--color-primary) !important;
+}
+
+.text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+.text-accent {
+  color: var(--color-accent) !important;
+}

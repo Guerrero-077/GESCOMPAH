@@ -10,25 +10,16 @@ namespace Entity.Infrastructure.DataInit.AdministrationSystem
         {
             var seedAt = new DateTime(2025, 01, 01, 0, 0, 0, DateTimeKind.Utc);
 
+            // Evitar duplicados por nombre (Key) sin importar fechas
+            builder.HasIndex(x => x.Key).IsUnique();
+
             builder.HasData(
-                // UVT 2024 (cerrado)
-                new SystemParameter
-                {
-                    Id = 1,
-                    Key = "UVT",
-                    Value = "47000",                   // valor de ejemplo
-                    EffectiveFrom = new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc),
-                    EffectiveTo = new DateTime(2024, 12, 31, 23, 59, 59, DateTimeKind.Utc),
-                    Active = true,
-                    IsDeleted = false,
-                    CreatedAt = seedAt
-                },
-                // UVT 2025 (abierto)
+                // UVT vigente (2025 en adelante)
                 new SystemParameter
                 {
                     Id = 2,
                     Key = "UVT",
-                    Value = "51000",                   // valor de ejemplo
+                    Value = "51300",                   // Valor oficial 2025: confirmar con DIAN
                     EffectiveFrom = new DateTime(2025, 01, 01, 0, 0, 0, DateTimeKind.Utc),
                     EffectiveTo = null,
                     Active = true,
