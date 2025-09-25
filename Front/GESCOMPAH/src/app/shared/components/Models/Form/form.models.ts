@@ -30,6 +30,8 @@ export interface DynamicFormField {
   disabled?: boolean;
   options?: FormFieldOption[];
   multiple?: boolean;
+  /** Si es true y type === 'number', se mostrará con separador de miles (pesos) */
+  currency?: boolean;
   validations?: {
     // texto
     minLength?: number;

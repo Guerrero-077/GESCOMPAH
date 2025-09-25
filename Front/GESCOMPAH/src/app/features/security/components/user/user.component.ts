@@ -31,7 +31,7 @@ export class UserComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly sweetAlertService = inject(SweetAlertService);
   private readonly pageHeaderService = inject(PageHeaderService);
-  
+
   @ViewChild('estadoTemplate', { static: true }) estadoTpl!: TemplateRef<any>;
 
   users$ = this.userStore.users$;
@@ -40,7 +40,6 @@ export class UserComponent implements OnInit {
   ngOnInit(): void {
     this.pageHeaderService.setPageHeader('Usuarios', 'Gestión de Usuarios');
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'personName', header: 'Nombre Completo' },
       { key: 'email', header: 'Correo Electrónico' },
       {

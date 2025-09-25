@@ -38,12 +38,30 @@ namespace WebGESCOMPAH.Controllers.Base
         {
             var created = await Service.CreateAsync(dto);
 
-            if (created is not BaseDto withId || withId.Id == 0)
-                return BadRequest("El recurso creado no contiene un ID válido.");
+            // Intentar obtener el Id de forma flexible (no todos los DTOs heredan BaseDto)
+            int? id = null;
 
-            // En el futuro puedes incluir enlaces HATEOAS aquí
+            if (created is BaseDto withId)
+            {
+                id = withId.Id;
+            }
+            else
+            {
+                var prop = created?.GetType().GetProperty("Id");
+                if (prop != null && prop.PropertyType == typeof(int))
+                {
+                    id = (int?)prop.GetValue(created!);
+                }
+            }
 
-            return CreatedAtAction(nameof(GetById), new { id = withId.Id }, created);
+            if (id.HasValue && id.Value > 0)
+            {
+                // Respuesta 201 con Location al recurso
+                return CreatedAtAction(nameof(GetById), new { id = id.Value }, created);
+            }
+
+            // Si no hay Id, devolvemos 200 OK con el payload creado
+            return Ok(created);
         }
 
         [HttpPut("{id:int}")]

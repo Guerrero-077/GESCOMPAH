@@ -16,16 +16,29 @@
                [placeholder]="field.placeholder ?? ''"
                (blur)="onTrim(field.name)" />
 
-        <!-- Number (ÚNICO) -->
-        <input matInput *ngSwitchCase="'number'"
-               type="number"
-               inputmode="decimal"
-               [attr.step]="'1'"
-               [attr.min]="(field.validations?.min ?? null)"
-               [attr.max]="(field.validations?.max ?? null)"
-               [formControlName]="field.name"
-               [placeholder]="field.placeholder ?? ''"
-               (keydown)="blockNegative($event)" />
+        <!-- Number (con opción de currency) -->
+        <ng-container *ngSwitchCase="'number'">
+          <!-- Si es currency: usamos separador de miles -->
+          <input matInput *ngIf="field.currency; else plainNumber"
+                 type="text"
+                 inputmode="decimal"
+                 appThousandSeparator
+                 [formControlName]="field.name"
+                 [placeholder]="field.placeholder ?? ''"
+                 (keydown)="blockNegative($event)" />
+          <!-- Número plano -->
+          <ng-template #plainNumber>
+            <input matInput
+                   type="number"
+                   inputmode="decimal"
+                   [attr.step]="'1'"
+                   [attr.min]="(field.validations?.min ?? null)"
+                   [attr.max]="(field.validations?.max ?? null)"
+                   [formControlName]="field.name"
+                   [placeholder]="field.placeholder ?? ''"
+                   (keydown)="blockNegative($event)" />
+          </ng-template>
+        </ng-container>
 
         <!-- Email -->
         <input matInput *ngSwitchCase="'email'"

@@ -10,7 +10,9 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using TimeZoneConverter;
 using Utilities.Helpers.CloudinaryHelper;
@@ -37,6 +39,9 @@ builder.Services
     {
         // permitir números como string en JSON
         o.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+        // tolerar comas finales (ej. { "a":1, }) y comentarios si llegan desde herramientas
+        o.JsonSerializerOptions.AllowTrailingCommas = true;
+        o.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -73,6 +78,24 @@ builder.Services.AddScoped<CloudinaryUtility>();
 // Jobs (orquestador Hangfire)
 builder.Services.AddScoped<ObligationJobs>();
 builder.Services.AddScoped<ContractJobs>();
+
+// Respuesta clara para errores de ModelState (400)
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = ctx =>
+    {
+        var problem = new ValidationProblemDetails(ctx.ModelState)
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "Errores de validación en la solicitud.",
+            Detail = "Revisa el formato del JSON y los campos obligatorios (evita comas finales y usa fechas YYYY-MM-DD).",
+            Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+            Instance = ctx.HttpContext.Request.Path
+        };
+        problem.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+        return new BadRequestObjectResult(problem);
+    };
+});
 
 // --------------------------
 // HANGFIRE (Storage en SQL Server)
@@ -168,6 +191,7 @@ MigrationManager.MigrateAllDatabases(app.Services, builder.Configuration);
 
 // SignalR hubs
 app.MapHub<ContractsHub>("/api/hubs/contracts");
+app.MapHub<SecurityHub>("/api/hubs/security");
 
 // Warmup Playwright/Chromium (PDF)
 try

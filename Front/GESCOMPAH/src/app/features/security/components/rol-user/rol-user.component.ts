@@ -25,7 +25,7 @@ export class RolUserComponent implements OnInit {
   // private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly sweetAlert    = inject(SweetAlertService);
 
-  
+
   private readonly dialog = inject(MatDialog);
   private readonly sweetAlertService = inject(SweetAlertService);
 
@@ -34,7 +34,6 @@ export class RolUserComponent implements OnInit {
 
   ngOnInit(): void {
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'userEmail', header: 'Correo' },
       { key: 'rolName', header: 'Rol' },
       { key: 'active', header: 'Estado' }
@@ -110,7 +109,7 @@ export class RolUserComponent implements OnInit {
 
         this.rolUserService.create(payload).subscribe({
           next: () => {
-            this.load() 
+            this.load()
             this.sweetAlertService.showNotification('Creación Exitosa', 'Rol-Usuario creado exitosamente.', 'success');
           },
           error: err => {

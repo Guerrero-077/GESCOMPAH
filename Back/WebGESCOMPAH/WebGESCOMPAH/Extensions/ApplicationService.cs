@@ -129,6 +129,7 @@ namespace WebGESCOMPAH.Extensions
 
             // Registro de notificaciones: Business -> (impl SignalR en Web)
             services.AddScoped<IContractNotificationService, SignalRContractNotificationService>();
+            services.AddScoped<IPermissionsNotificationService, SignalRPermissionsNotificationService>();
 
 
             return services;

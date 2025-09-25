@@ -18,6 +18,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import { map } from 'rxjs/operators';
 
 import { DepartmentService } from '../../../features/setting/services/department/department.service';
+import { ThousandSeparatorDirective } from '../../directives/number/thousand-separator.directive';
 import { DynamicFormField } from '../Models/Form/form.models';
 import { FormType, formSchemas } from './dymanic-forms.config';
 
@@ -35,6 +36,7 @@ type Option = { value: string | number; label: string };
     MatInputModule,
     MatFormFieldModule,
     MatCheckboxModule,
+    ThousandSeparatorDirective,
   ],
   templateUrl: './dymanic-forms.component.html',
   styleUrl: './dymanic-forms.component.css',
@@ -113,6 +115,11 @@ export class DymanicFormsComponent implements OnInit {
     });
 
     this.form = new FormGroup(controls);
+
+    // Validación cruzada específica para Finance: effectiveTo >= effectiveFrom
+    if (this.formType === 'Finance') {
+      this.form.addValidators(financeDateRangeValidator('effectiveFrom', 'effectiveTo'));
+    }
 
     // 6) Ajustes finales
     if (isUserEdit) {
@@ -231,7 +238,12 @@ export class DymanicFormsComponent implements OnInit {
     const v = c.value;
     if (typeof v === 'string') {
       const t = v.trim().replace(/\s+/g, ' ');
-      if (t !== v) c.setValue(t);
+      let next = t;
+      // Normaliza 'key' en Finance a MAYÚSCULAS para evitar rechazos del backend
+      if (this.formType === 'Finance' && name === 'key') {
+        next = next.toUpperCase();
+      }
+      if (next !== v) c.setValue(next);
     }
   }
 
@@ -279,11 +291,45 @@ export class DymanicFormsComponent implements OnInit {
         result[field.name] = ids;
 
       } else if (field.type === 'number') {
-        // convierte "100,50" => 100.5 / "" => null
         const v = result[field.name];
-        result[field.name] = (v === null || v === '')
-          ? null
-          : Number(String(v).replace(',', '.'));
+        if (v === null || v === '') {
+          result[field.name] = null;
+        } else {
+          const sNum = String(v).replace(/\./g, '').replace(',', '.');
+          // Backend de SystemParameter.Value es string: enviar como string en Finance
+          if (this.formType === 'Finance' && field.name === 'value') {
+            result[field.name] = sNum; // como cadena normalizada
+          } else {
+            result[field.name] = Number(sNum);
+          }
+        }
+
+      }
+      else if (field.type === 'date') {
+        // Normaliza fecha
+        // - Si viene vacía: null (para evitar enviar "")
+        // - Si viene Date o string válida: YYYY-MM-DD (sin hora)
+        const v = result[field.name];
+        if (v === '' || v === undefined) {
+          result[field.name] = null;
+        } else if (v instanceof Date) {
+          const d = v as Date;
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          result[field.name] = `${yyyy}-${mm}-${dd}`;
+        } else if (typeof v === 'string') {
+          const d = new Date(v);
+          if (!isNaN(d.getTime())) {
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            result[field.name] = `${yyyy}-${mm}-${dd}`;
+          } else if (!v) {
+            result[field.name] = null;
+          }
+        }
+
 
       } else if (typeof result[field.name] === 'string') {
         result[field.name] = result[field.name].trim().replace(/\s+/g, ' ');
@@ -299,7 +345,10 @@ function numberRange(min?: number, max?: number) {
   return (c: AbstractControl) => {
     const raw = c.value;
     if (raw === null || raw === undefined || raw === '') return null;
-    const n = Number(String(raw).replace(',', '.'));
+    // Soporta separadores de miles con punto y decimales con coma
+    // Ej: "1.676.666" -> 1676666; "1.234,56" -> 1234.56
+    const normalized = String(raw).replace(/\./g, '').replace(',', '.');
+    const n = Number(normalized);
     if (Number.isNaN(n)) return { NaN: true };
     if (min !== undefined && n < min) return { min: { min, actual: n } };
     if (max !== undefined && n > max) return { max: { max, actual: n } };
@@ -313,3 +362,16 @@ function atLeastOneTrueInGroupValidator(c: AbstractControl) {
   return Object.values(v || {}).some(Boolean) ? null : { required: true };
 }
 
+// Valida que end >= start (si ambos existen)
+function financeDateRangeValidator(startKey: string, endKey: string) {
+  return (group: AbstractControl) => {
+    const g = group as FormGroup;
+    const start = g.get(startKey)?.value;
+    const end = g.get(endKey)?.value;
+    if (!start || !end) return null; // alguno vacío: que otros validadores lo manejen
+    const s = new Date(start);
+    const e = new Date(end);
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) return null;
+    return e.getTime() < s.getTime() ? { dateRange: true } : null;
+  };
+}

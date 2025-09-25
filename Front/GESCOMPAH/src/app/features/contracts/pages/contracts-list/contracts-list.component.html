@@ -147,11 +147,11 @@
           <div class="amounts">
             <div class="amount">
               <span class="label">Total Base</span>
-              <span class="value amount-mono">{{ row.totalBase | number: '1.0-0' }}</span>
+              <span class="value amount-mono">{{ row.totalBase | money:true:0 }}</span>
             </div>
             <div class="amount">
               <span class="label">Total UVT</span>
-              <span class="value amount-mono strong">{{ row.totalUvt | number: '1.0-0' }}</span>
+              <span class="value amount-mono strong">{{ row.totalUvt | money:true:0 }}</span>
             </div>
           </div>
         </div>

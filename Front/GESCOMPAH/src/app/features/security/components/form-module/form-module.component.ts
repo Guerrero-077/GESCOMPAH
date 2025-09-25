@@ -54,7 +54,6 @@ export class FormModuleComponent implements OnInit {
   // Ciclo de vida
   ngOnInit(): void {
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'formName', header: 'Formulario' },
       { key: 'moduleName', header: 'Módulo' },
       { key: 'active', header: 'Estado', type: 'custom', template: this.estadoTemplate }

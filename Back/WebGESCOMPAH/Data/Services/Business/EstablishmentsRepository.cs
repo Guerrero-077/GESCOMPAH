@@ -26,7 +26,7 @@ namespace Data.Services.Business
         /// - Si includeImages = true, incluye solo la primera imagen activa (ordenada por Id).
         /// - Ordena resultados por fecha de creaci?n y luego por Id en orden descendente.
         /// </summary>
-        private IQueryable<Establishment> BaseQuery(bool includeImages = true)
+        private IQueryable<Establishment> BaseQuery(bool includeImages = true, bool includeAllImages = false)
         {
             var query = _dbSet.AsNoTracking()
                 .Where(e => !e.IsDeleted &&
@@ -34,12 +34,25 @@ namespace Data.Services.Business
 
             if (includeImages)
             {
-                query = query
-                    .Include(e => e.Plaza)
-                    .Include(e => e.Images
-                        .Where(img => img.Active && !img.IsDeleted)
-                        .OrderBy(img => img.Id)
-                        .Take(1)); // Solo toma la primera imagen activa para optimizar rendimiento
+                query = query.Include(e => e.Plaza);
+
+                if (includeAllImages)
+                {
+                    // Incluye TODAS las imágenes activas (ordenadas por Id)
+                    query = query
+                        .Include(e => e.Images
+                            .Where(img => img.Active && !img.IsDeleted)
+                            .OrderBy(img => img.Id));
+                }
+                else
+                {
+                    // Incluye solo la primera imagen activa (mejor para listados)
+                    query = query
+                        .Include(e => e.Images
+                            .Where(img => img.Active && !img.IsDeleted)
+                            .OrderBy(img => img.Id)
+                            .Take(1));
+                }
             }
             else
             {
@@ -71,7 +84,7 @@ namespace Data.Services.Business
         /// <param name="filter">Filtro de actividad (Any / ActiveOnly).</param>
         public async Task<IEnumerable<Establishment>> GetAllAsync(ActivityFilter filter, int? limit = null)
         {
-            var q = BaseQuery(includeImages: true);
+            var q = BaseQuery(includeImages: true, includeAllImages: false);
             if (filter == ActivityFilter.ActiveOnly)
                 q = q.Where(e => e.Active);
 
@@ -83,7 +96,7 @@ namespace Data.Services.Business
 
         public async Task<IEnumerable<Establishment>> GetByPlazaIdAsync(int plazaId, ActivityFilter filter, int? limit = null)
         {
-            var q = BaseQuery(includeImages: true)
+            var q = BaseQuery(includeImages: true, includeAllImages: false)
                 .Where(e => e.PlazaId == plazaId);
 
             if (filter == ActivityFilter.ActiveOnly)
@@ -99,13 +112,16 @@ namespace Data.Services.Business
         /// Obtiene un establecimiento por Id (incluyendo eliminados logicamente inactivos).
         /// </summary>
         public Task<Establishment?> GetByIdAnyAsync(int id) =>
-            BaseQuery().FirstOrDefaultAsync(e => e.Id == id);
+            BaseQuery(includeImages: true, includeAllImages: true)
+                .FirstOrDefaultAsync(e => e.Id == id);
 
         /// <summary>
         /// Obtiene un establecimiento por Id unicamente si esta activo.
         /// </summary>
         public Task<Establishment?> GetByIdActiveAsync(int id) =>
-            BaseQuery().Where(e => e.Active).FirstOrDefaultAsync(e => e.Id == id);
+            BaseQuery(includeImages: true, includeAllImages: true)
+                .Where(e => e.Active)
+                .FirstOrDefaultAsync(e => e.Id == id);
 
         /// <summary>
         /// Obtiene solo informacion basica de establecimientos (Id, RentValueBase, UvtQty).

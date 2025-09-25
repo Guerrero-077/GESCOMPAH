@@ -68,16 +68,6 @@ namespace Business.Services.Business
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyList<ContractCardDto>> GetMineAsync()
-        {
-            var contracts = _user.EsAdministrador
-                ? await _contractRepository.GetCardsAllAsync()
-                : await _contractRepository.GetCardsByPersonAsync(
-                    _user.PersonId ?? throw new BusinessException("Usuario sin persona asociada."));
-
-            return contracts.ToList().AsReadOnly();
-        }
-
         public async Task<int> CreateContractWithPersonHandlingAsync(ContractCreateDto dto)
         {
             ValidatePayload(dto);
@@ -95,9 +85,19 @@ namespace Business.Services.Business
             var snapshot = await BuildSnapshotAsync(contract);
             var fullName = ComposeFullName(person);
 
-            SchedulePostCommit(contract.Id, userResult, dto.Email, fullName, snapshot);
+            await SchedulePostCommitAsync(contract.Id, userResult, dto.Email, fullName, snapshot);
 
             return contract.Id;
+        }
+
+        public async Task<IReadOnlyList<ContractCardDto>> GetMineAsync()
+        {
+            var contracts = _user.EsAdministrador
+                ? await _contractRepository.GetCardsAllAsync()
+                : await _contractRepository.GetCardsByPersonAsync(
+                    _user.PersonId ?? throw new BusinessException("Usuario sin persona asociada."));
+
+            return contracts.ToList().AsReadOnly();
         }
 
         public async Task<IReadOnlyList<ObligationMonthSelectDto>> GetObligationsAsync(int contractId)
@@ -134,7 +134,7 @@ namespace Business.Services.Business
             });
         }
 
-        // ----------------------- Internals -----------------------
+        // ----------------------- Helpers internos -----------------------
 
         private void ValidatePayload(ContractCreateDto dto)
         {
@@ -145,11 +145,7 @@ namespace Business.Services.Business
                 throw new BusinessException("Debe seleccionar al menos un establecimiento.");
         }
 
-        private Contract BuildContract(
-            ContractCreateDto dto,
-            int personId,
-            decimal totalBaseRent,
-            decimal totalUvt)
+        private Contract BuildContract(ContractCreateDto dto, int personId, decimal totalBaseRent, decimal totalUvt)
         {
             var contract = _mapper.Map<Contract>(dto);
             contract.PersonId = personId;
@@ -177,53 +173,39 @@ namespace Business.Services.Business
         }
 
         private string ComposeFullName(PersonSelectDto person)
-        {
-            return $"{person.FirstName} {person.LastName}".Trim();
-        }
+            => $"{person.FirstName} {person.LastName}".Trim();
 
-        private void SchedulePostCommit(
+        private async Task SchedulePostCommitAsync(
             int contractId,
             (int userId, bool created, string? tempPassword) userResult,
             string? email,
             string fullName,
             ContractSelectDto? contractSnapshot)
         {
-            if (userResult.created)
+            // ---------- Enviar contraseña temporal inmediatamente ----------
+            if (userResult.created && !string.IsNullOrWhiteSpace(userResult.tempPassword) && !string.IsNullOrWhiteSpace(email))
             {
-                _uow.RegisterPostCommit(ct =>
+                try
                 {
-                    try
-                    {
-                        _userContextService.InvalidateCache(userResult.userId);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error invalidando cache para usuario {UserId}", userResult.userId);
-                    }
-
-                    return Task.CompletedTask;
-                });
-
-                if (!string.IsNullOrWhiteSpace(userResult.tempPassword) && !string.IsNullOrWhiteSpace(email))
+                    _logger.LogInformation("Enviando contraseña temporal a {Email} para {Name}", email, fullName);
+                    await _emailService.SendTemporaryPasswordAsync(email!, fullName, userResult.tempPassword!);
+                }
+                catch (Exception ex)
                 {
-                    SendTempPasswordPostCommit(email!, fullName, userResult.tempPassword!);
+                    _logger.LogError(ex, "Error enviando contraseña temporal a {Email}", email);
+                }
+
+                try
+                {
+                    _userContextService.InvalidateCache(userResult.userId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error invalidando cache para usuario {UserId}", userResult.userId);
                 }
             }
 
-            GenerateObligationPostCommit(contractId);
-            SendContractEmailPostCommit(contractId, email, fullName, contractSnapshot);
-        }
-
-        private void SendTempPasswordPostCommit(string email, string fullName, string tempPassword)
-        {
-            RunPostCommitBackground(() =>
-                _emailService.SendTemporaryPasswordAsync(email, fullName, tempPassword),
-                "Error enviando contraseña temporal a {Email} para {Name}",
-                email, fullName);
-        }
-
-        private void GenerateObligationPostCommit(int contractId)
-        {
+            // ---------- Generar obligaciones en post-commit ----------
             _uow.RegisterPostCommit(async ct =>
             {
                 try
@@ -238,53 +220,30 @@ namespace Business.Services.Business
                     _logger.LogError(ex, "Error generando obligaciones para contrato {ContractId}", contractId);
                 }
             });
-        }
 
-        private void SendContractEmailPostCommit(
-            int contractId,
-            string? email,
-            string fullName,
-            ContractSelectDto? contractSnapshot)
-        {
-            if (string.IsNullOrWhiteSpace(email) || contractSnapshot == null)
-                return;
-
-            var contractNumber = contractId.ToString("D6");
-
-            RunPostCommitBackground(async () =>
+            // ---------- Enviar correo con PDF inmediatamente ----------
+            if (!string.IsNullOrWhiteSpace(email) && contractSnapshot != null)
             {
-                var pdf = await _contractPdfService.GeneratePdfAsync(contractSnapshot);
-                await _emailService.SendContractWithPdfAsync(email!, fullName, contractNumber, pdf);
-            }, "Error enviando PDF del contrato {ContractId} a {Email}", contractId, email);
-        }
-
-        private void RunPostCommitBackground(Func<Task> task, string errorMsg, params object[] args)
-        {
-            _uow.RegisterPostCommit(ct =>
-            {
-                _ = Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        await task();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, errorMsg, args.Append(ex).ToArray());
-                    }
-                }, ct);
-
-                return Task.CompletedTask;
-            });
+                    var pdf = await _contractPdfService.GeneratePdfAsync(contractSnapshot);
+                    await _emailService.SendContractWithPdfAsync(email!, fullName, contractId.ToString("D6"), pdf);
+                    _logger.LogInformation("Correo de contrato enviado a {Email} con PDF {ContractId}", email, contractId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error enviando PDF del contrato {ContractId} a {Email}", contractId, email);
+                }
+            }
         }
+
         protected override Expression<Func<Contract, string>>[] SearchableFields() =>
-        [
-            c => c.Person.FirstName,
-            c => c.Person.LastName,
-            c => c.Person.Document
-        ];
-
-
+            new Expression<Func<Contract, string>>[]
+            {
+                c => c.Person.FirstName,
+                c => c.Person.LastName,
+                c => c.Person.Document
+            };
 
         protected override string[] SortableFields() => new[]
         {

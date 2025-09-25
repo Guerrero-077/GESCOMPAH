@@ -47,7 +47,6 @@ export class RoleComponent implements OnInit {
 
     // Se define aquí porque requiere el template ya resuelto
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
       {

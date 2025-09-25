@@ -1,6 +1,7 @@
 ﻿using Entity.Domain.Models.ModelBase;
 using Entity.DTOs.Base;
 using Entity.Infrastructure.Context;
+using Utilities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -58,7 +59,7 @@ namespace Data.Repository
                 x => x.Id == entity.Id && !x.IsDeleted);
 
             if (existing is null)
-                throw new InvalidOperationException($"No se encontró entidad con ID {entity.Id}");
+                throw new EntityNotFoundException(typeof(T).Name, entity.Id);
 
             // Protegemos campos inmutables.
             var originalCreatedAt = existing.CreatedAt;

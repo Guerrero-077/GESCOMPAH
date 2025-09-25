@@ -1,5 +1,6 @@
 ﻿using Business.Interfaces.Implements.SecurityAuthentication;
 using Business.Repository;
+using Business.Interfaces.Notifications;
 using Data.Interfaz.IDataImplement.SecurityAuthentication;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.DTOs.Implements.SecurityAuthentication.RolFormPemission;
@@ -14,12 +15,14 @@ namespace Business.Services.SecurityAuthentication
     {
         private readonly IRolFormPermissionRepository _repo;
         private readonly IUserContextService _auth;
+        private readonly IPermissionsNotificationService _notify;
 
-        public RolFormPermissionService(IRolFormPermissionRepository data, IMapper mapper, IUserContextService auth)
+        public RolFormPermissionService(IRolFormPermissionRepository data, IMapper mapper, IUserContextService auth, IPermissionsNotificationService notify)
             : base(data, mapper)
         {
             _repo = data;
             _auth = auth;
+            _notify = notify;
         }
 
         public override async Task<RolFormPermissionSelectDto> CreateAsync(RolFormPermissionCreateDto dto)
@@ -43,7 +46,8 @@ namespace Business.Services.SecurityAuthentication
                 createdEntities.Add(entity);
             }
 
-            await InvalidateUsersByRole(dto.RolId);
+            var affectedCreate = await InvalidateUsersByRole(dto.RolId);
+            await _notify.NotifyPermissionsUpdated(affectedCreate);
 
             if (createdEntities.Count == 0)
                 return null;
@@ -88,7 +92,8 @@ namespace Business.Services.SecurityAuthentication
                 group.Add(entity); // Actualizar snapshot local
             }
 
-            await InvalidateUsersByRole(dto.RolId);
+            var affectedUpdate = await InvalidateUsersByRole(dto.RolId);
+            await _notify.NotifyPermissionsUpdated(affectedUpdate);
 
             // 7. Armar el DTO agrupado final
             if (group.Count == 0)
@@ -150,7 +155,8 @@ namespace Business.Services.SecurityAuthentication
             foreach (var record in records)
                 await _repo.DeleteAsync(record.Id);
 
-            await InvalidateUsersByRole(rolId);
+            var affectedDeleteByGroup = await InvalidateUsersByRole(rolId);
+            await _notify.NotifyPermissionsUpdated(affectedDeleteByGroup);
             return true;
         }
 
@@ -160,16 +166,20 @@ namespace Business.Services.SecurityAuthentication
             var result = await base.DeleteAsync(id);
 
             if (result && rfp != null)
-                await InvalidateUsersByRole(rfp.RolId);
+            {
+                var affectedDelete = await InvalidateUsersByRole(rfp.RolId);
+                await _notify.NotifyPermissionsUpdated(affectedDelete);
+            }
 
             return result;
         }
 
-        private async Task InvalidateUsersByRole(int rolId)
+        private async Task<IReadOnlyList<int>> InvalidateUsersByRole(int rolId)
         {
             var userIds = await _repo.GetUserIdsByRoleIdAsync(rolId);
             foreach (var uid in userIds)
                 _auth.InvalidateCache(uid);
+            return userIds.ToList();
         }
 
         public override async Task<RolFormPermissionSelectDto> UpdateActiveStatusAsync(int id, bool active)
@@ -191,7 +201,8 @@ namespace Business.Services.SecurityAuthentication
                 }
             }
 
-            await InvalidateUsersByRole(target.RolId);
+            var affectedChangeState = await InvalidateUsersByRole(target.RolId);
+            await _notify.NotifyPermissionsUpdated(affectedChangeState);
 
             // 3. Devolver el DTO de uno de los elementos (todos tienen el mismo Rol y Form)
             var refreshed = await _repo.GetByIdAsync(id);

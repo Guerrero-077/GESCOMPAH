@@ -45,7 +45,22 @@ namespace Business.Services.Utilities
             if (files is null || files.Count == 0)
                 throw new BusinessException("Debe adjuntar al menos un archivo.");
 
-            var filesToUpload = files.Take(MaxFilesPerRequest).Where(f => f?.Length > 0).ToList();
+            var allowedMime = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            { "image/jpeg", "image/png", "image/webp" };
+            var allowedExt = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            { ".jpg", ".jpeg", ".png", ".webp" };
+
+            var filesToUpload = files.Take(MaxFilesPerRequest)
+                .Where(f => f?.Length > 0)
+                .Where(f =>
+                {
+                    var ct = f.ContentType ?? string.Empty;
+                    var ext = System.IO.Path.GetExtension(f.FileName) ?? string.Empty;
+                    if (!allowedMime.Contains(ct) || !allowedExt.Contains(ext))
+                        throw new BusinessException($"El archivo '{f.FileName}' tiene un formato no permitido. Solo se permiten JPG, PNG o WEBP.");
+                    return true;
+                })
+                .ToList();
             if (filesToUpload.Count == 0)
                 throw new BusinessException("No se recibieron archivos válidos.");
 

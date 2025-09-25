@@ -22,6 +22,7 @@
           (blur)="onTrim(generalGroup.get('name'))"
           autocomplete="off"
         />
+        <mat-hint align="start">{{ generalGroup.get('name')?.value?.length || 0 }}/100</mat-hint>
         <mat-error *ngIf="generalGroup.get('name')?.touched && generalGroup.get('name')?.errors as e">
           <ng-container *ngIf="e['required']">Por favor ingrese el nombre del establecimiento</ng-container>
           <ng-container *ngIf="e['maxlength']">El nombre no puede exceder 100 caracteres</ng-container>
@@ -45,7 +46,7 @@
           (blur)="onNumberBlur(generalGroup.get('areaM2'))"
           autocomplete="off"
         />
-        <mat-hint align="end">Máx. 2 decimales</mat-hint>
+        <mat-hint align="end">Máx. 2 decimales · [1 – 1.000.000]</mat-hint>
         <mat-error *ngIf="generalGroup.get('areaM2')?.touched && generalGroup.get('areaM2')?.errors as e">
           <ng-container *ngIf="e['required']">Por favor ingrese el área en metros cuadrados</ng-container>
           <ng-container *ngIf="e['NaN']">El área debe ser un número válido</ng-container>
@@ -59,27 +60,28 @@
       <!-- Valor base (izquierda) -->
 
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="field-currency">
         <mat-label>Valor base de arriendo</mat-label>
         <input
           matInput
-          type="number"
+          type="text"
           appNoSci
           inputmode="decimal"
           step="0.01"
           min="1"
           formControlName="rentValueBase"
+          appThousandSeparator
+          [appThousandSeparatorMax]="12"
           required
           placeholder="850000"
-          (blur)="onNumberBlur(generalGroup.get('rentValueBase'))"
           autocomplete="off"
         />
-        <mat-hint align="end">Máx. 2 decimales</mat-hint>
+        <mat-hint align="end">Máx. 2 decimales · ≥ 0.000</mat-hint>
         <mat-error *ngIf="generalGroup.get('rentValueBase')?.touched && generalGroup.get('rentValueBase')?.errors as e">
           <ng-container *ngIf="e['required']">Por favor ingrese el valor base del arriendo</ng-container>
-          <ng-container *ngIf="e['NaN']">El valor debe ser un número válido</ng-container>
+          <ng-container *ngIf="e['NaN'] || e['nan'] || e['numberInvalid']">El valor debe ser un número válido</ng-container>
           <ng-container *ngIf="e['invalidNotation']">Ingrese un número válido sin notación científica</ng-container>
-          <ng-container *ngIf="e['min']">El valor base debe ser mayor a $0</ng-container>
+          <ng-container *ngIf="e['min']">El valor base debe ser mayor o igual a $10.000</ng-container>
           <ng-container *ngIf="e['max']">El valor base no puede exceder $999,999,999</ng-container>
           <ng-container *ngIf="e['decimalScale']">El valor puede tener máximo 2 decimales</ng-container>
         </mat-error>
@@ -101,7 +103,7 @@
           (blur)="onNumberBlur(generalGroup.get('uvtQty'))"
           autocomplete="off"
         />
-        <mat-hint align="end">Máx. 2 decimales</mat-hint>
+        <mat-hint align="end">Máx. 2 decimales · [1 – 9.999]</mat-hint>
         <mat-error *ngIf="generalGroup.get('uvtQty')?.touched && generalGroup.get('uvtQty')?.errors as e">
           <ng-container *ngIf="e['required']">Por favor ingrese la cantidad de UVT</ng-container>
           <ng-container *ngIf="e['NaN']">La cantidad de UVT debe ser un número válido</ng-container>
@@ -187,8 +189,10 @@
           autocomplete="off"
         />
         <mat-error *ngIf="ubicacionGroup.get('address')?.touched && ubicacionGroup.get('address')?.errors as e">
-          <ng-container *ngIf="e['maxlength']">La dirección no puede exceder 200 caracteres</ng-container>
+          <ng-container *ngIf="e['required']">La dirección es obligatoria</ng-container>
+          <ng-container *ngIf="e['maxlength']">La dirección no puede exceder 150 caracteres</ng-container>
           <ng-container *ngIf="e['addressInvalid']">Por favor ingrese una dirección válida</ng-container>
+          <ng-container *ngIf="e['onlySpaces']">La dirección no puede ser solo espacios</ng-container>
         </mat-error>
       </mat-form-field>
 
@@ -247,7 +251,7 @@
       <mat-icon>cloud_upload</mat-icon>
       <p>Arrastra imágenes aquí o haz clic para seleccionarlas</p>
       <small>Formatos soportados: JPG, PNG, WEBP (Máx. {{ MAX_IMAGES }} imágenes · {{ MAX_FILE_SIZE_MB }} MB c/u)</small>
-      <input type="file" #fileInput (change)="handleFileInput($event)" accept="image/*" multiple hidden />
+      <input type="file" #fileInput (change)="handleFileInput($event)" accept="image/jpeg,image/png,image/webp" multiple hidden />
     </div>
 
     <div class="image-counter mt-2 mb-3">
