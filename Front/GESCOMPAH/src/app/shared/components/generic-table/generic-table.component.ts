@@ -52,10 +52,7 @@ export type RowDetailContext<T> = { $implicit: T; row: T };
   styleUrls: ['./generic-table.component.css']
 })
 export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChanges, OnDestroy {
-  // ★ Acepta readonly arrays también
   @Input() data: readonly T[] | T[] | null = null;
-  // (opcional) podrías hacer también readonly aquí:
-  // @Input() columns: ReadonlyArray<TableColumn<T>> = [];
   @Input() columns: TableColumn<T>[] = [];
 
   @Input() createButtonLabel = '+ Crear';
@@ -104,7 +101,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
 
   ngOnInit() {
     this.updateDisplayedColumns();
-    // ★ Clona para romper readonly y evitar mutaciones del input
     this.dataSource.data = this.data ? [...this.data] as T[] : [];
 
     this.filterSubject
@@ -121,7 +117,6 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
     }
 
     if (changes['data']) {
-      // Siempre clona al asignar
       this.dataSource.data = this.data ? [...this.data] as T[] : [];
 
       if (this._paginator) {
@@ -146,8 +141,13 @@ export class GenericTableComponent<T> implements OnInit, AfterViewInit, OnChange
   }
 
   private updateDisplayedColumns(): void {
-    this.displayedColumns = this.columns.map(col => col.key.toString());
-    if (this.showActionsColumn) this.displayedColumns.push('actions');
+    this.displayedColumns = this.columns
+      .filter(col => col.key?.toString().toLowerCase() !== 'id')
+      .map(col => col.key.toString());
+
+    if (this.showActionsColumn) {
+      this.displayedColumns.push('actions');
+    }
   }
 
   private connectPaginator() {

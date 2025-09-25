@@ -226,7 +226,7 @@
             <mat-option *ngFor="let e of filteredEstablishments" [value]="e.id">
               {{ e.name }}
               <span class="establishment-details" *ngIf="e.areaM2 || e.rentValueBase">
-                ({{ e.areaM2 ? e.areaM2 + ' m²' : '' }}{{ e.areaM2 && e.rentValueBase ? ' - ' : '' }}{{ e.rentValueBase ? '$' + e.rentValueBase : '' }})
+                ({{ e.areaM2 ? e.areaM2 + ' m²' : '' }}{{ e.areaM2 && e.rentValueBase ? ' - ' : '' }}{{ e.rentValueBase ? (e.rentValueBase | money:true:0) : '' }})
               </span>
             </mat-option>
           </mat-select>

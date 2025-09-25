@@ -31,6 +31,7 @@ import { SquareSelectModel } from '../../models/squares.models';
 
 // Soporte Drag & Drop aislado en directiva y servicio
 import { FileDropDirective } from '../../../../shared/directives/file-drop.directive';
+import { ThousandSeparatorDirective } from '../../../../shared/directives/number/thousand-separator.directive';
 import { FilePickerService } from '../../../../shared/Services/Picker/file-picker.service';
 import { GeneralForm, UbicacionForm } from '../../shapes/Formularios';
 
@@ -94,6 +95,7 @@ export const ERRORS = {
     MatSelectModule, MatIconModule, MatProgressSpinnerModule, MatTooltipModule,
     MatStepperModule,
     FileDropDirective, // directiva para manejar drag&drop de archivos
+    ThousandSeparatorDirective,
     StandardButtonComponent
   ],
   templateUrl: './form-establishment.component.html',
@@ -137,6 +139,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
   readonly generalGroup = this.fb.group<GeneralForm>({
     name: this.fb.control('', {
       validators: [
+        Validators.minLength(3),
         Validators.required,
         Validators.maxLength(100),
         AppValidators.notOnlySpaces()
@@ -152,7 +155,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
     rentValueBase: this.fb.control(0, {
       validators: [
         Validators.required,
-        AppValidators.numberRange({ min: 1, max: 9_999_999.99 }),
+        AppValidators.numberRange({ min: 10_000, max: 9_999_999.99 }),
         AppValidators.decimal({ decimals: 2 })
       ]
     }),
@@ -178,8 +181,10 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
     }),
     address: this.fb.control('', {
       validators: [
+        Validators.required,
         Validators.maxLength(150),
-        AppValidators.address()
+        AppValidators.address(),
+        AppValidators.notOnlySpaces()
       ]
     }),
   }, { updateOn: 'change' });

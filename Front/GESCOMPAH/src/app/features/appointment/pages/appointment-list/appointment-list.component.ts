@@ -8,18 +8,18 @@ import { FormDialogComponent } from '../../../../shared/components/form-dialog/f
 import { GenericTableComponent } from "../../../../shared/components/generic-table/generic-table.component";
 import { TableColumn } from '../../../../shared/models/TableColumn.models';
 // import { ConfirmDialogService } from '../../../../shared/Services/confirm-dialog-service';
+import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
+import { StandardButtonComponent } from "../../../../shared/components/standard-button/standard-button.component";
 import { AppointmentSelect, AppointmentUpdateModel } from '../../models/appointment.models';
 import { AppointmentStore } from '../../services/appointment/appointment.store';
-import { PageHeaderService } from '../../../../shared/Services/PageHeader/page-header.service';
-import { StandardButtonComponent } from "../../../../shared/components/standard-button/standard-button.component";
 
 import { HasRoleAndPermissionDirective } from '../../../../core/security/directives/HasRoleAndPermission.directive';
 
 
 @Component({
   selector: 'app-appointment-list',
-  imports: [CommonModule, GenericTableComponent, MatIconModule, MatProgressSpinnerModule, StandardButtonComponent, HasRoleAndPermissionDirective],
+  imports: [CommonModule, GenericTableComponent, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './appointment-list.component.html',
   styleUrl: './appointment-list.component.css'
 })
@@ -51,7 +51,6 @@ export class AppointmentListComponent implements OnInit {
   ngOnInit(): void {
     this.pageHeaderService.setPageHeader('Citas', 'Gestión de Citas');
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'personName', header: 'User', template: this.userTemplate },
       { key: 'establishmentName', header: 'Local' },
       { key: 'description', header: 'Descripcion' },

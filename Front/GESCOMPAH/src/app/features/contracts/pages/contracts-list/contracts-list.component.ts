@@ -22,6 +22,7 @@ import { MatInputModule } from '@angular/material/input';
 
 import { ContractsRealtimeService } from '../../../../core/realtime/contracts-realtime.service';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 
 @Component({
   selector: 'app-contracts-list',
@@ -40,6 +41,7 @@ import { StandardButtonComponent } from '../../../../shared/components/standard-
     ToggleButtonComponent,
     HasRoleAndPermissionDirective,
     StandardButtonComponent,
+    MoneyPipe,
   ],
   templateUrl: './contracts-list.component.html',
   styleUrls: ['./contracts-list.component.css'],

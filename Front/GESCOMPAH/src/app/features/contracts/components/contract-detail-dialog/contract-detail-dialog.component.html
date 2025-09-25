@@ -112,7 +112,7 @@
 
                 <div class="ob-total">
                   <span class="label">Total</span>
-                  <span class="value amount strong">{{ o.totalAmount | number:'1.0-0' }}</span>
+                  <span class="value amount strong">{{ o.totalAmount | money:true:0 }}</span>
                 </div>
               </header>
 
@@ -123,11 +123,11 @@
                 </div>
                 <div class="kv">
                   <span class="k">Base</span>
-                  <span class="v amount">{{ o.baseAmount | number:'1.0-0' }}</span>
+                  <span class="v amount">{{ o.baseAmount | money:true:0 }}</span>
                 </div>
                 <div class="kv">
                   <span class="k">IVA</span>
-                  <span class="v amount">{{ o.vatAmount | number:'1.0-0' }}</span>
+                  <span class="v amount">{{ o.vatAmount | money:true:0 }}</span>
                 </div>
                 <div class="kv">
                   <span class="k">Tarde</span>

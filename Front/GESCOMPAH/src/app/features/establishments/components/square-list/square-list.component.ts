@@ -36,7 +36,6 @@ export class SquareListComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.columns = [
-      { key: 'index', header: 'N°', type: 'index' },
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
       { key: 'location', header: 'Ubicación' },

@@ -7,7 +7,8 @@ namespace Entity.DTOs.Validations.AdministrationSystem.SystemParameter
 {
     public abstract class SystemParameterBaseValidator<T> : AbstractValidator<T> where T : ISystemParameterDto
     {
-        private static readonly Regex KeyRegex = new Regex("^[A-Z0-9_.-]+$", RegexOptions.Compiled);
+        // Acepta letras (mayúsculas/minúsculas), números, punto, guion y guion bajo
+        private static readonly Regex KeyRegex = new Regex("^[A-Za-z0-9_.-]+$", RegexOptions.Compiled);
 
         protected SystemParameterBaseValidator()
         {
@@ -15,7 +16,7 @@ namespace Entity.DTOs.Validations.AdministrationSystem.SystemParameter
                 .Cascade(CascadeMode.Stop)
                 .Must(value => !string.IsNullOrWhiteSpace(value)).WithMessage("La clave es obligatoria.")
                 .MaximumLength(100).WithMessage("La clave no puede superar 100 caracteres.")
-                .Matches(KeyRegex).WithMessage("La clave solo puede incluir letras mayúsculas, números, puntos, guiones y guiones bajos.");
+                .Matches(KeyRegex).WithMessage("La clave solo puede incluir letras, números, puntos, guiones y guiones bajos.");
 
             RuleFor(x => x.Value)
                 .Cascade(CascadeMode.Stop)

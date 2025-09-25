@@ -2,6 +2,7 @@
 using Entity.DTOs.Base;
 using Entity.Infrastructure.Context;
 using LinqKit; // necesario para PredicateBuilder y AsExpandable
+using Utilities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -53,7 +54,7 @@ namespace Data.Repository
                 x => x.Id == entity.Id && !x.IsDeleted);
 
             if (existing is null)
-                throw new InvalidOperationException($"No se encontró entidad con ID {entity.Id}");
+                throw new EntityNotFoundException(typeof(T).Name, entity.Id);
 
             // Campos inmutables
             var originalCreatedAt = existing.CreatedAt;

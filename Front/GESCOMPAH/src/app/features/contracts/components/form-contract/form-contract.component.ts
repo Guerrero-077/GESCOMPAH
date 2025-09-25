@@ -38,6 +38,7 @@ import { ErrorMessageService } from '../../../../shared/Services/forms/error-mes
 import { FormUtilsService, buildEmailValidators } from '../../../../shared/Services/forms/form-utils.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { DocumentFormatDirective } from '../../../../shared/directives/document-format/document-format.directive';
 import { AppValidators as AV } from '../../../../shared/utils/AppValidators';
 
@@ -92,6 +93,7 @@ function toDateOnly(d: Date): string {
     DocumentFormatDirective,
     MatStepper,
     MatStepperModule,
+    MoneyPipe,
 
   ],
   templateUrl: './form-contract.component.html',

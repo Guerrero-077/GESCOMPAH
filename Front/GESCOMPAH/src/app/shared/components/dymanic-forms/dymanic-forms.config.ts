@@ -218,10 +218,14 @@ export const formSchemas: Record<FormType, DynamicFormField[]> = {
   {
     name: 'value', type: 'number', required: true, label: 'Valor',
     placeholder: '47065',
+    currency: true,
     validations: {
       min: 0,
-      max: 1000000,
-      pattern: '^(?:\\d+|\\d+[\\.,]\\d{1,2})$'
+      // Acepta valores mayores (SMLV, etc.)
+      max: 100000000000,
+      // Permite miles con punto y decimales opcionales con coma o punto
+      // Ej válidos: 1676666, 1.676.666, 1.234,56, 1234.56
+      pattern: '^(?:\\d{1,3}(?:[\\.\\s]\\d{3})*|\\d+)(?:[\\.,]\\d{1,2})?$'
     }
   },
   { name: 'effectiveFrom', type: 'date', required: true, label: 'Vigente desde' },

@@ -43,9 +43,10 @@ namespace Business.Services.SecurityAuthentication
 
             var roleNames = roles.Select(r => r.Name!).ToList();
 
-            // Forms permitidos por los roles
+            // Forms permitidos por los roles (considerando solo RFP activos)
             var allowedForms = roles
                 .SelectMany(r => r.RolFormPermissions ?? Enumerable.Empty<RolFormPermission>())
+                .Where(rfp => rfp.Active && !rfp.IsDeleted)
                 .Select(rfp => rfp.Form)
                 .Where(f => f != null && f.Active && !f.IsDeleted)
                 .DistinctBy(f => f!.Id)
@@ -73,7 +74,7 @@ namespace Business.Services.SecurityAuthentication
 
                             var formPerms = roles
                                 .SelectMany(r => r.RolFormPermissions ?? Enumerable.Empty<RolFormPermission>())
-                                .Where(rfp => rfp.FormId == f.Id && rfp.Permission != null)
+                                .Where(rfp => rfp.Active && !rfp.IsDeleted && rfp.FormId == f.Id && rfp.Permission != null)
                                 .Select(rfp => NormalizePermission(rfp.Permission!.Name!))
                                 .Distinct(StringComparer.OrdinalIgnoreCase)
                                 .ToList();

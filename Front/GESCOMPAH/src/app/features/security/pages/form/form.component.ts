@@ -44,7 +44,6 @@ export class FormComponent implements OnInit {
     this.pageHeaderService.setPageHeader('Formularios', 'Gestión de Formularios');
 
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
       { key: 'route', header: 'Route' },

@@ -69,7 +69,6 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'rolName', header: 'Rol' },
       { key: 'formName', header: 'Formulario' },
       { key: 'permissions', header: 'Permisos', template: this.permissionsTemplate },

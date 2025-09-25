@@ -1,7 +1,7 @@
 // src/app/core/service/realtime/contracts-realtime.service.ts
 import { Injectable, inject, NgZone, ApplicationRef } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { ContractStore } from '../../features/contracts/services/contract/contract.store';
 
 type ExpiredPayload = {

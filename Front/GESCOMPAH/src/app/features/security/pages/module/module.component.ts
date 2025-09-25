@@ -42,7 +42,6 @@ export class ModuleComponent implements OnInit {
     this.pageHeaderService.setPageHeader('Módulos', 'Gestión de Módulos');
 
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'name', header: 'Nombre' },
       { key: 'description', header: 'Descripción' },
       { key: 'route', header: 'Route' },

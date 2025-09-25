@@ -4,7 +4,7 @@ import { TemplateRef } from "@angular/core";
 //     key: keyof T | string;
 //     header: string;
 //     sortable?: boolean;
-//     type?: 'text' | 'number' | 'boolean' | 'badge' | 'actions' | 'custom' | 'index';
+//     type?: 'text' | 'number' | 'boolean' | 'badge' | 'actions' | 'custom';
 //     template?: TemplateRef<any>;
 // }
 
@@ -26,10 +26,9 @@ export interface TableColumn<T> {
    * - `boolean`: puede usarse para íconos o chips
    * - `badge`: para mostrar estado en colores
    * - `actions`: para incluir botones por fila
-   * - `index`: para numeración incremental
    * - `custom`: se usa un TemplateRef
    */
-  type?: 'text' | 'number' | 'boolean' | 'badge' | 'actions' | 'custom' | 'index';
+  type?: 'text' | 'number' | 'boolean' | 'badge' | 'actions' | 'custom';
 
   /**
    * Permite personalizar el rendering con un TemplateRef.

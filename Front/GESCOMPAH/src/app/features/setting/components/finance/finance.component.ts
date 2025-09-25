@@ -26,8 +26,8 @@ export class FinanceComponent {
     { key: 'id', header: 'ID' },
     { key: 'key', header: 'Nombre' },
     { key: 'value', header: 'valor' },
-    { key: 'effectiveFrom', header: 'Vigeste desde' },
-    { key: 'effectiveTo', header: 'Vigente Hasta' },
+    { key: 'effectiveFrom', header: 'Vigente desde', format: (v) => this.formatDateOnly(v) },
+    { key: 'effectiveTo', header: 'Vigente hasta', format: (v) => this.formatDateOnly(v) },
   ];
 
   constructor(
@@ -36,6 +36,16 @@ export class FinanceComponent {
     private sweetAlert: SweetAlertService
   ) {
     this.finances$ = this.store.finances$;
+  }
+
+  // Formatea a YYYY-MM-DD (sin hora)
+  private formatDateOnly(v: any): string {
+    if (!v) return '';
+    try {
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return String(v);
+      return d.toISOString().split('T')[0];
+    } catch { return String(v); }
   }
 
   ngOnInit(): void {

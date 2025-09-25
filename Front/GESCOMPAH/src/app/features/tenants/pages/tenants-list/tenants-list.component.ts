@@ -56,7 +56,6 @@ export class TenantsListComponent implements OnInit {
     this.pageHeader.setPageHeader('Arrendatarios', 'Gestión de Arrendatarios');
 
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'email', header: 'Usuario', template: this.userTemplate },
       { key: 'personDocument', header: 'N° Documento' },
       { key: 'personPhone', header: 'Teléfono' },

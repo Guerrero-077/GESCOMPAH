@@ -43,7 +43,6 @@ export class PersonComponent implements OnInit {
   // Ciclo de vida
   ngOnInit(): void {
     this.columns = [
-      { key: 'index', header: 'Nº', type: 'index' },
       { key: 'firstName', header: 'Nombre' },
       { key: 'lastName', header: 'Apellido' },
       { key: 'document', header: 'Documento' },
