@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, Inject} from '@angular/core';
 import {
   ReactiveFormsModule, FormGroup, FormBuilder, Validators,
   AbstractControl, ValidatorFn, ValidationErrors
@@ -29,6 +29,14 @@ import { buildEmailValidators, FormUtilsService } from '../../../../shared/Servi
 import { ErrorMessageService } from '../../../../shared/Services/forms/error-message.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { AppointmentCreateModel } from '../../models/appointment.models';
+import { SquareSelectModel } from '../../../establishments/models/squares.models';
+import { CitySelectModel } from '../../../setting/models/city.models';
+import { EstablishmentSelect } from '../../../establishments/models/establishment.models';
+import { SquareService } from '../../../establishments/services/square/square.service';
+import { EstablishmentService } from '../../../establishments/services/establishment/establishment.service';
+
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+
 
 function toDateOnly(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -58,9 +66,12 @@ function toDateOnly(d: Date): string {
 export class FormAppointmentComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly citySvc = inject(CityService);
+  private readonly estSvc = inject(EstablishmentService);
   private readonly personSvc = inject(PersonService);
   private readonly appointmentSvc = inject(AppointmentService);
+  private readonly squareSvc = inject(SquareService);
   private readonly dialogRef = inject(MatDialogRef<FormAppointmentComponent>);
+
   private readonly utils = inject(FormUtilsService);
   private readonly errMsg = inject(ErrorMessageService);
   private readonly sweet = inject(SweetAlertService);
@@ -69,22 +80,41 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
 
   personFormGroup!: FormGroup;
   appointmentFormGroup!: FormGroup;
+  establishmentFormGroup!: FormGroup;
 
-  ciudades: any[] = [];
+  ciudades: CitySelectModel[] = [];
+  establishment: EstablishmentSelect | null = null;
+  filteredEstablishments: EstablishmentSelect[] = [];
+
   personaEncontrada = false;
   personId: number | null = null;
   foundCityName: string | null = null;
+
   loadingPerson = false;
+  loadingEstablishments = false;
   saving = false;
 
   today = new Date();
+  minEndDate = this.today;
+  startMinDate = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
 
   private lastQueriedDoc: string | null = null;
+
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {}
 
   ngOnInit(): void {
     this.initForms();
     this.loadCiudades();
     this.setupReactivePersonLookup();
+
+    if (this.data) {
+      this.appointmentFormGroup.patchValue({
+        establishmentId: this.data.id,
+        establishmentName: this.data.name       // para mostrar en input
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -100,6 +130,7 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
       lastName: ['', [Validators.required, AV.notOnlySpaces(), AV.alphaHumanName(), Validators.maxLength(50)]],
       phone: ['', [Validators.required, AV.colombianPhone()]],
       email: ['', buildEmailValidators(true)],
+      address: ['', Validators.required]
     });
 
     this.appointmentFormGroup = this.fb.group({
@@ -108,7 +139,8 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
       requestDate: [this.today, Validators.required],
       dateTimeAssigned: [this.today, Validators.required],
       cityId: [null, Validators.required],
-      establishmentId: [null, Validators.required]
+      establishmentId: [null, Validators.required],
+      establishmentName: [null, Validators.required]
     });
   }
 
@@ -173,13 +205,17 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
         firstName: p.firstName ?? '',
         lastName: p.lastName ?? '',
         phone: p.phone ?? '',
-        email: p.email ?? ''
+        email: p.email ?? '',
+        address: p.address ?? ''
       },
       { emitEvent: false }
     );
 
     this.appointmentFormGroup.patchValue(
-      { cityId: p.cityId ?? null },
+      { cityId: p.cityId ?? null,
+        establishmentId: this.data.id,
+        establishmentName: this.data.name
+      },
       { emitEvent: false }
     );
   }
@@ -188,19 +224,20 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
     this.personaEncontrada = false;
     this.personId = null;
     this.foundCityName = null;
-    this.personFormGroup.patchValue({ firstName: '', lastName: '', phone: '', email: '' }, { emitEvent: false });
+    this.personFormGroup.patchValue({ firstName: '', lastName: '', phone: '', email: '', address: ''}, { emitEvent: false });
     this.appointmentFormGroup.patchValue({ cityId: null }, { emitEvent: false });
   }
 
   private disablePersonFields(): void {
-    ['firstName', 'lastName', 'phone', 'email'].forEach(k => this.personFormGroup.get(k)?.disable({ emitEvent: false }));
+    ['firstName', 'lastName', 'phone', 'email', 'address'].forEach(k => this.personFormGroup.get(k)?.disable({ emitEvent: false }));
     ['cityId'].forEach(k => this.appointmentFormGroup.get(k)?.disable({ emitEvent: false }));
   }
 
   private enablePersonFields(): void {
-    ['firstName', 'lastName', 'phone', 'email'].forEach(k => this.personFormGroup.get(k)?.enable({ emitEvent: false }));
+    ['firstName', 'lastName', 'phone', 'email', 'address'].forEach(k => this.personFormGroup.get(k)?.enable({ emitEvent: false }));
     ['cityId'].forEach(k => this.appointmentFormGroup.get(k)?.enable({ emitEvent: false }));
   }
+
 
   /* ===================== Acciones ===================== */
   cancel(): void {
@@ -227,15 +264,18 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
       firstName: String(p.get('firstName')!.value).trim(),
       lastName: String(p.get('lastName')!.value).trim(),
       document: String(p.get('document')!.value).trim(),
-      adrress: String(a.get('address')?.value ?? '').trim(),
+      address: String(a.get('address')?.value ?? '').trim(), // 🔥 corregido
       phone: String(p.get('phone')!.value).trim(),
+      email: String(p.get('email')!.value).trim(),           // 🔥 agregado
       cityId: Number(a.get('cityId')!.value),
       establishmentId: Number(a.get('establishmentId')!.value),
       description: String(a.get('description')!.value).trim(),
       observation: String(a.get('observation')!.value ?? '').trim(),
       requestDate: a.get('requestDate')!.value,
-      dateTimeAssigned: a.get('dateTimeAssigned')!.value
+      dateTimeAssigned: a.get('dateTimeAssigned')!.value,
+      active: true                                          // 🔥 agregado
     };
+
 
     this.saving = true;
     this.appointmentSvc.create(payload)

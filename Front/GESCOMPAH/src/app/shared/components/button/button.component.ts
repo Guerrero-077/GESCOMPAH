@@ -12,11 +12,13 @@ export class ButtonComponent {
   @Input() showView = true;
   @Input() showEdit = true;
   @Input() showDelete = true;
+  @Input() showCreateAppointment = true;
 
 
   @Output() onView = new EventEmitter<void>();
   @Output() onEdit = new EventEmitter<void>();
   @Output() onDelete = new EventEmitter<void>();
+  @Output() onCreateAppointment = new EventEmitter<void>();
 
   handleView(): void {
     this.onView.emit();
@@ -28,5 +30,9 @@ export class ButtonComponent {
 
   handleDelete(): void {
     this.onDelete.emit();
+  }
+
+  handleCreateAppointment(): void {
+    this.onCreateAppointment.emit();
   }
 }

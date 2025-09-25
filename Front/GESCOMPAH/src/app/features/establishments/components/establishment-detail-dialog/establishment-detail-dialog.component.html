@@ -61,8 +61,10 @@
           <div class="info-card">
             <p><strong>Dirección:</strong> {{ data.address }}</p>
           </div>
+
           <div class="info-card mt-2">
-            <p><strong>Área m²:</strong> {{ data.areaM2 }}</p>
+            <!-- Área con separador de miles -->
+            <p><strong>Área m²:</strong> {{ data.areaM2 | number:'1.0-0' }}</p>
           </div>
 
           <div class="title m-3"><span>Información Financiera</span></div>

@@ -1,6 +1,5 @@
 <div class="local-card bg-white rounded-2">
   <!-- Contenedor de imagen -->
-
   <div class="image-container w-100 position-relative">
     <img *ngIf="isCloudinary; else plainImg"
          [ngSrc]="cloudinaryPath"
@@ -36,7 +35,8 @@
 
       <div class="info-item text-end">
         <span class="info-label">Área</span>
-        <span class="info-value">{{ local.areaM2 }} m²</span>
+        <!-- Formato con separador de miles, sin decimales -->
+        <span class="info-value">{{ local.areaM2 | number:'1.0-0' }} m²</span>
       </div>
     </div>
 
@@ -50,7 +50,7 @@
       </div>
 
       <!-- Botones de acción -->
-      <app-button (onView)="handleView()" (onEdit)="handleEdit()" (onDelete)="handleDelete()">
+      <app-button (onView)="handleView()" (onEdit)="handleEdit()" (onDelete)="handleDelete()" (onCreateAppointment)="handleCreateAppointment()">
       </app-button>
     </div>
   </div>

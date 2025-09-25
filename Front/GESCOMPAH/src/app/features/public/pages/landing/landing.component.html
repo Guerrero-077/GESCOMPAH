@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  <div class="row d-flex justify-content-center py-5">
+  <div class="row d-flex justify-content-center py-5 mx-1">
     <div class="row justify-content-center">
       <h2 class="text-center text-green fw-bolder">Palermo, Huila</h2>
       <p class="text-center text-marmol fs-5 text-marmol">Tierra de tradición cafetera, cultura vibrante y oportunidades
@@ -65,16 +65,12 @@
     </div>
   </div>
 
-  <div class="col-md-12 row d-flex pb-5">
-    <div class="col-md-3 col-sm-12">
-      <app-card></app-card>
-    </div>
-  </div>
-
-  <div class="col-md-12 row d-flex pb-5 gap">
+  <div class="col-md-12 row d-flex pb-3 d-flex justify-content-center gap mx-1">
     <div class="col-md-4 col-lg-4 col-sm-12 d-flex justify-content-center pb-3">
-      <app-card-feature title="Tradición Cafetera"
-        description="Reconocidos por la producción de café de alta calidad, con fincas familiares que mantienen tradiciones ancestrales de cultivo.">
+      <app-card-feature
+        title="Tradición Cafetera"
+        description="Reconocidos por la producción de café de alta calidad, con fincas familiares que mantienen tradiciones ancestrales de cultivo."
+      >
         <div icon>
           <i class="fa fa-coffee" aria-hidden="true"></i>
         </div>
@@ -82,29 +78,61 @@
     </div>
 
     <div class="col-md-4 col-lg-4 col-sm-12 d-flex justify-content-center pb-3">
-
-      <app-card-feature title="Ubicación Estratégica"
-        description="Situado en el valle del río Magdalena, con acceso privilegiado a las principales vías de comunicación del departamento del Huila.">
+      <app-card-feature
+        title="Ubicación Estratégica"
+        description="Situado en el valle del río Magdalena, con acceso privilegiado a las principales vías de comunicación del departamento del Huila."
+      >
         <div icon>
           <i class="fas fa-mountain"></i>
         </div>
       </app-card-feature>
-
     </div>
 
     <div class="col-md-4 col-lg-4 col-sm-12 d-flex justify-content-center pb-3">
-
-      <app-card-feature title="Comunidad Unida"
-        description="Una comunidad comprometida con el desarrollo sostenible, la preservación cultural y el crecimiento económico inclusivo.">
-
+      <app-card-feature
+        title="Comunidad Unida"
+        description="Una comunidad comprometida con el desarrollo sostenible, la preservación cultural y el crecimiento económico inclusivo."
+      >
         <div icon>
           <i class="fa fa-heart" aria-hidden="true"></i>
         </div>
-
       </app-card-feature>
     </div>
-
   </div>
+
+  <div class="seccion-locales">
+    <div class="section-header">
+      <h2 class="text-green fw-bolder">Nuestros Locales</h2>
+      <a href="#" class="ver-mas-link">Ver más</a>
+    </div>
+
+    <div class="contenedor-carrusel-wrapper">
+      <button class="flecha flecha-izquierda"
+        (click)="scrollCarrusel(-1)"
+        [disabled]="!canScrollLeft">
+        &#10094;
+      </button>
+
+      <div class="contenedor-carrusel" #carrusel>
+        <div class="carrusel-locales">
+          <div *ngFor="let establishment of items()" class="tarjeta-local mx-4">
+            <app-card
+              [local]="establishment"
+              [showAvailableTag]="true"
+              (onView)="onView($event)"
+              (onCreateAppointment)="onCreateAppointment(establishment.id)"
+            >
+            </app-card>
+          </div>
+        </div>
+      </div>
+
+      <button class="flecha flecha-derecha" (click)="scrollCarrusel(1)" [disabled]="!canScrollRight">
+        &#10095;
+      </button>
+    </div>
+  </div>
+
 
   <div class="footer row d-flex justify-content-start gap py-3 px-1">
     <div class="row col-sm-12 col-md-3 gap-2">

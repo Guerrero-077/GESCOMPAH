@@ -7,7 +7,7 @@ import {
   ImageSelectDto,
   EstablishmentCard
 } from '../../models/establishment.models';
-import { EstablishmentService } from './establishment.service';
+import { EstablishmentService, GetAllOptions } from './establishment.service';
 
 @Injectable({ providedIn: 'root' })
 export class EstablishmentStore {
@@ -116,15 +116,11 @@ export class EstablishmentStore {
 
   // I/O (async; el servicio hace HTTP)
   /** Carga inicial; si quieres filtrar en el backend, ajusta aquí. */
-  async loadAll(options?: { limit?: number }): Promise<void> {
+  async loadAll(options?: GetAllOptions): Promise<void> {
     this._loading.set(true);
     this._error.set(null);
     try {
-      // Si prefieres mantener endpoints separados:
-      // const obs = this._activeOnlyView() ? this.svc.getAllActive() : this.svc.getAllAny();
-      // const data = await firstValueFrom(obs);
-      // Recomendación: trae "todo" (opcionalmente limitado) y filtra en 'view' (reduce acoplamiento):
-      const data = await firstValueFrom(this.svc.getAllAny(options?.limit));
+      const data = await firstValueFrom(this.svc.getAll(options));
       this.setAll(data ?? []);
     } catch (e: any) {
       this._error.set(String(e?.message ?? e));
@@ -132,6 +128,7 @@ export class EstablishmentStore {
       this._loading.set(false);
     }
   }
+
 
   /** Carga cards livianos desde /Establishments/cards */
   async loadCardsAll(activeOnly = false): Promise<void> {

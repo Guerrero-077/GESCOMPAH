@@ -4,13 +4,15 @@ export interface AppointmentBaseModel {
   requestDate: Date;
   dateTimeAssigned: Date;
   establishmentId: number;
+  active: boolean;
 }
 
 export interface AppointmentCreateModel extends AppointmentBaseModel {
   firstName: string;
   lastName: string;
   document: string;
-  adrress: string;
+  address: string;
+  email: string;
   phone: string;
   cityId: number;
 }

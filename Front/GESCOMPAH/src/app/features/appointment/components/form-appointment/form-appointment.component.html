@@ -30,6 +30,15 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="field">
+        <mat-label>Dirección</mat-label>
+        <input matInput formControlName="address" placeholder="Ej: Calle 123 #45-67" />
+        <mat-error *ngIf="appointmentFormGroup.get('address')?.hasError('required')">
+          Ingrese dirección
+        </mat-error>
+      </mat-form-field>
+
+
+      <mat-form-field appearance="outline" class="field">
         <mat-label>Email</mat-label>
         <input matInput type="email" formControlName="email" (blur)="fixEmail()" />
         <mat-error *ngIf="personFormGroup.get('email')?.errors as errs">{{ getFirstError(personFormGroup.get('email')) }}</mat-error>
@@ -67,7 +76,7 @@
 
       <mat-form-field appearance="outline" class="field">
         <mat-label>Local</mat-label>
-        <input matInput formControlName="establishmentId" type="number" />
+        <input matInput formControlName="establishmentName" readonly />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="field">
