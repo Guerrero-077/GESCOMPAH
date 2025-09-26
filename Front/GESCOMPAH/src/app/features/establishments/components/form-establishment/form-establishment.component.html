@@ -267,13 +267,13 @@
           </app-standard-button>
         </div>
         <app-standard-button
-          text="Siguiente"
+          [text]="isEdit ? 'Guardar cambios' : 'Guardar'"
           variant="raised"
           color="primary"
-          icon="arrow_forward"
-          iconPosition="right"
-          matStepperNext
-          [disabled]="generalGroup.invalid || isBusy">
+          icon="save"
+          iconPosition="left"
+          (clicked)="onSubmit()"
+          [disabled]="generalGroup.invalid || ubicacionGroup.invalid || isBusy">
         </app-standard-button>
       </div>
     </div>
