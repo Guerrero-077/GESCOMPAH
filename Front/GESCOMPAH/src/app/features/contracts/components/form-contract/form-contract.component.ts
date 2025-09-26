@@ -41,6 +41,7 @@ import { StandardButtonComponent } from '../../../../shared/components/standard-
 import { DocumentFormatDirective } from '../../../../shared/directives/document-format/document-format.directive';
 import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import { AppValidators as AV } from '../../../../shared/utils/AppValidators';
+import { FormErrorComponent } from '../../../../shared/components/form-error/form-error.component';
 
 
 import { MatStepperModule } from '@angular/material/stepper';
@@ -93,6 +94,7 @@ function toDateOnly(d: Date): string {
     DocumentFormatDirective,
     MatStepper,
     MatStepperModule,
+    FormErrorComponent,
   ],
   templateUrl: './form-contract.component.html',
   styleUrls: ['./form-contract.component.css'],
@@ -136,6 +138,18 @@ export class FormContractComponent implements OnInit, OnDestroy {
 
   private lastQueriedDoc: string | null = null;
   private lastNotFoundAlertForDoc: string | null = null;
+
+  // Mapas de mensajes para validadores personalizados
+  docMessages = { colombianDocument: () => 'El documento debe tener entre 7 y 10 dígitos numéricos' } as const;
+  firstNameMessages = { alphaHuman: () => 'Los nombres solo pueden contener letras y espacios' } as const;
+  lastNameMessages = { alphaHuman: () => 'Los apellidos solo pueden contener letras y espacios' } as const;
+  phoneMessages = { colombianPhone: () => 'Ingrese un número celular válido (debe empezar en 3 y tener 10 dígitos)' } as const;
+  emailMessages = {
+    domainMissing: () => 'El correo debe incluir un dominio (ej: @gmail.com)',
+    tldMissing: () => 'El dominio debe incluir una extensión válida (.com, .co, etc.)'
+  } as const;
+  addressMessages = { addressInvalid: () => 'Ingrese una dirección válida' } as const;
+  dateRangeMessages = { endBeforeStart: () => 'La fecha de finalización debe ser posterior o igual a la de inicio' } as const;
 
   /**
    * Hook de ciclo de vida de Angular.

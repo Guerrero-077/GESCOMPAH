@@ -54,6 +54,14 @@ export const ERRORS = {
     maxlength: 'La descripción no puede superar 500 caracteres.',
     onlySpaces: 'La descripción no puede ser solo espacios.'
   },
+  rentValueBase: {
+    required: 'El valor base es obligatorio.',
+    NaN: 'Ingresa un número válido.',
+    invalidNotation: 'No uses notación científica (e/E) ni signos +/−.',
+    min: 'El valor base no puede ser menor que 1.',
+    max: 'El valor base es demasiado alto.',
+    decimalScale: 'Máximo 2 decimales permitidos.'
+  },
   uvtQty: {
     required: 'La cantidad de UVT es obligatoria.',
     NaN: 'Ingresa un número válido.',

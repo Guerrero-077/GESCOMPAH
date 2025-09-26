@@ -43,10 +43,7 @@ export const authGuard: CanActivateFn = (
     return fallbackUrl(u);
   };
 
-  const cached = userStore.snapshot;
-  if (cached) return can(cached);
-
-  // Rehidrata desde backend si no hay usuario en memoria
+  // Siempre valida sesión contra backend antes de activar la ruta
   return auth.GetMe().pipe(
     map(u => {
       if (!u) return router.parseUrl('/auth/login');

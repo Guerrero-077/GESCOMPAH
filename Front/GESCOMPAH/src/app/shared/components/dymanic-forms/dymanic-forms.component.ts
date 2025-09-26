@@ -21,6 +21,7 @@ import { DepartmentService } from '../../../features/setting/services/department
 import { ThousandSeparatorDirective } from '../../directives/number/thousand-separator.directive';
 import { DynamicFormField } from '../Models/Form/form.models';
 import { FormType, formSchemas } from './dymanic-forms.config';
+import { FormErrorComponent } from '../form-error/form-error.component';
 
 type Option = { value: string | number; label: string };
 
@@ -37,6 +38,7 @@ type Option = { value: string | number; label: string };
     MatFormFieldModule,
     MatCheckboxModule,
     ThousandSeparatorDirective,
+    FormErrorComponent,
   ],
   templateUrl: './dymanic-forms.component.html',
   styleUrl: './dymanic-forms.component.css',

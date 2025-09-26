@@ -61,7 +61,7 @@ export class PermissionComponent implements OnInit {
       tap(() => this.sweetAlertService.showNotification('Creación Exitosa', 'Permiso creado exitosamente.', 'success')),
       catchError(err => {
         console.error('Error creando el permiso:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo crear el permiso.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo crear el permiso.');
         return EMPTY;
       })
     ).subscribe();
@@ -83,7 +83,7 @@ export class PermissionComponent implements OnInit {
       tap(() => this.sweetAlertService.showNotification('Actualización Exitosa', 'Permiso actualizado exitosamente.', 'success')),
       catchError(err => {
         console.error('Error actualizando el permiso:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el permiso.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo actualizar el permiso.');
         return EMPTY;
       })
     ).subscribe();
@@ -105,7 +105,7 @@ export class PermissionComponent implements OnInit {
       next: () => this.sweetAlertService.showNotification('Eliminación Exitosa', 'Permiso eliminado exitosamente.', 'success'),
       error: err => {
         console.error('Error al eliminar el permiso:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el permiso.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo eliminar el permiso.');
       }
     });
   }
@@ -138,11 +138,7 @@ export class PermissionComponent implements OnInit {
       catchError(err => {
         console.error('Error cambiando estado:', err);
         row.active = previous; // revertir
-        this.sweetAlertService.showNotification(
-          'Error',
-          err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error'
-        );
+        this.sweetAlertService.showApiError(err, 'No se pudo cambiar el estado.');
         return EMPTY;
       }),
       finalize(() => this.busyIds.delete(row.id))

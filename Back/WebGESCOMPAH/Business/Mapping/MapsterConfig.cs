@@ -96,7 +96,6 @@ namespace Business.Mapping
                   .Map(dest => dest.Description, src => src.Description.Trim())
                   .Map(dest => dest.Address, src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address.Trim())
                   .Map(dest => dest.AreaM2, src => src.AreaM2)
-                  .Map(dest => dest.RentValueBase, src => src.RentValueBase)
                   .Map(dest => dest.UvtQty, src => src.UvtQty)
                   .Map(dest => dest.PlazaId, src => src.PlazaId);
 

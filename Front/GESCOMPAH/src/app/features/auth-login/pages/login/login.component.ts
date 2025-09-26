@@ -118,8 +118,7 @@ export class LoginComponent implements OnInit {
     this.auth.GetMe().subscribe({
       next: () => { },
       error: (err) => {
-        const message = err?.error?.detail || err?.error?.title || err?.message || 'Error inesperado';
-        this.sweetAlertService.showNotification('Oops...', message, 'error');
+        this.sweetAlertService.showApiError(err);
       }
     });
   }
@@ -160,32 +159,7 @@ export class LoginComponent implements OnInit {
       error: (err) => {
         this.sweetAlertService.hideLoading();
 
-        let message = 'Ocurrió un error inesperado.';
-
-        const problem = err?.error;
-
-        if (problem) {
-          if (problem.detail) {
-            message = problem.detail;
-          } else if (problem.title && !problem.errors) {
-            message = problem.title;
-          } else if (problem.errors) {
-            const errores = problem.errors;
-            const primerCampo = Object.keys(errores)[0];
-            const primerMensaje = errores[primerCampo][0];
-            message = primerMensaje;
-          }
-        } else if (typeof err?.error === 'string') {
-          message = err.error;
-        } else if (err?.message) {
-          message = err.message;
-        }
-
-        this.sweetAlertService.showNotification(
-          'Oops...',
-          message,
-          'error'
-        );
+        this.sweetAlertService.showApiError(err);
       }
     });
   }

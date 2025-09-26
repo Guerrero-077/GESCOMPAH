@@ -1,0 +1,23 @@
+.gcard {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gcard__image img { width: 100%; height: auto; display: block; }
+
+.gcard__body { padding: 12px; }
+
+.gcard__title { font-size: 1.1rem; font-weight: 600; }
+.gcard__subtitle { color: rgba(0,0,0,0.6); margin-top: 2px; }
+
+.gcard__fields { margin-top: 8px; display: grid; grid-template-columns: 1fr; gap: 6px; }
+.gcard__field { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: start; }
+.gcard__label { color: rgba(0,0,0,0.6); font-size: 0.85rem; }
+.gcard__value { font-size: 0.95rem; }
+
+.gcard__actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+

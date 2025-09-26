@@ -136,4 +136,63 @@ export class SweetAlertService {
   public async error(message: string, title: string = 'Error'): Promise<void> {
     await this.showNotification(title, message, 'error');
   }
+
+  // Extrae un mensaje amigable desde diferentes formas de error (HttpErrorResponse, strings, etc.)
+  private extractErrorMessage(err: unknown, fallback?: string): string {
+    try {
+      // String directo
+      if (typeof err === 'string') return err;
+
+      // Error estándar
+      if (err instanceof Error) return err.message || fallback || 'Ocurrió un error inesperado.';
+
+      // Posible HttpErrorResponse (Angular)
+      const anyErr: any = err as any;
+
+      // Network error
+      if (anyErr && anyErr.status === 0) {
+        return fallback || 'No hay conexión con el servidor. Verifica tu red.';
+      }
+
+      // ModelState (errors: { field: [messages] })
+      const errors = anyErr?.error?.errors;
+      if (errors && typeof errors === 'object') {
+        const msgs: string[] = [];
+        for (const key of Object.keys(errors)) {
+          const val = errors[key];
+          if (Array.isArray(val)) msgs.push(...val);
+          else if (typeof val === 'string') msgs.push(val);
+        }
+        if (msgs.length) return msgs.join('\n');
+      }
+
+      // Estructuras comunes
+      const candidates = [
+        anyErr?.error?.detail,
+        anyErr?.error?.title,
+        anyErr?.error?.message,
+        anyErr?.message,
+        anyErr?.error,
+      ].filter(Boolean);
+
+      if (candidates.length) {
+        const first = candidates[0];
+        if (typeof first === 'string') return first;
+        if (typeof first === 'object') {
+          // Si viene un objeto como error, intenta serializar brevemente
+          return JSON.stringify(first);
+        }
+      }
+
+      return fallback || 'Ocurrió un error inesperado.';
+    } catch {
+      return fallback || 'Ocurrió un error inesperado.';
+    }
+  }
+
+  // Muestra un toast de error estandarizado a partir de un error/HttpErrorResponse
+  public async showApiError(err: unknown, fallbackMessage?: string, title: string = 'Error'): Promise<void> {
+    const msg = this.extractErrorMessage(err, fallbackMessage);
+    await this.showNotification(title, msg, 'error');
+  }
 }

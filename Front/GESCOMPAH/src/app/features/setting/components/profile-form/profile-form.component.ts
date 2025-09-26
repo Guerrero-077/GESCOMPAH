@@ -23,6 +23,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
+import { FormErrorComponent } from '../../../../shared/components/form-error/form-error.component';
 
 @Component({
   selector: 'app-profile-form',
@@ -36,7 +37,8 @@ import { MatCardModule } from '@angular/material/card';
     MatButtonModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    StandardButtonComponent
+    StandardButtonComponent,
+    FormErrorComponent
   ],
   templateUrl: './profile-form.component.html',
   styleUrls: ['./profile-form.component.css']
@@ -56,6 +58,17 @@ export class ProfileFormComponent implements OnInit {
   profile: PersonSelectModel | null = null;
   isLoading = false;
   isSaving = false;
+
+  // Mapas de mensajes para validadores personalizados usados en la vista
+  firstNameMessages = { alphaHuman: () => 'Los nombres solo pueden contener letras y espacios' } as const;
+  lastNameMessages = { alphaHuman: () => 'Los apellidos solo pueden contener letras y espacios' } as const;
+  documentMessages = { colombianDocument: () => 'El documento debe tener entre 7 y 10 dígitos numéricos' } as const;
+  phoneMessages = { colombianPhone: () => 'Ingrese un número celular válido (debe empezar en 3 y tener 10 dígitos)' } as const;
+  emailMessages = {
+    domainMissing: () => 'El correo debe incluir un dominio (ej: @gmail.com)',
+    tldMissing: () => 'El dominio debe incluir una extensión válida (.com, .co, etc.)'
+  } as const;
+  cityIdMessages = { min: () => 'Debe seleccionar una ciudad válida de la lista' } as const;
 
   ngOnInit(): void {
     this.initForm();
@@ -125,7 +138,7 @@ export class ProfileFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading profile', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo cargar el perfil. Asegúrate de que tu usuario tenga una persona asociada.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo cargar el perfil. Asegúrate de que tu usuario tenga una persona asociada.');
         this.isLoading = false;
       }
     });
@@ -160,7 +173,7 @@ export class ProfileFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error updating profile', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el perfil.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo actualizar el perfil.');
         this.isSaving = false;
       }
     });

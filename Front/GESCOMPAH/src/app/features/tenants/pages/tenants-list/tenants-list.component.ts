@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, inject, effect } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -72,6 +72,14 @@ export class TenantsListComponent implements OnInit {
     await this.store.loadAll();
   }
 
+  // Notificación de error estandarizada
+  private readonly errorToast = effect(() => {
+    const err = this.error();
+    if (err) {
+      this.sweetAlert.showApiError(err, 'No se pudieron cargar los usuarios.');
+    }
+  });
+
   // CRUD
   onCreate(): void {
     const data: TenantFormData = { mode: 'create' };
@@ -83,8 +91,8 @@ export class TenantsListComponent implements OnInit {
         try {
           await this.store.create(payload);
           this.sweetAlert.showNotification('Éxito', 'Usuario creado exitosamente.', 'success');
-        } catch {
-          this.sweetAlert.showNotification('Error', 'No se pudo crear el usuario.', 'error');
+        } catch (err) {
+          this.sweetAlert.showApiError(err, 'No se pudo crear el usuario.');
         }
       });
     });
@@ -111,8 +119,8 @@ export class TenantsListComponent implements OnInit {
         try {
           await this.store.update(dto.id, dto);
           this.sweetAlert.showNotification('Éxito', 'Usuario actualizado exitosamente.', 'success');
-        } catch {
-          this.sweetAlert.showNotification('Error', 'No se pudo actualizar el usuario.', 'error');
+        } catch (err) {
+          this.sweetAlert.showApiError(err, 'No se pudo actualizar el usuario.');
         }
       });
     });
@@ -131,8 +139,8 @@ export class TenantsListComponent implements OnInit {
     try {
       await this.store.delete(row.id); // si tu back es lógico: this.store.deleteLogic(row.id)
       this.sweetAlert.showNotification('Eliminación Exitosa', 'Usuario eliminado exitosamente.', 'success');
-    } catch {
-      this.sweetAlert.showNotification('Error', 'No se pudo eliminar al Usuario.', 'error');
+    } catch (err) {
+      this.sweetAlert.showApiError(err, 'No se pudo eliminar al Usuario.');
     }
   }
 
@@ -160,7 +168,7 @@ export class TenantsListComponent implements OnInit {
         'success'
       );
     } catch (err: any) {
-      this.sweetAlert.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
+      this.sweetAlert.showApiError(err, 'No se pudo cambiar el estado.');
     }
   }
 

@@ -61,12 +61,7 @@ export class RoleComponent implements OnInit {
   // Helpers
   trackById = (_: number, it: RoleSelectModel) => it.id;
 
-  private notifySuccess(title: string, message: string) {
-    this.sweetAlertService.showNotification(title, message, 'success');
-  }
-  private notifyError(message: string) {
-    this.sweetAlertService.showNotification('Error', message, 'error');
-  }
+  
 
   // Crear
   onCreateNew(): void {
@@ -83,8 +78,8 @@ export class RoleComponent implements OnInit {
       dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
         if (!result) return;
         this.roleStore.create(result).pipe(take(1)).subscribe({
-          next: () => this.notifySuccess('Creación Exitosa', 'Rol creado exitosamente.'),
-          error: (err) => this.notifyError(err?.error?.detail || 'No se pudo crear el rol.')
+          next: () => this.sweetAlertService.showNotification('Creación Exitosa', 'Rol creado exitosamente.', 'success'),
+          error: (err) => this.sweetAlertService.showApiError(err, 'No se pudo crear el rol.')
         });
       });
     });
@@ -108,8 +103,8 @@ export class RoleComponent implements OnInit {
         const payload: RoleUpdateModel = { ...result, id: row.id } as RoleUpdateModel;
 
         this.roleStore.update(payload).pipe(take(1)).subscribe({
-          next: () => this.notifySuccess('Actualización Exitosa', 'Rol actualizado exitosamente.'),
-          error: (err) => this.notifyError(err?.error?.detail || 'No se pudo actualizar el rol.')
+          next: () => this.sweetAlertService.showNotification('Actualización Exitosa', 'Rol actualizado exitosamente.', 'success'),
+          error: (err) => this.sweetAlertService.showApiError(err, 'No se pudo actualizar el rol.')
         });
       });
     });
@@ -133,8 +128,8 @@ export class RoleComponent implements OnInit {
     if (!result.isConfirmed) return;
 
     this.roleStore.deleteLogic(row.id).pipe(take(1)).subscribe({
-      next: () => this.notifySuccess('Eliminación Exitosa', 'Rol eliminado exitosamente.'),
-      error: (err) => this.notifyError(err?.error?.detail || 'No se pudo eliminar el rol.')
+      next: () => this.sweetAlertService.showNotification('Eliminación Exitosa', 'Rol eliminado exitosamente.', 'success'),
+      error: (err) => this.sweetAlertService.showApiError(err, 'No se pudo eliminar el rol.')
     });
   }
 
@@ -150,12 +145,12 @@ export class RoleComponent implements OnInit {
       next: (updated: Partial<IsActive> | void) => {
         // Si la API retorna DTO, sincronizamos; si retorna 204, mantenemos el optimista
         row.active = (updated as IsActive)?.active ?? checked;
-        this.notifySuccess('Éxito', `Rol ${row.active ? 'activado' : 'desactivado'} correctamente.`);
+        this.sweetAlertService.showNotification('Éxito', `Rol ${row.active ? 'activado' : 'desactivado'} correctamente.`, 'success');
       },
       error: (err) => {
         // Rollback
         row.active = prev;
-        this.notifyError(err?.error?.detail || 'No se pudo cambiar el estado del rol.');
+        this.sweetAlertService.showApiError(err, 'No se pudo cambiar el estado del rol.');
       }
     });
   }

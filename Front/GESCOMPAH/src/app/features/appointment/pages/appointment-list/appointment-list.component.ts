@@ -108,11 +108,7 @@ export class AppointmentListComponent implements OnInit {
 
       catchError(err => {
         console.error('Error actualizando el formulario:', err);
-        this.sweetAlertService.showNotification(
-          'Error',
-          'No se pudo actualizar el formulario.',
-          'error'
-        );
+        this.sweetAlertService.showApiError(err, 'No se pudo actualizar el formulario.');
         return EMPTY;
       })
     ).subscribe();
@@ -135,7 +131,7 @@ export class AppointmentListComponent implements OnInit {
         },
         error: err => {
           console.error('Error eliminando el formulario:', err);
-          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el formulario.', 'error');
+          this.sweetAlertService.showApiError(err, 'No se pudo eliminar el formulario.');
         }
       });
     }
@@ -172,11 +168,7 @@ export class AppointmentListComponent implements OnInit {
       error: (err) => {
         // revertir si falla
         row.active = previous;
-        this.sweetAlertService.showNotification(
-          'Error',
-          err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error'
-        );
+        this.sweetAlertService.showApiError(err, 'No se pudo cambiar el estado.');
       }
     });
   }

@@ -23,22 +23,19 @@
 
   <!-- Contenido cuando NO está cargando -->
   <ng-template #content>
-    <!-- Error -->
-    <ng-container *ngIf="!errorCards(); else errorTpl">
-      <!-- Lista -->
-      <ng-container *ngIf="cards().length > 0; else noEstablishment">
-        <div class="d-flex flex-wrap gap-3 justify-content-center">
-          <app-card
-            *ngFor="let establishment of cards()"
-            [local]="establishment"
-            [showAvailableTag]="true"
-            (onDelete)="handleDelete(establishment.id)"
-            (onUpdate)="onCardUpdated()"
-            (onView)="onView($event)"
-            (onEdit)="openEditDialogById(establishment.id)">
-          </app-card>
-        </div>
-      </ng-container>
+    <!-- Lista -->
+    <ng-container *ngIf="cards().length > 0; else noEstablishment">
+      <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <app-card
+          *ngFor="let establishment of cards()"
+          [local]="establishment"
+          [showAvailableTag]="true"
+          (onDelete)="handleDelete(establishment.id)"
+          (onUpdate)="onCardUpdated()"
+          (onView)="onView($event)"
+          (onEdit)="openEditDialogById(establishment.id)">
+        </app-card>
+      </div>
     </ng-container>
   </ng-template>
 
@@ -49,10 +46,5 @@
     </div>
   </ng-template>
 
-  <!-- Template de error -->
-  <ng-template #errorTpl>
-    <div class="alert alert-danger mt-3" role="alert">
-      Ocurrió un error al cargar los establecimientos: {{ errorCards() }}
-    </div>
-  </ng-template>
+
 </div>

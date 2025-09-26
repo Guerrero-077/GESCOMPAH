@@ -123,6 +123,9 @@ export class EstablishmentStore {
       const data = await firstValueFrom(this.svc.getAll(options));
       this.setAll(data ?? []);
     } catch (e: any) {
+      const status = e?.status ?? e?.statusCode;
+      const type = e?.type;
+      if (status === 401 || type === 'Unauthorized' || e?.__authExpired) return; // evitar banner al expirar sesión
       this._error.set(String(e?.message ?? e));
     } finally {
       this._loading.set(false);
@@ -139,6 +142,9 @@ export class EstablishmentStore {
       const data = await firstValueFrom(obs);
       this.setCards(data ?? []);
     } catch (e: any) {
+      const status = e?.status ?? e?.statusCode;
+      const type = e?.type;
+      if (status === 401 || type === 'Unauthorized' || e?.__authExpired) return;
       this._cardsError.set(String(e?.message ?? e));
     } finally {
       this._cardsLoading.set(false);

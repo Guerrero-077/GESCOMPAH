@@ -1,12 +1,13 @@
 /* =========================
    Grid responsivo
    ========================= */
-   .form-grid {
+  .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-bottom: 16px;
   }
+  .field-with-error { display: flex; flex-direction: column; }
   .form-grid .col-span-2 {
     grid-column: 1 / span 2;
   }

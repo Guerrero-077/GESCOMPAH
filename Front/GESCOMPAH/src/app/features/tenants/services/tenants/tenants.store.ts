@@ -91,6 +91,9 @@ export class TenantStore {
   }
 
   private setError(e: unknown): void {
+    const status = (e as any)?.status ?? (e as any)?.statusCode;
+    const type = (e as any)?.type;
+    if (status === 401 || type === 'Unauthorized' || (e as any)?.__authExpired) return;
     this._error.set(String((e as any)?.message ?? e ?? 'Error'));
   }
 

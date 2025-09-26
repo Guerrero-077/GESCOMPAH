@@ -81,9 +81,10 @@
                   (blur)="onTrim(field.name)"></textarea>
       </ng-container>
 
-      <mat-error *ngIf="form.get(field.name)?.touched && form.get(field.name)?.invalid">
-        {{ getError(field.name) }}
-      </mat-error>
+      <app-form-error
+        [control]="form.get(field.name)"
+        [label]="field.label ?? (field.name | titlecase)">
+      </app-form-error>
     </mat-form-field>
 
     <!-- Checkbox -->
@@ -91,9 +92,10 @@
       <mat-checkbox [formControlName]="field.name" color="primary">
         {{ field.label ?? (field.name | titlecase) }}
       </mat-checkbox>
-      <mat-error *ngIf="form.get(field.name)?.touched && form.get(field.name)?.invalid">
-        {{ getError(field.name) }}
-      </mat-error>
+      <app-form-error
+        [control]="form.get(field.name)"
+        [label]="field.label ?? (field.name | titlecase)">
+      </app-form-error>
     </div>
 
     <!-- Checkbox-list -->
@@ -105,9 +107,10 @@
           {{ opt.label }}
         </mat-checkbox>
       </div>
-      <mat-error *ngIf="form.get(field.name)?.touched && form.get(field.name)?.invalid">
-        {{ getError(field.name) }}
-      </mat-error>
+      <app-form-error
+        [control]="form.get(field.name)"
+        [label]="field.label ?? (field.name | titlecase)">
+      </app-form-error>
     </div>
   </div>
 </form>

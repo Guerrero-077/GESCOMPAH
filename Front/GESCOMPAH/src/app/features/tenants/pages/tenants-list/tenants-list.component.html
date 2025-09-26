@@ -7,27 +7,18 @@
 
 <!-- Contenido -->
 <ng-template #content>
-  <ng-container *ngIf="!error(); else errorTpl">
-    <app-generic-table
-      [data]="tenants()"
-      [columns]="columns"
-      titulo="Gestión de Usuario"
-      subTitulo="Gesione los usuarios del sistema"
-      [createButtonLabel]="'Crear Usuario'"
-      [showViewButton]="false"
-      (create)="onCreate()"
-      (edit)="onEdit($event)"
-      (delete)="onDelete($event)"
-      (view)="onView($event)">
-    </app-generic-table>
-  </ng-container>
-</ng-template>
-
-<!-- Error -->
-<ng-template #errorTpl>
-  <div class="alert alert-danger mt-3" role="alert">
-    Ocurrió un error al cargar usuarios: {{ error() }}
-  </div>
+  <app-generic-table
+    [data]="tenants()"
+    [columns]="columns"
+    titulo="Gestión de Usuario"
+    subTitulo="Gesione los usuarios del sistema"
+    [createButtonLabel]="'Crear Usuario'"
+    [showViewButton]="false"
+    (create)="onCreate()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+    (view)="onView($event)">
+  </app-generic-table>
 </ng-template>
 
 <!-- Template columna Usuario -->
