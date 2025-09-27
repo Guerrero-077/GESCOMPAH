@@ -26,6 +26,7 @@ namespace Data.Repository
         public abstract Task<PagedResult<T>> QueryAsync(
             PageQuery query,
             Expression<Func<T, string>>[]? searchableExpressions = null,
-            Expression<Func<T, bool>>[]? extraFilters = null);
+            Expression<Func<T, bool>>[]? extraFilters = null,
+            IDictionary<string, LambdaExpression>? sortMap = null);
     }
 }

@@ -45,6 +45,17 @@ namespace Business.Services.Location
             nameof(City.Active)
         };
 
+        protected override IDictionary<string, LambdaExpression> SortMap()
+            => new Dictionary<string, LambdaExpression>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(City.Name)]          = (Expression<Func<City, string>>)(c => c.Name),
+                [nameof(City.DepartmentId)]  = (Expression<Func<City, int>>)(c => c.DepartmentId),
+                ["Department.Name"]         = (Expression<Func<City, string>>)(c => c.Department.Name),
+                [nameof(City.Active)]        = (Expression<Func<City, bool>>)(c => c.Active),
+                [nameof(City.CreatedAt)]     = (Expression<Func<City, DateTime>>)(c => c.CreatedAt),
+                [nameof(City.Id)]            = (Expression<Func<City, int>>)(c => c.Id),
+            };
+
         protected override IDictionary<string, Func<string, Expression<Func<City, bool>>>> AllowedFilters() =>
             new Dictionary<string, Func<string, Expression<Func<City, bool>>>>(StringComparer.OrdinalIgnoreCase)
             {

@@ -1,24 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace WebGESCOMPAH.Middleware.Handlers
 {
-    public class InfrastructureExceptionHandler : IExceptionHandler
+    public class NullReferenceExceptionHandler : IExceptionHandler
     {
-        public int Priority => 95;
+        // Ejecutar antes de Infrastructure/Default
+        public int Priority => 90;
 
         public bool CanHandle(Exception exception)
-            => exception is InvalidOperationException || exception is NotSupportedException;
+            => exception is NullReferenceException;
 
         public (ProblemDetails Problem, int StatusCode) Handle(Exception exception, IHostEnvironment env, HttpContext http)
         {
             var statusCode = (int)HttpStatusCode.InternalServerError;
 
-            var detail = "Ocurrió un error inesperado en la infraestructura del sistema.";
+            // Mensaje claro y corto, sin stacktrace
+            var detail = "Se intentó acceder a un dato no disponible (referencia nula). Verifique que los datos relacionados estén completos.";
 
             var problem = ProblemDetailsFactory.Create(
                 statusCode,
-                title: "Error interno del sistema.",
+                title: "Error de referencia nula.",
                 detail: detail,
                 type: "https://tools.ietf.org/html/rfc7231#section-6.6.1",
                 instance: http.Request.Path
@@ -28,3 +30,4 @@ namespace WebGESCOMPAH.Middleware.Handlers
         }
     }
 }
+

@@ -14,9 +14,7 @@ namespace WebGESCOMPAH.Middleware.Handlers
         {
             var statusCode = (int)HttpStatusCode.BadGateway;
 
-            var detail = env.IsDevelopment()
-                ? exception.ToString()
-                : "Fallo la comunicación con un servicio externo.";
+            var detail = "Fallo la comunicación con un servicio externo.";
 
             var problem = ProblemDetailsFactory.Create(
                 statusCode,

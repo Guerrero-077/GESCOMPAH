@@ -121,6 +121,7 @@ namespace WebGESCOMPAH.Extensions
             services.AddSingleton<IExceptionHandler, DbUpdateExceptionHandler>();
             services.AddSingleton<IExceptionHandler, HttpRequestExceptionHandler>();
             services.AddSingleton<IExceptionHandler, ExternalServiceExceptionHandler>();
+            services.AddSingleton<IExceptionHandler, NullReferenceExceptionHandler>();
             services.AddSingleton<IExceptionHandler, DefaultExceptionHandler>();
 
             // Mapster

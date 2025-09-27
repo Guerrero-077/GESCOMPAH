@@ -14,9 +14,7 @@ namespace WebGESCOMPAH.Middleware.Handlers
         {
             var statusCode = (int)HttpStatusCode.GatewayTimeout;
 
-            var detail = env.IsDevelopment()
-                ? exception.ToString()
-                : "El servidor no respondió a tiempo.";
+            var detail = "El servidor no respondió a tiempo.";
 
             var problem = ProblemDetailsFactory.Create(
                 statusCode,

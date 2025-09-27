@@ -130,7 +130,7 @@ namespace Business.Mapping
                 .Map(dest => dest.CityId, src => src.CityId);
 
             // ContractCreateDto -> Contract
-            // ⚠️ Ignoramos totales y navegaciones para que NO se pisen en Business
+            // ⚠ Ignoramos totales y navegaciones para que NO se pisen en Business
             TypeAdapterConfig<ContractCreateDto, Contract>.NewConfig()
                 .Ignore(dest => dest.Id)
                 .Ignore(dest => dest.Person)            // se setea PersonId en Business
@@ -216,16 +216,17 @@ namespace Business.Mapping
             config.NewConfig<RolUser, RolUserSelectDto>();
 
             config.NewConfig<User, UserSelectDto>()
-               .Map(dest => dest.PersonName, src => $"{src.Person.FirstName} {src.Person.LastName}")
+               .Map(dest => dest.PersonName, src => src.Person != null ? $"{src.Person.FirstName} {src.Person.LastName}".Trim() : string.Empty)
                .Map(dest => dest.PersonId, src => src.PersonId)
-               .Map(dest => dest.PersonDocument, src => src.Person.Document)
-               .Map(dest => dest.PersonAddress, src => src.Person.Address)
-               .Map(dest => dest.PersonPhone, src => src.Person.Phone)
-               .Map(dest => dest.CityId, src => src.Person.CityId)
-               .Map(dest => dest.CityName, src => src.Person.City != null ? src.Person.City.Name : string.Empty)
+               .Map(dest => dest.PersonDocument, src => src.Person != null ? src.Person.Document : string.Empty)
+               .Map(dest => dest.PersonAddress, src => src.Person != null ? src.Person.Address : string.Empty)
+               .Map(dest => dest.PersonPhone, src => src.Person != null ? src.Person.Phone : string.Empty)
+               .Map(dest => dest.CityId, src => src.Person != null ? src.Person.CityId : 0)
+               .Map(dest => dest.CityName, src => src.Person != null && src.Person.City != null ? src.Person.City.Name : string.Empty)
                .Map(dest => dest.Email, src => src.Email)
                // Importante: "Active" debe reflejar el flag Active real, no IsDeleted
-               .Map(dest => dest.Active, src => src.Active);
+               .Map(dest => dest.Active, src => src.Active)
+               .Map(dest => dest.Roles, src => src.RolUsers.Select(ru => ru.Rol.Name));
 
             config.NewConfig<UserCreateDto, User>()
                 .Ignore(dest => dest.Id);

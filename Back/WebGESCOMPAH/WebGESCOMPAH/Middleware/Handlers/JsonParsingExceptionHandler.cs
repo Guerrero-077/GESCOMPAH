@@ -14,9 +14,7 @@ namespace WebGESCOMPAH.Middleware.Handlers
         {
             var statusCode = (int)HttpStatusCode.BadRequest;
 
-            var detail = env.IsDevelopment()
-                ? exception.ToString()
-                : "El cuerpo de la solicitud no es un JSON válido.";
+            var detail = "El cuerpo de la solicitud no es un JSON válido.";
 
             var problem = ProblemDetailsFactory.Create(
                 statusCode,
