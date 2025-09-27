@@ -29,7 +29,6 @@ import { AppointmentService } from '../../../appointment/services/appointment/ap
 })
 export class LandingComponent implements OnInit, AfterViewInit {
   private readonly store = inject(EstablishmentStore);
-  private readonly storeAppointment = inject(AppointmentStore);
   private readonly sweetAlert = inject(SweetAlertService);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);

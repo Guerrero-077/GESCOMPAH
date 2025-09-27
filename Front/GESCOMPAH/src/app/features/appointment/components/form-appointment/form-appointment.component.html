@@ -1,104 +1,191 @@
 <mat-stepper linear #stepper>
-  <!-- Step 1: Person -->
+  <!-- Step 1: Información del Arrendatario -->
   <mat-step [stepControl]="personFormGroup">
     <form [formGroup]="personFormGroup" class="form">
-      <ng-template matStepLabel>Información del Arrendatario</ng-template>
+      <ng-template matStepLabel>
+        {{ stepper.selectedIndex === 0 ? 'Información del Arrendatario' : 'Información...' }}
+      </ng-template>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Documento</mat-label>
-        <input matInput formControlName="document" placeholder="12345678" />
-        <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
-        <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">Ingrese documento</mat-error>
-      </mat-form-field>
+      <!-- Sección Identificación -->
+      <div class="section-header">
+        <h3>Datos de Identificación</h3>
+      </div>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Nombres</mat-label>
-        <input matInput formControlName="firstName" />
-        <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('required')">Ingrese nombres</mat-error>
-      </mat-form-field>
+      <!-- Documento -->
+      <div class="row">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Documento de Identidad</mat-label>
+          <input
+            matInput
+            appDocumentFormat
+            class="document-digit-input"
+            formControlName="document"
+            placeholder="1.234.567"
+            maxlength="14"
+            inputmode="numeric"
+            required
+            (keydown.enter)="personFormGroup.get('document')!.markAsTouched(); personFormGroup.get('document')!.updateValueAndValidity();"
+          />
+          <mat-spinner *ngIf="loadingPerson" matSuffix diameter="20"></mat-spinner>
+          <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">Por favor ingrese el número de documento de identidad</mat-error>
+          <mat-error *ngIf="personFormGroup.get('document')?.hasError('required')">
+            Por favor ingrese el número de documento de identidad
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Apellidos</mat-label>
-        <input matInput formControlName="lastName" />
-        <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('required')">Ingrese apellidos</mat-error>
-      </mat-form-field>
+      <!-- Nombres y Apellidos -->
+      <div class="row two-cols">
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Nombres</mat-label>
+          <input matInput formControlName="firstName" placeholder="Carlos Alberto" />
+          <mat-error *ngIf="personFormGroup.get('firstName')?.hasError('required')">
+            Por favor ingrese los nombres del arrendatario
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Teléfono</mat-label>
-        <input matInput formControlName="phone" />
-        <mat-error *ngIf="personFormGroup.get('phone')?.hasError('required')">Ingrese teléfono</mat-error>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Apellidos</mat-label>
+          <input matInput formControlName="lastName" placeholder="García Rodríguez" />
+          <mat-error *ngIf="personFormGroup.get('lastName')?.hasError('required')">
+            Por favor ingrese los apellidos del arrendatario
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Dirección</mat-label>
-        <input matInput formControlName="address" placeholder="Ej: Calle 123 #45-67" />
-        <mat-error *ngIf="appointmentFormGroup.get('address')?.hasError('required')">
-          Ingrese dirección
-        </mat-error>
-      </mat-form-field>
+      <!-- Sección Contacto -->
+      <div class="section-header">
+        <h3>Información de Contacto</h3>
+      </div>
 
+      <div class="row two-cols">
+        <!-- Teléfono -->
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Teléfono Celular</mat-label>
+          <input matInput formControlName="phone" placeholder="3012345678" />
+          <mat-hint>Número celular colombiano de 10 dígitos</mat-hint>
+          <mat-error *ngIf="personFormGroup.get('phone')?.hasError('required')">
+            Por favor ingrese el número de teléfono celular
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Email</mat-label>
-        <input matInput type="email" formControlName="email" (blur)="fixEmail()" />
-        <mat-error *ngIf="personFormGroup.get('email')?.errors as errs">{{ getFirstError(personFormGroup.get('email')) }}</mat-error>
-      </mat-form-field>
+        <!-- Email -->
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="carlos.garcia@gmail.com" (blur)="fixEmail()" />
+          <mat-hint>Se enviará el contrato a este correo</mat-hint>
+          <mat-error *ngIf="personFormGroup.get('email')?.errors as errs">
+            {{ getFirstError(personFormGroup.get('email')) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
 
+      <!-- Dirección -->
+      <div class="row">
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Dirección de Residencia</mat-label>
+          <input matInput formControlName="address" placeholder="Calle 123 #45-67" />
+          <mat-error *ngIf="personFormGroup.get('address')?.hasError('required')">
+            Por favor ingrese la dirección completa de residencia
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Botones -->
       <div class="actions">
         <app-standard-button text="Cancelar" variant="stroked" (clicked)="cancel()"></app-standard-button>
-        <app-standard-button text="Siguiente" variant="raised" color="primary" icon="arrow_forward" iconPosition="right" (clicked)="stepper.next()"></app-standard-button>
+        <app-standard-button
+          text="Siguiente"
+          variant="raised"
+          color="primary"
+          icon="arrow_forward"
+          iconPosition="right"
+          (clicked)="stepper.next()">
+        </app-standard-button>
       </div>
     </form>
   </mat-step>
 
-  <!-- Step 2: Appointment -->
+  <!-- Step 2: Detalles de la Cita -->
   <mat-step [stepControl]="appointmentFormGroup">
     <form [formGroup]="appointmentFormGroup" class="form">
-      <ng-template matStepLabel>Detalles de la Cita</ng-template>
+      <ng-template matStepLabel>
+        {{ stepper.selectedIndex === 1 ? 'Detalles de la Cita' : 'Detalles...' }}
+      </ng-template>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Descripción</mat-label>
-        <input matInput formControlName="description" />
-        <mat-error *ngIf="appointmentFormGroup.get('description')?.hasError('required')">Ingrese descripción</mat-error>
-      </mat-form-field>
+      <!-- Sección Detalles -->
+      <div class="section-header">
+        <h3>Información de la Cita</h3>
+      </div>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Observación</mat-label>
-        <input matInput formControlName="observation" />
-      </mat-form-field>
+      <div class="row two-cols">
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Descripción</mat-label>
+          <input matInput formControlName="description" />
+          <mat-error *ngIf="appointmentFormGroup.get('description')?.hasError('required')">
+            Por favor ingrese la descripción
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Ciudad</mat-label>
-        <mat-select formControlName="cityId">
-          <mat-option *ngFor="let c of ciudades" [value]="c.id">{{ c.name }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Observación</mat-label>
+          <input matInput formControlName="observation" />
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Local</mat-label>
-        <input matInput formControlName="establishmentName" readonly />
-      </mat-form-field>
+      <!-- Ciudad y Local -->
+      <div class="row two-cols">
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Ciudad</mat-label>
+          <mat-select formControlName="cityId">
+            <mat-option *ngFor="let c of ciudades" [value]="c.id">{{ c.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Fecha Solicitud</mat-label>
-        <input matInput [matDatepicker]="pickerRequest" formControlName="requestDate" readonly />
-        <mat-datepicker-toggle matSuffix [for]="pickerRequest"></mat-datepicker-toggle>
-        <mat-datepicker #pickerRequest></mat-datepicker>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Local</mat-label>
+          <input matInput formControlName="establishmentName" readonly />
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline" class="field">
-        <mat-label>Fecha y Hora Asignada</mat-label>
-        <input matInput [matDatepicker]="pickerAssigned" formControlName="dateTimeAssigned" readonly />
-        <mat-datepicker-toggle matSuffix [for]="pickerAssigned"></mat-datepicker-toggle>
-        <mat-datepicker #pickerAssigned></mat-datepicker>
-      </mat-form-field>
+      <!-- Fechas -->
+      <div class="section-header">
+        <h3>Fechas de la Cita</h3>
+      </div>
 
+      <div class="row two-cols">
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Fecha de Solicitud</mat-label>
+          <input matInput [matDatepicker]="pickerRequest" formControlName="requestDate" readonly />
+          <button mat-icon-button matSuffix type="button" (click)="pickerRequest.open()" aria-label="Abrir calendario">
+            <mat-icon>event</mat-icon>
+          </button>
+          <mat-datepicker #pickerRequest></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field no-dim">
+          <mat-label>Fecha y Hora Asignada</mat-label>
+          <input matInput [matDatepicker]="pickerAssigned" formControlName="dateTimeAssigned" readonly />
+          <button mat-icon-button matSuffix type="button" (click)="pickerAssigned.open()" aria-label="Abrir calendario">
+            <mat-icon>event</mat-icon>
+          </button>
+          <mat-datepicker #pickerAssigned></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <!-- Botones -->
       <div class="actions">
         <app-standard-button text="Cancelar" variant="stroked" (clicked)="cancel()"></app-standard-button>
         <app-standard-button text="Atrás" variant="flat" icon="arrow_back" (clicked)="stepper.previous()"></app-standard-button>
-        <app-standard-button [text]="saving ? 'Creando…' : 'Crear Cita'" variant="raised" color="primary"
-          icon="save" [disabled]="personFormGroup.invalid || appointmentFormGroup.invalid || saving"
-          [loading]="saving" loadingText="Creando…" (clicked)="submit()">
+        <app-standard-button
+          [text]="saving ? 'Creando…' : 'Crear Cita'"
+          variant="raised"
+          color="primary"
+          icon="save"
+          [disabled]="personFormGroup.invalid || appointmentFormGroup.invalid || saving"
+          [loading]="saving"
+          loadingText="Creando…"
+          (clicked)="submit()">
         </app-standard-button>
       </div>
     </form>

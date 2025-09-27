@@ -4,10 +4,12 @@ import { publicGuard } from './core/security/guards/public.guard';
 import { LandingComponent } from './features/public/pages/landing/landing.component';
 import { LayoutComponent } from './layout/layout.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { EstablishmentListComponent } from './features/public/pages/establishment-list/establishment-list.component';
 
 export const routes: Routes = [
   // Landing pública
   { path: '', pathMatch: 'full', component: LandingComponent, canActivate: [publicGuard], title: 'Inicio' },
+  { path: 'establishments', pathMatch: 'full', component: EstablishmentListComponent, canActivate: [publicGuard], title: 'Establecimientos Disponibles' },
 
   // Área de autenticación (lazy)
   {

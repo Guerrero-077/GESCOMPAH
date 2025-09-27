@@ -1,1 +1,96 @@
-<p>establishment-list works!</p>
+<div class="container-fluid">
+    <div class="row justify-content-center d-flex g-3 py-1">
+        <mat-toolbar class="custom-toolbar">
+        <!-- Logo clickable -->
+            <div class="logo-container" (click)="goHome()">
+                <img src="./Escudo-palermo.png" alt="Logo" class="logo-img" />
+            </div>
+
+            <!-- Nombre + subtítulo -->
+            <div class="title-container">
+                <div class="app-title">GESCOMPAH</div>
+                <div class="app-subtitle">Locales Comerciales Disponibles</div>
+            </div>
+
+            <!-- Espaciador -->
+            <span class="spacer"></span>
+
+            <!-- Botón login -->
+            <button mat-stroked-button class="login-btn" [routerLink]="['/auth/login']">
+                <mat-icon>person</mat-icon>
+                Iniciar Sesión
+            </button>
+        </mat-toolbar>
+
+        <div class="row d-flex justify-content-center h-50 py-3 gap-1">
+            <h2 class="title text-center fw-bold">
+                Locales Comerciales Disponibles
+            </h2>
+            <h4 class="text-center fw-normal">
+                Encuentra el local perfecto para tu negocio en Palermo, Huila
+            </h4>
+            <h5 class="text-center fw-light">
+                Explora nuestras plazas comerciales y solicita una cita para conocer los espacios
+            </h5>
+        </div>
+
+        <div class="container">
+            <div class="filter-card p-4 mb-4">
+                <!-- Título y subtítulo -->
+                <h5 class="fw-bold mb-1">Buscar Locales</h5>
+                <p class="text-muted mb-4">Utiliza los filtros para encontrar el local ideal</p>
+
+                <!-- Filtros en grid -->
+                <div class="row g-3">
+                    <!-- Buscar -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Buscar</mat-label>
+                            <input 
+                                matInput 
+                                [value]="filterKey()" 
+                                (input)="onFilterChange($any($event.target).value || '')"
+                                placeholder="Número, plaza o descripción" 
+                            />
+                            <mat-icon matSuffix>search</mat-icon>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Plaza -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Plaza</mat-label>
+                            <mat-select formControlName="plazaId">
+                                <mat-option value="">Todas las plazas</mat-option>
+                                <mat-option *ngFor="let p of plazas" [value]="p.id">{{ p.name }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Área mínima -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Área mínima (m²)</mat-label>
+                            <input 
+                                matInput type="number" 
+                                appNoSci inputmode="decimal" 
+                                step="0.01" min="1"
+                                formControlName="areaM2" 
+                                placeholder="Ej: 20" 
+                                autocomplete="off" 
+                            />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center d-flex g-3 py-1">
+            <div class="col-12 col-md-4 col-lg-3 justify-content-center d-flex" *ngFor="let establishment of items()">
+                <app-card [local]="establishment" [showAvailableTag]="true" (onView)="onView($event)"
+                    (onCreateAppointment)="onCreateAppointment(establishment.id)">
+                </app-card>
+            </div>
+        </div>
+    </div>
+</div>

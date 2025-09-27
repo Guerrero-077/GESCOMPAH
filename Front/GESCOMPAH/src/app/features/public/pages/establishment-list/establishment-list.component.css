@@ -1,0 +1,77 @@
+.custom-toolbar {
+    display: flex;
+    height: 14vh;
+    align-items: center;
+    padding: 0 16px;
+    background: var(--white);
+    color: var(--gray-800);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+/* Logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin: 0vh 2vw;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.logo-img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+
+/* Títulos */
+.title-container {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.app-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--gray-900);
+    margin-bottom: 2px;
+}
+
+.app-subtitle {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+}
+
+/* Espaciador */
+.spacer {
+    flex: 1 1 auto;
+}
+
+/* Botón login */
+.login-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    border-color: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.login-btn:hover {
+    border-color: var(--green-500);
+    color: var(--green-600);
+}
+
+.row {
+    margin-top: 1rem; /* o más, según el alto del toolbar */
+}
+
+.filter-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+}

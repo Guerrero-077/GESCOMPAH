@@ -29,18 +29,10 @@ import { buildEmailValidators, FormUtilsService } from '../../../../shared/Servi
 import { ErrorMessageService } from '../../../../shared/Services/forms/error-message.service';
 import { SweetAlertService } from '../../../../shared/Services/sweet-alert/sweet-alert.service';
 import { AppointmentCreateModel } from '../../models/appointment.models';
-import { SquareSelectModel } from '../../../establishments/models/squares.models';
 import { CitySelectModel } from '../../../setting/models/city.models';
 import { EstablishmentSelect } from '../../../establishments/models/establishment.models';
-import { SquareService } from '../../../establishments/services/square/square.service';
-import { EstablishmentService } from '../../../establishments/services/establishment/establishment.service';
 
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-
-
-function toDateOnly(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
 
 @Component({
   selector: 'app-form-appointment',
