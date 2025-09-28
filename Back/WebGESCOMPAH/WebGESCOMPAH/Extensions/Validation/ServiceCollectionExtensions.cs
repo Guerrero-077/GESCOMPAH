@@ -1,8 +1,7 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace WebGESCOMPAH.Extensions
+namespace WebGESCOMPAH.Extensions.Validation
 {
     public static class ServiceCollectionExtensions
     {
@@ -25,3 +24,4 @@ namespace WebGESCOMPAH.Extensions
         }
     }
 }
+

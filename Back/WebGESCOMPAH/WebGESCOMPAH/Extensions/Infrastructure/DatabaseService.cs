@@ -1,9 +1,7 @@
 ﻿using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace WebGESCOMPAH.Extensions
+namespace WebGESCOMPAH.Extensions.Infrastructure
 {
     public static class DatabaseService
     {
@@ -55,3 +53,4 @@ namespace WebGESCOMPAH.Extensions
     }
 
 }
+

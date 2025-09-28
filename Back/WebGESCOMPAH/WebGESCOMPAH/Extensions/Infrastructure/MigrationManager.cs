@@ -1,10 +1,7 @@
 ﻿using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
-namespace WebGESCOMPAH.Extensions
+namespace WebGESCOMPAH.Extensions.Infrastructure
 {
     public static class MigrationManager
     {
@@ -30,27 +27,27 @@ namespace WebGESCOMPAH.Extensions
                             {
                                 var ctx = sp.GetService<ApplicationDbContext>();
                                 if (ctx == null) { log.LogWarning("SQL Server no configurado: se omite."); break; }
-                                log.LogInformation("➡️ Migrando SQL Server...");
+                                log.LogInformation("Migrando SQL Server...");
                                 ctx.Database.Migrate();
-                                log.LogInformation("✅ Migración completada para SqlServer");
+                                log.LogInformation("Migración completada para SqlServer");
                                 break;
                             }
                         case "postgres":
                             {
                                 var ctx = sp.GetService<PostgresDbContext>();
                                 if (ctx == null) { log.LogWarning("PostgreSQL no configurado: se omite."); break; }
-                                log.LogInformation("➡️ Migrando PostgreSQL...");
+                                log.LogInformation("Migrando PostgreSQL...");
                                 ctx.Database.Migrate();
-                                log.LogInformation("✅ Migración completada para Postgres");
+                                log.LogInformation("Migración completada para Postgres");
                                 break;
                             }
                         case "mysql":
                             {
                                 var ctx = sp.GetService<MySqlApplicationDbContext>();
                                 if (ctx == null) { log.LogWarning("MySQL no configurado: se omite."); break; }
-                                log.LogInformation("➡️ Migrando MySQL...");
+                                log.LogInformation("Migrando MySQL...");
                                 ctx.Database.Migrate();
-                                log.LogInformation("✅ Migración completada para MySql");
+                                log.LogInformation("Migración completada para MySql");
                                 break;
                             }
                         default:
@@ -60,10 +57,11 @@ namespace WebGESCOMPAH.Extensions
                 }
                 catch (Exception ex)
                 {
-                    log.LogError(ex, "❌ Error aplicando migraciones para {Target}", raw);
+                    log.LogError(ex, "Error aplicando migraciones para {Target}", raw);
                     throw; // falla rápido si una migración no aplica
                 }
             }
         }
     }
 }
+

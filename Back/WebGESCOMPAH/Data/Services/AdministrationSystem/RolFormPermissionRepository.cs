@@ -4,7 +4,7 @@ using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Repositories.Implementations.SecurityAuthentication
+namespace Data.Services.AdministrationSystem
 {
     public class RolFormPermissionRepository : DataGeneric<RolFormPermission>, IRolFormPermissionRepository
     {

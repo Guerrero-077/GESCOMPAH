@@ -1,19 +1,23 @@
 using Business.CustomJWT;
 using Business.Interfaces;
+using Business.Mapping;
 using Business.Repository;
 using Data.Interfaz.DataBasic;
 using Data.Repository;
 using Mapster;
-using Business.Mapping;
-using Microsoft.Extensions.DependencyInjection;
 using Utilities.Messaging.Factories;
 using Utilities.Messaging.Implements;
 using Utilities.Messaging.Interfaces;
 using WebGESCOMPAH.Infrastructure;
-using WebGESCOMPAH.Middleware;
 
-namespace WebGESCOMPAH.Extensions.Modules
+namespace WebGESCOMPAH.Extensions.Modules.Core
 {
+    /// <summary>
+    /// Registro DI del núcleo compartido (infra común, Mapster, UoW, JWT, CurrentUser, etc.).
+    /// </summary>
+    /// <remarks>
+    /// Separa dependencias base que todos los módulos pueden requerir, manteniendo consistencia.
+    /// </remarks>
     public static class CoreModuleExtensions
     {
         public static IServiceCollection AddCoreModule(this IServiceCollection services)

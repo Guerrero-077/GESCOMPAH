@@ -3,7 +3,7 @@ using Entity.DTOs.Implements.SecurityAuthentication.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Web.Api.Controllers.SecurityAuthentication;
+using WebGESCOMPAH.Controllers.Module.SecurityAuthentication;
 
 namespace Tests.Web.SecurityAuthentication;
 

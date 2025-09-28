@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace WebGESCOMPAH.Extensions
+namespace WebGESCOMPAH.Extensions.Validation
 {
     public static class ValidationRegistrationExtensions
     {
@@ -17,3 +16,4 @@ namespace WebGESCOMPAH.Extensions
         }
     }
 }
+

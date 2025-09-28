@@ -1,4 +1,4 @@
-using Data.Repositories.Implementations.SecurityAuthentication;
+using Data.Services.AdministrationSystem;
 using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Infrastructure.Context;

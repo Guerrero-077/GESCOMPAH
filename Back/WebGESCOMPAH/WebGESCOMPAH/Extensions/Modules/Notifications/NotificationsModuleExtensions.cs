@@ -1,9 +1,14 @@
 using Business.Interfaces.Notifications;
-using Microsoft.Extensions.DependencyInjection;
 using WebGESCOMPAH.RealTime;
 
-namespace WebGESCOMPAH.Extensions.Modules
+namespace WebGESCOMPAH.Extensions.Modules.Notifications
 {
+    /// <summary>
+    /// Registro DI de servicios de notificaciones (SignalR adapters).
+    /// </summary>
+    /// <remarks>
+    /// Conecta interfaces de notificación de dominio con implementaciones en tiempo real.
+    /// </remarks>
     public static class NotificationsModuleExtensions
     {
         public static IServiceCollection AddNotificationsModule(this IServiceCollection services)
@@ -14,4 +19,3 @@ namespace WebGESCOMPAH.Extensions.Modules
         }
     }
 }
-

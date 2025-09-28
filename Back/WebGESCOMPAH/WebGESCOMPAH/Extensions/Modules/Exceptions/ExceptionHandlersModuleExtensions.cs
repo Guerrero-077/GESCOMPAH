@@ -1,8 +1,13 @@
-using Microsoft.Extensions.DependencyInjection;
 using WebGESCOMPAH.Middleware;
 
-namespace WebGESCOMPAH.Extensions.Modules
+namespace WebGESCOMPAH.Extensions.Modules.Exceptions
 {
+    /// <summary>
+    /// Registro DI de handlers de excepciones personalizados del middleware.
+    /// </summary>
+    /// <remarks>
+    /// Escanea el ensamblado Web y registra todas las implementaciones de IExceptionHandler como singleton.
+    /// </remarks>
     public static class ExceptionHandlersModuleExtensions
     {
         public static IServiceCollection AddExceptionHandlersModule(this IServiceCollection services)
@@ -20,4 +25,3 @@ namespace WebGESCOMPAH.Extensions.Modules
         }
     }
 }
-

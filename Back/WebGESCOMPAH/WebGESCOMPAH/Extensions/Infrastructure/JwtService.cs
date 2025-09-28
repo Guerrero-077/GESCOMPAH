@@ -1,12 +1,8 @@
-﻿using Business.CustomJWT;
-using Business.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace WebGESCOMPAH.Extensions
+namespace WebGESCOMPAH.Extensions.Infrastructure
 {
     public static class JwtService
     {
@@ -55,3 +51,4 @@ namespace WebGESCOMPAH.Extensions
         }
     }
 }
+

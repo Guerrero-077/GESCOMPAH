@@ -5,7 +5,7 @@ using Entity.Domain.Models.Implements.SecurityAuthentication;
 using Entity.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Services.AdministratiosSystem
+namespace Data.Services.AdministrationSystem
 {
     public class FormModuleRepository : DataGeneric<FormModule>, IFormModuleRepository
     {
