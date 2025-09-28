@@ -10,9 +10,9 @@ import {
 } from '../../models/establishment.models';
 
 export interface GetAllOptions {
-  /** Si true, trae solo activos; si no se envia, trae todos (Any). */
+  /** Si true, trae solo activos; si no se envía, trae todos (Any). */
   activeOnly?: boolean;
-  /** Limite maximo de registros a solicitar. */
+  /** Límite máximo de registros a solicitar. */
   limit?: number;
 }
 
@@ -26,7 +26,7 @@ export class EstablishmentService {
 
   /**
    * Obtener establecimientos:
-   * - sin opciones -> aplica limite por defecto (si existe) y trae todos (Any)
+   * - sin opciones -> aplica límite por defecto (si existe) y trae todos (Any)
    * - { activeOnly: true } -> solo activos
    * - { limit: 25 } -> limita la respuesta
    */
@@ -78,7 +78,7 @@ export class EstablishmentService {
   // CRUD
 
   create(dto: EstablishmentCreate): Observable<EstablishmentSelect> {
-    // Limpia campos locales (archivos/imagenes) si viajan desde el formulario
+    // Limpia campos locales (archivos/imágenes) si viajan desde el formulario
     const { files, images, imagesToDelete, ...body } = dto as any;
     return this.http.post<EstablishmentSelect>(this.baseUrl, body);
   }

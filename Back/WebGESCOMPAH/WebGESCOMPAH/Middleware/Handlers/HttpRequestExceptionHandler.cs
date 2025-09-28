@@ -14,11 +14,11 @@ namespace WebGESCOMPAH.Middleware.Handlers
         {
             var statusCode = (int)HttpStatusCode.BadGateway;
 
-            var detail = "Fallo la comunicación con un servicio externo.";
+            var detail = "Falló la comunicación con un servicio externo.";
 
             var problem = ProblemDetailsFactory.Create(
                 statusCode,
-                title: "Error al comunicarse con servicio externo.",
+                title: "Error al comunicarse con el servicio externo.",
                 detail: detail,
                 type: "https://www.rfc-editor.org/rfc/rfc7231#section-6.6.3",
                 instance: http.Request.Path

@@ -1,4 +1,7 @@
-﻿namespace WebGESCOMPAH.Extensions
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace WebGESCOMPAH.Extensions
 {
     public static class CorsService
     {

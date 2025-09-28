@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace WebGESCOMPAH.Extensions
 {
@@ -8,7 +9,7 @@ namespace WebGESCOMPAH.Extensions
         {
             services.Scan(scan => scan
                 .FromAssemblyOf<T>()
-                .AddClasses(classes => classes.AssignableTo(typeof(IValidator<>)))
+                .AddClasses(c => c.AssignableTo(typeof(IValidator<>)))
                 .AsImplementedInterfaces()
                 .WithScopedLifetime());
 

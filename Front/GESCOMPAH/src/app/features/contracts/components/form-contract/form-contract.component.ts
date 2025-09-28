@@ -454,7 +454,7 @@ export class FormContractComponent implements OnInit, OnDestroy {
 
   /**
    * Marca todos los campos como tocados y actualiza su validez.
-   * Forza la visualización de errores de validación.
+   * Fuerza la visualización de errores de validación.
    */
   markAllTouched(): void {
     [this.personFormGroup, this.contractFormGroup, this.establishmentFormGroup].forEach(g => {

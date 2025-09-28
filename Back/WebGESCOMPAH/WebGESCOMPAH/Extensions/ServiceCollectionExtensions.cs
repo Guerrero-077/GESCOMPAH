@@ -8,7 +8,7 @@ namespace WebGESCOMPAH.Extensions
     {
         public static IServiceCollection AddValidations(this IServiceCollection services)
         {
-            // Registrar todos los IValidator<T> desde cualquier ensamblado
+            // Registra todos los IValidator<T> desde el ensamblado de Entity
             var entityAssembly = AppDomain.CurrentDomain
                 .GetAssemblies()
                 .FirstOrDefault(a => a.GetName().Name == "Entity")
