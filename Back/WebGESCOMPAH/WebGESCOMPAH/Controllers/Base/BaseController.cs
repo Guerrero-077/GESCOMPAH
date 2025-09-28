@@ -1,6 +1,7 @@
 ﻿using Business.Interfaces.IBusiness;
 using Entity.DTOs.Base;
 using Microsoft.AspNetCore.Mvc;
+using WebGESCOMPAH.Contracts.Controllers;
 using WebGESCOMPAH.Contracts.Requests;
 
 namespace WebGESCOMPAH.Controllers.Base
@@ -8,8 +9,8 @@ namespace WebGESCOMPAH.Controllers.Base
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public abstract class BaseController<TGet, TCreate, TUpdate> : ControllerBase
-        where TGet : class
+    public abstract class BaseController<TGet, TCreate, TUpdate> : ControllerBase, ICrudController<TGet, TCreate, TUpdate>
+        where TGet : BaseDto
     {
         protected readonly IBusiness<TGet, TCreate, TUpdate> Service;
         protected readonly ILogger Logger;
@@ -38,29 +39,11 @@ namespace WebGESCOMPAH.Controllers.Base
         {
             var created = await Service.CreateAsync(dto);
 
-            // Intentar obtener el Id de forma flexible (no todos los DTOs heredan BaseDto)
-            int? id = null;
+            // Respuesta 201 con Location al recurso usando Id del DTO base
+            if (created.Id > 0)
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
 
-            if (created is BaseDto withId)
-            {
-                id = withId.Id;
-            }
-            else
-            {
-                var prop = created?.GetType().GetProperty("Id");
-                if (prop != null && prop.PropertyType == typeof(int))
-                {
-                    id = (int?)prop.GetValue(created!);
-                }
-            }
-
-            if (id.HasValue && id.Value > 0)
-            {
-                // Respuesta 201 con Location al recurso
-                return CreatedAtAction(nameof(GetById), new { id = id.Value }, created);
-            }
-
-            // Si no hay Id, devolvemos 200 OK con el payload creado
+            // Devolver 200 si por algún motivo no se asignó Id (casos especiales)
             return Ok(created);
         }
 
@@ -96,38 +79,25 @@ namespace WebGESCOMPAH.Controllers.Base
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public virtual async Task<IActionResult> ChangeActiveStatus(int id, [FromBody] ChangeActiveStatusRequest body)
         {
-            if (body.Active is null)
-                return BadRequest("El campo 'Active' no puede ser nulo.");
-
-            await Service.UpdateActiveStatusAsync(id, body.Active.Value);
+            // Con [ApiController] + [Required] en el modelo, si Active es null se responde 400 automáticamente.
+            await Service.UpdateActiveStatusAsync(id, body.Active!.Value);
             return NoContent();
         }
 
         [HttpGet("query")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual async Task<ActionResult<PagedResult<TGet>>> Query(
-            [FromQuery] int Page = 1,
-            [FromQuery] int Size = 20,
+            [FromQuery, System.ComponentModel.DataAnnotations.Range(1, int.MaxValue)] int Page = 1,
+            [FromQuery, System.ComponentModel.DataAnnotations.Range(1, 200)] int Size = 20,
             [FromQuery] string? Search = null,
             [FromQuery] string? Sort = null,
             [FromQuery] bool Desc = true,
             [FromQuery] IDictionary<string, string>? Filters = null)
         {
-            if (Page <= 0 || Size <= 0)
-                return BadRequest("Los valores de paginación deben ser mayores a cero.");
-
             var query = new PageQuery(Page, Size, Search, Sort, Desc, Filters);
             var result = await Service.QueryAsync(query);
-
-            // Headers para UI/paginación
-            Response.Headers["X-Total-Count"] = result.Total.ToString();
-            Response.Headers["X-Total-Pages"] = result.TotalPages.ToString();
-            Response.Headers["X-Page"] = result.Page.ToString();
-            Response.Headers["X-Size"] = result.Size.ToString();
-
             return Ok(result);
         }
     }

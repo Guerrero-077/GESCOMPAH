@@ -13,11 +13,18 @@ namespace WebGESCOMPAH.Extensions.Modules
 
             services.Scan(scan => scan
                 .FromAssemblies(businessAsm, dataAsm)
-                .AddClasses(c => c.Where(t => t.Namespace != null && t.Namespace.Contains("Services.SecurityAuthentication") && !t.Name.EndsWith("Repository")))
+                // Servicios del dominio de seguridad (no repos)
+                .AddClasses(c => c.Where(t => t.Namespace != null
+                                               && t.Namespace.Contains("Services.SecurityAuthentication")
+                                               && !t.Name.EndsWith("Repository")))
                     .AsImplementedInterfaces()
                     .WithScopedLifetime()
-                .AddClasses(c => c.Where(t => t.Namespace != null && t.Namespace.Contains("Services.SecurityAuthentication") && t.Name.EndsWith("Repository")))
-                    .AsMatchingInterface()
+                // Repositorios: aceptar implementaciones en Services.SecurityAuthentication y Repositories.Implementations.SecurityAuthentication
+                .AddClasses(c => c.Where(t => t.Namespace != null
+                                               && (t.Namespace.Contains("Services.SecurityAuthentication")
+                                                   || t.Namespace.Contains("Repositories.Implementations.SecurityAuthentication"))
+                                               && t.Name.EndsWith("Repository")))
+                    .AsImplementedInterfaces()
                     .WithScopedLifetime()
             );
 

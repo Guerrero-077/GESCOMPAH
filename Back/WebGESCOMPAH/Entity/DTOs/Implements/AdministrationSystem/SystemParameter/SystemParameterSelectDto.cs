@@ -1,8 +1,9 @@
-﻿namespace Entity.DTOs.Implements.AdministrationSystem.SystemParameter
+using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.AdministrationSystem.SystemParameter
 {
-    public class SystemParameterSelectDto
+    public class SystemParameterSelectDto : BaseDto
     {
-        public int Id { get; set; }
         public string Key { get; set; } = null!;
         public string Value { get; set; } = null!;
         public DateTime EffectiveFrom { get; set; }
@@ -10,3 +11,4 @@
         public bool Active { get; set; }
     }
 }
+

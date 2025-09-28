@@ -18,6 +18,7 @@ using TimeZoneConverter;
 using Utilities.Helpers.CloudinaryHelper;
 using WebGESCOMPAH.Extensions;
 using WebGESCOMPAH.RealTime;
+using WebGESCOMPAH.Filters;
 using WebGESCOMPAH.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,8 @@ builder.Services
     .AddControllers(options =>
     {
         options.ModelBinderProviders.Insert(0, new FlexibleDecimalModelBinderProvider());
+        // Filtro global para escribir headers de paginación automáticamente
+        options.Filters.Add(new PagedResultHeadersFilter());
     })
     .AddJsonOptions(o =>
     {
