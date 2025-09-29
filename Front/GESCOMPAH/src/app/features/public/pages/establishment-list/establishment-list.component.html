@@ -60,8 +60,8 @@
                     <div class="col-12 col-md-6 col-lg-3">
                         <mat-form-field appearance="outline" class="w-100">
                             <mat-label>Plaza</mat-label>
-                            <mat-select formControlName="plazaId">
-                                <mat-option value="">Todas las plazas</mat-option>
+                            <mat-select (selectionChange)="onPlazaChange($event.value)">
+                                <mat-option [value]="0">Todas las plazas</mat-option>
                                 <mat-option *ngFor="let p of plazas" [value]="p.id">{{ p.name }}</mat-option>
                             </mat-select>
                         </mat-form-field>
@@ -86,11 +86,17 @@
         </div>
 
         <div class="row justify-content-center d-flex g-3 py-1">
-            <div class="col-12 col-md-4 col-lg-3 justify-content-center d-flex" *ngFor="let establishment of items()">
+            <div class="col-12 col-md-4 col-lg-3 justify-content-center d-flex" 
+             *ngFor="let establishment of filtered()"
+            >
                 <app-card [local]="establishment" [showAvailableTag]="true" (onView)="onView($event)"
                     (onCreateAppointment)="onCreateAppointment(establishment.id)">
                 </app-card>
             </div>
-        </div>
+            <!-- Si no hay resultados -->
+            <div *ngIf="filtered().length === 0" class="text-center text-muted py-4">
+                <p>No se encontraron resultados con los filtros aplicados.</p>
+            </div>
+        </div> 
     </div>
 </div>

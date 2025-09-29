@@ -52,9 +52,11 @@ export class EstablishmentListComponent implements OnInit {
   readonly rows = this.store.items;
 
   plazas: SquareSelectModel[] = [];
+  establishments: EstablishmentCard[] = [];
   selectedPlazaId: number | null = null;
 
-  filteredEstablishments: EstablishmentCard[] = [];
+  readonly filteredEstablishments = signal<EstablishmentCard[]>([]);
+
   loadingEstablishments = false;
 
   async ngOnInit(): Promise<void> {
@@ -109,19 +111,33 @@ export class EstablishmentListComponent implements OnInit {
 
 
   readonly filtered = computed<readonly EstablishmentCard[]>(() => {
-    const list = this.rows() ?? [];
+
+    const baseList = (this.selectedPlazaId && this.selectedPlazaId !== 0)
+      ? this.filteredEstablishments()
+      : this.rows() ?? [];
+
+
+    let result = [...baseList];
+
     const q = this.filterKey().trim().toLowerCase();
-    if (!q) return list; // ya es readonly
-    // Array.filter<T> devuelve T[], que es asignable a readonly T[]
-    return list.filter(it => (
-      it.name?.toLowerCase().includes(q) ||
-      it.description?.toLowerCase().includes(q) ||
-      it.address?.toLowerCase().includes(q) ||
-      it.plazaName?.toLowerCase().includes(q) ||
-      it.rentValueBase?.toString().includes(q) ||
-      (it.uvtQty || '').toString().includes(q)
-    ));
+    if (q) {
+      result = result.filter(it =>
+        it.name?.toLowerCase().includes(q) ||
+        it.description?.toLowerCase().includes(q) ||
+        it.address?.toLowerCase().includes(q) ||
+        it.rentValueBase?.toString().includes(q)
+      );
+    }
+
+    const area = this.generalGroup.controls.areaM2.value;
+    if (area && area > 0) {
+      result = result.filter(it => (it.areaM2 ?? 0) >= area);
+    }
+
+    return result;
   });
+
+
 
   onFilterChange(v: string): void {
     this.filterKey.set(v || '');
@@ -141,22 +157,23 @@ export class EstablishmentListComponent implements OnInit {
   onPlazaChange(plazaId: number | null): void {
     this.selectedPlazaId = plazaId;
 
-    if (!plazaId || plazaId <= 0) {
-      this.filteredEstablishments = [];
+    if (!plazaId || plazaId === 0) {
+      this.filteredEstablishments.set(this.rows() ?? []);
+      this.store.loadAll({ activeOnly: true }); // carga todos los que ya están en el store
       return;
     }
 
     this.loadingEstablishments = true;
-    this.store.clear(); // opcional: limpia la store si la usas como origen
+    this.store.clear();
 
     this.estSvc.getByPlaza(plazaId, { activeOnly: true }).pipe(
       takeUntil(this.destroy$),
       catchError(() => of([])),
-      finalize(() => {
+      finalize(() => {  
         this.loadingEstablishments = false;
       })
     ).subscribe((list) => {
-      this.filteredEstablishments = list ?? [];
+      this.filteredEstablishments.set(list ?? []);
     });
   }
 
