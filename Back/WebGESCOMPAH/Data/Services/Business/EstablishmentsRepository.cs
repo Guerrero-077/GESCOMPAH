@@ -185,7 +185,7 @@ namespace Data.Services.Business
         }
 
         /// <summary>
-        /// Activa o desactiva en masa establecimientos segun una lista de Ids.
+        /// Activa o desactiva en masa establecimientos según una lista de Ids.
         /// </summary>
         /// <param name="ids">Lista de Ids a actualizar.</param>
         /// <param name="active">Nuevo estado (true = activo, false = inactivo).</param>
@@ -199,7 +199,7 @@ namespace Data.Services.Business
         }
 
         /// <summary>
-        /// Activa o desactiva en masa todos los establecimientos de una plaza especifica.
+        /// Activa o desactiva en masa todos los establecimientos de una plaza específica.
         /// </summary>
         /// <param name="plazaId">Id de la plaza.</param>
         /// <param name="active">Nuevo estado (true = activo, false = inactivo).</param>

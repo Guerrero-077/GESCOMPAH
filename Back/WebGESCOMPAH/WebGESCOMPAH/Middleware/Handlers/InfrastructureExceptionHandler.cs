@@ -14,9 +14,7 @@ namespace WebGESCOMPAH.Middleware.Handlers
         {
             var statusCode = (int)HttpStatusCode.InternalServerError;
 
-            var detail = env.IsDevelopment()
-                ? exception.ToString()
-                : "Ocurrió un error inesperado en la infraestructura del sistema.";
+            var detail = "Ocurrió un error inesperado en la infraestructura del sistema.";
 
             var problem = ProblemDetailsFactory.Create(
                 statusCode,

@@ -17,6 +17,9 @@ namespace Business.Services.Location
             _cityRepository = cityRepository;
         }
 
+        protected override IQueryable<City>? ApplyUniquenessFilter(IQueryable<City> query, City candidate)
+            => query.Where(c => c.Name == candidate.Name && c.DepartmentId == candidate.DepartmentId);
+
         public async Task<IEnumerable<CitySelectDto>> GetCityByDepartment(int idDepartment)
         {
             try
@@ -44,6 +47,17 @@ namespace Business.Services.Location
             nameof(City.Id),
             nameof(City.Active)
         };
+
+        protected override IDictionary<string, LambdaExpression> SortMap()
+            => new Dictionary<string, LambdaExpression>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(City.Name)]          = (Expression<Func<City, string>>)(c => c.Name),
+                [nameof(City.DepartmentId)]  = (Expression<Func<City, int>>)(c => c.DepartmentId),
+                ["Department.Name"]         = (Expression<Func<City, string>>)(c => c.Department.Name),
+                [nameof(City.Active)]        = (Expression<Func<City, bool>>)(c => c.Active),
+                [nameof(City.CreatedAt)]     = (Expression<Func<City, DateTime>>)(c => c.CreatedAt),
+                [nameof(City.Id)]            = (Expression<Func<City, int>>)(c => c.Id),
+            };
 
         protected override IDictionary<string, Func<string, Expression<Func<City, bool>>>> AllowedFilters() =>
             new Dictionary<string, Func<string, Expression<Func<City, bool>>>>(StringComparer.OrdinalIgnoreCase)

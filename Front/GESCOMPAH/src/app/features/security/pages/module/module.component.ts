@@ -63,7 +63,7 @@ export class ModuleComponent implements OnInit {
       tap(() => this.sweetAlertService.showNotification('Creación Exitosa', 'Módulo creado exitosamente.', 'success')),
       catchError(err => {
         console.error('Error creando el módulo:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo crear el módulo.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo crear el módulo.');
         return EMPTY;
       })
     ).subscribe();
@@ -85,7 +85,7 @@ export class ModuleComponent implements OnInit {
       tap(() => this.sweetAlertService.showNotification('Actualización Exitosa', 'Módulo actualizado exitosamente.', 'success')),
       catchError(err => {
         console.error('Error actualizando el módulo:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo actualizar el módulo.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo actualizar el módulo.');
         return EMPTY;
       })
     ).subscribe();
@@ -107,7 +107,7 @@ export class ModuleComponent implements OnInit {
       next: () => this.sweetAlertService.showNotification('Eliminación Exitosa', 'Módulo eliminado exitosamente.', 'success'),
       error: err => {
         console.error('Error eliminando el módulo:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el módulo.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo eliminar el módulo.');
       }
     });
   }
@@ -140,11 +140,7 @@ export class ModuleComponent implements OnInit {
       catchError(err => {
         console.error('Error cambiando estado:', err);
         row.active = previous; // revertir
-        this.sweetAlertService.showNotification(
-          'Error',
-          err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error'
-        );
+        this.sweetAlertService.showApiError(err, 'No se pudo cambiar el estado.');
         return EMPTY;
       }),
       finalize(() => this.busyIds.delete(row.id))

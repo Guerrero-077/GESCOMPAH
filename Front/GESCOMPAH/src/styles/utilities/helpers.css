@@ -1,0 +1,23 @@
+.rounded {
+  border-radius: 8px !important;
+}
+
+.shadow-1 {
+  box-shadow: var(--shadow-1) !important;
+}
+
+.shadow-2 {
+  box-shadow: var(--shadow-2) !important;
+}
+
+.shadow-3 {
+  box-shadow: var(--shadow-3) !important;
+}
+
+.shadow-green {
+  box-shadow: var(--shadow-2);
+}
+
+.shadow-accent {
+  box-shadow: var(--shadow-accent);
+}

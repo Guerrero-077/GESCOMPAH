@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebGESCOMPAH.Controllers.Base;
 
-namespace Web.Api.Controllers.SecurityAuthentication
+namespace WebGESCOMPAH.Controllers.Module.SecurityAuthentication
 {
     [ApiController]
     [Route("api/[controller]")]

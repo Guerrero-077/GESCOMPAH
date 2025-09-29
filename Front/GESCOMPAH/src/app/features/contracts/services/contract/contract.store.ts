@@ -167,11 +167,12 @@ export class ContractStore {
   }
 
   private setError(e: unknown): void {
-    // Normaliza error
-    const m =
-      (e as any)?.message ??
-      (typeof e === 'string' ? e : 'Error inesperado');
+    // Ignora errores de sesión expirada (401) porque el authInterceptor ya navega a login
     const status = (e as any)?.status ?? (e as any)?.statusCode;
+    const type = (e as any)?.type;
+    if (status === 401 || type === 'Unauthorized' || (e as any)?.__authExpired) return;
+
+    const m = (e as any)?.message ?? (typeof e === 'string' ? e : 'Error inesperado');
     const code = (e as any)?.error?.code ?? (e as any)?.code;
     this._error.set({ status, code, message: String(m) });
   }

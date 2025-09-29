@@ -19,9 +19,6 @@
 </ng-container>
 
 <ng-template #contentTpl>
-  <!-- Error -->
-  <ng-container *ngIf="!error(); else errorTpl">
-
     <!-- Encabezado de página -->
     <header class="page-header">
       <div class="page-title">
@@ -163,12 +160,4 @@
       <p>No hay contratos que coincidan con la búsqueda.</p>
     </div>
 
-  </ng-container>
-</ng-template>
-
-<!-- Error -->
-<ng-template #errorTpl>
-  <div class="alert-error" role="alert">
-    Ocurrió un error al cargar contratos: {{ error() }}
-  </div>
 </ng-template>

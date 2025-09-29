@@ -29,7 +29,6 @@ export interface EstablishmentCreate {
   name: string;
   description: string;
   areaM2: number;
-  rentValueBase: number;
   uvtQty: number;
   plazaId: number;
   address?: string;

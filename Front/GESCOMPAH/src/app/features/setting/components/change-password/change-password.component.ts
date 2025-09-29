@@ -9,17 +9,26 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
+import { FormErrorComponent } from '../../../../shared/components/form-error/form-error.component';
 
 @Component({
   selector: 'app-change-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatIconModule, MatButtonModule, MatFormFieldModule, StandardButtonComponent],
+  imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatIconModule, MatButtonModule, MatFormFieldModule, StandardButtonComponent, FormErrorComponent],
   templateUrl: './change-password.component.html',
   styleUrl: './change-password.component.css'
 })
 export class ChangePasswordComponent {
   form: FormGroup;
   passwordVisible: boolean = false;
+
+  // Mensajes específicos para validadores custom de la nueva contraseña
+  newPasswordMessages = {
+    upper: () => 'Debe incluir al menos una letra mayúscula',
+    lower: () => 'Debe incluir al menos una letra minúscula',
+    digit: () => 'Debe incluir al menos un número',
+    symbol: () => 'Debe incluir al menos un símbolo especial'
+  } as const;
 
   constructor(
     private fb: FormBuilder,
@@ -88,7 +97,7 @@ export class ChangePasswordComponent {
           this.form.get('currentPassword')?.updateValueAndValidity();
         }
 
-        this.sweetAlertService.showNotification('Error', errorMessage, 'error');
+        this.sweetAlertService.showApiError(err, errorMessage);
       }
     });
   }

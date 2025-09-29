@@ -38,7 +38,7 @@ public class ExceptionMiddleware : IMiddleware
 
     private void Log(Exception ex, HttpContext context)
     {
-        // Puedes ajustar según tipo, esto es un ejemplo
+        // Puedes ajustar según el tipo; esto es un ejemplo
         _logger.LogError(ex, "Excepción no manejada en {Path}", context.Request.Path);
     }
 
@@ -53,7 +53,7 @@ public class ExceptionMiddleware : IMiddleware
 
         var (problem, statusCode) = handler.Handle(exception, _env, context);
 
-        // Metadata útil para trazabilidad
+        // Metadatos útiles para trazabilidad
         problem.Extensions ??= new Dictionary<string, object?>();
         problem.Extensions["traceId"] = context.TraceIdentifier;
         problem.Extensions["path"] = context.Request.Path.Value;

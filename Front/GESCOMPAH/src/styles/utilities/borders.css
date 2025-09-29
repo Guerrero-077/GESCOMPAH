@@ -1,0 +1,12 @@
+.border-default {
+  border: 1px solid var(--color-border) !important;
+}
+
+.border-accent {
+  border: 1px solid var(--color-accent) !important;
+}
+
+/* Borde usado en las cartas del dashboard (verde suave) */
+.border-dashboard {
+  border: 1px solid var(--green-200) !important; /* emerald-200 */
+}

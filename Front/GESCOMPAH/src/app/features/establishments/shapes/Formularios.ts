@@ -5,7 +5,6 @@ import { FormControl } from "@angular/forms";
 export type GeneralForm = {
   name: FormControl<string>;
   description: FormControl<string>;
-  rentValueBase: FormControl<number>;
   uvtQty: FormControl<number>;
   areaM2: FormControl<number>;
 };

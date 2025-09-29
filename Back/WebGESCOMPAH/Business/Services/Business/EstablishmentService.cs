@@ -2,15 +2,19 @@
 using Business.Repository;
 using Business.Services.Validation;
 using Data.Interfaz.IDataImplement.Business;
+using Data.Interfaz.DataBasic;
+using Entity.Domain.Models.Implements.AdministrationSystem;
 using Entity.Domain.Models.Implements.Business;
 using Entity.DTOs.Implements.Business.EstablishmentDto;
 using Entity.Enum;
 using Entity.Infrastructure.Context;
 using Mapster;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using Utilities.Exceptions;
@@ -27,17 +31,24 @@ namespace Business.Services.Business
     {
         private readonly IEstablishmentsRepository _repo;
         private readonly ILogger<EstablishmentService> _logger;
+        private readonly IDataGeneric<SystemParameter> _systemParamRepository;
 
         public EstablishmentService(
             IEstablishmentsRepository repo,
             ApplicationDbContext context,
             IMapper mapper,
-            ILogger<EstablishmentService> logger
+            ILogger<EstablishmentService> logger,
+            IDataGeneric<SystemParameter> systemParamRepository
         ) : base(repo, mapper)
         {
             _repo = repo;
             _logger = logger;
+            _systemParamRepository = systemParamRepository;
         }
+
+        // Aquí defines la llave “única” de negocio
+        protected override IQueryable<Establishment>? ApplyUniquenessFilter(IQueryable<Establishment> query, Establishment candidate)
+            => query.Where(e => e.Name == candidate.Name);
 
         // ========= LISTAS =========
 
@@ -87,6 +98,10 @@ namespace Business.Services.Business
 
                 var entity = dto.Adapt<Establishment>();
 
+                // Calcular RentValueBase a partir del parámetro UVT vigente
+                var uvtValue = await GetParameterValueAsync("UVT", DateTime.UtcNow);
+                entity.RentValueBase = Math.Round(dto.UvtQty * uvtValue, 2, MidpointRounding.AwayFromZero);
+
                 await _repo.AddAsync(entity);
 
                 // Recarga sin filtro por Active (o usa el entity si no hace falta)
@@ -110,6 +125,10 @@ namespace Business.Services.Business
 
                 Validate(dto);
                 dto.Adapt(entity);
+
+                // Recalcular RentValueBase a partir del parámetro UVT vigente (ignora valor recibido)
+                var uvtValue = await GetParameterValueAsync("UVT", DateTime.UtcNow);
+                entity.RentValueBase = Math.Round(entity.UvtQty * uvtValue, 2, MidpointRounding.AwayFromZero);
 
                 await _repo.UpdateAsync(entity);
 
@@ -195,7 +214,6 @@ namespace Business.Services.Business
         {
             dto.Name = DomainValidation.RequireText(dto.Name, "Nombre", 100);
             dto.Description = DomainValidation.RequireText(dto.Description, "Descripción", 500);
-            dto.RentValueBase = DomainValidation.EnsureDecimalRange(dto.RentValueBase, 1m, 9_999_999.99m, 2, "RentValueBase");
             dto.UvtQty = DomainValidation.EnsureDecimalRange(dto.UvtQty, 1m, 9_999m, 2, "UvtQty");
             dto.AreaM2 = DomainValidation.EnsureDecimalRange(dto.AreaM2, 1m, 1_000_000m, 2, "AreaM2");
             dto.Address = DomainValidation.NormalizeAddress(dto.Address, required: false, maxLength: 150);
@@ -206,7 +224,6 @@ namespace Business.Services.Business
         {
             dto.Name = DomainValidation.RequireText(dto.Name, "Nombre", 100);
             dto.Description = DomainValidation.RequireText(dto.Description, "Descripción", 500);
-            dto.RentValueBase = DomainValidation.EnsureDecimalRange(dto.RentValueBase, 1m, 9_999_999.99m, 2, "RentValueBase");
             dto.UvtQty = DomainValidation.EnsureDecimalRange(dto.UvtQty, 1m, 9_999m, 2, "UvtQty");
             dto.AreaM2 = DomainValidation.EnsureDecimalRange(dto.AreaM2, 1m, 1_000_000m, 2, "AreaM2");
             dto.Address = DomainValidation.NormalizeAddress(dto.Address, required: false, maxLength: 150);
@@ -236,6 +253,35 @@ namespace Business.Services.Business
             nameof(Establishment.CreatedAt),
             nameof(Establishment.Active)
         ];
+
+        // ------------------ Helpers de parámetros del sistema ------------------
+        private async Task<decimal> GetParameterValueAsync(string key, DateTime date)
+        {
+            var param = await _systemParamRepository.GetAllQueryable()
+                .Where(p => p.Key == key && p.EffectiveFrom <= date && (p.EffectiveTo == null || p.EffectiveTo >= date))
+                .OrderByDescending(p => p.EffectiveFrom)
+                .FirstOrDefaultAsync();
+
+            if (param == null)
+                throw new BusinessException($"Parámetro '{key}' no encontrado para la fecha {date:yyyy-MM-dd}.");
+
+            if (!TryParseDecimalFlexible(param.Value, out var value))
+                throw new BusinessException($"Valor inválido para parámetro '{key}': '{param.Value}'.");
+
+            if (key.Equals("UVT", StringComparison.OrdinalIgnoreCase) && value <= 0m)
+                throw new BusinessException("UVT debe ser mayor que 0.");
+
+            return value;
+        }
+
+        private static bool TryParseDecimalFlexible(string raw, out decimal value)
+        {
+            raw = raw?.Trim() ?? string.Empty;
+            if (decimal.TryParse(raw, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value)) return true;
+            var es = CultureInfo.GetCultureInfo("es-CO");
+            if (decimal.TryParse(raw, System.Globalization.NumberStyles.Any, es, out value)) return true;
+            return decimal.TryParse(raw, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value);
+        }
 
 
     }

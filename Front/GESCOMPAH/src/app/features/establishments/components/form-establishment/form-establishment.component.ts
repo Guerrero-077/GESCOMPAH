@@ -37,6 +37,7 @@ import { GeneralForm, UbicacionForm } from '../../shapes/Formularios';
 
 import { AppValidators } from '../../../../shared/utils/AppValidators';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
+import { FormErrorComponent } from '../../../../shared/components/form-error/form-error.component';
 
 
 /* Mensajes de error:
@@ -52,14 +53,6 @@ export const ERRORS = {
     required: 'La descripción es obligatoria.',
     maxlength: 'La descripción no puede superar 500 caracteres.',
     onlySpaces: 'La descripción no puede ser solo espacios.'
-  },
-  rentValueBase: {
-    required: 'El valor base es obligatorio.',
-    NaN: 'Ingresa un número válido.',
-    invalidNotation: 'No uses notación científica (e/E) ni signos +/−.',
-    min: 'El valor base no puede ser menor que 1.',
-    max: 'El valor base es demasiado alto.',
-    decimalScale: 'Máximo 2 decimales permitidos.'
   },
   uvtQty: {
     required: 'La cantidad de UVT es obligatoria.',
@@ -96,7 +89,8 @@ export const ERRORS = {
     MatStepperModule,
     FileDropDirective, // directiva para manejar drag&drop de archivos
     ThousandSeparatorDirective,
-    StandardButtonComponent
+    StandardButtonComponent,
+    FormErrorComponent
   ],
   templateUrl: './form-establishment.component.html',
   styleUrls: ['./form-establishment.component.css'],
@@ -150,13 +144,6 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.maxLength(500),
         AppValidators.notOnlySpaces()
-      ]
-    }),
-    rentValueBase: this.fb.control(0, {
-      validators: [
-        Validators.required,
-        AppValidators.numberRange({ min: 10_000, max: 9_999_999.99 }),
-        AppValidators.decimal({ decimals: 2 })
       ]
     }),
     uvtQty: this.fb.control(0, {
@@ -235,7 +222,6 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
       name: this.data.name,
       description: this.data.description,
       areaM2: this.data.areaM2,
-      rentValueBase: this.data.rentValueBase,
       uvtQty: this.data.uvtQty,
     });
     this.ubicacionGroup.patchValue({
@@ -358,7 +344,7 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
       await this.uploadNewImagesIfAny(establishmentId);
       this.dialogRef.close(true);
     } catch (err: any) {
-      this.sweetAlert.showNotification('Error', err?.error?.detail || 'No se pudo guardar el establecimiento.', 'error');
+      this.sweetAlert.showApiError(err, 'No se pudo guardar el establecimiento.');
     } finally {
       this.isBusy = false;
       this.dialogRef.disableClose = false;
@@ -373,7 +359,6 @@ export class FormEstablishmentComponent implements OnInit, OnDestroy {
       name: base.name,
       description: base.description,
       areaM2: base.areaM2,
-      rentValueBase: base.rentValueBase,
       uvtQty: base.uvtQty,
       plazaId: loc.plazaId,
       address: loc.address

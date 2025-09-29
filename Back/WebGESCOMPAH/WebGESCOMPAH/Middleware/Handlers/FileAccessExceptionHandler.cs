@@ -14,9 +14,7 @@ namespace WebGESCOMPAH.Middleware.Handlers
         {
             var statusCode = (int)HttpStatusCode.InternalServerError;
 
-            var detail = env.IsDevelopment()
-                ? exception.ToString()
-                : "Ocurrió un error al acceder a un archivo o recurso físico.";
+            var detail = "Ocurrió un error al acceder a un archivo o recurso físico.";
 
             var problem = ProblemDetailsFactory.Create(
                 statusCode,

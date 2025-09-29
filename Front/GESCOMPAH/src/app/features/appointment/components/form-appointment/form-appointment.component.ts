@@ -16,6 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { StandardButtonComponent } from '../../../../shared/components/standard-button/standard-button.component';
+import { FormErrorComponent } from '../../../../shared/components/form-error/form-error.component';
 
 import { Subject, of } from 'rxjs';
 import { distinctUntilChanged, switchMap, tap, catchError, takeUntil, map, finalize } from 'rxjs/operators';
@@ -50,7 +51,8 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
     MatIconModule,
     MatStepperModule,
     MatProgressSpinnerModule,
-    StandardButtonComponent
+    StandardButtonComponent,
+    FormErrorComponent
   ],
   templateUrl: './form-appointment.component.html',
   styleUrls: ['./form-appointment.component.css']
@@ -163,8 +165,8 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
           this.lastQueriedDoc = doc;
           return this.personSvc.getByDocument(doc).pipe(
             catchError(err => {
-              if (err?.status === 404 && typeof err?.error === 'string') {
-                this.sweet.showNotification('No encontrado', err.error, 'error');
+              if (err?.status === 404) {
+                this.sweet.showApiError(err, 'No encontrado', 'No encontrado');
               }
               return of(null);
             }),
@@ -254,7 +256,7 @@ export class FormAppointmentComponent implements OnInit, OnDestroy {
       firstName: String(p.get('firstName')!.value).trim(),
       lastName: String(p.get('lastName')!.value).trim(),
       document: String(p.get('document')!.value).trim(),
-      address: String(a.get('address')?.value ?? '').trim(), // 🔥 corregido
+      address: String(p.get('address')?.value ?? '').trim(),
       phone: String(p.get('phone')!.value).trim(),
       email: String(p.get('email')!.value).trim(),           // 🔥 agregado
       cityId: Number(a.get('cityId')!.value),

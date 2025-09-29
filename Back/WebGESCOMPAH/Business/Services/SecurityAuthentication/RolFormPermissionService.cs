@@ -25,6 +25,10 @@ namespace Business.Services.SecurityAuthentication
             _notify = notify;
         }
 
+        // Aquí defines la llave “única” de negocio
+        protected override IQueryable<RolFormPermission>? ApplyUniquenessFilter(IQueryable<RolFormPermission> query, RolFormPermission candidate)
+            => query.Where(rfp => rfp.RolId == candidate.RolId && rfp.FormId == candidate.FormId && rfp.PermissionId == candidate.PermissionId);
+
         public override async Task<RolFormPermissionSelectDto> CreateAsync(RolFormPermissionCreateDto dto)
         {
             // 1. Validar duplicados antes de crear

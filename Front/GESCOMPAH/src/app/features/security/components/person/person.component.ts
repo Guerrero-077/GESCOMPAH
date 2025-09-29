@@ -55,12 +55,7 @@ export class PersonComponent implements OnInit {
 
   // Utilidades UI
   trackById = (_: number, it: PersonSelectModel) => it.id;
-  private notifySuccess(title: string, msg: string) {
-    this.sweetAlertService.showNotification(title, msg, 'success');
-  }
-  private notifyError(msg: string) {
-    this.sweetAlertService.showNotification('Error', msg, 'error');
-  }
+  
 
   // Helpers
   private getCityOptions$() {
@@ -89,10 +84,10 @@ export class PersonComponent implements OnInit {
       dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
         if (!result) return;
         this.personStore.update(row.id, result).pipe(take(1)).subscribe({
-          next: () => this.notifySuccess('Actualización Exitosa', 'Persona actualizada correctamente.'),
+          next: () => this.sweetAlertService.showNotification('Actualización Exitosa', 'Persona actualizada correctamente.', 'success'),
           error: (err) => {
             console.error('Error actualizando persona:', err);
-            this.notifyError(err?.error?.detail || 'No se pudo actualizar la persona.');
+            this.sweetAlertService.showApiError(err, 'No se pudo actualizar la persona.');
           }
         });
       });
@@ -116,10 +111,10 @@ export class PersonComponent implements OnInit {
       dialogRef.afterClosed().pipe(take(1)).subscribe((result: any) => {
         if (!result) return;
         this.personStore.create(result).pipe(take(1)).subscribe({
-          next: () => this.notifySuccess('Creación Exitosa', 'Persona creada exitosamente.'),
+          next: () => this.sweetAlertService.showNotification('Creación Exitosa', 'Persona creada exitosamente.', 'success'),
           error: (err) => {
             console.error('Error creando persona:', err);
-            this.notifyError(err?.error?.detail || 'No se pudo crear la persona.');
+            this.sweetAlertService.showApiError(err, 'No se pudo crear la persona.');
           }
         });
       });
@@ -139,10 +134,10 @@ export class PersonComponent implements OnInit {
     if (!result.isConfirmed) return;
 
     this.personStore.deleteLogic(row.id).pipe(take(1)).subscribe({
-      next: () => this.notifySuccess('Eliminación Exitosa', 'Persona eliminada exitosamente.'),
+      next: () => this.sweetAlertService.showNotification('Eliminación Exitosa', 'Persona eliminada exitosamente.', 'success'),
       error: (err) => {
         console.error('Error eliminando persona:', err);
-        this.notifyError(err?.error?.detail || 'No se pudo eliminar la persona.');
+        this.sweetAlertService.showApiError(err, 'No se pudo eliminar la persona.');
       }
     });
   }
@@ -168,13 +163,13 @@ export class PersonComponent implements OnInit {
         if (updated && typeof updated.active === 'boolean') {
           row.active = updated.active;
         }
-        this.notifySuccess('Éxito', `Persona ${row.active ? 'activada' : 'desactivada'} correctamente.`);
+        this.sweetAlertService.showNotification('Éxito', `Persona ${row.active ? 'activada' : 'desactivada'} correctamente.`, 'success');
         this.busyToggleIds.delete(row.id);
       },
       error: (err) => {
         // rollback
         row.active = prev;
-        this.notifyError(err?.error?.detail || 'No se pudo cambiar el estado.');
+        this.sweetAlertService.showApiError(err, 'No se pudo cambiar el estado.');
         this.busyToggleIds.delete(row.id);
       }
     });

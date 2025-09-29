@@ -24,9 +24,7 @@ export const permissionMatchGuard: CanMatchFn = (route: Route, segments: UrlSegm
     return false;
   };
 
-  const cached = userStore.snapshot;
-  if (cached) return can(cached) || router.parseUrl('/auth/login');
-
+  // Siempre valida sesión contra backend antes de resolver permisos
   return auth.GetMe().pipe(
     map(u => {
       if (!u) return router.parseUrl('/auth/login');

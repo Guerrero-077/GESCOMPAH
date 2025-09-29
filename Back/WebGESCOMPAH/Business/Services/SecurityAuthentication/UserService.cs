@@ -237,14 +237,30 @@ namespace Business.Services.SecurityAuthentication
             x => x.Person.City.Name
         ];
 
-        protected override string[] SortableFields() =>
-        [
-            nameof(User.Email),
-            nameof(User.PersonId),
-            nameof(User.Id),
+        protected override string[] SortableFields() => new[]
+        {
+            nameof(User.Email),                // Usuario
+            "Person.Document",               // N° Documento
+            "Person.Phone",                  // Teléfono
+            "Person.Address",                // Dirección
+            "Person.City.Name",              // Ciudad
+            nameof(User.Active),               // Estado
             nameof(User.CreatedAt),
-            nameof(User.Active)
-        ];
+            nameof(User.Id)
+        };
+
+        protected override IDictionary<string, LambdaExpression> SortMap()
+            => new Dictionary<string, LambdaExpression>(StringComparer.OrdinalIgnoreCase)
+            {
+                [nameof(User.Email)]          = (Expression<Func<User, string>>)(u => u.Email),
+                ["Person.Document"]          = (Expression<Func<User, string?>>)(u => u.Person.Document),
+                ["Person.Phone"]             = (Expression<Func<User, string?>>)(u => u.Person.Phone),
+                ["Person.Address"]           = (Expression<Func<User, string?>>)(u => u.Person.Address),
+                ["Person.City.Name"]         = (Expression<Func<User, string>>)(u => u.Person.City.Name),
+                [nameof(User.Active)]         = (Expression<Func<User, bool>>)(u => u.Active),
+                [nameof(User.CreatedAt)]      = (Expression<Func<User, DateTime>>)(u => u.CreatedAt),
+                [nameof(User.Id)]             = (Expression<Func<User, int>>)(u => u.Id),
+            };
 
         protected override IDictionary<string, Func<string, Expression<Func<User, bool>>>> AllowedFilters() =>
             new Dictionary<string, Func<string, Expression<Func<User, bool>>>>(StringComparer.OrdinalIgnoreCase)

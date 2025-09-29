@@ -15,6 +15,9 @@ namespace Business.Services.Location
         {
         }
 
+        protected override IQueryable<Department>? ApplyUniquenessFilter(IQueryable<Department> query, Department candidate)
+            => query.Where(d => d.Name == candidate.Name);
+
         protected override Expression<Func<Department, string>>[] SearchableFields() => 
         [
             d => d.Name

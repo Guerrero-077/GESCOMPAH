@@ -19,10 +19,15 @@
 }
 
 .layout-content {
-  padding: 24px; /* MÃ¡s espacioso */
+  padding: 32px; /* Espaciado general del area de contenido */
   height: calc(100vh - 90px);
   overflow-y: auto;
   background: transparent; /* Deja que se vea el gradiente del body */
+}
+
+/* Contenedor interno para separar el contenido de los bordes */
+.content-container {
+  padding: 24px;
 }
 
 
@@ -92,6 +97,10 @@
 
   .layout-content,
   .layout-content-enhanced {
+    padding: 16px;
+  }
+
+  .content-container {
     padding: 16px;
   }
 }

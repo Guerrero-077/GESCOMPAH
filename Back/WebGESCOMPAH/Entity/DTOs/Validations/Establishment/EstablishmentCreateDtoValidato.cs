@@ -39,9 +39,6 @@ namespace Entity.DTOs.Validations.Establishment
                     var areaError = ValidateDecimal(dto.AreaM2, 1m, 1_000_000m);
                     if (areaError is not null) context.AddFailure(nameof(dto.AreaM2), areaError);
 
-                    var rentError = ValidateDecimal(dto.RentValueBase, 1m, 9_999_999.99m);
-                    if (rentError is not null) context.AddFailure(nameof(dto.RentValueBase), rentError);
-
                     var uvtError = ValidateDecimal(dto.UvtQty, 1m, 9_999m);
                     if (uvtError is not null) context.AddFailure(nameof(dto.UvtQty), uvtError);
 

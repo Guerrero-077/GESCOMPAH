@@ -114,7 +114,7 @@ export class RolUserComponent implements OnInit {
           },
           error: err => {
             console.error('Error creando RolUser:', err)
-            this.sweetAlertService.showNotification('Error', 'No se pudo crear la asignación Rol-Usuario.', 'error');
+            this.sweetAlertService.showApiError(err, 'No se pudo crear la asignación Rol-Usuario.');
           }
         });
       });
@@ -185,7 +185,7 @@ export class RolUserComponent implements OnInit {
             },
             error: err => {
               console.error('Error actualizando RolUser:', err)
-              this.sweetAlertService.showNotification('Error', 'No se pudo actualizar la asignación Rol-Usuario.', 'error');
+              this.sweetAlertService.showApiError(err, 'No se pudo actualizar la asignación Rol-Usuario.');
             }
           });
         });
@@ -215,7 +215,7 @@ export class RolUserComponent implements OnInit {
         },
         error: err => {
           console.error('Error eliminando RolUser:', err)
-          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar la asignación Rol-Usuario.', 'error');
+          this.sweetAlertService.showApiError(err, 'No se pudo eliminar la asignación Rol-Usuario.');
         }
       });
     }

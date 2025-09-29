@@ -18,8 +18,8 @@ namespace Entity.Infrastructure.DataInit.Business
                 new PremisesLeased
                 {
                     Id = 1,
-                    ContractId = 1,      // ← existe por ContractSeeder
-                    EstablishmentId = 1,    // ← debe existir en tu tabla Establishment
+                    ContractId = 1,        // ← existe por ContractSeeder
+                    EstablishmentId = 1,   // ← existe en EstablishmentSeeder
                     Active = true,
                     IsDeleted = false,
                     CreatedAt = seedAt
@@ -29,16 +29,46 @@ namespace Entity.Infrastructure.DataInit.Business
                 {
                     Id = 2,
                     ContractId = 2,
-                    EstablishmentId = 2,    // ← debe existir
+                    EstablishmentId = 2,
+                    Active = true,
+                    IsDeleted = false,
+                    CreatedAt = seedAt
+                },
+                // Contrato 3 (histórico) vinculado al establecimiento 3
+                new PremisesLeased
+                {
+                    Id = 3,
+                    ContractId = 3,
+                    EstablishmentId = 3,
+                    Active = true,
+                    IsDeleted = false,
+                    CreatedAt = seedAt
+                },
+                // Contrato 1 también usa el establecimiento 5 (isla comercial)
+                new PremisesLeased
+                {
+                    Id = 4,
+                    ContractId = 1,
+                    EstablishmentId = 5,
+                    Active = true,
+                    IsDeleted = false,
+                    CreatedAt = seedAt
+                },
+                // Contrato 2 también usa el establecimiento 6 (oficina piso 12)
+                new PremisesLeased
+                {
+                    Id = 5,
+                    ContractId = 2,
+                    EstablishmentId = 6,
                     Active = true,
                     IsDeleted = false,
                     CreatedAt = seedAt
                 }
-                // (opcional) Si quieres que 1001 tenga dos locales:
+                // (opcional) Si quieres que 1 tenga dos locales:
                 // ,new PremisesLeased
                 // {
-                //     Id = 3003,
-                //     ContractId = 1001,
+                //     Id = 4,
+                //     ContractId = 1,
                 //     EstablishmentId = 2,
                 //     Active = true,
                 //     IsDeleted = false,

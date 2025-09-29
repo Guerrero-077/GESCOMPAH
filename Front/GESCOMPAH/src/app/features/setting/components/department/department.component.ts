@@ -116,9 +116,7 @@ export class DepartmentComponent implements OnInit {
       error: err => {
         // Rollback
         row.active = prev;
-        this.sweetAlert.showNotification('Error',
-          err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error');
+        this.sweetAlert.showApiError(err, 'No se pudo cambiar el estado.');
       }
     });
   }

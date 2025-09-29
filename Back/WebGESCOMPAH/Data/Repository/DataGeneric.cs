@@ -1,11 +1,9 @@
 ﻿using Entity.Domain.Models.ModelBase;
 using Entity.DTOs.Base;
 using Entity.Infrastructure.Context;
-using LinqKit; // necesario para PredicateBuilder y AsExpandable
-using Utilities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Reflection;
+using Utilities.Exceptions;
 
 namespace Data.Repository
 {
@@ -24,7 +22,7 @@ namespace Data.Repository
         /// Query base:
         /// - AsNoTracking para lecturas (evita overhead del change-tracker).
         /// - Filtra soft-delete (!IsDeleted).
-        /// - Orden estable: CreatedAt DESC, Id DESC (útil para paginación determinista).
+        /// - Orden estable: CreatedAt DESC, Id DESC ( til para paginaci n determinista).
         /// </summary>
         private IQueryable<T> BaseQuery() =>
             _dbSet.AsNoTracking()
@@ -92,12 +90,13 @@ namespace Data.Repository
 
         #endregion
 
-        #region Query dinámica con paginado
+        #region Query din mica con paginado
 
         public override async Task<PagedResult<T>> QueryAsync(
             PageQuery query,
             Expression<Func<T, string>>[]? searchableExpressions = null,
-            Expression<Func<T, bool>>[]? extraFilters = null)
+            Expression<Func<T, bool>>[]? extraFilters = null,
+            IDictionary<string, LambdaExpression>? sortMap = null)
         {
             // 0) Saneamos page y size
             var page = query.Page <= 0 ? 1 : query.Page;
@@ -113,47 +112,84 @@ namespace Data.Repository
                     q = q.Where(f);
             }
 
-            // 3) Búsqueda libre (OR-Like) sobre campos string
+            // 3) B squeda libre (OR-Like) sobre campos string (case-insensitive)
             if (!string.IsNullOrWhiteSpace(query.Search) &&
                 searchableExpressions is { Length: > 0 })
             {
-                var text = query.Search.Trim();
-                const string escape = "\\"; // EF.Functions.Like espera string, no char
-                var pattern = $"%{EscapeLike(text, escape[0])}%";
+                var raw = query.Search.Trim();
+                var text = raw.ToLower(); // normaliza a min sculas
+                // Usar LIKE con el escape por defecto de MySQL (\\) sin pasar el 3er par metro (algunos providers no lo soportan)
+                var pattern = $"%{EscapeLike(text, '\\')}%";
 
-                var predicate = PredicateBuilder.New<T>(false); // inicia en false (OR)
+                var toLower = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+                Expression? orBody = null;
+                var param = Expression.Parameter(typeof(T), "e");
 
                 foreach (var expr in searchableExpressions)
                 {
-                    // Coalesce para evitar null
+                    // Coalesce para evitar null y normalizar a min sculas
                     var coalescedExpr = Expression.Coalesce(
                         expr.Body,
                         Expression.Constant(string.Empty)
                     );
+                    var lowered = Expression.Call(coalescedExpr, toLower);
 
-                    // Construimos EF.Functions.Like como Expression.Call (traducible a SQL)
+                    // EF.Functions.Like(lowered, pattern)
+                    var likeMethod = typeof(DbFunctionsExtensions)
+                        .GetMethods()
+                        .First(m => m.Name == nameof(DbFunctionsExtensions.Like)
+                                    && m.GetParameters().Length == 3); // (DbFunctions, string, string)
+
                     var likeCall = Expression.Call(
-                        typeof(DbFunctionsExtensions),
-                        nameof(DbFunctionsExtensions.Like),
-                        Type.EmptyTypes,
+                        likeMethod!,
                         Expression.Constant(EF.Functions),
-                        coalescedExpr,
-                        Expression.Constant(pattern),
-                        Expression.Constant(escape)
+                        lowered,
+                        Expression.Constant(pattern)
                     );
 
-                    var lambda = Expression.Lambda<Func<T, bool>>(likeCall, expr.Parameters);
-
-                    predicate = predicate.Or(lambda);
+                    var fieldLambda = Expression.Lambda<Func<T, bool>>(likeCall, expr.Parameters);
+                    var replaced = new ParameterReplaceVisitor(fieldLambda.Parameters[0], param)
+                        .Visit(fieldLambda.Body)!;
+                    orBody = orBody == null ? replaced : Expression.OrElse(orBody, replaced);
                 }
 
-                q = q.AsExpandable().Where(predicate);
+                if (orBody != null)
+                {
+                    var finalLambda = Expression.Lambda<Func<T, bool>>(orBody, param);
+                    q = q.Where(finalLambda);
+                }
             }
 
-            // 4) Orden dinámico
-            q = ApplySorting(q, query.Sort, query.Desc);
+            // 4) Orden dinámico (prioriza sortMap si fue provisto)
+            if (!string.IsNullOrWhiteSpace(query.Sort) && sortMap != null && sortMap.TryGetValue(query.Sort, out var selector))
+            {
+                var keyType = selector.ReturnType;
+                var orderByName = query.Desc ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy);
+                var thenByName = query.Desc ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy);
 
-            // 5) Paginación
+                var orderBy = typeof(Queryable).GetMethods()
+                    .Where(m => m.Name == orderByName && m.GetParameters().Length == 2)
+                    .Single()
+                    .MakeGenericMethod(typeof(T), keyType);
+
+                var thenBy = typeof(Queryable).GetMethods()
+                    .Where(m => m.Name == thenByName && m.GetParameters().Length == 2)
+                    .Single()
+                    .MakeGenericMethod(typeof(T), typeof(int));
+
+                q = (IQueryable<T>)orderBy.Invoke(null, new object[] { q, Expression.Quote(selector) })!;
+
+                var param = Expression.Parameter(typeof(T), "e");
+                var idProp = Expression.Property(param, nameof(BaseModel.Id));
+                var idSelector = Expression.Lambda(idProp, param);
+                q = (IQueryable<T>)thenBy.Invoke(null, new object[] { q, Expression.Quote(idSelector) })!;
+            }
+            else
+            {
+                q = ApplySorting(q, query.Sort, query.Desc);
+            }
+
+            // 5) Paginaci n
             var total = await q.CountAsync();
             var items = await q.Skip((page - 1) * size)
                                .Take(size)
@@ -166,25 +202,63 @@ namespace Data.Repository
 
         #region Helpers
 
+        private sealed class ParameterReplaceVisitor : ExpressionVisitor
+        {
+            private readonly ParameterExpression _from;
+            private readonly ParameterExpression _to;
+            public ParameterReplaceVisitor(ParameterExpression from, ParameterExpression to)
+            { _from = from; _to = to; }
+            protected override Expression VisitParameter(ParameterExpression node)
+                => node == _from ? _to : base.VisitParameter(node);
+        }
+
         private static IQueryable<T> ApplySorting(IQueryable<T> q, string? sort, bool desc)
         {
             if (string.IsNullOrWhiteSpace(sort))
                 return q; // mantiene orden base
 
             var param = Expression.Parameter(typeof(T), "e");
-            var body = Expression.Call(
-                typeof(EF).GetMethod(nameof(EF.Property))!.MakeGenericMethod(typeof(object)),
-                param,
-                Expression.Constant(sort)
-            );
+            var body = BuildPropertyAccess(param, sort);
+            if (body is null)
+                return q; // sort desconocido → mantener orden base
 
-            var lambda = Expression.Lambda<Func<T, object>>(
-                Expression.Convert(body, typeof(object)), param
-            );
+            var keyType = body.Type;
+            var keySelector = Expression.Lambda(body, param);
 
-            return desc
-                ? q.OrderByDescending(lambda).ThenByDescending(e => e.Id)
-                : q.OrderBy(lambda).ThenBy(e => e.Id);
+            var orderByName = desc ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy);
+            var thenByName = desc ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy);
+
+            var orderBy = typeof(Queryable).GetMethods()
+                .Where(m => m.Name == orderByName && m.GetParameters().Length == 2)
+                .Single()
+                .MakeGenericMethod(typeof(T), keyType);
+
+            var thenBy = typeof(Queryable).GetMethods()
+                .Where(m => m.Name == thenByName && m.GetParameters().Length == 2)
+                .Single()
+                .MakeGenericMethod(typeof(T), typeof(int));
+
+            var ordered = (IQueryable<T>)orderBy.Invoke(null, new object[] { q, Expression.Quote(keySelector) })!;
+
+            // desempate por Id para estabilidad
+            var idProp = Expression.Property(param, nameof(BaseModel.Id));
+            var idSelector = Expression.Lambda(idProp, param);
+            ordered = (IQueryable<T>)thenBy.Invoke(null, new object[] { ordered, Expression.Quote(idSelector) })!;
+
+            return ordered;
+        }
+
+        private static Expression? BuildPropertyAccess(ParameterExpression param, string path)
+        {
+            // Soporta rutas anidadas: Ej. "Person.Document", "Person.City.Name"
+            Expression current = param;
+            foreach (var segment in path.Split('.', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var prop = current.Type.GetProperty(segment);
+                if (prop == null) return null;
+                current = Expression.Property(current, prop);
+            }
+            return current;
         }
 
         private static string EscapeLike(string input, char escapeChar)
@@ -198,3 +272,6 @@ namespace Data.Repository
         #endregion
     }
 }
+
+
+

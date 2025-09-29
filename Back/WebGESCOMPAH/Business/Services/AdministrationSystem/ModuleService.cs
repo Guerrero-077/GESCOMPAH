@@ -14,6 +14,10 @@ namespace Business.Services.AdministrationSystem
         {
         }
 
+        // Aquí defines la llave “única” de negocio
+        protected override IQueryable<Module>? ApplyUniquenessFilter(IQueryable<Module> query, Module candidate)
+            => query.Where(m => m.Name == candidate.Name);
+
         protected override Expression<Func<Module, string>>[] SearchableFields() =>
         [
             m => m.Name!,

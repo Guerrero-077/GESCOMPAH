@@ -1,8 +1,9 @@
-﻿namespace Entity.DTOs.Implements.Business.ObligationMonth
+using Entity.DTOs.Base;
+
+namespace Entity.DTOs.Implements.Business.ObligationMonth
 {
-    public class ObligationMonthSelectDto
+    public class ObligationMonthSelectDto : BaseDto
     {
-        public int Id { get; set; }
         public int ContractId { get; set; }
         public int Year { get; set; }
         public int Month { get; set; }
@@ -20,3 +21,4 @@
         public bool Active { get; set; }
     }
 }
+

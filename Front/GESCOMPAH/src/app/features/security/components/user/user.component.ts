@@ -71,11 +71,7 @@ export class UserComponent implements OnInit {
       error: (err) => {
         // revertir si falla
         row.active = previous;
-        this.sweetAlertService.showNotification(
-          'Error',
-          err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error'
-        );
+        this.sweetAlertService.showApiError(err, 'No se pudo cambiar el estado.');
       }
     });
   }
@@ -185,7 +181,7 @@ export class UserComponent implements OnInit {
         },
         error: err => {
           console.error('Error eliminando el usuario:', err);
-          this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el usuario.', 'error');
+          this.sweetAlertService.showApiError(err, 'No se pudo eliminar el usuario.');
         }
       });
     }

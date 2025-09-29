@@ -1,0 +1,48 @@
+<div class="gcard">
+  <div class="gcard__image" *ngIf="img as src">
+    <img [src]="src" alt="imagen" />
+  </div>
+
+  <div class="gcard__body">
+    <div class="gcard__header" *ngIf="title || subtitle">
+      <div class="gcard__title">{{ title }}</div>
+      <div class="gcard__subtitle" *ngIf="subtitle">{{ subtitle }}</div>
+    </div>
+
+    <div class="gcard__fields" *ngIf="fields?.length">
+      <div class="gcard__field" *ngFor="let col of fields">
+        <div class="gcard__label">{{ col.header }}</div>
+        <div class="gcard__value">
+          <ng-container *ngIf="col.template; else autoValue"
+                        [ngTemplateOutlet]="col.template"
+                        [ngTemplateOutletContext]="{ $implicit: data, row: data }">
+          </ng-container>
+          <ng-template #autoValue>{{ valueFor(col) }}</ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="gcard__actions">
+      <ng-container *ngIf="actionsTemplate; else defaultActions"
+                    [ngTemplateOutlet]="actionsTemplate"
+                    [ngTemplateOutletContext]="{ $implicit: data, row: data }">
+      </ng-container>
+      <ng-template #defaultActions>
+        <button mat-stroked-button color="primary" *ngIf="showViewButton" (click)="view.emit(data)">
+          <mat-icon>visibility</mat-icon>&nbsp;Ver
+        </button>
+        <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'EDITAR'">
+          <button mat-stroked-button *ngIf="showEditButton" (click)="edit.emit(data)">
+            <mat-icon>edit</mat-icon>&nbsp;Editar
+          </button>
+        </ng-container>
+        <ng-container *appHasRoleAndPermission="'Administrador'; perms: 'ELIMINAR'">
+          <button mat-stroked-button color="warn" *ngIf="showDeleteButton" (click)="delete.emit(data)">
+            <mat-icon>delete</mat-icon>&nbsp;Eliminar
+          </button>
+        </ng-container>
+      </ng-template>
+    </div>
+  </div>
+</div>
+

@@ -12,6 +12,10 @@ namespace Business.Services.SecurityAuthentication
         : BusinessGeneric<PermissionSelectDto, PermissionCreateDto, PermissionUpdateDto, Permission>(data, mapper),
           IPermissionService
     {
+        // Aquí defines la llave “única” de negocio
+        protected override IQueryable<Permission>? ApplyUniquenessFilter(IQueryable<Permission> query, Permission candidate)
+            => query.Where(p => p.Name == candidate.Name);
+
         protected override Expression<Func<Permission, string?>>[] SearchableFields() =>
         [
             p => p.Name,

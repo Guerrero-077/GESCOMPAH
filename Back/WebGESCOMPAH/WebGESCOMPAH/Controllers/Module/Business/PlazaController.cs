@@ -7,7 +7,7 @@ using Utilities.Exceptions;
 namespace WebGESCOMPAH.Controllers.Module.Business
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class PlazaController : BaseController<PlazaSelectDto, PlazaCreateDto, PlazaUpdateDto>
     {

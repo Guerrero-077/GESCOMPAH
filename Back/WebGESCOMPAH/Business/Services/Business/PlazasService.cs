@@ -28,6 +28,10 @@ namespace Business.Services.Business
             _contractRepository = contractRepository;
         }
 
+        // Aquí defines la llave “única” de negocio
+        protected override IQueryable<Plaza>? ApplyUniquenessFilter(IQueryable<Plaza> query, Plaza candidate)
+            => query.Where(p => p.Name == candidate.Name);
+
         public override async Task UpdateActiveStatusAsync(int id, bool active)
         {
             // Cargar entidad y validar estado actual

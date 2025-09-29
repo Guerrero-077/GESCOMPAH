@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, inject, effect } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { GenericTableComponent } from '../../../../shared/components/generic-table/generic-table.component';
@@ -45,6 +45,14 @@ export class SquareListComponent implements OnInit {
     await this.squaresStore.loadAll();
   }
 
+  // Notificación de error estandarizada
+  private readonly errorToast = effect(() => {
+    const err = this.error();
+    if (err) {
+      this.sweetAlert.showApiError(err, 'No se pudieron cargar las plazas.');
+    }
+  });
+
   onView(row: SquareSelectModel) { }
 
   onCreate(): void {
@@ -60,7 +68,7 @@ export class SquareListComponent implements OnInit {
           await this.squaresStore.create(result);
           this.sweetAlert.showNotification('Creación Exitosa', 'Plaza creada exitosamente.', 'success');
         } catch (err) {
-          this.sweetAlert.showNotification('Error', 'No se pudo crear la plaza.', 'error');
+          this.sweetAlert.showApiError(err, 'No se pudo crear la plaza.');
         }
       });
     });
@@ -80,7 +88,7 @@ export class SquareListComponent implements OnInit {
           await this.squaresStore.update(dto.id, dto);
           this.sweetAlert.showNotification('Actualización Exitosa', 'Plaza actualizada exitosamente.', 'success');
         } catch (err) {
-          this.sweetAlert.showNotification('Error', 'No se pudo actualizar la plaza.', 'error');
+          this.sweetAlert.showApiError(err, 'No se pudo actualizar la plaza.');
         }
       });
     });
@@ -99,7 +107,7 @@ export class SquareListComponent implements OnInit {
       await this.squaresStore.deleteLogic(row.id);
       this.sweetAlert.showNotification('Eliminación exitosa', 'Plaza eliminada correctamente.', 'success');
     } catch (err) {
-      this.sweetAlert.showNotification('Error', 'No se pudo eliminar la plaza.', 'error');
+      this.sweetAlert.showApiError(err, 'No se pudo eliminar la plaza.');
     }
   }
 

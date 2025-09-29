@@ -62,15 +62,7 @@ export class FormModuleComponent implements OnInit {
   }
 
   // Utilidades UI
-  private notifySuccess(title: string, msg: string): void {
-    this.sweetAlertService.showNotification(title, msg, 'success');
-  }
-  private notifyError(msg: string): void {
-    this.sweetAlertService.showNotification('Error', msg, 'error');
-  }
-  private notifyWarn(msg: string): void {
-    this.sweetAlertService.showNotification('Advertencia', msg, 'warning');
-  }
+  
 
   // Datos
   private loadFormModules(): void {
@@ -78,7 +70,7 @@ export class FormModuleComponent implements OnInit {
       next: (data) => this.formModulesSubject.next(data as FormModuleSelectModel[]),
       error: (err) => {
         console.error('Error loading form modules:', err);
-        this.notifyError('No se pudieron cargar las relaciones Form–Module.');
+        this.sweetAlertService.showApiError(err, 'No se pudieron cargar las relaciones Form–Module.');
       }
     });
   }
@@ -112,7 +104,7 @@ export class FormModuleComponent implements OnInit {
     }).pipe(take(1)).subscribe(({ formOpts, moduleOpts }) => {
       if (!formOpts.length || !moduleOpts.length) {
         console.warn('No hay opciones disponibles para Form/Module');
-        this.notifyWarn('No hay opciones disponibles para Formularios o Módulos. Asegúrese de que existan.');
+        this.sweetAlertService.showNotification('Advertencia', 'No hay opciones disponibles para Formularios o Módulos. Asegúrese de que existan.', 'warning');
         return;
       }
 
@@ -143,12 +135,12 @@ export class FormModuleComponent implements OnInit {
 
           this.formModuleService.create(payload).pipe(take(1)).subscribe({
             next: () => {
-              this.notifySuccess('Creación Exitosa', 'Relación Form–Module creada exitosamente.');
+              this.sweetAlertService.showNotification('Creación Exitosa', 'Relación Form–Module creada exitosamente.', 'success');
               this.loadFormModules();
             },
             error: (err) => {
               console.error('Error creando FormModule:', err);
-              this.notifyError('No se pudo crear la relación Form–Module.');
+              this.sweetAlertService.showApiError(err, 'No se pudo crear la relación Form–Module.');
             }
           });
         });
@@ -178,7 +170,7 @@ export class FormModuleComponent implements OnInit {
         })),
         catchError(err => {
           console.error('Error al obtener datos para edición:', err);
-          this.notifyError('No se pudieron cargar los datos para editar la relación Form–Module.');
+          this.sweetAlertService.showApiError(err, 'No se pudieron cargar los datos para editar la relación Form–Module.');
           return of({ formOpts: [], moduleOpts: [], initial: {} as any });
         }),
         take(1)
@@ -186,7 +178,7 @@ export class FormModuleComponent implements OnInit {
       .subscribe(({ formOpts, moduleOpts, initial }) => {
         if (!formOpts.length || !moduleOpts.length) {
           console.warn('No hay opciones disponibles para Form/Module');
-          this.notifyWarn('No hay opciones disponibles para Formularios o Módulos. Asegúrese de que existan.');
+          this.sweetAlertService.showNotification('Advertencia', 'No hay opciones disponibles para Formularios o Módulos. Asegúrese de que existan.', 'warning');
           return;
         }
 
@@ -214,12 +206,12 @@ export class FormModuleComponent implements OnInit {
 
             this.formModuleService.update(id, payload).pipe(take(1)).subscribe({
               next: () => {
-                this.notifySuccess('Actualización Exitosa', 'Relación Form–Module actualizada exitosamente.');
+                this.sweetAlertService.showNotification('Actualización Exitosa', 'Relación Form–Module actualizada exitosamente.', 'success');
                 this.loadFormModules();
               },
               error: (err) => {
                 console.error('Error actualizando FormModule:', err);
-                this.notifyError('No se pudo actualizar la relación Form–Module.');
+                this.sweetAlertService.showApiError(err, 'No se pudo actualizar la relación Form–Module.');
               }
             });
           });
@@ -240,12 +232,12 @@ export class FormModuleComponent implements OnInit {
 
     this.formModuleService.delete(row.id).pipe(take(1)).subscribe({
       next: () => {
-        this.notifySuccess('Eliminación Exitosa', 'Relación Form–Module eliminada exitosamente.');
+        this.sweetAlertService.showNotification('Eliminación Exitosa', 'Relación Form–Module eliminada exitosamente.', 'success');
         this.loadFormModules();
       },
       error: (err) => {
         console.error('Error eliminando FormModule:', err);
-        this.notifyError('No se pudo eliminar la relación Form–Module.');
+        this.sweetAlertService.showApiError(err, 'No se pudo eliminar la relación Form–Module.');
       }
     });
   }
@@ -276,13 +268,13 @@ export class FormModuleComponent implements OnInit {
             curr.map(it => it.id === row.id ? { ...it, active: updated.active! } : it)
           );
         }
-        this.notifySuccess('Éxito', 'Estado de la relación actualizado correctamente.');
+        this.sweetAlertService.showNotification('Éxito', 'Estado de la relación actualizado correctamente.', 'success');
         this.busyToggleIds.delete(row.id);
       },
       error: (err) => {
         // rollback
         this.formModulesSubject.next(original);
-        this.notifyError(err?.error?.detail || 'No se pudo cambiar el estado.');
+        this.sweetAlertService.showApiError(err, 'No se pudo cambiar el estado.');
         this.busyToggleIds.delete(row.id);
       }
     });

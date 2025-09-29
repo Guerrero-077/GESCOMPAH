@@ -7,31 +7,19 @@
 
 <!-- Contenido cuando NO está cargando -->
 <ng-template #content>
-  <!-- Error -->
-  <ng-container *ngIf="!error(); else errorTpl">
-
-    <app-generic-table
-      [data]="squares()"
-      [columns]="columns"
-      titulo="Gestión de plazas comerciales"
-      subTitulo="Administra las plazas comerciales del sistema"
-      [showViewButton]="false"
-      [showActionsColumn]="true"
-      [createButtonLabel]="'Nueva Plaza'"
-      (view)="onView($event)"
-      (create)="onCreate()"
-      (edit)="onEdit($event)"
-      (delete)="onDelete($event)">
-    </app-generic-table>
-
-  </ng-container>
-</ng-template>
-
-<!-- Template de error -->
-<ng-template #errorTpl>
-  <div class="alert alert-danger mt-3" role="alert">
-    Ocurrió un error al cargar las plazas: {{ error() }}
-  </div>
+  <app-generic-table
+    [data]="squares()"
+    [columns]="columns"
+    titulo="Gestión de plazas comerciales"
+    subTitulo="Administra las plazas comerciales del sistema"
+    [showViewButton]="false"
+    [showActionsColumn]="true"
+    [createButtonLabel]="'Nueva Plaza'"
+    (view)="onView($event)"
+    (create)="onCreate()"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)">
+  </app-generic-table>
 </ng-template>
 
 <!-- Template para la columna 'Estado' -->

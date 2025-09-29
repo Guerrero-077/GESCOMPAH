@@ -26,8 +26,8 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([
         csrfInterceptor,
         ...(environment.production ? [] : [ngrokCredentialsInterceptor]),
-        authInterceptor,
-        errorInterceptor
+        errorInterceptor,
+        authInterceptor
       ])
     ),
 

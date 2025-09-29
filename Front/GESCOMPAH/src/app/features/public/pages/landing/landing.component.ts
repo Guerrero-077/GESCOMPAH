@@ -78,7 +78,6 @@ export class LandingComponent implements OnInit, AfterViewInit {
               width: '600px',
               data: row
             });
-            console.log(row);
 
           });
         }, 

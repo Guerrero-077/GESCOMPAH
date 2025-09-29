@@ -109,7 +109,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
                 tap(() => this.sweetAlertService.showNotification('Creado', 'Relación creada con éxito.', 'success')),
                 catchError(err => {
                   console.error('Error creando:', err);
-                  this.sweetAlertService.showNotification('Error', 'No se pudo crear.', 'error');
+                  this.sweetAlertService.showApiError(err, 'No se pudo crear.');
                   return EMPTY;
                 })
               )
@@ -160,7 +160,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
                 tap(() => this.sweetAlertService.showNotification('Actualizado', 'Relación actualizada con éxito.', 'success')),
                 catchError(err => {
                   console.error('Error actualizando:', err);
-                  this.sweetAlertService.showNotification('Error', 'No se pudo actualizar.', 'error');
+                  this.sweetAlertService.showApiError(err, 'No se pudo actualizar.');
                   return EMPTY;
                 })
               )
@@ -185,7 +185,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       next: () => this.sweetAlertService.showNotification('Eliminado', 'Grupo de permisos eliminado correctamente.', 'success'),
       error: err => {
         console.error('Error eliminando:', err);
-        this.sweetAlertService.showNotification('Error', 'No se pudo eliminar el grupo.', 'error');
+        this.sweetAlertService.showApiError(err, 'No se pudo eliminar el grupo.');
       }
     });
   }
@@ -218,11 +218,7 @@ export class RolFormPermissionComponent implements OnInit, AfterViewInit {
       catchError(err => {
         console.error('Error cambiando estado:', err);
         row.active = previous; // revertir
-        this.sweetAlertService.showNotification(
-          'Error',
-          err?.error?.detail || 'No se pudo cambiar el estado.',
-          'error'
-        );
+        this.sweetAlertService.showApiError(err, 'No se pudo cambiar el estado.');
         return EMPTY;
       }),
       finalize(() => this.busyIds.delete(row.id))

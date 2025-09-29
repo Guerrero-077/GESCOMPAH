@@ -10,6 +10,20 @@ namespace Data.Services.SecurityAuthentication
     {
         public UserRepository(ApplicationDbContext context) : base(context) { }
 
+        // Usado por consultas genéricas (paginadas) para asegurar Includes necesarios.
+        public override IQueryable<User> GetAllQueryable()
+        {
+            return _dbSet
+                .AsNoTracking()
+                .Where(u => !u.IsDeleted)
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
+                .Include(u => u.Person)
+                    .ThenInclude(p => p.City)
+                .Include(u => u.RolUsers)
+                    .ThenInclude(ru => ru.Rol);
+        }
+
         // ========== LISTADOS ==========
         // SELECT masivo → NoTracking para no saturar el ChangeTracker
         public override async Task<IEnumerable<User>> GetAllAsync()
@@ -130,9 +144,5 @@ namespace Data.Services.SecurityAuthentication
                     .ThenInclude(ru => ru.Rol)
                 .FirstOrDefaultAsync(u => u.PersonId == personId && !u.IsDeleted);
         }
-
-        // ========== ELIMINA el método inseguro ==========
-        // ❌ NUNCA compares password en Data. Elimina LoginUser(LoginDto).
-        // La verificación de hash va en la capa Business con IPasswordHasher.
     }
 }

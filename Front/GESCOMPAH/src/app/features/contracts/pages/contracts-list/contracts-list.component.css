@@ -101,12 +101,11 @@
 .chip--success { background: var(--success-bg); color: var(--success-color); }
 .chip--warning { background: var(--warning-bg); color: var(--warning-color); }
 
-/* No results / error */
-.no-results, .alert-error {
+/* No results */
+.no-results {
   display: grid; place-items: center; gap: .5rem; padding: 1.5rem; text-align: center;
   color: var(--text-muted);
 }
-.alert-error { color: var(--danger-color); }
 
 /* Overlay descarga PDF (conservado y pulido) */
 .pdf-loading-overlay {

@@ -38,9 +38,9 @@ namespace Business.Services.AdministrationSystem
                 [nameof(SystemParameter.Active)] = v => e => e.Active == bool.Parse(v)
             };
 
-        // Evita duplicados por (Key, EffectiveFrom)
+        // Evita duplicados por nombre (Key)
         protected override IQueryable<SystemParameter>? ApplyUniquenessFilter(IQueryable<SystemParameter> query, SystemParameter candidate)
-            => query.Where(sp => sp.Key == candidate.Key && sp.EffectiveFrom.Date == candidate.EffectiveFrom.Date);
+            => query.Where(sp => sp.Key == candidate.Key);
 
         private static void ValidateDates(ISystemParameterDto dto)
         {

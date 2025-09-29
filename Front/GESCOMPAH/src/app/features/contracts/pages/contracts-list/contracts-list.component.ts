@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { take, switchMap, tap, finalize } from 'rxjs/operators';
@@ -155,7 +155,7 @@ export class ContractsListComponent implements OnInit, OnDestroy {
       next: () => this.toast.showNotification('Éxito', 'La descarga del contrato ha comenzado.', 'success'),
       error: (err) => {
         console.error('Error downloading PDF:', err);
-        this.toast.showNotification('Error', 'No se pudo descargar el contrato.', 'error');
+        this.toast.showApiError(err, 'No se pudo descargar el contrato.');
       },
     });
   }
@@ -166,7 +166,7 @@ export class ContractsListComponent implements OnInit, OnDestroy {
       await this.store.changeActiveStatusRemote(row.id, next);
       this.toast.showNotification('Éxito', `Contrato ${next ? 'activado' : 'desactivado'} correctamente.`, 'success');
     } catch (err: any) {
-      this.toast.showNotification('Error', err?.message || 'No se pudo cambiar el estado.', 'error');
+      this.toast.showApiError(err, 'No se pudo cambiar el estado.');
     }
   }
 
@@ -177,10 +177,18 @@ export class ContractsListComponent implements OnInit, OnDestroy {
     try {
       await this.store.delete(row.id);
       this.toast.showNotification('Eliminación Exitosa', 'Contrato eliminado correctamente.', 'success');
-    } catch {
-      this.toast.showNotification('Error', 'No se pudo eliminar el contrato.', 'error');
+    } catch (err) {
+      this.toast.showApiError(err, 'No se pudo eliminar el contrato.');
     }
   }
 
   trackById = (_: number, item: ContractCard) => item.id;
+
+  // Notifica error de carga inicial/stream mediante toast en lugar de un div en plantilla
+  private readonly errorToast = effect(() => {
+    const err = this.error?.();
+    if (err) {
+      this.toast.showApiError(err, 'No se pudieron cargar los contratos.');
+    }
+  });
 }

@@ -1,0 +1,82 @@
+.button-save:disabled,
+.button-cancel:disabled,
+.button-cancel--warn:disabled,
+.btn-accent:disabled,
+.btn:disabled,
+.btn.disabled,
+button.btn[disabled] {
+  background: var(--gray-300) !important;
+  color: var(--gray-600) !important;
+  border-color: var(--gray-300) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}
+
+.button-save:disabled::before {
+  display: none !important;
+}
+
+.btn:disabled:hover,
+.btn.disabled:hover,
+button.btn[disabled]:hover,
+.button-save:disabled:hover,
+.button-cancel:disabled:hover,
+.button-cancel--warn:disabled:hover,
+.btn-accent:disabled:hover {
+  background-color: var(--gray-300) !important;
+  color: var(--gray-600) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.mat-mdc-raised-button[disabled],
+.mat-mdc-raised-button.mat-primary[disabled],
+.mat-raised-button.mat-primary[disabled],
+.mat-mdc-unelevated-button[disabled],
+.mat-mdc-fab[disabled],
+.mat-mdc-mini-fab[disabled],
+.mdc-button.mdc-button--disabled.mdc-button--raised,
+.mdc-fab.mdc-fab--extended:disabled {
+  background-color: var(--gray-300) !important;
+  color: var(--gray-600) !important;
+  box-shadow: none !important;
+  border-color: var(--gray-300) !important;
+  transform: none !important;
+}
+
+.mat-mdc-outlined-button[disabled],
+.mat-mdc-outlined-button.mat-primary[disabled],
+.mat-stroked-button.mat-primary[disabled],
+.mdc-button.mdc-button--disabled.mdc-button--outlined {
+  background-color: var(--gray-100) !important;
+  color: var(--gray-600) !important;
+  border-color: var(--gray-300) !important;
+}
+
+.mat-mdc-button[disabled],
+.mdc-button.mdc-button--disabled:not(.mdc-button--raised):not(.mdc-button--outlined) {
+  color: var(--gray-500) !important;
+}
+
+.mat-mdc-icon-button[disabled] {
+  --mdc-icon-button-icon-color: var(--gray-400) !important;
+  color: var(--gray-400) !important;
+}
+
+.mat-mdc-button[disabled]:hover,
+.mat-mdc-raised-button[disabled]:hover,
+.mat-mdc-raised-button.mat-primary[disabled]:hover,
+.mat-raised-button.mat-primary[disabled]:hover,
+.mat-mdc-outlined-button[disabled]:hover,
+.mat-mdc-outlined-button.mat-primary[disabled]:hover,
+.mat-mdc-unelevated-button[disabled]:hover,
+.mat-mdc-icon-button[disabled]:hover,
+.mat-mdc-fab[disabled]:hover,
+.mat-mdc-mini-fab[disabled]:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background-color: var(--gray-300) !important;
+  color: var(--gray-600) !important;
+}

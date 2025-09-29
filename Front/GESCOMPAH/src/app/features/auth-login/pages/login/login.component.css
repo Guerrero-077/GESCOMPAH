@@ -122,7 +122,10 @@ body, html {
 }
 
 .btn-green:disabled {
-  opacity: .7;
+  background-color: var(--gray-300) !important;
+  color: var(--gray-600) !important;
+  border-color: var(--gray-300) !important;
+  opacity: 1;
   cursor: not-allowed;
   box-shadow: none;
 }

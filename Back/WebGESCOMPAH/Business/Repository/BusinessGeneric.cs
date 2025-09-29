@@ -148,6 +148,18 @@ namespace Business.Repository
             try
             {
                 BusinessValidationHelper.ThrowIfZeroOrLess(id, "El ID debe ser mayor que cero.");
+
+                var entity = await Data.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    return false; // Or throw a KeyNotFoundException
+                }
+
+                if (entity.Active)
+                {
+                    throw new BusinessException("No se puede eliminar un registro que se encuentra activo.");
+                }
+
                 return await Data.DeleteAsync(id);
             }
             catch (DbUpdateException dbx)
@@ -169,6 +181,18 @@ namespace Business.Repository
             try
             {
                 BusinessValidationHelper.ThrowIfZeroOrLess(id, "El ID debe ser mayor que cero.");
+
+                var entity = await Data.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    return false; // Or throw a KeyNotFoundException
+                }
+
+                if (entity.Active)
+                {
+                    throw new BusinessException("No se puede eliminar un registro que se encuentra activo.");
+                }
+
                 return await Data.DeleteLogicAsync(id);
             }
             catch (Exception ex)
@@ -213,6 +237,14 @@ namespace Business.Repository
         protected virtual string[] SortableFields() => Array.Empty<string>();
 
         /// <summary>
+        /// Mapa opcional de claves de orden -> selector fuertemente tipado.
+        /// Si se provee, Data usará estas expresiones en lugar de EF.Property.
+        /// Las claves deben coincidir con las aceptadas desde el front.
+        /// </summary>
+        protected virtual IDictionary<string, LambdaExpression> SortMap()
+            => new Dictionary<string, LambdaExpression>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
         /// Lista blanca de filtros (propiedad -> builder de expresión) para "Filters".
         /// Controla QUÉ se puede filtrar desde la Web (hardening).
         /// </summary>
@@ -239,8 +271,10 @@ namespace Business.Repository
                     }
                 }
 
-                // Validate sort field
-                if (!SortableFields().Contains(query.Sort, StringComparer.OrdinalIgnoreCase))
+                // Validate sort field contra SortMap (si existe) o SortableFields
+                var sortOk = SortMap().ContainsKey(query.Sort ?? string.Empty)
+                             || SortableFields().Contains(query.Sort, StringComparer.OrdinalIgnoreCase);
+                if (!sortOk)
                 {
                     query = query with { Sort = null };
                 }
@@ -249,12 +283,13 @@ namespace Business.Repository
                 var result = await Data.QueryAsync(
                     query,
                     SearchableFields(),
-                    safeFilters.ToArray()
+                    safeFilters.ToArray(),
+                    SortMap()
                 );
 
                 // 3) Mapear entidades -> DTOs de salida
                 return new PagedResult<TDtoGet>(
-                    Items: _mapper.Map<IEnumerable<TDtoGet>>(result.Items),
+                    Items: _mapper.Map<IEnumerable<TDtoGet>>(result.Items).ToList(),
                     Total: result.Total,
                     Page: result.Page,
                     Size: result.Size
