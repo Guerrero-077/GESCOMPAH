@@ -14,6 +14,10 @@ namespace Business.Services.Business
         {
         }
 
+        // Aquí defines la llave “única” de negocio
+        protected override IQueryable<Clause>? ApplyUniquenessFilter(IQueryable<Clause> query, Clause candidate)
+            => query.Where(c => c.Description == candidate.Description);
+
         protected override Expression<Func<Clause, string>>[] SearchableFields() =>
             [
                 c => c.Name!,

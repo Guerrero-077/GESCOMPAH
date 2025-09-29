@@ -25,7 +25,7 @@ namespace Business.Services.AdministrationSystem
 
         // Aquí defines la llave “única” de negocio
         protected override IQueryable<FormModule>? ApplyUniquenessFilter(IQueryable<FormModule> query, FormModule candidate)
-            => query.Where(f => f.FormId == candidate.FormId);
+            => query.Where(fm => fm.FormId == candidate.FormId && fm.ModuleId == candidate.ModuleId);
 
         public override async Task<FormModuleSelectDto> CreateAsync(FormModuleCreateDto dto)
         {

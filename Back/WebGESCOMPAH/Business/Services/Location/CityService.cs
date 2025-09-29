@@ -17,6 +17,9 @@ namespace Business.Services.Location
             _cityRepository = cityRepository;
         }
 
+        protected override IQueryable<City>? ApplyUniquenessFilter(IQueryable<City> query, City candidate)
+            => query.Where(c => c.Name == candidate.Name && c.DepartmentId == candidate.DepartmentId);
+
         public async Task<IEnumerable<CitySelectDto>> GetCityByDepartment(int idDepartment)
         {
             try

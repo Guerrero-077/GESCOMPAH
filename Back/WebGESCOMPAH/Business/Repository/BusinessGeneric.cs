@@ -148,6 +148,18 @@ namespace Business.Repository
             try
             {
                 BusinessValidationHelper.ThrowIfZeroOrLess(id, "El ID debe ser mayor que cero.");
+
+                var entity = await Data.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    return false; // Or throw a KeyNotFoundException
+                }
+
+                if (entity.Active)
+                {
+                    throw new BusinessException("No se puede eliminar un registro que se encuentra activo.");
+                }
+
                 return await Data.DeleteAsync(id);
             }
             catch (DbUpdateException dbx)
@@ -169,6 +181,18 @@ namespace Business.Repository
             try
             {
                 BusinessValidationHelper.ThrowIfZeroOrLess(id, "El ID debe ser mayor que cero.");
+
+                var entity = await Data.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    return false; // Or throw a KeyNotFoundException
+                }
+
+                if (entity.Active)
+                {
+                    throw new BusinessException("No se puede eliminar un registro que se encuentra activo.");
+                }
+
                 return await Data.DeleteLogicAsync(id);
             }
             catch (Exception ex)

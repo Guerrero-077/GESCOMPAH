@@ -46,6 +46,10 @@ namespace Business.Services.Business
             _systemParamRepository = systemParamRepository;
         }
 
+        // Aquí defines la llave “única” de negocio
+        protected override IQueryable<Establishment>? ApplyUniquenessFilter(IQueryable<Establishment> query, Establishment candidate)
+            => query.Where(e => e.Name == candidate.Name);
+
         // ========= LISTAS =========
 
         /// <summary>Todos: activos e inactivos.</summary>
