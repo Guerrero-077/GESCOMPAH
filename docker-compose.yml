@@ -52,7 +52,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Back/WebGESCOMPAH/WebGESCOMPAH/Dockerfile
+      dockerfile: Back/WebGESCOMPH/WebGESCOMPH/Dockerfile
     container_name: backend
     ports: ["8080:8080"]
     environment:
@@ -74,7 +74,7 @@ services:
 
   frontend:
     build:
-      context: ./Front/GESCOMPAH
+      context: ./Front/GESCOMPH
       dockerfile: Dockerfile
     container_name: frontend
     ports: ["4300:80"]

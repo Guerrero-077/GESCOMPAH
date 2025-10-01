@@ -1,13 +1,13 @@
 services:
   frontend:
     build:
-      context: ./Front/GESCOMPAH
+      context: ./Front/GESCOMPH
       dockerfile: Dockerfile.dev
     container_name: frontend-dev
     ports:
       - "4200:4200"
     volumes:
-      - ./Front/GESCOMPAH:/app
+      - ./Front/GESCOMPH:/app
       - /app/node_modules
     depends_on:
       - backend

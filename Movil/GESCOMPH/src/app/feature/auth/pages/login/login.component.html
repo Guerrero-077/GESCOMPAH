@@ -1,0 +1,92 @@
+<ion-content class="ion-padding">
+
+  <ion-grid class="min-vh-100 ion-align-items-center ion-justify-content-center">
+    <ion-row class="ion-justify-content-center ion-align-items-center">
+
+      <!-- Logo -->
+      <ion-col size="12" size-lg="6" class="ion-text-center">
+        <div class="mb-3">
+          <ion-img src="../../../../../..//public/Escudo-palermo.png" class="imagen-logo"></ion-img>
+        </div>
+        <h2 class="text-green fw-bolder mb-2">GESCOMPH</h2>
+        <p class="text-marmol fs-5 fw-semibold mb-1">Sistema de Gestión Comercial</p>
+        <p class="text-marmol fs-6 mb-0">Alcaldía de Palermo, Huila</p>
+      </ion-col>
+
+      <!-- Formulario -->
+      <ion-col size="12" size-md="8" size-lg="6" size-xl="5">
+        <ion-card class="login-card border-green shadow-sm">
+          <ion-card-header>
+            <ion-card-title class="text-green fw-medium">Iniciar Sesión</ion-card-title>
+            <ion-card-subtitle class="text-marmol">Ingrese sus credenciales para acceder al sistema</ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content>
+            <form [formGroup]="formLogin" (ngSubmit)="login()" novalidate>
+
+              <!-- Email -->
+              <ion-item lines="full">
+                <ion-label position="stacked">Correo Electrónico</ion-label>
+                <ion-input type="email" formControlName="email" placeholder="Correo Electrónico"
+                  (ionBlur)="onEmailBlur()"
+                  [class.is-invalid]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched"
+                  autocomplete="username">
+                </ion-input>
+              </ion-item>
+              <ion-note color="danger" *ngIf="formLogin.get('email')?.touched && formLogin.get('email')?.errors as e">
+                <ng-container *ngIf="e['required']">El correo es obligatorio.</ng-container>
+                <ng-container *ngIf="e['email']">Ingresa un correo válido (ej. usuario&#64;dominio.com).</ng-container>
+                <ng-container *ngIf="e['maxlength']">El correo no puede superar 254 caracteres.</ng-container>
+                <ng-container *ngIf="e['onlySpaces']">El correo no puede ser solo espacios.</ng-container>
+                <ng-container *ngIf="e['pattern']">Ingresa un correo completo con dominio y TLD (ej.
+                  usuario&#64;dominio.com).</ng-container>
+              </ion-note>
+
+              <!-- Password -->
+              <ion-item lines="full">
+                <ion-label position="stacked">Contraseña</ion-label>
+                <ion-input [type]="passwordVisible ? 'text' : 'password'" formControlName="password"
+                  placeholder="Contraseña" autocomplete="current-password"
+                  [class.is-invalid]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched">
+                </ion-input>
+                <!-- <ion-button slot="end" fill="clear" class="password-toggle" (click)="togglePasswordVisibility()">
+                  <ion-icon [name]="passwordVisible ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+                </ion-button> -->
+              </ion-item>
+
+              <ion-note color="danger"
+                *ngIf="formLogin.get('password')?.touched && formLogin.get('password')?.errors as e">
+                <ng-container *ngIf="e['required']">La contraseña es obligatoria.</ng-container>
+                <ng-container *ngIf="e['minlength']">La contraseña debe tener al menos 6 caracteres.</ng-container>
+                <ng-container *ngIf="e['maxlength']">La contraseña no puede superar 128 caracteres.</ng-container>
+                <ng-container *ngIf="e['onlySpaces']">La contraseña no puede ser solo espacios.</ng-container>
+              </ion-note>
+
+              <div class="ion-text-end ion-margin-top">
+                <ion-router-link [routerLink]="['../password_reset']" class="small link-secondary">
+                  ¿Olvidaste tu contraseña?
+                </ion-router-link>
+              </div>
+
+              <ion-button expand="block" type="submit" [disabled]="formLogin.invalid || formLogin.pending"
+                class="ion-margin-top">
+                Iniciar Sesión
+              </ion-button>
+
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+  <ion-alert [isOpen]="showAlert" [header]="alertHeader" [message]="alertMessage" [buttons]="alertButtons"
+    (didDismiss)="showAlert = false">
+  </ion-alert>
+
+  <ion-loading [isOpen]="showLoading" message="Iniciando sesión..." spinner="crescent"
+    (didDismiss)="showLoading = false">
+  </ion-loading>
+
+</ion-content>

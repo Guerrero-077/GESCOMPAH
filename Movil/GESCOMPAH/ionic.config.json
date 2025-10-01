@@ -1,7 +1,0 @@
-{
-  "name": "GESCOMPAH",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular-standalone"
-}

@@ -1,0 +1,80 @@
+<!-- menu.component.html (reemplazar) -->
+<ion-menu contentId="main-content">
+  <ion-header class="menu-header">
+    <ion-toolbar>
+      <div class="menu-header-inner">
+        <div class="menu-brand">
+          <div class="menu-title">GESCOMPH</div>
+          <div class="menu-sub">Palermo | Locales</div>
+        </div>
+      </div>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+      <ion-menu-toggle auto-hide="true">
+        <ion-item button routerLink="/home" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
+          <ion-icon name="home" slot="start"></ion-icon>
+          <ion-label>Inicio</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true">
+        <ion-item button routerLink="/establishment" routerLinkActive="selected">
+          <ion-icon name="business" slot="start"></ion-icon>
+          <ion-label>Establecimientos</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <ion-menu-toggle auto-hide="true">
+        <ion-item button routerLink="/contract" routerLinkActive="selected">
+          <ion-icon name="document-text" slot="start"></ion-icon>
+          <ion-label>Contratos</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+
+      <!-- separador y footer -->
+      <div class="menu-footer-spacer"></div>
+
+      <!-- <ion-menu-toggle auto-hide="true">
+        <ion-item button >
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          <ion-label>Cerrar sesión</ion-label>
+        </ion-item>
+      </ion-menu-toggle> -->
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<!-- main content (header + outlet) -->
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+
+      <!-- toolbar layout: título/subtitulo izquierda, usuario derecha -->
+      <div class="app-toolbar">
+        <div class="brand">
+          <div class="brand-title">GESCOMPH</div>
+          <div class="brand-sub">Sistema de Gestión Comercial - GESCOMPH</div>
+        </div>
+
+        <!-- <div class="user-info" role="region" aria-label="Usuario">
+          <div class="avatar">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+          <div class="user-meta">
+            <div class="user-name">Administrador Sistema</div>
+          </div>
+        </div> -->
+      </div>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-router-outlet></ion-router-outlet>
+  </ion-content>
+</div>

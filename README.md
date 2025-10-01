@@ -1,11 +1,11 @@
-
-Aplicación web para gestionar contratos de arrendamiento y procesos administrativos. 
+Aplicación web para gestionar contratos de arrendamiento y procesos administrativos.
 El repositorio se divide en:
 
 - **Back**: API REST creada con ASP.NET Core 8.
 - **Front**: cliente generado con Angular CLI 20.
 
 ## Requisitos previos
+
 Instala las siguientes herramientas antes de comenzar:
 
 - [Git](https://git-scm.com/) para clonar el repositorio.
@@ -21,12 +21,14 @@ Instala las siguientes herramientas antes de comenzar:
 - [Docker](https://www.docker.com/) para levantar SQL Server en un contenedor.
 
 ## Clonar el proyecto
+
 ```bash
 git clone <URL_DEL_REPOSITORIO>
-cd GESCOMPAH
+cd GESCOMPH
 ```
 
 ## Base de datos SQL Server en Docker
+
 1. Crear y ejecutar un contenedor SQL Server 2022:
    ```bash
    docker run --name gescomph-sql -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=<TU_PASSWORD>' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
@@ -36,36 +38,42 @@ cd GESCOMPAH
    docker exec -it gescomph-sql /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P <TU_PASSWORD> -Q "CREATE DATABASE gescomph;"
    ```
 
-La cadena de conexión del backend se configura en `Back/WebGESCOMPAH/WebGESCOMPAH/appsettings.json`. Un ejemplo para desarrollo local sería:
+La cadena de conexión del backend se configura en `Back/WebGESCOMPH/WebGESCOMPH/appsettings.json`. Un ejemplo para desarrollo local sería:
+
 ```text
 Server=localhost,1433;Database=gescomph;User Id=sa;Password=<TU_PASSWORD>;Encrypt=False;TrustServerCertificate=True
 ```
+
 Ajusta los valores según tus credenciales y entorno.
 
 ## Backend (ASP.NET Core)
+
 1. Restaurar dependencias y aplicar migraciones desde la carpeta del backend:
    ```bash
-   cd Back/WebGESCOMPAH
+   cd Back/WebGESCOMPH
    dotnet restore
-   dotnet ef database update --project Entity --startup-project WebGESCOMPAH/WebGESCOMPAH
+   dotnet ef database update --project Entity --startup-project WebGESCOMPH/WebGESCOMPH
    ```
 2. Ejecutar la API:
    ```bash
-   dotnet run --project WebGESCOMPAH/WebGESCOMPAH
+   dotnet run --project WebGESCOMPH/WebGESCOMPH
    ```
    La API quedará disponible en `http://localhost:5000` (o en el puerto configurado).
 
 ### Crear nuevas migraciones
-Si cambias las entidades, genera una nueva migración y actualiza la base de datos desde la misma carpeta `Back/WebGESCOMPAH`:
+
+Si cambias las entidades, genera una nueva migración y actualiza la base de datos desde la misma carpeta `Back/WebGESCOMPH`:
+
 ```bash
-dotnet ef migrations add NombreMigracion --project Entity --startup-project WebGESCOMPAH/WebGESCOMPAH
-dotnet ef database update --project Entity --startup-project WebGESCOMPAH/WebGESCOMPAH
+dotnet ef migrations add NombreMigracion --project Entity --startup-project WebGESCOMPH/WebGESCOMPH
+dotnet ef database update --project Entity --startup-project WebGESCOMPH/WebGESCOMPH
 ```
 
 ## Frontend (Angular)
+
 1. Instalar dependencias:
    ```bash
-   cd Front/GESCOMPAH
+   cd Front/GESCOMPH
    npm install
    ```
 2. Iniciar el servidor de desarrollo:
@@ -77,5 +85,6 @@ dotnet ef database update --project Entity --startup-project WebGESCOMPAH/WebGES
    La aplicación estará disponible en `http://localhost:4200`.
 
 ## Notas
+
 - Verifica que el backend permita el origen `http://localhost:4200` para evitar problemas de CORS.
 - Ajusta la cadena de conexión en `appsettings.json` si tu instancia de SQL Server usa otros datos de acceso.
