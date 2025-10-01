@@ -1,3 +1,33 @@
 {
-    "docwriter.style": "XML"
+    "docwriter.style": "XML",
+    "sqltools.connections": [
+        {
+            "connectionTimeout": 15,
+            "mssqlOptions": {
+                "appName": "SQLTools",
+                "useUTC": true,
+                "encrypt": true,
+                "trustServerCertificate": true
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 1433,
+            "driver": "MSSQL",
+            "name": "localhost",
+            "username": "sa",
+            "password": "Admin123."
+        },
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5433,
+            "driver": "PostgreSQL",
+            "name": "postgres",
+            "database": "gescomph",
+            "username": "postgres",
+            "password": "Admin123."
+        }
+    ]
 }
